@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="format-detection" content="telephone=no">
+    <title>Dulce Engineering</title>
+    <meta name="author" content="Dulce Engineering Pty. Ltd.">
+    <meta name="description" content="Dulce Engineering - Software Design, Engineering, and Consulting">
+    <meta name="keywords" content="software, engineering, development, consulting, web, windows, mobile, android">
+    <base href="../../../" />
+    
+    <!-- FAVICON FILES -->
+    <link href="ico/apple-touch-icon-144-precomposed.png" rel="apple-touch-icon" sizes="144x144">
+    <link href="ico/apple-touch-icon-114-precomposed.png" rel="apple-touch-icon" sizes="114x114">
+    <link href="ico/apple-touch-icon-72-precomposed.png" rel="apple-touch-icon" sizes="72x72">
+    <link href="ico/apple-touch-icon-57-precomposed.png" rel="apple-touch-icon">
+    <link href="ico/favicon.png" rel="shortcut icon">
+    <!-- CSS FILES -->
+    <link rel="stylesheet" href="css/animate.min.css">
+    <link rel="stylesheet" href="css/hamburger-menu.css">
+    <link rel="stylesheet" href="css/odometer.min.css">
+    <link rel="stylesheet" href="css/swiper.min.css">
+    <link rel="stylesheet" href="css/fancybox.min.css">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/style.css">
+
+    <script src="component/DeHeader/index.js" type="module"></script> 
+    <script src="component/DeFooter/index.js" type="module"></script> 
+
+    <style>
+      .project-detail .project
+      {
+        padding-top: 20px;
+      }
+      .project-detail .project h2
+      {
+        font-size: 50px;
+      }
+      .project-detail .project code
+      {
+        color: #0f0;
+        background-color: #040;
+        padding: 10px;
+        border-radius: 6px;
+        display: block;
+      }
+      .project-detail .container
+      {
+        padding: 0 15px 15px 15px;
+      }
+      .project-hero img
+      {
+        opacity: 0.4;
+      }
+      tab
+      {
+        display: inline-block;
+        padding: 0 20px 0 0;
+        margin: 0;
+        font-size: 0;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="preloader"> <img src="images/preloader.gif" alt="Image">
+      <ul class="text-rotater">
+        <li>Hangin there</li>
+        <li>Still loading</li>
+        <li>Almost done</li>
+      </ul>
+    </div>
+    <div class="transition-overlay"></div>
+
+    <main>
+
+      <de-header></de-header>
+
+      <section class="project-hero">
+        <figure><img src="images-de/dedial/placeholder.svg" alt="Image">
+          <figcaption><h2>Shopify DeDial Components</h2></figcaption></figure>
+      </section>
+
+      <section class="content">
+        <div class="project-detail">
+          <div class="container">
+            <div class="project-navbar">
+              <ul class="navbar">
+                <li><a href="#dedial">DEDIAL</a></li>
+                <li><a href="#text">TEXT</a></li>
+                <li><a href="#bkimage">BACKGROUND IMAGE</a></li>
+              </ul>
+            </div>
+
+            <div class="project" id="dedial">
+              <h2>DeDial Settings</h2>
+              <p>
+                DeDial is a low level component that renders circular gauge dials with
+                distinct ticks. These can be used as part of a larger design for animated
+                effects or clock faces. Additional functionality is provided to 
+                animate forward or reverse counting.
+              </p>
+              <p>
+                This Shopify block is backed by a DeDial Web Component that can be used
+                to automate functionality via JavaScript. More details can be found
+                <a href="docs.html">here</a>.
+              </p>
+
+              <p class="lead">Auto-Start</p>
+              <p>
+                Checkbox setting that indicates whether the dial should start counting as 
+                soon as it becomes visible. If not present, counting can only be started 
+                by calling the start() method.
+              </p>
+              <code>default: on</code>
+
+              <p class="lead">Auto-Stop</p>
+              <p>
+                Checkbox setting that indicates whether the dial should stop counting when 
+                it reaches its maximum or minimum value. If not present, counting will 
+                restart at 0 or the minimum value.
+              </p>
+              <code>default: off</code>
+
+              <p class="lead">Background</p>
+              <p>
+                Colour picker setting for setting the background of the entire dial 
+                component.
+              </p>
+              <code>default: conic-gradient(#666, #ccc, #666, #ccc, #666)</code>
+
+              <p class="lead">CSS</p>
+              <p>
+                Text setting for specifying CSS attributes for the entire dial component.
+              </p>
+              <code>default: position:relative; display:inline-block; border-radius:100%;</code>
+
+              <p class="lead">Dial CSS</p>
+              <p>
+                Text setting for specifying CSS attributes for the dial ticks only.
+              </p>
+              <code>default: transform:rotate(-90deg);</code>
+
+              <p class="lead">HTML After Label</p>
+              <p>
+                Text setting for specifying HTML to display immediately after the dial label.
+              </p>
+              <code>default: empty</code>
+
+              <p class="lead">HTML Before Label</p>
+              <p>
+                Text setting for specifying HTML to display immediately before the dial label.
+              </p>
+              <code>default: empty</code>
+
+              <p class="lead">HTML Id</p>
+              <p>
+                Text setting for specifying the HTML ID of the dial.
+              </p>
+              <code>default: empty</code>
+
+              <p class="lead">Fill Colour</p>
+              <p>
+                Colour picker setting for setting the interior colour of the dial.
+              </p>
+              <code>default: transparent</code>
+
+              <p class="lead">Gap Width</p>
+              <p>
+                Number setting for specifying the relative size of the gaps between ticks.
+              </p>
+              <code>default: 2</code>
+
+              <p class="lead">Label CSS</p>
+              <p>
+                Text setting for specifying CSS attributes for the label only.
+              </p>
+              <code>default: position:absolute; border-radius:100%; left:50%; top:50%;
+                transform:translate(-50%, -50%); font-weight:bold;</code>
+
+              <p class="lead">Label Font Size</p>
+              <p>
+                Text setting for specifying the font size of the label. Any CSS value is
+                allowed. 
+              </p>
+              <code>default: 32px</code>
+
+              <p class="lead">Max. Value</p>
+              <p>
+                Number setting for specifying the total number of ticks on the dial.
+              </p>
+              <code>default: 20</code>
+
+              <p class="lead">Reverse Count</p>
+              <p>
+                Checkbox setting that indicates that the dial should count backwards (-1). 
+                If not set, the dial will count forwards (+1).
+              </p>
+              <code>default: off</code>
+
+              <p class="lead">Size</p>
+              <p>
+                Text setting to specify the width and height of the entire dial component.
+                Any CSS value is allowed. 
+              </p>
+              <code>default: 150px</code>
+
+              <p class="lead">Show Label</p>
+              <p>
+                Checkbox setting for specifying if the current value of the dial is displayed. 
+                By default, it is displayed in the center of the dial but this can be adjusted 
+                through CSS styling.
+              </p>
+              <code>default: on</code>
+
+              <p class="lead">Text Colour</p>
+              <p>
+                Colour picker setting for specifying the colour of any text in the dial.
+              </p>
+              <code>default: #000</code>
+
+              <p class="lead">Tick Colour</p>
+              <p>
+                Colour picker setting for specifying the colour of ticks on the dial.
+              </p>
+              <code>default: #f00</code>
+
+              <p class="lead">Tick Size</p>
+              <p>
+                Text setting used to set the length of the dial ticks from the center to
+                the edge of the dial. Since ticks are centered around the dial 
+                circumference, it's possible that very long ticks will render outside the 
+                visible area. In these cases you can increase the rendering area with the 
+                Viewbox setting.
+              </p>
+              <code>default: 20px</code>
+
+              <p class="lead">Tick Width</p>
+              <p>
+                Number setting that indicates the relative width of each tick. This 
+                width is relative to the gap width. For example, if both the gap width and 
+                the tick width are set to 1, then the dial will be divided into gaps and 
+                ticks of equal length. If the tick width is 4 and the gap width is 1, then 
+                the dial will be divided into ticks that are 4 times wider than the gaps.
+              </p>
+              <code>default: 1</code>
+
+              <p class="lead">Value</p>
+              <p>
+                Number setting that determines the number of ticks that should currently 
+                be displayed. Values greater than the maximum value will revert to 0 whilst 
+                values less than 0 will revert to the maximum value.
+              </p>
+              <code>default: 10</code>
+
+              <p class="lead">Viewbox Radius</p>
+              <p>
+                Number setting that determines the size of the SVG rendering area. If large 
+                ticks render off the edges of the dial component, this number can be 
+                increased to bring rendering back within the bounds of the dial component.
+              </p>
+              <code>default: 108</code>
+
+              <p class="lead">Wait Milliseconds</p>
+              <p>
+                Number setting that determines the amount of time, in milliseconds, that 
+                the dial should wait before incrementing to the next value.
+              </p>
+              <code>default: 100</code>
+
+            </div>
+
+            <div class="project" id="text">
+              <h2>Text Settings</h2>
+              <p>
+                This simple Shopify block can be used to display text around the DeDial 
+                component.
+              </p>
+
+              <p class="lead">Text</p>
+              <p>
+                Rich-text setting for specifying the text to be displayed.
+              </p>
+              <code>default: Some Text!</code>
+
+              <p class="lead">CSS</p>
+              <p>
+                Text setting for specifying any CSS styling to be applied to the text.
+              </p>
+              <code>default: empty</code>
+            </div>
+
+            <div class="project" id="bkimage">
+              <h2>Background Image Settings</h2>
+              <p>
+                This simple Shopify block can be used to add a single background image
+                onto which several dials and text can be rendered.
+              </p>
+
+              <p class="lead">Image</p>
+              <p>
+                Image picker setting for specifying the image to be displayed.
+              </p>
+              <code>default: empty</code>
+
+              <p class="lead">Height</p>
+              <p>
+                Text setting for specifying the height image to be displayed.
+              </p>
+              <code>default: 50vh</code>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <de-footer></de-footer>
+
+    <script src="js/jquery.min.js"></script> 
+    <script src="js/bootstrap.min.js"></script> 
+    <script src="js/swiper.min.js"></script> 
+    <script src="js/fancybox.min.js"></script> 
+    <script src="js/jquery.stellar.js"></script> 
+    <script src="js/odometer.min.js"></script> 
+    <script src="js/easings.js"></script> 
+    <script src="js/isotope.min.js"></script> 
+    <script src="js/wow.min.js"></script> 
+    <script src="js/perspective.min.js"></script> 
+    <script src="js/scripts.js"></script> 
+  </body>
+
+</html>
