@@ -1,0 +1,54 @@
+<html>
+  <head>
+
+    <link rel="stylesheet" href="dedial.css">
+    <style>
+      body
+      {
+        background-color: #888;
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin: 0;
+        gap: 16px;
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+
+    <script src="dedial.js" type="module"></script>
+  </head>
+
+  <body>
+    <de-timer auto-start show-labels
+      date-year="2024"
+      date-month="12"
+      date-day="25"
+    ></de-timer>
+    <de-timer auto-start show-labels 
+      label-sec="segundos"
+      label-min="minutos"
+      label-hr="horas"
+      label-day="dias"
+    ></de-timer>
+    <de-timer
+      date-year="2024"
+      date-month="1"
+      date-day="1"
+      date-hour="0"
+      date-minute="0"
+      date-second="0"
+      auto-start
+    ></de-timer>
+    <de-timer
+      date-year="1971"
+      date-month="11"
+      date-day="13"
+      date-hour="0"
+      date-minute="0"
+      date-second="0"
+      auto-start
+    ></de-timer>
+  </body>
+</html>
