@@ -686,9 +686,215 @@ class DeTimer extends HTMLElement
   }
 }
 
+class DeTimerCompact extends HTMLElement
+{
+  static tname = "de-timer-compact";
+
+  constructor()
+  {
+    super();
+    Utils.Bind(this, "On_");
+  }
+
+  connectedCallback()
+  {
+    this.Render();
+  }
+  
+  Get_Date()
+  {
+    const now_date = new Date();
+    let def_year = now_date.getFullYear();
+    const def_date = new Date(def_year, 10, 13, 0, 0, 0);
+    if (def_date.getTime() <= now_date.getTime())
+    {
+      def_year++;
+    }
+
+    const yr = Utils.Get_Attribute_Int(this, "date-year", def_year);
+    const mth = Utils.Get_Attribute_Int(this, "date-month", 11);
+    const day = Utils.Get_Attribute_Int(this, "date-day", 13);
+    const hr = Utils.Get_Attribute_Int(this, "date-hour", 0);
+    const min = Utils.Get_Attribute_Int(this, "date-minute", 0);
+    const sec = Utils.Get_Attribute_Int(this, "date-second", 0);
+    const date = new Date(yr, mth-1, day, hr, min, sec);
+
+    return date;
+  }
+
+  Check_Completed(value, elem)
+  {
+    if (value == 0 && !elem.is_completed)
+    {
+      this.On_Dial_Completed(elem);
+      elem.is_completed = true;
+    }
+    else if (value != 0)
+    {
+      elem.is_completed = false;
+    }
+  }
+
+  Split_Timespan(millis)
+  {
+    const res = {};
+    
+    res.hrs = Math.floor(millis / Utils.MILLIS_HOUR);
+    millis = millis % Utils.MILLIS_HOUR;
+      
+    res.mins = Math.floor(millis / Utils.MILLIS_MINUTE);
+    millis = millis % Utils.MILLIS_MINUTE;
+      
+    res.secs = Math.floor(millis / Utils.MILLIS_SECOND);
+    millis = millis % Utils.MILLIS_SECOND;
+
+    return res;
+  }
+
+  // attributes =========================================================================
+
+  // auto-start
+  // auto-stop
+  // label-sec
+  // label-min
+  // label-hr
+  // label-day
+  // show-labels
+  // stop-href
+
+  // style-host
+  // style-label
+  // style-svg
+  // value
+
+  // properties =========================================================================
+
+  // value
+  // labelText
+
+  // methods ============================================================================
+
+  start()
+  {
+    this.interval_id = setInterval(this.On_Interval, 1000);
+  }
+
+  stop()
+  {
+    if (this.interval_id)
+    {
+      clearInterval(this.interval_id);
+      this.interval_id = null;
+    }
+  }
+
+  toggle()
+  {
+    if (this.interval_id)
+    {
+      this.stop();
+    }
+    else
+    {
+      this.start();
+    }
+  }
+
+  // events =============================================================================
+
+  On_Dial_Completed(elem)
+  {
+    elem.addEventListener("animationend", this.On_Animation_End);
+    elem.classList.add("completed");
+  }
+
+  On_Animation_End(event)
+  {
+    event.target.classList.remove("completed");
+    event.target.removeEventListener("animationend", this.On_Animation_End);
+  }
+
+  On_Interval()
+  {
+    const now = Date.now();
+    const target_date = this.Get_Date();
+    const timespan_millis = Math.abs(target_date.getTime() - now);
+    const timespan = this.Split_Timespan(timespan_millis);
+
+    this.Update_Timer(timespan);
+
+    this.dispatchEvent(new Event("tick"));
+
+    const auto_stop = this.hasAttribute("auto-stop");
+    const is_terminal_value = now >= target_date.getTime();
+    if (auto_stop && is_terminal_value)
+    {
+      this.stop();
+      this.dispatchEvent(new Event("completed"));
+
+      if (this.hasAttribute("stop-href"))
+      {
+        const stop_href = this.getAttribute("stop-href");
+        window.location.href = stop_href;
+      }
+    }
+  }
+
+  // rendering ==========================================================================
+
+  Update_Timer(timespan)
+  {
+    this.hours_elem.value = timespan.hrs;
+    this.minutes_elem.value = timespan.mins;
+    this.seconds_elem.value = timespan.secs;
+
+    this.Check_Completed(timespan.secs, this);
+  }
+
+  Render()
+  {
+    let 
+      label_postfix_sec = "", 
+      label_postfix_min = "", 
+      label_postfix_hr = "";
+    const label_sec = this.hasAttribute("label-sec") ? this.getAttribute("label-sec") : "seconds";
+    const label_min = this.hasAttribute("label-min") ? this.getAttribute("label-min") : "minutes";
+    const label_hr = this.hasAttribute("label-hr") ? this.getAttribute("label-hr") : "hours";
+
+    if (this.hasAttribute("show-labels"))
+    {
+      label_postfix_sec = "label-postfix=\"<br><span class='text-label'>" + label_sec + "</span>\"";
+      label_postfix_min = "label-postfix=\"<br><span class='text-label'>" + label_min + "</span>\"";
+      label_postfix_hr = "label-postfix=\"<br><span class='text-label'>" + label_hr + "</span>\"";
+    }
+
+    const html = `
+      <de-dial cid="hours_elem" max-value="23" show-label show-shadow has-overflow
+        ${label_postfix_hr}
+        class="ticks"></de-dial>
+      <de-dial cid="minutes_elem" max-value="59" show-label show-shadow
+        ${label_postfix_min}
+        class="ticks"></de-dial>
+      <de-dial cid="seconds_elem" max-value="59" show-label show-shadow
+        ${label_postfix_sec}
+        class="ticks"></de-dial>
+      <de-dial class="anim-border hours" max-value="80" value="80" gap-width="2"></de-dial>
+    `;
+    this.innerHTML = html;
+    Utils.Set_Id_Shortcuts(this, this, "cid");
+
+    const auto_start = this.hasAttribute("auto-start");
+    if (auto_start)
+    {
+      this.start();
+    }
+  }
+}
+
 Utils.Register_Element(DeDial);
 Utils.Register_Element(DeActionBtn);
 Utils.Register_Element(DeTimer);
+Utils.Register_Element(DeTimerCompact);
 
 export default 
 {

@@ -1,0 +1,449 @@
+<!doctype html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="format-detection" content="telephone=no">
+    <title>Dulce Engineering</title>
+    <meta name="author" content="Dulce Engineering Pty. Ltd.">
+    <meta name="description" 
+      content="Dulce Engineering - Software Design, Engineering, and Consulting">
+    <meta name="keywords" 
+      content="software, engineering, development, consulting, web, windows, mobile, android">
+    
+    <!-- FAVICON FILES -->
+    <link href="ico/apple-touch-icon-144-precomposed.png" rel="apple-touch-icon" sizes="144x144">
+    <link href="ico/apple-touch-icon-114-precomposed.png" rel="apple-touch-icon" sizes="114x114">
+    <link href="ico/apple-touch-icon-72-precomposed.png" rel="apple-touch-icon" sizes="72x72">
+    <link href="ico/apple-touch-icon-57-precomposed.png" rel="apple-touch-icon">
+    <link href="ico/favicon.png" rel="shortcut icon">
+    <!-- CSS FILES -->
+    <link rel="stylesheet" href="css/animate.min.css">
+    <link rel="stylesheet" href="css/hamburger-menu.css">
+    <link rel="stylesheet" href="css/odometer.min.css">
+    <link rel="stylesheet" href="css/swiper.min.css">
+    <link rel="stylesheet" href="css/fancybox.min.css">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/style.css">
+
+    <script src="component/DeHeader/index.js" type="module"></script> 
+    <script src="component/DeFooter/index.js" type="module"></script> 
+    <script src="dedial/dedial.js" type="module"></script> 
+
+    <style>
+      .project-detail .project
+      {
+        padding-top: 20px;
+      }
+      .project-detail .project h2
+      {
+        font-size: 50px;
+      }
+      .project-detail .project code
+      {
+        color: #0f0;
+        background-color: #040;
+        padding: 10px;
+        border-radius: 6px;
+        display: block;
+      }
+      .project-detail .container
+      {
+        padding: 0 15px 15px 15px;
+      }
+      .project-hero figure figcaption
+      {
+        position: relative;
+        padding: 170px 0px 30px 0px;
+      }
+      tab
+      {
+        display: inline-block;
+        padding: 0 20px 0 0;
+        margin: 0;
+        font-size: 0;
+      }
+
+      .project-detail .project figure
+      {
+        display: inline-block;
+        position: relative;
+        margin: 10px 0 0 0;
+      }
+      li
+      {
+        list-style-type: decimal;
+        font-size: 22px;
+        margin: 30px 0;
+      }
+      li img
+      {
+        width: 800px;
+        border: 10px solid #ddd;
+      }
+      .content de-dial
+      {
+        display: inline-block;
+        width: 80px;
+        height: 80px;
+        fill: none;
+        stroke-width: 80px;
+        position: absolute;
+
+        animation: spin;
+        animation-duration: 4s;
+        animation-iteration-count: infinite;
+        animation-timing-function: linear;
+      }
+
+      #dh1
+      {
+        left: 20%;
+        top: 50%;
+        stroke: #f008;
+        width: 30vw;
+        height: 30vw;
+        animation: spin;
+        animation-duration: 4s;
+        animation-iteration-count: infinite;
+        stroke-width: 80px;
+        fill: none;
+        position: absolute;
+      }
+      #dh2
+      {
+        left: 20%;
+        top: 50%;
+        stroke: #0f08;
+        width: 30vw;
+        height: 30vw;
+        animation: spin;
+        animation-duration: 3s;
+        animation-delay: 0.3s;
+        animation-iteration-count: infinite;
+        stroke-width: 40px;
+        fill: none;
+        position: absolute;
+      }
+      #dh3
+      {
+        left: 20%;
+        top: 50%;
+        stroke: #00f;
+        width: 30vw;
+        height: 30vw;
+        animation: spin;
+        animation-duration: 2s;
+        animation-delay: 0.6s;
+        animation-iteration-count: infinite;
+        stroke-width: 10px;
+        fill: none;
+        position: absolute;
+      }
+      #dh5
+      {
+        left: 60%;
+        top: 5%;
+        stroke: #ff08;
+        width: 30vw;
+        height: 30vw;
+        stroke-width: 30px;
+        fill: none;
+        position: absolute;
+        transform: rotate(10deg);
+      }
+      #dh5 span
+      {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        left: 0;
+        top: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 90px;
+        font-family: monospace;
+        color: #ff08;
+      }
+      
+      /* 780 x 480 */
+      #d1
+      {
+        left: 8%;
+        top: 60%;
+        stroke: #f008;
+      }
+      #d2
+      {
+        left: 90%;
+        top: 88%;
+        stroke: #0a08;
+      }
+      /* 780 x 236 */
+      #d3
+      {
+        left: 55%;
+        top: 10%;
+        stroke: #00f8;
+      }
+      /* 780 x 533 */
+      #d4
+      {
+        left: 15%;
+        top: 47%;
+        stroke: #8808;
+      }
+      #d5
+      {
+        left: 50%;
+        top: 58%;
+        stroke: #f0f8;
+      }
+      /* 780 x 517 */
+      #d6
+      {
+        left: 20%;
+        top: 38%;
+        width: 150px;
+        height: 150px;
+        stroke: #0aa8;
+      }
+      #d7
+      {
+        left: 95%;
+        top: 5%;
+        stroke: #f008;
+      }
+
+      @keyframes spin
+      {
+        from 
+        {
+          transform: translate(-50%, -50%) rotate(0) scale(0.5);
+        }
+        50%
+        {
+          transform: translate(-50%, -50%) rotate(180deg) scale(1);
+        }
+        to 
+        {
+          transform: translate(-50%, -50%) rotate(360deg) scale(0.5);
+        }
+      }
+
+      de-timer
+      {
+        display: inline-flex;
+        gap: 2vw;
+        font-family: Arial, Helvetica, sans-serif;
+        text-align: center;
+        stroke-width: 10px;
+        stroke: #f0f;
+        color: #f0fc;
+        fill: none;
+        position: absolute;
+        left: 25%;
+        top: 36%;
+        transform: rotate(-30deg);
+      }
+      de-timer .counter
+      {
+        display: inline-block;
+        position: relative;
+        width: 10vw;
+        height: 10vw;
+      }
+      de-timer .counter.completed
+      {
+        animation: dedial-spin-y 1s linear;
+      }
+      de-timer .anim-border
+      {
+        display: inline-block;
+        position: absolute;
+        xtop: -5px;
+        xleft: -5px;
+        top: -1vw;
+        left: -1vw;
+        xwidth: calc(10vw + 10px);
+        xheight: calc(10vw + 10px);
+        width: 12vw;
+        height: 12vw;
+        stroke-width: 3px;
+      }
+      de-timer .anim-border.days
+      {
+        animation: dedial-spin 100s infinite linear;
+      }
+      de-timer .anim-border.hours
+      {
+        animation: dedial-spin 70s infinite linear;
+      }
+      de-timer .anim-border.minutes
+      {
+        animation: dedial-spin 30s infinite linear;
+      }
+      de-timer .anim-border.seconds
+      {
+        animation: dedial-spin 10s infinite linear;
+      }
+      de-timer .dial
+      {
+        transform: rotate(-90deg);
+      }
+      de-timer .ticks
+      {
+        display: inline-block;
+        width: 100%;
+        height: 100%;
+      }
+      de-timer .ticks .label
+      {
+        display: flex;
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        font-size: 16px;
+        flex-direction: column;
+        justify-content: center;
+      }
+      de-timer .ticks .label .text-label
+      {
+        xfont-size: 14px;
+      }
+      de-timer .shadow
+      {
+        stroke: #f0f4;
+      }
+
+      @keyframes dedial-spin
+      {
+        from
+        {
+          transform: rotate(0deg);
+        }
+        to
+        {
+          transform: rotate(-360deg);
+        }
+      }
+
+      @keyframes dedial-spin-y
+      {
+        from
+        {
+          transform: rotateY(0deg);
+        }
+        to
+        {
+          transform: rotateY(360deg);
+        }
+      }
+
+    </style>
+  </head>
+
+  <body>
+    <div class="preloader"> <img src="images/preloader.gif" alt="Image">
+      <ul class="text-rotater">
+        <li>Hangin there</li>
+        <li>Still loading</li>
+        <li>Almost done</li>
+      </ul>
+    </div>
+    <div class="transition-overlay"></div>
+
+    <main>
+      <de-header></de-header>
+
+      <section class="project-hero">
+        <figure>
+          <de-dial id="dh1" max-value="10" value="10" gap-width="4" viewbox-radius="140"></de-dial>
+          <de-dial id="dh2" max-value="15" value="15" gap-width="4" viewbox-radius="140"></de-dial>
+          <de-dial id="dh3" max-value="20" value="20" gap-width="4" viewbox-radius="140"></de-dial>
+          <de-dial id="dh5" max-value="100" value="0" viewbox-radius="120" auto-start show-label wait-millis="50"></de-dial>
+          <de-timer id="dh4" date-year="2024" date-month="11" date-day="13" auto-start show-labels></de-timer>
+          <figcaption><h2>Welcome to Shopify DeDial Components</h2></figcaption>
+        </figure>
+      </section>
+
+      <section class="content">
+        <div class="project-detail">
+          <div class="container">
+            <div class="project-navbar">
+              <ul class="navbar">
+                <li><a href="dedial/docs-sp.html">Shopify Reference</a></li>
+                <li><a href="dedial/docs.html">HTML Reference</a></li>
+              </ul>
+            </div>
+
+            <div class="project" id="dedial">
+
+              <p>
+                DeDial is a set of section blocks that can be used to customise and style compatible
+                store themes. They are intended for use by designers, developers, or store managers
+                and are based around the core DeDial component that renders a circular dial.
+              </p>
+              <p>
+                To start adding DeDial components, just go directly to the theme editor and add
+                the required blocks to the appropriate pages.
+              </p>
+              <ol>
+                <li>
+                  <span>Go to your theme editor and click "Customize"</span>
+                  <figure>
+                    <img src="images-de/dedial/s1.png">
+                    <de-dial id="d1" max-value="10" value="10" gap-width="4" viewbox-radius="140"></de-dial>
+                    <de-dial id="d2" max-value="10" value="10" gap-width="4" viewbox-radius="140"></de-dial>
+                  </figure>
+                </li>
+                <li>
+                  Select the page you wish to add DeDial blocks to
+                  <figure>
+                    <img src="images-de/dedial/s2.png">
+                    <de-dial id="d3" max-value="10" value="10" gap-width="4" viewbox-radius="140"></de-dial>
+                  </figure>
+                </li>
+                <li>
+                  Add a section with the appropriate DeDial blocks
+                  <figure>
+                    <img id="s1_img" src="images-de/dedial/s3.png">
+                    <de-dial id="d4" max-value="10" value="10" gap-width="4" viewbox-radius="140"></de-dial>
+                    <de-dial id="d5" max-value="10" value="10" gap-width="4" viewbox-radius="140"></de-dial>
+                  </figure>
+                </li>
+                <li>
+                  Customise as required and click "Save"
+                  <figure>
+                    <img id="s1_img" src="images-de/dedial/s4-s5.png">
+                    <de-dial id="d6" max-value="10" value="10" gap-width="4" viewbox-radius="140"></de-dial>
+                    <de-dial id="d7" max-value="10" value="10" gap-width="4" viewbox-radius="140"></de-dial>
+                  </figure>
+                </li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <de-footer></de-footer>
+
+    <script src="js/jquery.min.js"></script> 
+    <script src="js/bootstrap.min.js"></script> 
+    <script src="js/swiper.min.js"></script> 
+    <script src="js/fancybox.min.js"></script> 
+    <script src="js/jquery.stellar.js"></script> 
+    <script src="js/odometer.min.js"></script> 
+    <script src="js/easings.js"></script> 
+    <script src="js/isotope.min.js"></script> 
+    <script src="js/wow.min.js"></script> 
+    <script src="js/perspective.min.js"></script> 
+    <script src="js/scripts.js"></script> 
+  </body>
+
+</html>
