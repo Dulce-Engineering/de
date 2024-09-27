@@ -28,6 +28,7 @@
 
     <script src="component/DeHeader/index.js" type="module"></script> 
     <script src="component/DeFooter/index.js" type="module"></script> 
+    <script src="dedial/dedial.js" type="module"></script> 
 
     <style>
       .project-detail .project
@@ -36,7 +37,7 @@
       }
       .project-detail .project h2
       {
-        font-size: 50px;
+        font-size: 2em;
       }
       .project-detail .project code
       {
@@ -60,6 +61,10 @@
         padding: 0 20px 0 0;
         margin: 0;
         font-size: 0;
+      }
+      de-dial
+      {
+        margin: 0 0 0 30px;
       }
     </style>
   </head>
@@ -88,14 +93,71 @@
           <div class="container">
             <div class="project-navbar">
               <ul class="navbar">
-                <li><a href="#dedial">DEDIAL</a></li>
-                <li><a href="#text">TEXT</a></li>
-                <li><a href="#bkimage">BACKGROUND IMAGE</a></li>
+                <li><a href="dedial/docs-sp.html#bkimage">BACKGROUND IMAGE</a></li>
+                <li><a href="dedial/docs-sp.html#clock">  CLOCK DIAL</a></li>
+                <li><a href="dedial/docs-sp.html#dedial"> FULL DIAL</a></li>
+                <li><a href="dedial/docs-sp.html#hours">  HOURS DIAL</a></li>
+                <li><a href="dedial/docs-sp.html#large">  LARGE DIAL</a></li>
+                <li><a href="dedial/docs-sp.html#minsecs">MINUTES/SECONDS DIAL</a></li>
+                <li><a href="dedial/docs-sp.html#target"> TARGET</a></li>
+                <li><a href="dedial/docs-sp.html#text">   TEXT</a></li>
               </ul>
             </div>
 
+            <!-- Background Image -->
+            <div class="project" id="bkimage">
+              <h2>Background Image Settings</h2>
+              <p>
+                This simple Shopify block can be used to add a single background image
+                onto which several dials and text can be rendered.
+              </p>
+
+              <p class="lead">Image</p>
+              <p>
+                Image picker setting for specifying the image to be displayed.
+              </p>
+              <code>default: empty</code>
+
+              <p class="lead">Height</p>
+              <p>
+                Text setting for specifying the height image to be displayed.
+              </p>
+              <code>default: 50vh</code>
+            </div>
+
+            <!-- Clock Dial -->
+            <div class="project" id="clock">
+              <h2>Clock Dial Settings</h2>
+              <p>
+                This block can be used to render clock-style dial markings that include 12 hour
+                marks and sixty minute and second marks. It consists of two overlapped dial 
+                components with preset values and a limited number properties available for
+                customisation. Please refer to the <a href="dedial/docs-sp.html#dedial">full dial 
+                documentation</a> for more details.
+              </p>
+              <div style="position:relative;">
+                <de-dial 
+                  value="12"
+                  max-value="12"
+                  tick-width="1"
+                  gap-width="10"
+                  style-svg="display:inline-block;border-radius:100%;"
+                  style="fill:none;stroke:#000;stroke-width:15px;width:150px;height:150px;transform:rotate(-91deg);display:inline-block;border-radius:100%;"
+                ></de-dial>
+                <de-dial 
+                  value="60"
+                  max-value="60"
+                  tick-width="1"
+                  gap-width="10"
+                  style-svg="display:inline-block;border-radius:100%;"
+                  style="fill:none;stroke:#000;stroke-width:10px;width:150px;height:150px;transform:rotate(-90deg);position:absolute;left:0;top:0;display:inline-block;border-radius:100%;"
+                ></de-dial>
+              </div>
+            </div>
+
+            <!-- Full Dial -->
             <div class="project" id="dedial">
-              <h2>DeDial Settings</h2>
+              <h2>Full Dial Settings</h2>
               <p>
                 DeDial is a low level component that renders circular gauge dials with
                 distinct ticks. These can be used as part of a larger design for animated
@@ -272,6 +334,92 @@
 
             </div>
 
+            <!-- Hour Dial -->
+            <div class="project" id="hours">
+              <h2>Hour Dial Settings</h2>
+              <p>
+                This block can be used to render clock-style hour markings that include 12 hour
+                marks. It consists of a single dial component with preset values and a limited number of
+                properties available for customisation. Please refer to the 
+                <a href="dedial/docs-sp.html#dedial">full dial documentation</a> for more details.
+              </p>
+              <de-dial 
+                value="12"
+                max-value="12"
+                tick-width="1"
+                gap-width="10"
+                style-svg="display:inline-block;border-radius:100%;"
+                style="fill:none;stroke:#000;stroke-width:15px;width:150px;height:150px;transform:rotate(-91deg);display:inline-block;border-radius:100%;"
+              ></de-dial>
+            </div>
+
+            <!-- Large Dial -->
+            <div class="project" id="large">
+              <h2>Large Dial Settings</h2>
+              <p>
+                This block can be used to render dials with very wide markings. These can be
+                useful when compositing animation effects. 
+                It consists of a single dial component with preset values and a limited number of
+                properties available for customisation. Please refer to the 
+                <a href="dedial/docs-sp.html#dedial">full dial documentation</a> for more details.
+              </p>
+              <de-dial 
+                value="50"
+                max-value="50"
+                tick-width="2"
+                gap-width="10"
+                viewbox-radius="140"
+                style="
+                  fill:none;
+                  stroke:#00f;
+                  stroke-width:100px;
+                  width:150px;
+                  height:150px;
+                  display:inline-block;border-radius:100%;
+                "
+              ></de-dial>            
+            </div>
+
+            <!-- Min/Sec Dial -->
+            <div class="project" id="minsecs">
+              <h2>Minutes/Seconds Dial Settings</h2>
+              <p>
+                This block can be used to render dials with very long markings. These can be
+                useful when compositing animation effects. 
+                It consists of a single dial component with preset values and a limited number of
+                properties available for customisation. Please refer to the 
+                <a href="dedial/docs-sp.html#dedial">full dial documentation</a> for more details.
+              </p>
+              <de-dial 
+                value="60"
+                max-value="60"
+                tick-width="1"
+                gap-width="10"
+                style-svg="display:inline-block;border-radius:100%;"
+                style="fill:none;stroke:#000;stroke-width:10px;width:150px;height:150px;transform:rotate(-90deg);display:inline-block;border-radius:100%;"
+              ></de-dial>
+            </div>
+
+            <!-- Target -->
+            <div class="project" id="target">
+              <h2>Target Settings</h2>
+              <p>
+                This block can be used to render a target sight. These can be
+                useful when compositing animation effects. 
+                It consists of a single dial component with preset values and a limited number of
+                properties available for customisation. Please refer to the 
+                <a href="dedial/docs-sp.html#dedial">full dial documentation</a> for more details.
+              </p>
+              <de-dial 
+                value="4"
+                gap-width="10"
+                max-value="4"
+                tick-width="1"
+                style="fill:none;stroke:#f00;stroke-width:20px;width:150px;height:150px;transform:rotate(-94deg);display:inline-block;border-radius:100%;"
+              ></de-dial>
+            </div>
+
+            <!-- Text -->
             <div class="project" id="text">
               <h2>Text Settings</h2>
               <p>
@@ -290,26 +438,6 @@
                 Text setting for specifying any CSS styling to be applied to the text.
               </p>
               <code>default: empty</code>
-            </div>
-
-            <div class="project" id="bkimage">
-              <h2>Background Image Settings</h2>
-              <p>
-                This simple Shopify block can be used to add a single background image
-                onto which several dials and text can be rendered.
-              </p>
-
-              <p class="lead">Image</p>
-              <p>
-                Image picker setting for specifying the image to be displayed.
-              </p>
-              <code>default: empty</code>
-
-              <p class="lead">Height</p>
-              <p>
-                Text setting for specifying the height image to be displayed.
-              </p>
-              <code>default: 50vh</code>
             </div>
 
           </div>

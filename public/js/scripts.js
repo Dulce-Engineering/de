@@ -105,8 +105,8 @@ function On_Ready()
   });
   
   // FOOTER HEIGHT CALCULATION	
-  const height = $('.footer').innerHeight()+50;
-  $('.footer-spacing').css({'height': height});
+  //const height = $('.footer').innerHeight()+50;
+  //$('.footer-spacing').css({'height': height});
   
   // DATA BACKGROUND IMAGE
   var pageSection = $(".bg-image");
