@@ -139,6 +139,264 @@ class Utils
   }
 }
 
+class DeActionBtn extends HTMLElement
+{
+  static tname = "de-action-btn";
+
+  constructor()
+  {
+    super();
+    Utils.Bind(this, "On_");
+  }
+
+  connectedCallback()
+  {
+    this.addEventListener("click", this.On_Click);
+  }
+
+  On_Click()
+  {
+    const for_id = this.getAttribute("for");
+    const for_action = this.getAttribute("for-action");
+    if (for_id)
+    {
+      const elem = document.getElementById(for_id);
+      if (elem)
+      {
+        elem[for_action]();
+      }
+    }
+  }
+}
+
+class DeDialMarks extends HTMLElement
+{
+  static tname = "de-dialmarks";
+  static DEF_MAX = 10;
+  static DEF_TICK_WIDTH = 1;
+  static DEF_GAP_WIDTH = 1;
+  static DEF_CIRCLE_RADIUS = 90;
+  static DEF_VIEW_RADIUS = 100;
+
+  connectedCallback()
+  {
+    this.Render();
+  }
+
+  set value(new_value)
+  {
+    this.setAttribute("value", new_value);
+    if (this.isConnected)
+    {
+      this.Update();
+    }
+  }
+
+  get value()
+  {
+    return Utils.Get_Attribute_Int(this, "value", DeDialMarks.DEF_MAX);
+  }
+
+  Calc_Path_Length()
+  {
+    const value = Utils.Get_Attribute_Int(this, "value", DeDialMarks.DEF_MAX);
+    const tick_width = Utils.Get_Attribute_Int(this, "tick-width", DeDialMarks.DEF_TICK_WIDTH);
+    const gap_width = Utils.Get_Attribute_Int(this, "gap-width", DeDialMarks.DEF_GAP_WIDTH);
+    const path_length = value * (tick_width + gap_width);
+    return path_length;
+  }
+
+  Set_Style(elem, attr_name)
+  {
+    if (this.hasAttribute(attr_name))
+    {
+      const css = this.getAttribute(attr_name);
+      elem.style = css;
+    }
+  }
+
+  Update()
+  {
+    let stroke_dasharray = null;
+    let value = Utils.Get_Attribute_Int(this, "value", DeDialMarks.DEF_MAX);
+
+    if (value == 0)
+    {
+      stroke_dasharray = "0 1";
+    }
+    else if (value == 1)
+    {
+      stroke_dasharray = "1 0";
+    }
+    else
+    {
+      const tick_width = Utils.Get_Attribute_Int(this, "tick-width", DeDialMarks.DEF_TICK_WIDTH);
+      const gap_width = Utils.Get_Attribute_Int(this, "gap-width", DeDialMarks.DEF_GAP_WIDTH);
+      stroke_dasharray = "" + tick_width + " " + gap_width;
+    }
+
+    if (stroke_dasharray)
+    {
+      this.circle_elem.setAttribute("stroke-dasharray", stroke_dasharray);
+    }
+  }
+
+  Render()
+  {
+    const path_length = this.Calc_Path_Length();
+
+    const viewbox_radius = Utils.Get_Attribute_Int(this, "viewbox-radius", DeDial.DEF_VIEW_RADIUS);
+    const viewbox_diameter = Math.abs(viewbox_radius) * 2;
+    const view_box = 
+      "-" + viewbox_radius + " -" + viewbox_radius + 
+      " " + viewbox_diameter + " " + viewbox_diameter;
+    const circle_radius = Utils.Get_Attribute_Int(this, "circle-radius", DeDial.DEF_CIRCLE_RADIUS);
+
+    const html = `
+      <svg cid="svg_elem" viewBox="${view_box}" class="dial">
+        <circle 
+          cid="circle_elem"
+          cx="0" cy="0" r="${circle_radius}" 
+          pathLength="${path_length}"
+          stroke-dasharray="0 ${path_length}" 
+        />
+      </svg>
+    `;
+    this.innerHTML = html;
+    Utils.Set_Id_Shortcuts(this, this, "cid");
+
+    this.Set_Style(this.svg_elem, "style-svg");
+
+    this.Update();
+  }
+}
+
+class DeClockDial extends HTMLElement
+{
+  static tname = "de-clock-dial";
+
+  connectedCallback()
+  {
+    this.innerHTML = `
+      <de-dialmarks value="12" tick-width="1" gap-width="10" class="hours"></de-dialmarks>
+      <de-dialmarks value="60" tick-width="1" gap-width="10" class="minutes"></de-dialmarks>
+    `;
+  }
+}
+
+class DeClock extends HTMLElement
+{
+  static tname = "de-clock";
+
+  interval_id = null;
+
+  constructor()
+  {
+    super();
+    Utils.Bind(this, "On_");
+  }
+
+  connectedCallback()
+  {
+    this.Render();
+  }
+
+  start()
+  {
+    if (!this.hasAttribute("time-str"))
+    {
+      this.interval_id = setInterval(this.On_Update, Utils.MILLIS_SECOND);
+    }
+  }
+
+  stop()
+  {
+    if (this.interval_id)
+    {
+      clearInterval(this.interval_id);
+      this.interval_id = null;
+    }
+  }
+
+  toggle()
+  {
+    if (this.interval_id)
+    {
+      this.stop();
+    }
+    else
+    {
+      this.start();
+    }
+  }
+
+  On_Update()
+  {
+    let now = new Date();
+    if (this.hasAttribute("time-str"))
+    {
+      now = new Date(this.getAttribute("time-str"));
+    }
+
+    let hr = now.getHours() % 12;
+    let min = now.getMinutes();
+    let sec = now.getSeconds();
+    if (this.hasAttribute("time-zone"))
+    {
+      const timeZone = this.getAttribute("time-zone");
+      hr = parseInt(now.toLocaleString("en-AU", {timeZone, hour12: false, hour: "numeric"}));
+      min = parseInt(now.toLocaleString("en-AU", {timeZone, minute: "numeric"}));
+      sec = parseInt(now.toLocaleString("en-AU", {timeZone, second: "numeric"}));
+    }
+
+    this.hr_elem.style = `transform: rotate(${hr*30-180}deg)`;
+    this.min_elem.style = `transform: rotate(${min*6-180}deg)`;
+    this.sec_elem.style = `transform: rotate(${sec*6-180}deg)`;
+
+  }
+
+  Render()
+  {
+    const html = `
+      <de-clock-dial></de-clock-dial>
+      <svg viewBox="-100 -100 200 200" width="100%" height="100%" class="hands">
+        <path cid="hr_elem"  class="hand-hr"  d="M 0,50 L 8,0 0,-10 -8,0 z" />
+        <path cid="min_elem" class="hand-min" d="M 0,80 L 5,0 0,-10 -5,0 z" />
+        <path cid="sec_elem" class="hand-sec" d="M 0,80 L 0,-10 z" />
+
+        <text x=  "0" y="-77" text-anchor="middle" dominant-baseline="hanging">12</text>
+
+        <text x= "45" y="-67" text-anchor="end"    dominant-baseline="hanging">1</text>
+        <text x= "67" y="-42" text-anchor="end"    dominant-baseline="hanging">2</text>
+
+        <text x= "78" y=  "0" text-anchor="end"    dominant-baseline="middle">3</text>
+
+        <text x= "67" y= "42" text-anchor="end"    dominant-baseline="text-bottom">4</text>
+        <text x= "38" y= "68" text-anchor="end"    dominant-baseline="text-bottom">5</text>
+
+        <text x=  "0" y= "77" text-anchor="middle" dominant-baseline="text-bottom">6</text>
+
+        <text x="-38" y= "68" text-anchor="start" dominant-baseline="text-bottom">7</text>
+        <text x="-67" y= "42" text-anchor="start" dominant-baseline="text-bottom">8</text>
+
+        <text x="-78" y=  "0" text-anchor="start" dominant-baseline="middle">9</text>
+
+        <text x="-70" y="-42" text-anchor="start" dominant-baseline="hanging">10</text>
+        <text x="-45" y="-67" text-anchor="start" dominant-baseline="hanging">11</text>
+      </svg>
+    `;
+    this.innerHTML = html;
+    Utils.Set_Id_Shortcuts(this, this, "cid");
+
+    this.On_Update();
+
+    if (this.hasAttribute("auto-start"))
+    {
+      this.start();
+    }
+  }
+}
+
 class DeDial extends HTMLElement
 {
   static tname = "de-dial";
@@ -423,36 +681,6 @@ class DeDial extends HTMLElement
       const options = { root: null, rootMargin: '0px', threshold: 0.5 };
       const observer = new IntersectionObserver(this.On_Observe, options);
       observer.observe(this);
-    }
-  }
-}
-
-class DeActionBtn extends HTMLElement
-{
-  static tname = "de-action-btn";
-
-  constructor()
-  {
-    super();
-    Utils.Bind(this, "On_");
-  }
-
-  connectedCallback()
-  {
-    this.addEventListener("click", this.On_Click);
-  }
-
-  On_Click()
-  {
-    const for_id = this.getAttribute("for");
-    const for_action = this.getAttribute("for-action");
-    if (for_id)
-    {
-      const elem = document.getElementById(for_id);
-      if (elem)
-      {
-        elem[for_action]();
-      }
     }
   }
 }
@@ -891,6 +1119,9 @@ class DeTimerCompact extends HTMLElement
   }
 }
 
+Utils.Register_Element(DeDialMarks);
+Utils.Register_Element(DeClockDial);
+Utils.Register_Element(DeClock);
 Utils.Register_Element(DeDial);
 Utils.Register_Element(DeActionBtn);
 Utils.Register_Element(DeTimer);

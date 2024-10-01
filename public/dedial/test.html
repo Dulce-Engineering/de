@@ -1,7 +1,5 @@
 <html>
   <head>
-
-    <link rel="stylesheet" href="dedial.css">
     <style>
       body
       {
@@ -15,41 +13,218 @@
         width: 100%;
         xheight: 100%;
       }
+
+      de-dialmarks
+      {
+        width: 150px;
+        height: 150px;
+        stroke: #fff;
+        stroke-width: 10px;
+        fill: none;
+      }
+
+      de-clock-dial
+      {
+        display:inline-block;
+        position: relative;
+      }
+      de-clock-dial de-dialmarks
+      {
+        fill:none;
+        stroke:#000;
+        width:150px;
+        height:150px;
+        display:inline-block;
+        border-radius:100%;
+      }
+      de-clock-dial .hours
+      {
+        stroke-width:15px;
+        transform:rotate(-91deg);
+      }
+      de-clock-dial .minutes
+      {
+        stroke-width:10px;
+        transform:rotate(-90deg);
+        position:absolute;
+        left:0;top:0;
+      }
+
+      de-clock
+      {
+        position: relative;
+        width: 150px;
+        height: 150px;
+        font-size: 25px;
+        background-color: #fff;
+        border-radius: 100%;
+      }
+      de-clock .hands
+      {
+        position: absolute;
+        left: 0;
+        top: 0;
+      }
+      de-clock .hand-hr
+      {
+        stroke: none; 
+        fill: #000;
+      }
+      de-clock .hand-min
+      {
+        stroke: none; 
+        fill: #000;
+      }
+      de-clock .hand-sec
+      {
+        stroke: #f00;
+        fill: none;
+      }
+      
+      de-timer de-dial
+      {
+        position: relative;
+        display: inline-block;
+        width: 150px;
+        height: 150px;
+        color: #fff;
+        stroke: #fff;
+        stroke-width: 10px;
+        fill: none;
+      }
+      de-timer
+      {
+        display: inline-flex;
+        gap: 16px;
+        font-family: Arial, Helvetica, sans-serif;
+        text-align: center;
+      }
+      de-timer .counter
+      {
+        position: relative;
+      }
+      de-timer .counter.completed
+      {
+        animation: dedial-spin-y 1s linear;
+      }
+      de-timer .anim-border
+      {
+        position: absolute;
+        top: -12px;
+        left: -12px;
+        width: calc(100% + 24px);
+        height: calc(100% + 24px);
+        stroke-width: 3px;
+      }
+      de-timer .anim-border.days
+      {
+        animation: dedial-spin 100s infinite linear;
+      }
+      de-timer .anim-border.hours
+      {
+        animation: dedial-spin 70s infinite linear;
+      }
+      de-timer .anim-border.minutes
+      {
+        animation: dedial-spin 30s infinite linear;
+      }
+      de-timer .anim-border.seconds
+      {
+        animation: dedial-spin 10s infinite linear;
+      }
+      de-timer .ticks
+      {
+        width: 110px;
+        height: 110px;
+      }
+      de-timer .ticks .label
+      {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        font-size: 32px;
+      }
+      de-timer .ticks .label .text-label
+      {
+        font-size: 14px;
+      }
+      de-timer .shadow
+      {
+        stroke: #777;
+      }
+
+      @keyframes dedial-spin
+      {
+        from
+        {
+          transform: rotate(0deg);
+        }
+        to
+        {
+          transform: rotate(-360deg);
+        }
+      }
+
+      @keyframes dedial-spin-y
+      {
+        from
+        {
+          transform: rotateY(0deg);
+        }
+        to
+        {
+          transform: rotateY(360deg);
+        }
+      }
+
+      de-timer-compact
+      {
+
+      }
     </style>
 
     <script src="dedial.js" type="module"></script>
   </head>
 
   <body>
+    <de-dialmarks value="0"></de-dialmarks>
+    <de-dialmarks value="1" class="de-dialmarks"></de-dialmarks>
+    <de-dialmarks value="5" class="de-dialmarks"></de-dialmarks>
+    <de-dialmarks value="10" tick-width="2" class="de-dialmarks"></de-dialmarks>
+    <de-dialmarks value="10" gap-width="2" class="de-dialmarks"></de-dialmarks>
+
+    <hr style="width:50%;">
+    <de-clock-dial></de-clock-dial>
+
+    <hr style="width:50%;">
+    Australia<de-clock auto-start></de-clock>
+    Buenos Aires<de-clock auto-start time-zone="America/Argentina/Buenos_Aires"></de-clock>
+    Shanghai<de-clock auto-start time-zone="Asia/Shanghai"></de-clock>
+    12:34:56<de-clock time-str="2024-09-30T12:34:56"></de-clock>
+
+    <hr style="width:50%;">
     <de-timer auto-start show-labels
-      date-year="2024"
-      date-month="12"
-      date-day="25"
+      date-year="2024" date-month="12" date-day="25"
     ></de-timer>
     <de-timer auto-start show-labels 
-      label-sec="segundos"
-      label-min="minutos"
-      label-hr="horas"
-      label-day="dias"
+      label-sec="segundos" label-min="minutos" label-hr="horas" label-day="dias"
     ></de-timer>
     <de-timer
-      date-year="2024"
-      date-month="1"
-      date-day="1"
-      date-hour="0"
-      date-minute="0"
-      date-second="0"
+      date-year="2024" date-month="1" date-day="1"
+      date-hour="0" date-minute="0" date-second="0"
       auto-start
     ></de-timer>
     <de-timer
-      date-year="1971"
-      date-month="11"
-      date-day="13"
-      date-hour="0"
-      date-minute="0"
-      date-second="0"
+      date-year="1971" date-month="11" date-day="13"
+      date-hour="0" date-minute="0" date-second="0"
       auto-start
     ></de-timer>
+
     <hr style="width:50%;">
     <de-timer-compact auto-start show-labels
       date-year="2024"
