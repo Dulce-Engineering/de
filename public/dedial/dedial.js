@@ -10,6 +10,30 @@ class Utils
   static MILLIS_MONTH = Utils.MILLIS_WEEK * 4;
   static MILLIS_YEAR = Utils.MILLIS_MONTH * 12;
 
+  static Append_Str(a, b, sep)
+  {
+    let res = null;
+
+    if (sep == null || sep == undefined)
+    {
+      sep = "";
+    }
+    if (a && b && a.length > 0 && b.length > 0)
+    {
+      res = a + sep + b;
+    } 
+    else if (a && !b && a.length > 0)
+    {
+      res = a;
+    } 
+    else if (!a && b && b.length > 0)
+    {
+      res = b;
+    }
+
+    return res;
+  }
+
   static Bind(obj, fn_prefix)
   {
     let prop_names = new Set();
@@ -197,13 +221,48 @@ class DeDialMarks extends HTMLElement
     return Utils.Get_Attribute_Int(this, "value", DeDialMarks.DEF_MAX);
   }
 
-  Calc_Path_Length()
+  Calc_Ticks_Length()
   {
     const value = Utils.Get_Attribute_Int(this, "value", DeDialMarks.DEF_MAX);
     const tick_width = Utils.Get_Attribute_Int(this, "tick-width", DeDialMarks.DEF_TICK_WIDTH);
     const gap_width = Utils.Get_Attribute_Int(this, "gap-width", DeDialMarks.DEF_GAP_WIDTH);
-    const path_length = value * (tick_width + gap_width);
-    return path_length;
+    let ticks_length = value * (tick_width + gap_width);
+
+    if (this.hasAttribute("base-type"))
+    {
+      ticks_length = value*tick_width + (value-1)*gap_width;
+    }
+
+    return ticks_length;
+  }
+
+  Calc_Base_Length()
+  {
+    let base_length = 0;
+    const base_type = this.getAttribute("base-type");
+
+    if (base_type == "small")
+    { // value = 6, path = 12
+      const ticks_length = this.Calc_Ticks_Length();
+      base_length = ticks_length * 0.5;
+    }
+    else if (base_type == "medium")
+    {
+      const ticks_length = this.Calc_Ticks_Length();
+      base_length = ticks_length;
+    }
+    else if (base_type == "large")
+    {
+      const ticks_length = this.Calc_Ticks_Length();
+      base_length = ticks_length * 2;
+    }
+
+    return base_length;
+  }
+
+  Calc_Path_Length()
+  {
+    return this.Calc_Ticks_Length() + this.Calc_Base_Length();
   }
 
   Set_Style(elem, attr_name)
@@ -226,15 +285,37 @@ class DeDialMarks extends HTMLElement
     }
     else if (value == 1)
     {
-      stroke_dasharray = "1 0";
+      const base_length = this.Calc_Base_Length();
+      const ticks_length = this.Calc_Path_Length() - base_length;
+      stroke_dasharray = "" + ticks_length + " " + base_length;
     }
-    else
+    else if (!this.hasAttribute("base-type"))
     {
       const tick_width = Utils.Get_Attribute_Int(this, "tick-width", DeDialMarks.DEF_TICK_WIDTH);
       const gap_width = Utils.Get_Attribute_Int(this, "gap-width", DeDialMarks.DEF_GAP_WIDTH);
       stroke_dasharray = "" + tick_width + " " + gap_width;
     }
+    else
+    {
+      const base_length = this.Calc_Base_Length();
+      const tick_width = Utils.Get_Attribute_Int(this, "tick-width", DeDialMarks.DEF_TICK_WIDTH);
+      const gap_width = Utils.Get_Attribute_Int(this, "gap-width", DeDialMarks.DEF_GAP_WIDTH);
 
+      stroke_dasharray = "";
+      for (let v = 1; v <= value; v++)
+      {
+        stroke_dasharray += tick_width + " ";
+        if (v != value)
+        {
+          stroke_dasharray += gap_width + " ";
+        }
+        else
+        {
+          stroke_dasharray += base_length;
+        }
+      }
+    }
+      
     if (stroke_dasharray)
     {
       this.circle_elem.setAttribute("stroke-dasharray", stroke_dasharray);
@@ -1097,16 +1178,16 @@ class DeTimerCompact extends HTMLElement
     }
 
     const html = `
-      <de-dial cid="hours_elem" max-value="23" show-label show-shadow has-overflow
+      <de-dial cid="hours_elem" max-value="23" show-shadow has-overflow
         ${label_postfix_hr}
-        class="ticks"></de-dial>
-      <de-dial cid="minutes_elem" max-value="59" show-label show-shadow
+        class="hrs"></de-dial>
+      <de-dial cid="minutes_elem" max-value="59" show-shadow
         ${label_postfix_min}
-        class="ticks"></de-dial>
-      <de-dial cid="seconds_elem" max-value="59" show-label show-shadow
+        class="mins"></de-dial>
+      <de-dial cid="seconds_elem" max-value="59" show-shadow
         ${label_postfix_sec}
-        class="ticks"></de-dial>
-      <de-dial class="anim-border hours" max-value="80" value="80" gap-width="2"></de-dial>
+        class="secs"></de-dial>
+      <de-dialmarks class="anim-border" value="80" gap-width="2"></de-dialmarks>
     `;
     this.innerHTML = html;
     Utils.Set_Id_Shortcuts(this, this, "cid");

@@ -3,6 +3,7 @@
     <style>
       body
       {
+        color: #fff;
         background-color: #888;
         display: inline-flex;
         flex-direction: column;
@@ -12,6 +13,10 @@
         gap: 16px;
         width: 100%;
         xheight: 100%;
+      }
+      hr
+      {
+        width: 70%;
       }
 
       de-dialmarks
@@ -153,6 +158,10 @@
       {
         font-size: 14px;
       }
+      de-timer .dial
+      {
+        transform: rotate(-90deg);
+      }
       de-timer .shadow
       {
         stroke: #777;
@@ -184,30 +193,100 @@
 
       de-timer-compact
       {
-
+        fill: none;
+        width: 200px;
+        height: 200px;
+        position: relative;
+      }
+      de-timer-compact .shadow
+      {
+        stroke: #777;
+      }
+      de-timer-compact .anim-border
+      {
+        display: inline-block;
+        width: 100%;
+        height: 100%;
+        stroke-width: 5px;
+        stroke: #fff;
+      }
+      de-timer-compact .mins, de-timer-compact .secs, de-timer-compact .hrs
+      {
+        stroke-width: 7px;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+      }
+      de-timer-compact .hrs
+      {
+        width: 90%;
+        height: 90%;
+        stroke: #f00;
+      }
+      de-timer-compact .mins
+      {
+        width: 80%;
+        height: 80%;
+        stroke: #00f
+      }
+      de-timer-compact .secs
+      {
+        width: 70%;
+        height: 70%;
+        stroke: #0f0;
+      }
+      de-timer-compact .dial
+      {
+        transform: rotate(-90deg);
       }
     </style>
 
     <script src="dedial.js" type="module"></script>
+    <script type="module">
+      const dials = document.querySelectorAll("de-dialmarks");
+      for (const dial of dials)
+      {
+        dial.addEventListener("click", () => dial.Update());
+      }
+
+      /*function On_Click()
+      {
+
+      }*/
+    </script>
   </head>
 
   <body>
-    <de-dialmarks value="0"></de-dialmarks>
+    <h1>De-DialMarks</h1>
+    <de-dialmarks value="0" style="border:1px solid #666;border-radius:100%;"></de-dialmarks>
     <de-dialmarks value="1" class="de-dialmarks"></de-dialmarks>
     <de-dialmarks value="5" class="de-dialmarks"></de-dialmarks>
     <de-dialmarks value="10" tick-width="2" class="de-dialmarks"></de-dialmarks>
     <de-dialmarks value="10" gap-width="2" class="de-dialmarks"></de-dialmarks>
+    <de-dialmarks value="10" gap-width="2" base-type="small" class="de-dialmarks"></de-dialmarks>
+    <de-dialmarks value="10" gap-width="2" base-type="medium" class="de-dialmarks"></de-dialmarks>
+    <de-dialmarks value="10" gap-width="2" base-type="large" class="de-dialmarks"></de-dialmarks>
 
-    <hr style="width:50%;">
+    <hr>
+    <h1>De-Clock-Dial</h1>
     <de-clock-dial></de-clock-dial>
 
-    <hr style="width:50%;">
+    <hr>
+    <h1>De-Gauge</h1>
+
+    <hr>
+    <h1>De-Counter</h1>
+
+    <hr>
+    <h1>De-Clock</h1>
     Australia<de-clock auto-start></de-clock>
     Buenos Aires<de-clock auto-start time-zone="America/Argentina/Buenos_Aires"></de-clock>
     Shanghai<de-clock auto-start time-zone="Asia/Shanghai"></de-clock>
     12:34:56<de-clock time-str="2024-09-30T12:34:56"></de-clock>
 
-    <hr style="width:50%;">
+    <hr>
+    <h1>De-Timer</h1>
     <de-timer auto-start show-labels
       date-year="2024" date-month="12" date-day="25"
     ></de-timer>
@@ -225,34 +304,23 @@
       auto-start
     ></de-timer>
 
-    <hr style="width:50%;">
+    <hr>
+    <h1>De-Timer-Compact</h1>
     <de-timer-compact auto-start show-labels
-      date-year="2024"
-      date-month="12"
-      date-day="25"
+      date-year="2024" date-month="12" date-day="25"
     ></de-timer-compact>
     <de-timer-compact auto-start show-labels 
-      label-sec="segundos"
-      label-min="minutos"
-      label-hr="horas"
+      label-sec="segundos" label-min="minutos" label-hr="horas"
       label-day="dias"
     ></de-timer-compact>
     <de-timer-compact
-      date-year="2024"
-      date-month="1"
-      date-day="1"
-      date-hour="0"
-      date-minute="0"
-      date-second="0"
+      date-year="2024" date-month="1" date-day="1"
+      date-hour="0" date-minute="0" date-second="0"
       auto-start
     ></de-timer-compact>
     <de-timer-compact
-      date-year="1971"
-      date-month="11"
-      date-day="13"
-      date-hour="0"
-      date-minute="0"
-      date-second="0"
+      date-year="1971" date-month="11" date-day="13"
+      date-hour="0" date-minute="0" date-second="0"
       auto-start
     ></de-timer-compact>
 
