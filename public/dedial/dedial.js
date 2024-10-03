@@ -230,7 +230,8 @@ class DeDialMarks extends HTMLElement
 
     if (this.hasAttribute("base-type"))
     {
-      ticks_length = value*tick_width + (value-1)*gap_width;
+      //ticks_length = value*tick_width + (value-1)*gap_width;
+      ticks_length -= gap_width;
     }
 
     return ticks_length;
@@ -335,6 +336,196 @@ class DeDialMarks extends HTMLElement
 
     const html = `
       <svg cid="svg_elem" viewBox="${view_box}" class="dial">
+        <circle 
+          cid="circle_elem"
+          cx="0" cy="0" r="${circle_radius}" 
+          pathLength="${path_length}"
+          stroke-dasharray="0 ${path_length}" 
+        />
+      </svg>
+    `;
+    this.innerHTML = html;
+    Utils.Set_Id_Shortcuts(this, this, "cid");
+
+    this.Set_Style(this.svg_elem, "style-svg");
+
+    this.Update();
+  }
+}
+
+class DeGauge extends HTMLElement
+{
+  static tname = "de-gauge";
+  static DEF_MAX = 10;
+  static DEF_TICK_WIDTH = 1;
+  static DEF_GAP_WIDTH = 1;
+  static DEF_CIRCLE_RADIUS = 90;
+  static DEF_VIEW_RADIUS = 100;
+
+  connectedCallback()
+  {
+    this.Render();
+  }
+
+  set value(new_value)
+  {
+    this.setAttribute("value", new_value);
+    if (this.isConnected)
+    {
+      this.Update();
+    }
+  }
+
+  get value()
+  {
+    return Utils.Get_Attribute_Int(this, "value", DeGauge.DEF_MAX);
+  }
+
+  Calc_Ticks_Length(value)
+  {
+    const tick_width = Utils.Get_Attribute_Int(this, "tick-width", DeGauge.DEF_TICK_WIDTH);
+    const gap_width = Utils.Get_Attribute_Int(this, "gap-width", DeGauge.DEF_GAP_WIDTH);
+    let ticks_length = value * (tick_width + gap_width) - gap_width;
+
+    return ticks_length;
+  }
+
+  Calc_Base_Length()
+  {
+    const base_type = this.getAttribute("base-type");
+    const max_value = Utils.Get_Attribute_Int(this, "max-value", DeGauge.DEF_MAX);
+    const gap_width = Utils.Get_Attribute_Int(this, "gap-width", DeGauge.DEF_GAP_WIDTH);
+    let base_length = 0;
+
+    if (base_type == "small")
+    {
+      const ticks_length = this.Calc_Ticks_Length(max_value);
+      base_length = ticks_length * 0.5;
+    }
+    else if (base_type == "medium")
+    {
+      const ticks_length = this.Calc_Ticks_Length(max_value);
+      base_length = ticks_length;
+    }
+    else if (base_type == "large")
+    {
+      const ticks_length = this.Calc_Ticks_Length(max_value);
+      base_length = ticks_length * 2;
+    }
+    else
+    {
+      base_length = gap_width;
+    }
+
+    return base_length;
+  }
+
+  Calc_Path_Length()
+  {
+    const max_value = Utils.Get_Attribute_Int(this, "max-value", DeGauge.DEF_MAX);
+    return this.Calc_Ticks_Length(max_value) + this.Calc_Base_Length();
+  }
+
+  Calc_Remaining_Length(value)
+  {
+    return this.Calc_Path_Length() - this.Calc_Ticks_Length(value);
+  }
+
+  Set_Style(elem, attr_name)
+  {
+    if (this.hasAttribute(attr_name))
+    {
+      const css = this.getAttribute(attr_name);
+      elem.style = css;
+    }
+  }
+
+  Calc_Dash_Array(value)
+  {
+    let stroke_dasharray = null;
+    const max_value = Utils.Get_Attribute_Int(this, "max-value", DeGauge.DEF_MAX);
+
+    if (value < 0)
+    {
+      value = 0;
+    }
+    else if (value > max_value)
+    {
+      value = max_value;
+    }
+
+    if (value == 0)
+    {
+      stroke_dasharray = "0 1";
+    }
+    else
+    {
+      const tick_width = Utils.Get_Attribute_Int(this, "tick-width", DeGauge.DEF_TICK_WIDTH);
+      const gap_width = Utils.Get_Attribute_Int(this, "gap-width", DeGauge.DEF_GAP_WIDTH);
+
+      stroke_dasharray = "";
+      for (let v = 1; v <= value; v++)
+      {
+        stroke_dasharray += tick_width + " ";
+        if (v != value)
+        {
+          stroke_dasharray += gap_width + " ";
+        }
+        else
+        {
+          stroke_dasharray += this.Calc_Remaining_Length(value);
+        }
+      }
+    }
+
+    //console.log("ticks length value: ", this.Calc_Ticks_Length(value));
+    //console.log("ticks length max: ", this.Calc_Ticks_Length(max_value));
+    //console.log("base length: ", this.Calc_Base_Length());
+    //console.log("path length: ", this.Calc_Path_Length());
+    //console.log("remaining length: ", this.Calc_Remaining_Length(value));
+    
+    return stroke_dasharray;
+  }
+
+  Update()
+  {
+    const value = Utils.Get_Attribute_Int(this, "value", DeGauge.DEF_MAX);
+    const stroke_dasharray = this.Calc_Dash_Array(value);
+    if (stroke_dasharray)
+    {
+      this.circle_elem.setAttribute("stroke-dasharray", stroke_dasharray);
+    }
+  }
+
+  Render()
+  {
+    const path_length = this.Calc_Path_Length();
+
+    const viewbox_radius = Utils.Get_Attribute_Int(this, "viewbox-radius", DeGauge.DEF_VIEW_RADIUS);
+    const viewbox_diameter = Math.abs(viewbox_radius) * 2;
+    const view_box = 
+      "-" + viewbox_radius + " -" + viewbox_radius + 
+      " " + viewbox_diameter + " " + viewbox_diameter;
+    const circle_radius = Utils.Get_Attribute_Int(this, "circle-radius", DeGauge.DEF_CIRCLE_RADIUS);
+    
+    let shadow_svg = "";
+    if (this.hasAttribute("show-shadow"))
+    {
+      const max_value = Utils.Get_Attribute_Int(this, "max-value", DeGauge.DEF_MAX);
+      shadow_svg = `
+        <circle 
+          cid="shadow_elem"
+          cx="0" cy="0" r="${circle_radius}" 
+          pathLength="${path_length}"
+          stroke-dasharray="${this.Calc_Dash_Array(max_value)}" 
+          class="shadow"
+        />
+      `;
+    }
+
+    const html = `
+      <svg cid="svg_elem" viewBox="${view_box}" class="dial">
+        ${shadow_svg}
         <circle 
           cid="circle_elem"
           cx="0" cy="0" r="${circle_radius}" 
@@ -1179,13 +1370,10 @@ class DeTimerCompact extends HTMLElement
 
     const html = `
       <de-dial cid="hours_elem" max-value="23" show-shadow has-overflow
-        ${label_postfix_hr}
         class="hrs"></de-dial>
       <de-dial cid="minutes_elem" max-value="59" show-shadow
-        ${label_postfix_min}
         class="mins"></de-dial>
       <de-dial cid="seconds_elem" max-value="59" show-shadow
-        ${label_postfix_sec}
         class="secs"></de-dial>
       <de-dialmarks class="anim-border" value="80" gap-width="2"></de-dialmarks>
     `;
@@ -1207,6 +1395,7 @@ Utils.Register_Element(DeDial);
 Utils.Register_Element(DeActionBtn);
 Utils.Register_Element(DeTimer);
 Utils.Register_Element(DeTimerCompact);
+Utils.Register_Element(DeGauge);
 
 export default 
 {

@@ -240,14 +240,28 @@
       {
         transform: rotate(-90deg);
       }
+
+      de-gauge
+      {
+        fill: none;
+        stroke: #fff;
+        stroke-width: 10px;
+        width: 200px;
+        height: 200px;
+      }
+      de-gauge .shadow
+      {
+        stroke: #777;
+      }
     </style>
 
     <script src="dedial.js" type="module"></script>
     <script type="module">
-      const dials = document.querySelectorAll("de-dialmarks");
+      const dials = document.querySelectorAll("de-gauge");
       for (const dial of dials)
       {
-        dial.addEventListener("click", () => dial.Update());
+        //dial.addEventListener("click", () => dial.Update());
+        dial.addEventListener("click", () => dial.value--);
       }
 
       /*function On_Click()
@@ -269,35 +283,42 @@
     <de-dialmarks value="10" gap-width="2" base-type="large" class="de-dialmarks"></de-dialmarks>
 
     <hr>
-    <h1>De-Clock-Dial</h1>
-    <de-clock-dial></de-clock-dial>
-
-    <hr>
     <h1>De-Gauge</h1>
+    <de-gauge max-value="10" value="5" show-shadow></de-gauge>
+    <de-gauge max-value="10" value="5" base-type="small" show-shadow></de-gauge>
+    <de-gauge max-value="10" value="5" base-type="medium" show-shadow></de-gauge>
+    <de-gauge max-value="10" value="5" base-type="large" show-shadow></de-gauge>
 
     <hr>
     <h1>De-Counter</h1>
 
     <hr>
+    <h1>De-Clock-Dial</h1>
+    <de-clock-dial></de-clock-dial>
+
+    <hr>
     <h1>De-Clock</h1>
-    Australia<de-clock auto-start></de-clock>
-    Buenos Aires<de-clock auto-start time-zone="America/Argentina/Buenos_Aires"></de-clock>
-    Shanghai<de-clock auto-start time-zone="Asia/Shanghai"></de-clock>
+    Sydney, Australia<de-clock auto-start></de-clock>
+    Buenos Aires, Argentina<de-clock auto-start time-zone="America/Argentina/Buenos_Aires"></de-clock>
+    Shanghai, China<de-clock auto-start time-zone="Asia/Shanghai"></de-clock>
     12:34:56<de-clock time-str="2024-09-30T12:34:56"></de-clock>
 
     <hr>
     <h1>De-Timer</h1>
+    Christmas
     <de-timer auto-start show-labels
       date-year="2024" date-month="12" date-day="25"
     ></de-timer>
     <de-timer auto-start show-labels 
       label-sec="segundos" label-min="minutos" label-hr="horas" label-day="dias"
     ></de-timer>
+    Birthday
     <de-timer
-      date-year="2024" date-month="1" date-day="1"
+      date-year="2024" date-month="11" date-day="13"
       date-hour="0" date-minute="0" date-second="0"
       auto-start
     ></de-timer>
+    Time Alive
     <de-timer
       date-year="1971" date-month="11" date-day="13"
       date-hour="0" date-minute="0" date-second="0"
