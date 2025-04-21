@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Dulce Engineering - Home</title>
+
+    <style media="screen">
+      body 
+      { 
+        background: #fff; 
+        color: #000; 
+        font-family: Roboto, Helvetica, Arial, sans-serif; 
+        margin: 0; 
+        padding: 0; 
+        height: 100vh;
+        width: 100vw;
+        display: grid;
+      }
+      #title-logo
+      {
+        xborder: 1px solid red;
+        align-self: center;
+        text-align: center;
+      }
+      #title
+      {
+        xborder: 1px solid red;
+        animation-duration: 2s;
+        animation-name: revealright;
+        animation-delay: 3s;
+        animation-timing-function: ease;
+        animation-fill-mode: forwards;
+        clip-path: inset(0% 100% 0% 0%);
+        display: inline-flex;
+        flex-direction: column;
+        align-items: flex-start;
+        margin-left: 10px;
+        width: 50%;
+      }
+      #title-dulce
+      {
+        xborder: 1px solid blue;
+        margin-bottom: 10px;
+        width: 50%;
+      }
+      #title-engineering
+      {
+        xborder: 1px solid blue;
+        width: 100%;
+      }
+      #logo
+      {
+        xborder: 1px solid blue;
+        width: 19%;
+        margin: 0; 
+        padding: 0; 
+        vertical-align: bottom;
+        animation-duration: 5s;
+        animation-name: fadein;
+        animation-timing-function: ease-in;
+        animation-fill-mode: forwards;
+        opacity: 0;
+      }
+      @keyframes fadein
+      {
+        from
+        {
+          opacity: 0;
+        }
+        to
+        {
+          opacity: 1;
+        }
+      }
+      @keyframes revealright
+      {
+        from
+        {
+          clip-path: inset(0% 100% 0% 0%);
+        }
+        to
+        {
+          clip-path: inset(0% 0% 0% 0%);
+        }
+      }
+      #page_canvas
+      {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+      }
+    </style>
+
+    <script type="module">
+      window.onload = Main;
+
+      function Main()
+      {
+        const gfx = {};
+
+        Init_Canvas(gfx);
+        window.onresize = () => Init_Canvas(gfx);
+        window.requestAnimationFrame(t => Draw_Frame(t, gfx));
+      }
+
+      function Init_Canvas(gfx)
+      {
+        const page_width = window.innerWidth;
+        const page_height = window.innerHeight;
+        gfx.x = page_width/2;
+        gfx.y = page_height/2;
+
+        const canvas = document.getElementById('page_canvas');
+        canvas.width = page_width;
+        canvas.height = page_height;
+
+        gfx.ctx = canvas.getContext('2d');
+        const stroke_style = gfx.ctx.createRadialGradient(0, 0, 5, 0, 0, 25);
+        stroke_style.addColorStop(0, "#fff");
+        stroke_style.addColorStop(0.2, "#ff8");
+        stroke_style.addColorStop(0.8, "#f00");
+        gfx.ctx.strokeStyle = stroke_style;
+        gfx.ctx.lineWidth = 3;
+        gfx.ctx.lineCap = "round";
+      }
+
+      function Draw_Frame(draw_time, gfx)
+      {
+        const ctx = gfx.ctx;
+
+        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+        ctx.save();
+
+        ctx.translate(gfx.x, gfx.y);
+
+        const s = Math.max(ctx.canvas.width, ctx.canvas.height)/40;
+        ctx.scale(s, s);
+
+        const a = draw_time/200.0;
+        ctx.rotate(-a);
+
+        Draw_Spiral(ctx);
+
+        ctx.restore();
+        window.requestAnimationFrame(t => Draw_Frame(t, gfx));
+      }
+
+      function Draw_Spiral(ctx)
+      {
+        const t_start = 0, t_end = 30, t_step = 0.1;
+
+        ctx.beginPath();
+        for (let t = t_start; t < t_end; t += t_step)
+        {
+          const x = t * Math.cos(t);
+          const y = t * Math.sin(t);
+
+          if (t == t_start)
+          {
+            ctx.moveTo(x, y);
+          }
+          else
+          {
+            ctx.lineTo(x, y);
+          }
+        }
+        ctx.stroke();
+      }
+    </script>
+  </head>
+
+  <body>
+    <div id="title-logo">
+      <img id="logo" src="images/logo-3.svg" />
+      <div id="title">
+        <img id="title-dulce" src="images/title-dulce.svg" />
+        <img id="title-engineering" src="images/title-engineering.svg" />
+      </div>
+    </div>
+    <canvas id="page_canvas"></canvas>
+  </body>
+</html>

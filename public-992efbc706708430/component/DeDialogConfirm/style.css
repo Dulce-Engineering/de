@@ -1,0 +1,76 @@
+
+dialog-confirm dialog
+{
+  border: none;
+  background-color: #fff;
+  color: #111;
+  padding: 30px 40px;
+  font-size: 1.4rem;
+  font-weight: 300;
+  text-transform: uppercase;
+}
+
+dialog-confirm dialog[open]
+{
+  animation: do-open 0.5s ease-out;
+}
+
+@keyframes do-open 
+{
+  from 
+  {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  to 
+  {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+dialog-confirm dialog::backdrop
+{
+  opacity: 0.66;
+  background-color: #000;
+}
+
+dialog-confirm header, 
+dialog-confirm h1
+{
+  font-family: "Playfair Display";
+  font-size: 2.5rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  margin: 0 0 20px 0;
+}
+
+dialog-confirm main
+{
+  margin: 0;
+}
+
+dialog-confirm footer
+{
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  gap: 10px;
+  margin: 20px 0 10px 0;
+}
+
+dialog-confirm button
+{
+  border: none;
+  background-color: #000;
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 700;
+  font-family: "Poppins";
+  text-transform: uppercase;
+  padding: 15px 25px;
+  cursor: pointer;
+  letter-spacing: 1px;
+  display: inline-flex;
+  align-items: center;
+}

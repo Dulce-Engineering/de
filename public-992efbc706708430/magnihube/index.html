@@ -1,0 +1,1086 @@
+<!doctype html>
+<html lang="en">
+
+  <head>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-KMFPTFXKGX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-KMFPTFXKGX');
+    </script>
+
+    <link rel="manifest" href="/magnihube/manifest.json">
+    <title>Magnigube</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Visualize File Growth Over Time with Magnihube. Unlock insights into your code's evolution with Magnihube, a free and privacy-focused Progressive Web App (PWA).">
+    <meta name="keywords" content="">
+    <meta name="author" content="Dulce Engineering Pty. Ltd.">
+    <meta name="robots" content="index, follow"> 
+    <meta property="og:title" content="Magnigube">
+    <meta property="og:description" content="Visualize File Growth Over Time with Magnihube. Unlock insights into your code's evolution with Magnihube, a free and privacy-focused Progressive Web App (PWA).">
+    <meta property="og:image" content="https://dulceeng.com.au/magnihube/image/screenshot-landscape.png">
+    <meta property="og:url" content="https://dulceeng.com.au/magnihube">
+    <meta property="og:type" content="website">
+    <link rel="shortcut icon" href="./image/favicon.ico">
+    
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Covered+By+Your+Grace&family=Crafty+Girls&family=Fuzzy+Bubbles:wght@400;700&family=Handlee&display=swap');      
+      @import url('https://fonts.googleapis.com/css2?family=Doto:wght@100..900&family=Major+Mono+Display&family=Turret+Road:wght@200;300;400;500;700;800&display=swap');
+      @import url('https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&family=Cutive+Mono&family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Special+Elite&display=swap');      
+      
+      /*
+        heading fonts
+        font-family: "Major Mono Display";
+        font-family: "Doto";
+        font-family: "Turret Road";
+        font-family: "IBM Plex Mono";
+        font-family: "Courier Prime";
+        font-family: "Cutive Mono";
+        font-family: "Special Elite";
+
+        text fonts
+        font-family: "Fuzzy Bubbles";
+        font-family: "Crafty Girls";
+        font-family: "Handlee";
+        font-family: "Covered By Your Grace";
+      */
+      html
+      {
+        font-family: "Covered By Your Grace", cursive;
+        font-weight: 400;
+        font-style: normal;
+
+        font-size: 25px;
+        color: #00f;
+
+        background-image: url(./image/bk-2.webp);
+      }
+      body
+      {
+        padding: 40px;
+        margin: 0;
+        background-image: 
+          radial-gradient(#eed9 60%, #fc02 100%);
+          min-height: 100vh;
+          box-sizing: border-box;
+      }
+      #ads_elem
+      {
+        height: 80px;
+        overflow: hidden;
+      }
+      footer
+      {
+        text-align: center;
+        margin: 40px 20px 10px 20px;
+        font-size: 0.8rem;
+      }
+      .emoji
+      {
+        color: #000;
+      }
+
+      button
+      {
+        font-family: inherit;
+        background-color: #ff06;
+        color: inherit;
+
+        border: none;
+        font-size: 1.4rem;
+        padding: 0 20px;
+        margin: 0;
+        cursor: pointer;
+        transform: rotate(-10deg);
+      }
+      button.small
+      {
+        font-size: 1rem;
+        padding: 0 15px;
+      }
+      button .text
+      {
+        transform: rotate(10deg);
+        display: inline-block;
+      }
+
+      header h1,
+      de-line-chart .title > span,
+      main#docs h1,
+      main#docs h2
+      {
+        font-family: "Special Elite";
+        color: #0009;
+      }
+      header h1
+      {
+        font-size: 3rem;
+        font-weight: 100;
+        text-align: center;
+      }
+
+      nav
+      {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+      }
+
+      main
+      {
+        display: flex;
+        flex-direction: column;
+      }
+      main#docs
+      {
+        margin: 40px 0 0 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      main#docs p
+      {
+        margin: 0 0 10px 0;
+        text-align: center;
+        width: 70%;
+      }
+      main#docs h1
+      {
+        margin: 0 0 20px 0;
+        text-align: center;
+        line-height: 2.5rem;
+        width: 80%;
+        font-weight: 100;
+      }
+      main#docs h2
+      {
+        margin: 20px 0 10px 0;
+        text-align: center;
+      }
+      main#docs ul
+      {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        margin: 0 0 30px 0;
+        padding: 0;
+        list-style-type: none;
+        justify-content: center;
+        gap: 20px;
+      }
+      main#docs li
+      {
+        width: 30%;
+        text-align: center;
+        position: relative;
+        text-shadow: 
+          -3px -3px 0 #fff,
+          3px -3px 0 #fff,
+          -3px 3px 0 #fff,
+          3px 1px 0 #fff;
+      }
+      main#docs .icon
+      {
+        position: absolute;
+        left: 0; right: 0;
+        top: 0; bottom: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 4rem;
+        z-index: -1;
+        animation: 16s rotate infinite linear;
+      }
+      main#docs.hidden
+      {
+        display: none;
+      }
+      main#docs .highlight
+      {
+        background-color: #0f03;
+        transform: rotate(-10deg);
+      }
+      main#docs .highlight .text
+      {
+        transform: rotate(10deg);
+        display: inline-block;
+      }
+      @keyframes rotate 
+      {
+        0%
+        {
+          transform: rotate(0deg);
+        }
+        100% 
+        {
+          transform: rotate(360deg);
+        }
+      }
+
+      .wait
+      {
+        height: 510px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        background-color: #ffe7;
+        font-size: 1.5rem;
+      }
+      .wait .img
+      {
+        font-size: 9rem;
+        animation: throb 1s ease-in-out infinite;
+      }
+      @keyframes throb 
+      {
+        0%, 100% 
+        {
+          transform: scale(1);
+        }
+        50% 
+        {
+          transform: scale(1.1);
+        }
+      }
+      
+      de-dialog-form,
+      de-dialog-alert
+      {
+        dialog
+        {
+          color: inherit;
+          width: 70%;
+          border: 3px solid #0009;
+        }
+        form
+        {
+          margin: 0;
+        }
+        header
+        {
+          margin: 0 0 20px 0;
+        }
+        h1
+        {
+          font-size: 2rem;
+          margin: 0;
+        }
+        input
+        {
+          font-family: inherit;
+          font-size: inherit;
+          color: inherit;
+
+          background-color: transparent;
+          border: none;
+          border-bottom: 1px dashed #00f;
+          margin: 0;
+          cursor: pointer;
+          flex-grow: 1;
+        }
+        footer
+        {
+          margin: 40px 0 0 0;
+          display: flex;
+          justify-content: center;
+          gap: 10px;
+        }
+      }
+      de-dialog-form
+      {
+        main
+        {
+          display: flex;
+          flex-direction: row;
+          gap: 10px;
+          justify-content: center;
+        }
+      }
+      de-dialog-alert
+      {
+        main
+        {
+          display: flex;
+          align-items: center;
+        }
+        p
+        {
+          margin: 0;
+        }
+      }
+
+      de-line-chart
+      {
+        display: block;
+        background-color: #ffe7;
+        margin: 20px 0;
+      }
+      de-line-chart svg
+      {
+        width: 100%;
+        xheight: 400px;
+        xborder: 1px solid #f00;
+      }
+      de-line-chart .axis-label
+      {
+        font-size: 1rem;
+      }
+      de-line-chart .title
+      {
+        margin: 15px 35px 10px 35px;
+        padding: 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+      }
+      de-line-chart .title > span
+      {
+        font-size: 1.2rem;
+        font-weight: 100;
+        overflow-wrap: anywhere;
+      }
+      de-line-chart .summary
+      {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr 2fr;
+        gap: 10px;
+      }
+      de-line-chart .header
+      { 
+        justify-self: start;
+      }
+      de-line-chart .label
+      { 
+        justify-self: end;
+        text-decoration: underline;
+      }
+      de-line-chart .ranges
+      {
+        padding: 0 4.5% 0 10%;
+        height: 0;
+        overflow: hidden;
+        display: flex;
+        align-items: flex-start;
+        transition: height 0.3s ease-in-out;
+      }
+      de-line-chart .time-range
+      {
+        width: 100%;
+      }
+      de-line-chart .highlight
+      {
+        fill: #0f03;
+        visibility: hidden;
+      }
+
+      @media screen and (min-width: 768px)
+      {
+        de-line-chart .mobile
+        {
+          display: none;
+        }
+      }
+
+      @media screen and (max-width: 768px)
+      {
+        html
+        {
+          font-size: 20px;
+        }
+        body
+        {
+          padding: 10px;
+        }
+        header h1
+        {
+          font-size: 2rem;
+        }
+        button
+        {
+          font-size: 1.5rem;
+        }
+
+        de-line-chart
+        {
+          margin: 20px 0 0 0;
+          border-top: 10px solid #0f04;
+        }
+        de-line-chart .title
+        {
+          margin: 15px 10px 20px 10px;
+        }
+        de-line-chart .header
+        {
+          justify-self: center;
+        }
+        de-line-chart .title > span
+        {
+          font-size: 0.9rem;
+        }
+        de-line-chart .summary
+        {
+          grid-template-columns: 1fr 1fr 1fr;
+          gap: 5px;
+        }
+        de-line-chart .desktop
+        {
+          display: none;
+        }
+        de-line-chart .axis-label
+        {
+          font-size: 2rem;
+        }
+        de-line-chart .label
+        {
+          justify-self: center;
+        }
+        de-line-chart .summary span
+        {
+          justify-self: center;
+          text-align: center;
+          line-height: 1rem;
+        }
+
+        main#file-list h1
+        {
+
+        }
+
+        main#docs h1
+        {
+          font-size: 1rem;
+          line-height: 1.2rem;
+          width: 100%;
+          padding: 0 20px;
+          box-sizing: border-box;
+        }
+        main#docs p
+        {
+          width: 100%;
+          padding: 0 20px;
+          line-height: 1rem;
+          box-sizing: border-box;
+        }
+        main#docs ul
+        {
+
+        }
+        main#docs li
+        {
+          width: 100%;
+          line-height: 1rem;
+        }
+
+        de-dialog-form main
+        {
+          flex-direction: column;
+        }
+
+      }
+    </style>
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Website",
+        "name": "Magnihube",
+        "url": "https://dulceeng.com.au/magnihube",
+        "description": "Visualize File Growth Over Time with Magnihube. Unlock insights into your code's evolution with Magnihube, a free and privacy-focused Progressive Web App (PWA).",
+        "image": "https://dulceeng.com.au/magnihube/image/screenshot-landscape.png"
+      }
+    </script>
+
+    <script type="module">
+      import "../component/DeDialogForm/index.js";
+      import "../component/DeDialogAlert/index.js";
+      import "./component/DeLineChart/index.js";
+      import Utils from "../lib/Utils.js";
+
+      Main();
+      async function Main()
+      {
+        if ("serviceWorker" in navigator) 
+        {
+          await navigator.serviceWorker.register("./lib/service-worker.js");
+        }
+
+        const observer = new MutationObserver(On_Mutation);
+        On_Mutation.observer = observer;
+        observer.observe(document.documentElement, { childList: true, subtree: false });
+
+        add_file_btn.addEventListener("click", On_Click_Add_File_Btn);
+        del_all_btn.addEventListener("click", On_Click_Del_All_Btn);
+      }
+
+      /**
+       * Retrieves the file size for each commit on a specific file in a GitHub repository.
+       *
+       * Args:
+       *   repoOwner: The owner of the repository (e.g., "username" or "organization").
+       *   repoName: The name of the repository (e.g., "my-repo").
+       *   filePath: The path to the file within the repository (e.g., "src/main.js").
+       *   githubToken: (Optional) A GitHub personal access token for authenticated requests (increased rate limits).
+       *
+       * Returns:
+       *   An array of objects, where each object represents a commit and contains:
+       *     - commitSha: The SHA of the commit.
+       *     - commitDate: The date of the commit.
+       *     - fileSize: The file size in bytes at that commit.
+       *     - error: null if no error; otherwise an error object.
+       *     - message: null if no error; otherwise a string describing the error.
+       *  Or, returns null if there's a general error like 404
+       */
+      async function Get_File_Sizes_Per_Commit
+        (repoOwner, repoName, filePath, githubToken = null) 
+      {
+        let res = null, fetch_response = null;
+        const baseUrl = "https://api.github.com";
+        const headers = { Accept: "application/vnd.github.v3+json" };
+
+        if (githubToken) 
+        {
+          headers.Authorization = `token ${githubToken}`;
+        }
+
+        // 1. Get the commit history for the file
+        const commitsUrl = `${baseUrl}/repos/${repoOwner}/${repoName}/commits?path=${filePath}`;
+        fetch_response = await fetch(commitsUrl, { headers });
+        if (fetch_response.ok) 
+        {
+          const commits = await fetch_response.json();
+
+          // 2. Iterate through commits and get file size for each
+          const fileSizesPerCommit = [];
+          for (const commit of commits) 
+          {
+            const commitSha = commit.sha;
+            const commitDate = commit.commit.committer.date;
+
+            const commitDetailsUrl = `${baseUrl}/repos/${repoOwner}/${repoName}/git/trees/${commitSha}?recursive=1`;
+            fetch_response = await fetch(commitDetailsUrl, { headers });
+
+            if (fetch_response.ok) 
+            {
+              const commitDetails = await fetch_response.json();
+
+              // Find the file in the commit's tree
+              const fileEntry = commitDetails.tree.find((entry) => entry.path === filePath);
+
+              if (!fileEntry) 
+              {
+                fileSizesPerCommit.push({
+                  commitSha,
+                  commitDate,
+                  fileSize: null,
+                  error: { status: 404},
+                  message: "File not found in this commit"
+                });
+                continue;
+              }
+
+              // Get file size if it's a blob
+              if (fileEntry.type === "blob") 
+              {
+                fileSizesPerCommit.push({
+                  commitSha,
+                  commitDate,
+                  fileSize: fileEntry.size,
+                  error: null,
+                  message: null
+                });
+              } 
+              else 
+              {
+                fileSizesPerCommit.push({
+                  commitSha,
+                  commitDate,
+                  fileSize: null,
+                  error: { status: 400 },
+                  message: "File is not a blob in this commit."
+                });
+              }
+            }
+            else
+            {
+              break;
+            }
+          }
+
+          res = {sizes: fileSizesPerCommit, status: fetch_response?.status};
+        }
+        else
+        {
+          res = {sizes: null, status: fetch_response?.status};
+        }
+
+        return res;
+      }
+
+      /**
+       * Extracts the repository owner, repository name, and file path from a GitHub URL.
+       *
+       * Args:
+       *   githubUrl: The GitHub URL (e.g., "https://github.com/Dulce-Engineering/menu-buddy/blob/main/src/Menu_Buddy.mjs").
+       *
+       * Returns:
+       *   An object with the following properties:
+       *     - owner: The repository owner (e.g., "Dulce-Engineering").
+       *     - repo: The repository name (e.g., "menu-buddy").
+       *     - filePath: The file path within the repository (e.g., "src/Menu_Buddy.mjs").
+       *   Or null if the URL is not a valid GitHub file URL
+       */
+      function Extract_GitHub_Info(githubUrl) 
+      {
+        let res = null, url = null;
+
+        try {url = new URL(githubUrl);} 
+        catch {url = null;}
+        if (url?.hostname == "github.com") 
+        {
+          const parts = url.pathname.split("/").filter((part) => part !== "");
+          if (!(parts.length < 5 || parts[2] !== "blob"))
+          {
+            const owner = parts[0];
+            const repo = parts[1];
+            const branch = parts[3];
+            const filePath = parts.slice(4).join("/");
+
+            res = { owner, repo, filePath };
+          }
+        }
+
+        return res;
+      }
+
+      function Find_Size_At_Time(data, start_millis)
+      {
+        let res = 0;
+
+        for (let i = 0; i < data.length; i++)
+        {
+          if (data[i].x > start_millis)
+          {
+            res = i > 0 ? data[i - 1].y : 0;
+            break;
+          }
+          else if (data[i].x == start_millis)
+          {
+            res = data[i].y;
+            break;
+          }
+        }
+
+        return res;
+      }
+
+      function Format(str)
+      {
+        const mql = window.matchMedia("screen and (max-width: 768px)");
+        if (mql.matches)
+        {
+          str = str.replaceAll(",", "<br>");
+        }
+
+        return str;
+      }
+
+      // events =========================================================================
+
+      function On_Mutation(mutations)
+      {
+        for (const mutation of mutations)
+        {
+          for (const node of mutation.addedNodes)
+          {
+            if (ads_elem && node.nodeType === 1 && node.nodeName == "IFRAME")
+            {
+              node.style.cssText = "width:100%;position:relative;border:none;";
+              ads_elem.appendChild(node);
+
+              console.log("iframe intercepted.");
+            }
+          }
+        }
+      }
+
+      function On_Click_Del_All_Btn()
+      {
+        const charts = file_list.querySelectorAll("de-line-chart");
+        charts.forEach((c) => c.remove());
+        Update_Nav();
+      }
+
+      async function On_Click_Add_File_Btn()
+      {
+        const file_data = await file_form.Show_Async();
+        if (file_data)
+        {
+          const wait = Render_Wait();
+          file_list.appendChild(wait);
+
+          const github_info = Extract_GitHub_Info(file_data.url);
+          if (github_info)
+          {
+            let api_res = await Get_File_Sizes_Per_Commit
+              (github_info.owner, github_info.repo, github_info.filePath);
+
+            if (api_res?.status == 200)
+            {
+              const data = api_res.sizes.map(f => { return {x: Date.parse(f.commitDate), y: f.fileSize};});
+              data.sort((a, b) => a.x - b.x);
+
+              const title = github_info.repo + ": " + github_info.filePath;
+              const file_elem = Render_Chart(title, data);
+              file_list.appendChild(file_elem);
+              file_elem.items = data;
+
+              const summary_elem = Render_Summary(data, file_elem);
+              file_elem.appendChild(summary_elem);
+              Update_Nav();
+            }
+            else if (api_res?.status == 403)
+            {
+              forbidden_alert.Alert();
+            }
+            else
+            {
+              error_alert.Show();
+            }
+          }
+          else
+          {
+            //alert("Invalid URL");
+          }
+          wait.remove();
+        }
+      }
+
+      function On_Click_Del_File_Btn(event, chart_elem)
+      {
+        chart_elem.remove();
+        Update_Nav();
+      }
+
+      function On_Click_Toggle_Btn(event, summary_elem, range_elem, file_elem)
+      {
+        if (!range_elem.hidden)
+        {
+          summary_elem.start_range.hidden = true;
+          summary_elem.end_range.hidden = true;
+        
+          summary_elem.ranges.style.height = "0";
+          file_elem.highlight.style.visibility = "hidden";
+        }
+        else
+        {
+          summary_elem.start_range.hidden = true;
+          summary_elem.end_range.hidden = true;
+        
+          range_elem.hidden = false;
+          summary_elem.ranges.style.height = "40px";
+          file_elem.highlight.style.visibility = "visible";
+        }
+      }
+
+      function On_Change_Start_Time_Range(event, summary_elem, chart_elem)
+      {
+        const range_elem = event.target;
+        chart_elem.highlight_start = range_elem.value;
+        Update_Summary(summary_elem);
+      }
+
+      function On_Change_End_Time_Range(event, summary_elem, chart_elem)
+      {
+        const range_elem = event.target;
+        chart_elem.highlight_end = range_elem.value;
+        Update_Summary(summary_elem);
+      }
+
+      // rendering ======================================================================
+
+      function Render_Wait()
+      {
+        const html = `
+          <div class="wait">
+            <span class="img">✋</span>
+            <span>Please wait...</span>
+          </div>
+        `;
+        const wait = Utils.toDocument(html).querySelector(".wait");
+
+        return wait;
+      }
+
+      function Update_Nav()
+      {
+        const charts = file_list.querySelectorAll("de-line-chart");
+        if (charts.length > 0)
+        {
+          del_all_btn.hidden = false;
+          file_list.hidden = false;
+          docs.classList.add("hidden");
+        }
+        else
+        {
+          del_all_btn.hidden = true;
+          file_list.hidden = true;
+          docs.classList.remove("hidden");
+        }
+      }
+
+      function Render_Chart(title, data)
+      {
+        const html = `
+          <de-line-chart title="${title}" x-label="Time" y-label="Size">
+            <button cid="del_btn" slot="title" class="header small">
+              <span class="text">Delete</span>
+            </button>
+          </de-line-chart>
+        `;
+        const elements = Utils.toDocument(html);
+        const chart_elem = elements.querySelector("de-line-chart");
+        const del_btn = elements.querySelector("[cid=del_btn]");
+
+        del_btn.addEventListener("click", (e) => On_Click_Del_File_Btn(e, chart_elem));
+
+        return chart_elem;
+      }
+
+      function Render_Summary(data, file_elem)
+      {
+        const html = `
+          <div cid="ranges" class="ranges" style="height: 0;">
+            <input cid="start_range" type="range" value="0" step="any" class="time-range" hidden>
+            <input cid="end_range" type="range" value="100" step="any" class="time-range" hidden>
+          </div>
+          <div class="summary">
+
+            <label class="header desktop"></label>
+            <button cid="start_btn" class="header small"><span class="text">Start</span></button>
+            <button cid="end_btn" class="header small"><span class="text">End</span></button>
+            <label class="header">Difference</label>
+
+            <label class="label">Time</label>
+            <label class="label mobile">Time</label>
+            <label class="label mobile">Time</label>
+            <span cid="start_time"></span>
+            <span cid="end_time"></span>
+            <span cid="duration"></span>
+
+            <label class="label">Size</label>
+            <label class="label mobile">Size</label>
+            <label class="label mobile">Size</label>
+            <span cid="start_size"></span>
+            <span cid="end_size"></span>
+            <span cid="d_size"></span>
+
+          </div>
+        `;
+        const summary_elem = Utils.toDocument(html);
+        Utils.Set_Id_Shortcuts(summary_elem, summary_elem, "cid");
+        summary_elem.data = data;
+
+        summary_elem.start_btn.addEventListener
+          ("click", (e) => On_Click_Toggle_Btn(e, summary_elem, summary_elem.start_range, file_elem));
+        summary_elem.end_btn.addEventListener
+          ("click", (e) => On_Click_Toggle_Btn(e, summary_elem, summary_elem.end_range, file_elem));
+        summary_elem.start_range.addEventListener
+          ("input", (e) => On_Change_Start_Time_Range(e, summary_elem, file_elem));
+        summary_elem.end_range.addEventListener
+          ("input", (e) => On_Change_End_Time_Range(e, summary_elem, file_elem));
+        
+        Update_Summary(summary_elem);
+
+        return summary_elem;
+      }
+
+      function Update_Summary(summary_elem)
+      {
+        const min_millis = Math.min(...summary_elem.data.map((d) => d.x));
+        const max_millis = Math.max(...summary_elem.data.map((d) => d.x));
+        let d_millis = max_millis - min_millis;
+
+        const start_prc = summary_elem.start_range.valueAsNumber;
+        const start_millis = (start_prc / 100 * d_millis) + min_millis;
+        const start_time = Format((new Date(start_millis)).toLocaleString());
+        summary_elem.start_time.innerHTML = start_time;
+
+        const end_prc = summary_elem.end_range.valueAsNumber;
+        const end_millis = (end_prc / 100 * d_millis) + min_millis;
+        const end_time = Format((new Date(end_millis)).toLocaleString());
+        summary_elem.end_time.innerHTML = end_time;
+
+        d_millis = end_millis - start_millis;
+        const duration_split = Utils.Split_Time(d_millis, true);
+        const duration = 
+          duration_split.days + " days, " + 
+          duration_split.hrs + " hours, " + 
+          duration_split.mins + " minutes";
+        summary_elem.duration.innerHTML = Format(duration);
+
+        const start_bytes = Find_Size_At_Time(summary_elem.data, start_millis);
+        const start_size = start_bytes + " bytes";
+        summary_elem.start_size.innerText = start_size;
+
+        const end_bytes = Find_Size_At_Time(summary_elem.data, end_millis);
+        const end_size = end_bytes + " bytes";
+        summary_elem.end_size.innerText = end_size;
+
+        const d_size = end_bytes - start_bytes + " bytes";
+        summary_elem.d_size.innerText = d_size;
+      }
+    </script>
+
+    <script src="https://vemtoutcheeg.com/400/8903613"></script>
+
+  </head>
+
+  <body>
+
+    <div id="ads_elem"></div>
+
+    <header>
+      <!-- 🛸 🛰️ 🚀 ☄️ -->
+      <h1><span class="emoji">⭐</span><span>Magnihube</span><span class="emoji">⭐</span></h1>
+      <nav>
+        <button id="add_file_btn"><span class="text">Add File</span></button>
+        <button id="del_all_btn" hidden><span class="text">Delete All</span></button>
+      </nav>
+    </header>
+
+    <main id="file_list"></main>
+
+    <main id="docs">
+      <h1>
+        Visualize file growth over time with this free & private code analysis tool.
+      </h1>
+      <!--p>
+        Unlock insights into your code's evolution with Magnihube, a free and 
+        privacy-focused Progressive Web App (PWA). 
+      </p>
+      <p>
+        Magnihube allows you to effortlessly chart the growth of individual files 
+        across your Git commits, providing valuable data for development estimation 
+        and understanding project history.
+      </p-->
+      <p class="highlight">
+        <span class="text">
+          To get started click/touch "Add File" above and supply the GitHub URL of the 
+          file you wish to inspect.
+        </span>
+      </p>
+      <!--h2>Features</h2>
+      <ul>
+        <li>
+          Track File History: Visualize the growth of multiple files over time.
+          <span class="icon">📈</span>
+        </li>
+        <li>
+          Customizable Analysis: Set precise start and end times for your analysis.
+          <span class="icon">🔧</span>
+        </li>
+        <li>
+          GitHub Integration: Seamlessly analyze your GitHub repositories.
+          <span class="icon">📦</span>
+        </li>
+        <li>
+          User-Friendly Interface: Easy to use, no technical expertise required.
+          <span class="icon">😊</span>
+        </li>
+        <li>
+          No Account Needed: Start analyzing instantly, no logins or sign-ups.
+          <span class="icon">🚀</span>
+        </li>
+        <li>
+          Completely Free: Enjoy all features without any cost.
+          <span class="icon">🆓</span>
+        </li>
+        <li>
+          Local Data Storage: Your data stays private on your device.
+          <span class="icon">💾</span>
+        </li>
+        <li>
+          Development Estimation: Use historical data to accurately estimate future 
+          development efforts.
+          <span class="icon">🔮</span>
+        </li>
+        <li>
+          Code Evolution Insights: Gain a deeper understanding of the work invested 
+          in your modules.
+          <span class="icon">💡</span>
+        </li>
+      </ul-->
+      <!--p>
+        Magnihube empowers developers to make informed decisions by providing clear, 
+        visual representations of code changes. 
+      </p>      
+      <p>
+        Analyze your project's history with confidence, knowing your data remains 
+        secure and private. 
+      </p-->
+      <p>
+        🚀Try Magnihube today and experience a new level of code analysis!🚀<br>
+        🤪P.S. Our marketing AI drinks too much coffee.🤪
+      </p>
+    </main>
+
+    <footer>
+      © Copyright Dulce Engineering 2025. All rights reserved. v1
+    </footer>
+
+    <de-dialog-alert id="forbidden_alert">
+      <h1 slot="header">Ooops!</h1>
+      <p slot="body">GitHub access has been forbidden.</p>
+      <p slot="body">We've probably exhausted our access quota for now.</p>
+    </de-dialog-alert>
+
+    <de-dialog-alert id="error_alert">
+      <h1 slot="header">Ooops!</h1>
+      <p slot="body">There was some problem accessing GitHub.</p>
+    </de-dialog-alert>
+
+    <de-dialog-form id="file_form">
+      <h1 slot="header"><span>Chart Details</span></h1>
+      <label slot="fields" for="url">GitHub URL:</label>
+      <input id="url" slot="fields" name="url" type="url">
+    </de-dialog-form>
+
+    <template>
+
+      <div cid="ranges" class="ranges" style="height: 0;">
+        <input cid="start_range" type="range" value="0" step="any" class="time-range" hidden>
+        <input cid="end_range" type="range" value="100" step="any" class="time-range" hidden>
+      </div>
+
+      <div class="summary">
+
+        <label class="header desktop"></label>
+        <button cid="start_btn" class="header small"><span class="text">Start</span></button>
+        <button cid="end_btn" class="header small"><span class="text">End</span></button>
+        <label class="header">Difference</label>
+
+        <label class="label">Time</label>
+        <label class="label mobile">Time</label>
+        <label class="label mobile">Time</label>
+        <span cid="start_time"></span>
+        <span cid="end_time"></span>
+        <span cid="duration"></span>
+
+        <label class="label desktop">Size</label>
+        <span cid="start_size"></span>
+        <span cid="end_size"></span>
+        <span cid="d_size"></span>
+
+      </div>
+
+    </template>
+
+  </body>
+
+</html>

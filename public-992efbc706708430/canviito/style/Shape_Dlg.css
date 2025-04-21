@@ -1,0 +1,75 @@
+shape-dlg dialog
+{
+  background-color: var(--green);
+  border: none;
+  box-shadow: 0 5px 10px 5px #0004;
+  border: 2px outset #fff5;
+}
+
+shape-dlg header
+{
+}
+shape-dlg header h1
+{
+  color: #000;
+  font-size: 35px;
+  padding: 0 0 10px 0;
+  margin: 0;
+  flex-grow: 1;
+}
+
+shape-dlg main
+{
+  grid-template-columns: 1fr 2fr;
+  grid-row-gap: 10px;
+  grid-column-gap: 10px;
+  overflow: auto;
+  align-content: start;
+  align-items: center;
+  display: grid;
+  margin: 20px 0;
+}
+shape-dlg input
+{
+  border: none;
+  border-radius: 7px;
+  padding: 8px;
+  background-color: #0002;
+  margin: 0;
+
+  font-family: 'Quicksand', sans-serif;
+  font-size: 16px;
+  width: 200px;
+}
+shape-dlg input:focus-visible
+{
+  outline: 1px solid #0005;
+}
+shape-dlg select
+{
+  border: none;
+  border-radius: 7px;
+  padding: 8px;
+  background-color: #0002;
+  margin: 0;
+  
+  font-family: 'Quicksand', sans-serif;
+  font-size: 16px;
+}
+shape-dlg label
+{
+  margin-right: 10px;
+  padding: 0;
+  margin: 0;
+  font-weight: 100;
+  text-align: right;
+}
+shape-dlg span
+{
+  text-align: left;
+}
+
+shape-dlg footer
+{
+  text-align: right;
+}

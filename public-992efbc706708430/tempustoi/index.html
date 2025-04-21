@@ -1,0 +1,1201 @@
+<!doctype html>
+<html lang="en">
+
+  <head>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-PBDX6F4VCB"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-PBDX6F4VCB');
+    </script>
+
+    <link rel="manifest" href="/tempustoi/manifest.json">
+    <title>TempusToi</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="TempusToi is a simple and efficient task scheduling tool that helps you stay on top of deadlines. It displays a sorted list of countdown timers, visually representing the time remaining for each task at a glance. Unlike cloud-based planners, TempusToi requires no online account or subscription—it runs entirely on your PC or mobile device, keeping your tasks private and accessible anytime.">
+    <meta name="keywords" content="Online countdown timer,Countdown timer app,Event countdown timer,Countdown clock online,Free countdown timer,Timer for events,Custom countdown timer,Countdown timer for website,Countdown timer with alarm,Set a countdown timer,Productivity timer,Focus timer app,Pomodoro timer alternative,Work countdown clock,Time tracking app,Time blocking tool,Task countdown app,Stay focused timer,Countdown to New Year,Birthday countdown app,Wedding countdown timer,Retirement countdown clock,Vacation countdown tool,Deadline countdown app,Exam countdown timer">
+    <meta name="author" content="Dulce Engineering Pty. Ltd.">
+    <meta name="robots" content="index, follow"> 
+    <meta property="og:title" content="TempusToi">
+    <meta property="og:description" content="TempusToi is a simple and efficient task scheduling tool that helps you stay on top of deadlines. It displays a sorted list of countdown timers, visually representing the time remaining for each task at a glance. Unlike cloud-based planners, TempusToi requires no online account or subscription—it runs entirely on your PC or mobile device, keeping your tasks private and accessible anytime.">
+    <meta property="og:image" content="https://dulceeng.com.au/tempustoi/screenshot-1.png">
+    <meta property="og:url" content="https://dulceeng.com.au/tempustoi">
+    <meta property="og:type" content="website">
+    <link rel="shortcut icon" href="/tempustoi/favicon.ico">
+
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Roboto+Slab:wght@100..900&family=Rye&family=Slabo+27px&display=swap');
+
+      /* #EBD5B8, #EFBC9C, #EA572A, #0B3F30, #E39828 */
+      :root 
+      {
+        --white: #EBD5B8;
+        --pink: #EFBC9C;
+        --red: #EA572A;
+        --green: #0B3F30;
+        --orange: #E39828;
+        --overdue: #0f08;
+      }
+
+      html
+      {
+        width: 100%;
+        min-height: 100vh;
+        font-size: 20px;
+      }
+      html, dialog
+      {
+        background: 
+          radial-gradient(circle farthest-corner at 50% 10%, var(--green) 10%, rgb(from var(--green) calc(r / 2) calc( g / 2) calc(b / 2))) no-repeat;
+          /* rgb(from var(--green) calc(r / 2) calc( g / 2) calc(b / 2)); */
+      }
+      html, body, input, button
+      {
+        font-family: "Roboto Slab", serif;
+        font-optical-sizing: auto;
+        font-weight: 400;
+        font-style: normal;
+      }
+      body
+      {
+        box-sizing: border-box;
+        width: calc(100% - 40px);
+        min-height: calc(100vh - 40px);
+        margin: 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+        padding: 1% 6% 6% 6%;
+        color: var(--white);
+        border: 10px double var(--orange);
+      }
+      main
+      {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      form
+      {
+        color: var(--white);
+        border: 10px double var(--orange);
+      }
+      footer
+      {
+        color: var(--red);
+        font-size: 0.8rem;
+        margin: 40px 0 0 0;
+        width: 100%;
+        text-align: center;
+      }
+
+      dialog
+      {
+        width: 60%;
+        transition: display 1s allow-discrete;
+        animation: fall 1s ease-out forwards;
+      }
+      dialog[open]
+      {
+        transform-origin: 50% 0%;
+        animation: swingIn 1.5s ease-out forwards;
+      }
+      dialog::backdrop
+      {
+        background: radial-gradient(circle farthest-corner at center, #000a, #0002);
+      }
+      dialog form
+      {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        padding: 6%;
+      }
+      dialog main
+      {
+        display: flex;
+        flex-direction: column;
+        gap: 32px;
+      }
+      dialog .msg
+      {
+        text-align: center;
+      }
+      dialog .field
+      {
+        display: flex;
+        flex-direction: column;
+        gap: 0px;
+        width: 100%;
+      }
+      dialog label
+      {
+        color: var(--orange);
+        font-size: 1.5rem;
+      }
+      dialog footer
+      {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        width: 100%;
+      }
+
+      nav
+      {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin: 0 0 20px 0;
+      }
+      header
+      {
+        font-family: "Rye", serif;
+        font-size: 2.5rem;
+        color: var(--red);
+        fill: var(--red);
+        stroke: none;
+        margin: 0 0 0 0;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        flex-direction: row;
+        align-items: center;
+
+        svg
+        {
+          width: 70%;
+          text-shadow: -0.4vw 0.4vw 0 var(--orange);
+        }
+        &.timer
+        {
+          justify-content: end;
+          font-family: "Roboto Slab", serif;
+          font-size: 1.4rem;
+          margin: 0;
+          padding: 10px 0 0 0;
+          gap: 10px;
+        }
+        &.timer label
+        {
+          margin: 0 auto 0 0;
+          color: var(--orange);
+        }
+        &.timer .time
+        {
+          font-size: 1rem;
+        }
+        span.overdue
+        {
+          color: var(--overdue);
+        }
+      }
+
+      button
+      {
+        background-color: var(--orange);
+        color: var(--green);
+        border: 2px solid transparent;
+        xbackground: 
+          radial-gradient(circle farthest-corner at 50% 10%, var(--orange) 30%, rgb(from var(--orange) calc(r / 1.5) calc( g / 1.5) calc(b / 1.5))) no-repeat;
+
+        width: fit-content;
+        border-radius: 100px;
+        margin: 0;
+        padding: 10px 20px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        font-weight: 600;
+      }
+      button.info
+      {
+        padding: 0;
+        width: 25px;
+        height: 25px;
+        line-height: 20px;
+        margin: 0 5px 0 0;
+        font-weight: 100;
+        font-weight: 900;
+      }
+      button.img
+      {
+        padding: 10px;
+        font-size: 0;
+      }
+      button img
+      {
+        width: 24px;
+        height: 24px;
+        pointer-events: none;
+      }
+      input
+      {
+        border: none;
+        border-bottom: 1px solid var(--red);
+        background-color: transparent;
+        color: var(--white);
+        padding: 0 0 5px 0;
+        margin: 8px 0 0 0;
+        font-size: 1.3rem;
+      }
+      input:focus-visible
+      {
+        border-bottom: 1px solid var(--white);
+        outline: none;
+      }
+      [popover]
+      {
+        background-color: var(--orange);
+        width: 50%;
+        padding: 20px;
+      }
+      .alarm .counter
+      {
+        animation: pulsate-red 0.4s infinite alternate ease-in-out;
+        border-radius: 100%;
+      }
+
+      #bk
+      {
+        position: absolute;
+        left: 0; right: 0;
+        top: 0; bottom: 0;
+        pointer-events: none;
+        z-index: -1;
+        overflow: hidden;
+      }
+      #sound_btn
+      {
+        background-color: transparent;
+        color: var(--orange);
+        border: 2px solid var(--orange);
+      }
+      #sound_btn.on
+      {
+        background-color: var(--orange);
+        color: var(--green);
+        border: 2px solid transparent;
+      }
+      #ads_elem
+      {
+        width: 100%;
+        height: 80px;
+        overflow: hidden;
+        margin: 0 0 20px 0;
+        xdisplay: none;
+      }
+      #about_info
+      {
+        text-align: justify;
+        font-size: 1.4rem;
+        padding: 5% 10%;
+      }
+      .timer-panel
+      {
+        width: 100%;
+        max-width: 1000px;
+        overflow: hidden;
+        margin: 0 0 10px 0;
+        border-top: 1px dashed var(--orange);
+      }
+      .timer-panel:first-child
+      {
+        border-top: none;
+      }
+
+      de-clock
+      {
+        position: absolute;
+        display: block;
+        width: 200px;
+        height: 200px;
+        animation: dedial-zoom-spin 5s linear infinite;
+        fill: var(--pink);
+        stroke: var(--pink);
+        margin: auto auto;
+        top: calc(50% - 100px);
+        left: calc(50% - 100px);
+      }
+      de-clock-dial
+      {
+        position: absolute;
+        left: 0; right: 0;
+        top: 0; bottom: 0;
+      }
+      de-dialmarks
+      {
+        position: absolute;
+        left: 0; right: 0;
+        top: 0; bottom: 0;
+        fill: none;
+        stroke-width: 10px;
+      }
+      de-dialmarks.hours
+      {
+        transform: rotate(-1deg);
+      }
+      de-dialmarks.minutes
+      {
+
+      }
+      de-clock text
+      {
+        stroke: none;
+      }
+      de-clock .hand-hr
+      {
+        stroke: none;
+      }
+      de-clock .hand-min
+      {
+        stroke: none;
+      }
+      de-clock .hand-sec
+      {
+        fill: none;
+      }
+
+      de-timer
+      {
+        display:flex;
+        justify-content:center;
+        font-size: 0;
+
+        .label
+        {
+          color: #fff;
+          font-size: min(6vw, 70px);
+          line-height: min(6vw, 70px);
+
+          display:flex;
+          justify-content:center;
+          align-items:center;
+          flex-direction:column;
+
+          position: absolute;
+          left: 0px; 
+          top: 0px; 
+          width: 100%;
+          height: 100%;
+          transform: translateZ(25px);
+        }
+        .label-sub
+        {
+          font-size: min(1.9vw, 30px);
+          line-height: min(1.9vw, 30px);
+        }
+        .counter
+        {
+          display: block;
+          width: 100%;
+          position: relative;
+          transform-style: preserve-3d;
+        }
+        .dial
+        {
+          rotate:-91deg;
+        }
+        .anim-border
+        {
+          stroke-width: 8px;
+          stroke:#f008;
+          fill: none;
+          pointer-events: none;
+
+          display: block;
+          position: absolute;
+          left: 0px;
+          top: 0px;
+          width: 100%;
+          --z: -50px;
+        }
+        &.overdue .anim-border
+        {
+          stroke: #0f08;
+        }
+        .ticks
+        {
+          stroke-width:15px;
+          stroke: #fff8;
+          fill: none;
+
+          display: block;
+          position: relative;
+          width: 100%;
+          padding: 20px 20px;
+          box-sizing: border-box;
+          transform-style: preserve-3d;
+          transform: translateZ(-25px);
+        }
+        .active-marks
+        {
+        }
+        .shadow
+        {
+          stroke:#8888;
+        }
+        .anim-seconds
+        {
+          animation: dedial-spin 10s infinite linear;
+        }
+        .anim-minutes
+        {
+          animation:dedial-spin 30s infinite linear;
+        }
+        .anim-hours
+        {
+          animation:dedial-spin 70s infinite linear;
+        }
+        .anim-days
+        {
+          animation:dedial-spin 100s infinite linear;
+        }
+        .counter.completed
+        {
+          animation: dedial-spin-y 1s forwards linear;
+        } 
+      }
+
+      de-input-period
+      {
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+      }
+      de-input-period input
+      {
+        width: 25%;
+      }
+
+      @keyframes dedial-spin
+      {
+        from
+        {
+          transform: rotate(0deg) translateZ(var(--z, 0));
+        }
+        to
+        {
+          transform: rotate(360deg) translateZ(var(--z, 0));
+        }
+      }
+      @keyframes dedial-spin-y
+      {
+        from
+        {
+          transform: rotateY(0deg) translateZ(var(--z, 0));
+        }
+        to
+        {
+          transform: rotateY(360deg) translateZ(var(--z, 0));
+        }
+      }
+      @keyframes dedial-zoom
+      {
+        from
+        {
+          transform: scale(0.5);
+        }
+        to
+        {
+          transform: scale(5);
+        }
+      }
+      @keyframes dedial-zoom-spin
+      {
+        from
+        {
+          transform: rotate(0deg) translate(var(--d),var(--d));
+        }
+        to
+        {
+          transform: rotate(360deg) translate(var(--d),var(--d));
+        }
+      }
+      @keyframes swingIn 
+      {
+        0%   { transform: perspective(1500px) rotateX(-90deg); }
+        20%  { transform: perspective(1500px) rotateX( 60deg); }
+        40%  { transform: perspective(1500px) rotateX(-30deg); }
+        60%  { transform: perspective(1500px) rotateX( 15deg); }
+        80%  { transform: perspective(1500px) rotateX( -5deg); }
+        100% { transform: perspective(1500px) rotateX(  0deg); }
+      }
+      @keyframes fall
+      {
+        0%   
+        { 
+          opacity: 1;
+          transform: translateY(0px) rotate(0deg); 
+        }
+        100% 
+        { 
+          opacity: 0;
+          transform: translateY(400px) rotate(-90deg); 
+        }
+      }
+      @keyframes pulsate-red 
+      {
+        0% 
+        {
+          background-color: #EA572A00;
+        }
+        100% 
+        {
+          background-color: #EA572A88;
+        }
+      }
+
+      @media screen and (max-width: 768px)
+      {
+        html
+        {
+          font-size: 12px;
+        }
+        body
+        {
+          width: 100%;
+        }
+        body, form
+        {
+          margin: 0;
+          border: none;
+        }
+        input
+        {
+          font-size: 1.5rem;
+        }
+        button
+        {
+          font-size: 1.2rem;
+          line-height: 1,2rem;
+          padding: 5px 12px;
+        }
+
+        header.timer
+        {
+          font-size: 2rem;
+          line-height: 1.8rem;
+        }
+        header.timer .time
+        {
+          font-size: 1.1rem;
+          line-height: 1rem;
+        }
+        
+        dialog
+        {
+          width: 80%;
+        }
+        dialog form
+        {
+          padding: 3%;
+          font-size: 1.6rem;
+        }
+        dialog footer
+        {
+          margin: 0;
+          height: 48px;
+        }
+
+        #about_info
+        {
+          padding: 20px;
+          width: 80%;
+        }
+
+        de-timer .label-sub
+        {
+          font-size: min(2.5vw, 30px);
+          xline-height: min(1.9vw, 30px);
+        }
+        de-timer .ticks
+        {
+          padding: 8px;
+        }
+      }
+    </style>
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Website",
+      "name": "TempusToi",
+      "url": "https://dulceeng.com.au/tempustoi",
+      "description": "TempusToi is a simple and efficient task scheduling tool that helps you stay on top of deadlines. It displays a sorted list of countdown timers, visually representing the time remaining for each task at a glance. Unlike cloud-based planners, TempusToi requires no online account or subscription—it runs entirely on your PC or mobile device, keeping your tasks private and accessible anytime.",
+      "image": "https://dulceeng.com.au/tempustoi/screenshot-1.png"
+    }
+    </script>
+  
+    <script type="module">
+      import DE from "/dedial/dedial.js";
+      import "/component/DeInputPeriod/index.js";
+
+      Main();
+      async function Main()
+      {
+        if ("serviceWorker" in navigator) 
+        {
+          await navigator.serviceWorker.register("/lib/tempustoi-service-worker.js");
+        }
+
+        add_btn.addEventListener("click", On_Click_Add);
+        del_all_btn.addEventListener("click", On_Click_Del_All);
+        ok_btn.addEventListener("click", On_Click_Ok);
+        sound_btn.addEventListener("click", On_Click_Sound);
+
+        Render_Timers();
+        Update_Nav();
+        
+        Ads();
+      }
+
+      function Ads()
+      {
+        //ezstandalone.cmd.push(function() {ezstandalone.showAds(101)});
+
+        const observer = new MutationObserver(On_Mutation);
+        On_Mutation.observer = observer;
+        observer.observe(document.documentElement, { childList: true, subtree: false });
+        function On_Mutation(mutations)
+        {
+          for (const mutation of mutations)
+          {
+            for (const node of mutation.addedNodes)
+            {
+              if (ads_elem && node.nodeType === 1 && node.nodeName == "IFRAME")
+              {
+                node.style.cssText = "width:100%;position:relative;border:none;";
+                ads_elem.appendChild(node);
+
+                console.log("iframe intercepted.");
+              }
+            }
+          }
+        }
+      }
+
+      // events ===================================================================================
+
+      function On_Click_Sound()
+      {
+        sound_btn.innerText = "Sound On";
+        sound_btn.classList.add("on");
+      }
+
+      function On_Click_Add()
+      {
+        timer_form.reset();
+        timer_dlg.showModal();
+      }
+
+      function On_Click_Delete(e)
+      {
+        const del_btn = e.target;
+
+        confirm_msg.innerText = 
+          del_btn.timer.title ? 
+            " you want to delete the \"" + del_btn.timer.title + "\" timer" :
+            " you want to delete this timer";
+
+        confirm_ok_btn.onclick = On_Click_Delete_Ok;
+        confirm_ok_btn.timer = del_btn.timer;
+        confirm_dlg.showModal();
+      }
+
+      function On_Click_Delete_Ok(e)
+      {
+        const btn_elem = e.target;
+        const timer_id = btn_elem.timer.id;
+
+        const timer_elem = document.getElementById("timer_" + timer_id);
+        timer_elem.stop();
+
+        const panel_elem = document.getElementById("panel_" + timer_id);
+        panel_elem.remove();
+        
+        Update_Nav();
+
+        Delete_Timer(timer_id);
+      }
+
+      function On_Click_Ok()
+      {
+        const timer = Dlg_Get_Value();
+        timer.id = Date.now();
+
+        Save_Timer(timer);
+
+        Render_Timers();
+        Update_Nav();
+      }
+
+      function On_Timer_Completed(e)
+      {
+        const timer_elem = e.target;
+        Update_Alarm(timer_elem.timer.id, true);
+
+        alarm.play();
+      }
+
+      function On_Click_Quiet(e) 
+      {
+        const quiet_btn_elem = e.target;
+        Update_Alarm(quiet_btn_elem.timer.id, false);
+
+        alarm.pause();
+        alarm.currentTime = 0;
+      }
+
+      function On_Click_Del_All()
+      {
+        confirm_msg.innerText = " you want to delete all timers";
+        confirm_ok_btn.onclick = On_Click_Del_All_Ok;
+        confirm_dlg.showModal();
+      }
+
+      function On_Click_Del_All_Ok()
+      {
+        for (const timer_elem of document.querySelectorAll("de-timer"))
+        {
+          timer_elem.stop();
+        }
+
+        timers_elem.replaceChildren();
+        Update_Nav();
+
+        Delete_Timers();
+      }
+
+      function On_Click_Stop(e)
+      {
+        const stop_btn_elem = e.target;
+        const timer_elem = document.getElementById("timer_" + stop_btn_elem.timer.id);
+
+        timer_elem.toggle();
+      }
+
+      function On_Timer_Click(e)
+      {
+        const timer_elem = e.currentTarget;
+        const elems = e.composedPath();
+        const counter_elem = elems.find(elem => elem.classList.contains("counter"));
+        timer_elem.On_Dial_Completed(counter_elem);
+      }
+
+      // rendering ================================================================================
+
+      function Set_Animations()
+      {
+        let show_animations = true;
+        const show_animations_str = localStorage.getItem("tempustoi-show-anim");
+        if (show_animations_str)
+        {
+          show_animations = JSON.parse(show_animations_str);
+        }
+        if (show_animations)
+        {
+          let dials = document.querySelectorAll(".seconds");
+          for (let dial of dials)
+          {
+            dial.classList.add("anim-seconds");
+          }
+          dials = document.querySelectorAll(".minutes");
+          for (let dial of dials)
+          {
+            dial.classList.add("anim-minutes");
+          }
+          dials = document.querySelectorAll(".hours");
+          for (let dial of dials)
+          {
+            dial.classList.add("anim-hours");
+          }
+          dials = document.querySelectorAll(".days");
+          for (let dial of dials)
+          {
+            dial.classList.add("anim-days");
+          }
+        }
+      }
+
+      function Render_Timers()
+      {
+        document.querySelectorAll(".timer-panel").forEach((elem) => elem.remove());
+
+        const timers = Select_Timers() || [];
+        for (const timer of timers)
+        {
+          if (typeof timer.id =="string" && timer.id.startsWith("timer_"))
+          {
+            const id = parseInt(timer.id.slice(6));
+            timer.id = id;
+          }
+          Render_Timer(timer)
+        }
+
+        Set_Animations();
+      }
+
+      function Render_Title(timer)
+      {
+        let date_str = "";
+        if (timer.time)
+        {
+          const date = new Date(timer.time);
+          const date_format =
+          {
+            weekday: "short", 
+            day: "numeric",
+            month: "numeric",
+            year: "numeric",
+            hour: "numeric",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: true
+          };
+          date_str = 
+            "<span class=\"time\">" + 
+              date.toLocaleString(undefined, date_format) + 
+            "</span>";
+          if (Timer_Is_Overdue(timer))
+          {
+            date_str +=
+              " <span class=\"time overdue\">(overdue)</span>";
+          }
+        }
+
+        const title_html = 
+          DE.Utils.Is_Empty(timer.title) && DE.Utils.Is_Empty(date_str) ? "" : 
+          `<label>${DE.Utils.Append_Str(date_str, timer.title, "<br>")}</label>`;
+        
+        return title_html;
+      }
+
+      function Render_Timer(timer)
+      {
+        const title_html = Render_Title(timer);
+        const timer_elem_id = "timer_" + timer.id;
+        const del_btn_id = "del_btn_" + timer.id;
+        const stop_btn_id = "stop_btn_" + timer.id;
+        const quiet_btn_id = "quiet_btn_" + timer.id;
+        const panel_id = "panel_" + timer.id;
+        const html = `
+          <div id="${panel_id}" class="timer-panel">
+            <header class="timer">
+              ${title_html}
+              <button id="${quiet_btn_id}" hidden>Silence!</button>
+              <button id="${stop_btn_id}" class="stop-btn img">
+                <img src="../images/pause.svg" alt="Pause">
+              </button>
+              <button id="${del_btn_id}" class="del-btn img">
+                <img src="../images/bin.svg" alt="Delete">
+              </button>
+            </header>
+            <de-timer id="${timer_elem_id}" show-labels></de-timer>
+          </div>
+        `;
+        timers_elem.insertAdjacentHTML("beforeend", html);
+
+        const timer_elem = document.getElementById(timer_elem_id);
+        timer_elem.timer = timer;
+        timer_elem.time = timer.time;
+        if (Timer_Is_Overdue(timer)) timer_elem.classList.add("overdue");
+        timer_elem.start();
+        timer_elem.addEventListener("completed", On_Timer_Completed);
+        timer_elem.addEventListener("click", On_Timer_Click);
+
+        const quiet_btn_elem = document.getElementById(quiet_btn_id);
+        quiet_btn_elem.timer = timer;
+        quiet_btn_elem.addEventListener("click", On_Click_Quiet);
+
+        const stop_btn_elem = document.getElementById(stop_btn_id);
+        stop_btn_elem.timer = timer;
+        stop_btn_elem.addEventListener("click", On_Click_Stop);
+
+        const del_btn_elem = document.getElementById(del_btn_id);
+        del_btn_elem.timer = timer;
+        del_btn_elem.addEventListener("click", On_Click_Delete);
+      }
+
+      function Update_Nav()
+      {
+        const timer_elems = document.querySelectorAll("de-timer");
+        const has_timers = timer_elems.length > 0;
+
+        if (!has_timers)
+        {
+          about_info.removeAttribute("popover");
+          bk.hidden = false;
+        }
+        else
+        {
+          about_info.setAttribute("popover", "auto");
+          bk.hidden = true;
+        }
+
+        about_btn.hidden = !has_timers;
+        del_all_btn.hidden = !has_timers;
+
+        if (window.matchMedia("(display-mode: standalone)").matches)
+        {
+          sound_btn.hidden = true;
+        }
+      }
+
+      function Update_Alarm(timer_id, is_on)
+      {
+        const quiet_btn_elem = document.getElementById("quiet_btn_" + timer_id);
+        const panel_elem = document.getElementById("panel_" + timer_id);
+        if (quiet_btn_elem && panel_elem)
+        {
+          if (is_on)
+          {
+            setTimeout(() => Update_Alarm(timer_id, false), 30000);
+            quiet_btn_elem.hidden = false;
+            panel_elem.classList.add("alarm");
+          }
+          else
+          {
+            quiet_btn_elem.hidden = true;
+            panel_elem.classList.remove("alarm");
+          }
+        }
+      }
+
+      // misc =====================================================================================
+
+      function Timer_Is_Overdue(timer)
+      {
+        return timer.time < Date.now();
+      }
+
+      function To_Elements(html_str)
+      {
+        const template = document.createElement("template");
+        template.innerHTML = html_str.trim();
+        const elements = template.content.children;
+
+        const id_elems = template.querySelectorAll("[id]");
+        for (const id_elem of id_elems)
+        {
+          const id = id_elem.getAttribute("id");
+          elements[id] = id_elem;
+        }
+
+        return elements;
+      }
+
+      function Dlg_Get_Value()
+      {
+        let time = DE.Utils.Time_Strs_To_Millis
+          (timer_date.value, timer_time.value, timer_millis.value);
+        if (!time)
+        {
+          time = Date.now();
+        }
+
+        const res =
+        {
+          title: timer_title.value,
+          time
+        };
+
+        return res;
+      }
+
+      // db =======================================================================================
+
+      function Select_Timers()
+      {
+        let timers = null;
+        const timers_str = localStorage.getItem("tempustoi");
+        if (timers_str)
+        {
+          timers = JSON.parse(timers_str);
+          timers = timers.sort((t1, t2) => t1.time - t2.time);
+        }
+
+        return timers;
+        //return null;
+      }
+
+      function Save_Timer(timer)
+      {
+        let timers = Select_Timers() || [];
+        timers = timers.filter(t => t.id != timer.id);
+        timers.push(timer);
+        localStorage.setItem("tempustoi", JSON.stringify(timers));
+      }
+
+      function Delete_Timers()
+      {
+        localStorage.removeItem("tempustoi");
+      }
+
+      function Delete_Timer(id)
+      {
+        let timers = Select_Timers();
+        if (timers)
+        {
+          timers = timers.filter(t => t.id != id);
+          if (timers.length == 0)
+          {
+            Delete_Timers();
+          }
+          else
+          {
+            localStorage.setItem("tempustoi", JSON.stringify(timers));
+          }
+        }
+      }
+
+    </script>
+
+    <script src="https://vemtoutcheeg.com/400/8903613" defer></script>
+
+  </head>
+
+  <body>
+    <div id="bk" hidden>
+      <de-clock style="--d:50%;animation-duration:3s;scale:0.5;opacity:0.05;" auto-start></de-clock>
+      <de-clock style="--d:60%;animation-duration:4s;scale:1;opacity:0.1;" auto-start></de-clock>
+      <de-clock style="--d:70%;animation-duration:5s;scale:1.5;opacity:0.15;" auto-start></de-clock>
+      <de-clock style="--d:80%;animation-duration:6s;scale:2;opacity:0.2;" auto-start></de-clock>
+      <de-clock style="--d:90%;animation-duration:7s;scale:2.5;opacity:0.25;" auto-start></de-clock>
+      <de-clock style="--d:100%;animation-duration:8s;scale:3;opacity:0.3;" auto-start></de-clock>
+
+      <de-clock style="--d:-50%;animation-duration:3s;scale:0.5;opacity:0.05;" auto-start></de-clock>
+      <de-clock style="--d:-60%;animation-duration:4s;scale:1;opacity:0.1;" auto-start></de-clock>
+      <de-clock style="--d:-70%;animation-duration:5s;scale:1.5;opacity:0.15;" auto-start></de-clock>
+      <de-clock style="--d:-80%;animation-duration:6s;scale:2;opacity:0.2;" auto-start></de-clock>
+      <de-clock style="--d:-90%;animation-duration:7s;scale:2.5;opacity:0.25;" auto-start></de-clock>
+      <de-clock style="--d:-100%;animation-duration:8s;scale:3;opacity:0.3;" auto-start></de-clock>
+    </div>
+
+    <div id="ads_elem"></div>
+    <!--div id="ezoic-pub-ad-placeholder-101"></div-->
+
+    <header>
+      <svg viewBox="0 0 320 80" style="xborder: 1px solid #f00">
+        <path id="arcPath" d="M 0 70 A 250 100 0 0 1 320 70" fill="none" stroke="none"/>
+        <text>
+          <textPath href="#arcPath" startOffset="50%" text-anchor="middle" font-size="50px">
+            TempusToi
+          </textPath>
+        </text>
+      </svg>
+    </header>
+
+    <nav>
+      <button id="add_btn" class="img">
+        <img src="../images/plus.svg" alt="Add">
+      </button>
+      <button id="del_all_btn" class="img" hidden>
+        <img src="../images/bin.svg" alt="Delete">
+      </button>
+      <button id="about_btn" popovertarget="about_info">About</button>
+      <button id="sound_btn">Sound Off</button>
+    </nav>
+
+    <div popover id="about_info">
+      <p>
+        TempusToi is a simple task scheduling tool that helps you stay on 
+        top of deadlines. 
+      </p>
+      <p>
+        It displays a sorted list of countdown timers, visually 
+        representing the time remaining for each task at a glance. 
+      </p>
+      <p>
+        Unlike cloud-based 
+        planners, TempusToi requires no online account or subscription—it runs entirely 
+        on your PC or mobile device, keeping your tasks private and accessible anytime. 
+      </p>
+      <p>
+        Please note that, if this app is not installed, due to browser restrictions 
+        sound notifications need to be manually activated every time on startup.
+      </p>
+    </div>
+
+    <main id="timers_elem"></main>
+
+    <dialog id="timer_dlg">
+      <form id="timer_form" method="dialog">
+        <header>
+          Create Timer
+        </header>
+
+        <main>
+          <div class="field">
+            <label>
+              <button class="info" popovertarget="title_info" type="button">i</button>
+              <div popover id="title_info">Titles are optional.</div>
+              Title
+            </label>
+            <input id="timer_title" type="text">
+          </div>
+          <div class="field">
+            <label>
+              <button class="info" popovertarget="date_info" type="button">i</button>
+              <div popover id="date_info">Dates are optional. If not provided, will default to today's date.</div>
+              Date
+            </label>
+            <input id="timer_date" type="date">
+          </div>
+          <div class="field">
+            <label>
+              <button class="info" popovertarget="time_info" type="button">i</button>
+              <div popover id="time_info">Times are optional. If not provided, will default to the start of the day.</div>
+              Time
+            </label>
+            <input id="timer_time" type="time">
+          </div>
+          <div class="field">
+            <label>
+              <button class="info" popovertarget="period_info" type="button">i</button>
+              <div popover id="period_info">
+                Periods are optional. If provided, they will override any date or time setting.
+                A period indicates that the timer should count down a specific amount of time, rather than TO a set date or time.
+              </div>
+              Period
+            </label>
+            <input id="xtimer_millis" type="number" hidden>
+            <de-input-period id="timer_millis"></de-input-period>
+          </div>
+        </main>
+
+        <footer>
+          <button id="ok_btn" type="submit">OK</button>
+          <button id="clr_btn" type="reset">Reset</button>
+          <button id="cancel_btn" type="submit">Cancel</button>
+        </footer>
+      </form>
+    </dialog>
+
+    <dialog id="confirm_dlg">
+      <form method="dialog">
+        <main>
+          <div class="msg">Are you sure<span id="confirm_msg"></span>?</div>
+        </main>
+        <footer>
+          <button id="confirm_ok_btn">OK</button>
+          <button type="submit">Cancel</button>
+        </footer>
+      </form>
+    </dialog>
+
+    <audio id="alarm" preload="auto">
+      <source src="/audio/alarm-1.wav" type="audio/mpeg">
+    </audio>
+  
+    <footer>
+      © Copyright Dulce Engineering 2025. All rights reserved. v2
+    </footer>
+  </body>
+
+</html>

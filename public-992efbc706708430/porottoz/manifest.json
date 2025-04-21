@@ -1,0 +1,33 @@
+{
+  "id": "porottoz",
+  "name": "Porottoz",
+  "short_name": "Porottoz",
+  "description": "Take control of your spending with Porottoz, the colorful and easy-to-use budgeting app designed to show you exactly how much you can spend each day! It calculates your daily spending allowance and includes a countdown timer to keep you on track.",
+  "start_url": "/porottoz/",
+  "scope": "/porottoz/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#000000",
+  "icons": 
+  [
+    {
+      "src": "./image/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "screenshots": 
+  [
+    {
+      "src": "./image/screenshot-portrait.png",
+      "sizes": "1065x1745",
+      "type": "image/png"
+    },
+    {
+      "src": "./image/screenshot-landscape.png",
+      "sizes": "1760x1044",
+      "type": "image/png",
+      "form_factor": "wide"
+    }
+  ]
+}

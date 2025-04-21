@@ -1,0 +1,8 @@
+mkdir "\Users\esteb\Local Sites\plugin-development-site\app\public\wp-content\plugins\dedial"
+mkdir "\Users\esteb\Local Sites\plugin-development-site\app\public\wp-content\plugins\dedial\src"
+
+cmd /c wp-scripts build
+copy de-dial.php "\Users\esteb\Local Sites\plugin-development-site\app\public\wp-content\plugins\dedial\"
+copy src\dedial.js "\Users\esteb\Local Sites\plugin-development-site\app\public\wp-content\plugins\dedial\src\"
+copy src\style.css "\Users\esteb\Local Sites\plugin-development-site\app\public\wp-content\plugins\dedial\src\"
+xcopy build "\Users\esteb\Local Sites\plugin-development-site\app\public\wp-content\plugins\dedial\build" /e /i /y

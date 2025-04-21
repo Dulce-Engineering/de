@@ -1,0 +1,402 @@
+<html>
+  <head>
+    <style>
+      body
+      {
+        color: #fff;
+        background-color: #000;
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin: 20px 0;
+        gap: 16px;
+        width: 100%;
+        xheight: 100%;
+        font-family: sans-serif;
+      }
+      hr
+      {
+        border-color: #f00;
+        width: 70%;
+      }
+      .shadow
+      {
+        stroke: #333;
+      }
+
+      de-dialmarks
+      {
+        width: 150px;
+        height: 150px;
+        stroke: #fff;
+        stroke-width: 10px;
+        fill: none;
+      }
+
+      de-clock-dial
+      {
+        display:inline-block;
+        position: relative;
+      }
+      de-clock-dial de-dialmarks
+      {
+        fill:none;
+        stroke:#fff;
+        width:150px;
+        height:150px;
+        display:inline-block;
+        border-radius:100%;
+      }
+      de-clock-dial .hours
+      {
+        stroke-width:15px;
+        transform:rotate(-91deg);
+      }
+      de-clock-dial .minutes
+      {
+        stroke-width:10px;
+        transform:rotate(-90deg);
+        position:absolute;
+        left:0;top:0;
+      }
+
+      de-clock
+      {
+        position: relative;
+        width: 150px;
+        height: 150px;
+        font-size: 25px;
+        border-radius: 100%;
+      }
+      de-clock de-dialmarks
+      {
+        stroke: #fff;
+      }
+      de-clock .hands
+      {
+        position: absolute;
+        left: 0;
+        top: 0;
+      }
+      de-clock .hand-hr
+      {
+        stroke: none; 
+        fill: #fff;
+      }
+      de-clock .hand-min
+      {
+        stroke: none; 
+        fill: #777;
+      }
+      de-clock .hand-sec
+      {
+        stroke: #f00;
+        fill: none;
+      }
+      
+      de-timer
+      {
+        display: inline-flex;
+        gap: 16px;
+        font-family: Arial, Helvetica, sans-serif;
+        text-align: center;
+      }
+      de-timer de-dial
+      {
+        position: relative;
+        display: inline-block;
+        width: 150px;
+        height: 150px;
+        color: #fff;
+        stroke: #fff;
+        stroke-width: 10px;
+        fill: none;
+      }
+      de-timer .counter
+      {
+        position: relative;
+      }
+      de-timer .counter.completed
+      {
+        animation: dedial-spin-y 1s linear;
+      }
+      de-timer .anim-border
+      {
+        position: absolute;
+        top: -12px;
+        left: -12px;
+        width: calc(100% + 24px);
+        height: calc(100% + 24px);
+        stroke-width: 3px;
+      }
+      de-timer .anim-border.days
+      {
+        animation: dedial-spin 100s infinite linear;
+      }
+      de-timer .anim-border.hours
+      {
+        animation: dedial-spin 70s infinite linear;
+      }
+      de-timer .anim-border.minutes
+      {
+        animation: dedial-spin 30s infinite linear;
+      }
+      de-timer .anim-border.seconds
+      {
+        animation: dedial-spin 10s infinite linear;
+      }
+      de-timer .ticks
+      {
+        width: 110px;
+        height: 110px;
+      }
+      de-timer .ticks .label
+      {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        font-size: 32px;
+      }
+      de-timer .ticks .label .label-sub
+      {
+        font-size: 14px;
+      }
+      de-timer .dial
+      {
+        transform: rotate(-90deg);
+      }
+
+      @keyframes dedial-spin
+      {
+        from
+        {
+          transform: rotate(0deg);
+        }
+        to
+        {
+          transform: rotate(-360deg);
+        }
+      }
+
+      @keyframes dedial-spin-y
+      {
+        from
+        {
+          transform: rotateY(0deg);
+        }
+        to
+        {
+          transform: rotateY(360deg);
+        }
+      }
+
+      xde-timer-compact
+      {
+        fill: none;
+        width: 200px;
+        height: 200px;
+        position: relative;
+      }
+      xde-timer-compact de-dial
+      {
+        stroke: #fff;
+      }
+      xde-timer-compact .anim-border
+      {
+        display: inline-block;
+        width: 100%;
+        height: 100%;
+        stroke-width: 5px;
+        stroke: #fff;
+      }
+      xde-timer-compact .mins, xde-timer-compact .secs, xde-timer-compact .hrs
+      {
+        stroke-width: 7px;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+      }
+      xde-timer-compact .hrs
+      {
+        width: 90%;
+        height: 90%;
+        xstroke: #f00;
+      }
+      xde-timer-compact .mins
+      {
+        width: 80%;
+        height: 80%;
+        xstroke: #00f
+      }
+      xde-timer-compact .secs
+      {
+        width: 70%;
+        height: 70%;
+        xstroke: #0f0;
+      }
+      xde-timer-compact .dial
+      {
+        transform: rotate(-90deg);
+      }
+      xde-timer-compact .label
+      {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        font-family: monospace;
+        font-size: 18px;
+      }
+      xde-timer-compact .sublabel
+      {
+        font-size: 12px;
+      }
+
+      de-gauge
+      {
+        fill: none;
+        stroke: #fff;
+        stroke-width: 10px;
+        width: 200px;
+        height: 200px;
+      }
+    </style>
+
+    <script src="dedial.js" type="module"></script>
+    <script type="module">
+      const dials = document.querySelectorAll("de-gauge");
+      for (const dial of dials)
+      {
+        //dial.addEventListener("click", () => dial.Update());
+        dial.addEventListener("click", () => dial.value--);
+      }
+
+      /*function On_Click()
+      {
+
+      }*/
+    </script>
+  </head>
+
+  <body>
+    <h1>De-DialMarks</h1>
+    <de-dialmarks value="0" style="border:1px solid #666;border-radius:100%;"></de-dialmarks>
+    <de-dialmarks value="1" class="de-dialmarks"></de-dialmarks>
+    
+    <de-dialmarks value="10" tick-width="10" class="de-dialmarks" style="stroke:#f0f;transform:rotate(0deg);"></de-dialmarks>
+    <de-dialmarks value="80" tick-width="1" viewbox-radius="130" class="de-dialmarks" style="stroke:#aaa;stroke-width:80px;transform:rotate(0deg);"></de-dialmarks>
+    <de-dialmarks value="4" gap-width="20" class="de-dialmarks" style="stroke:#ff0;transform:rotate(-1deg);"></de-dialmarks>
+    
+    <de-dialmarks value="10" gap-width="3" base-type="small" class="de-dialmarks" style="stroke:#f00;transform:rotate(150deg);"></de-dialmarks>
+    <de-dialmarks value="15" gap-width="7" base-type="medium" class="de-dialmarks" style="stroke:#0f0;transform:rotate(180deg);"></de-dialmarks>
+    <de-dialmarks value="10" tick-width="6" base-type="large" class="de-dialmarks" style="stroke:#00f;transform:rotate(210deg);"></de-dialmarks>
+
+    <hr>
+    <h1>De-Gauge</h1>
+    <de-gauge max-value="10" value="5" show-shadow></de-gauge>
+    <de-gauge max-value="10" value="5" base-type="small" show-shadow></de-gauge>
+    <de-gauge max-value="10" value="5" base-type="medium" show-shadow></de-gauge>
+    <de-gauge max-value="10" value="5" base-type="large" show-shadow></de-gauge>
+
+    <hr>
+    <h1>De-Counter</h1>
+
+    <hr>
+    <h1>De-Clock-Dial</h1>
+    <de-clock-dial></de-clock-dial>
+
+    <hr>
+    <h1>De-Clock</h1>
+    Sydney, Australia
+    <de-clock auto-start></de-clock>
+    Buenos Aires, Argentina
+    <de-clock auto-start time-zone="America/Argentina/Buenos_Aires"></de-clock>
+    Shanghai, China
+    <de-clock 
+      auto-start 
+      time-zone="Asia/Shanghai" 
+      style-ticks-hr="stroke:#f00;"
+      style-ticks-min="stroke:#0f0;"
+      style-hand-hr="fill:#f00;"
+      style-hand-min="fill:#0f0;"
+      style-hand-sec="stroke:#00f;"    
+      style-numbers="fill:#fff;"
+    ></de-clock>
+    12:34:56<de-clock time-str="2024-09-30T12:34:56"></de-clock>
+
+    <hr>
+    <h1>De-Timer</h1>
+    Test
+    <de-timer auto-start show-labels date="2024-10-17" time="14:30:00"></de-timer>
+    <de-timer auto-start show-labels date="2025-01-01"></de-timer>
+    <de-timer auto-start show-labels time="14:30:00"></de-timer>
+    Time to Christmas
+    <de-timer auto-start show-labels date="2024-12-25"></de-timer>
+    Time to Navidad
+    <de-timer auto-start show-labels 
+    date-year="2024" date-month="12" date-day="25"
+    label-sec="segundos" label-min="minutos" label-hr="horas" label-day="dias"
+    ></de-timer>
+    Time to My Birthday
+    <de-timer
+      date-year="2024" date-month="11" date-day="13"
+      date-hour="0" date-minute="0" date-second="0"
+      auto-start
+    ></de-timer>
+    Time I've Been Alive
+    <de-timer
+      date-year="1971" date-month="11" date-day="13"
+      date-hour="0" date-minute="0" date-second="0"
+      auto-start
+    ></de-timer>
+
+    <hr>
+    <h1>De-Timer-Compact</h1>
+
+    Time to Christmas
+    <de-timer-compact 
+      id="xxx"
+      auto-start 
+      sublabel-text="hrs:min:sec"
+      date-year="2024" date-month="12" date-day="25"
+      date-hour="0" date-minute="0" date-second="0"
+      style="fill:none;stroke:#fff;stroke-width:8px;width:200px;height:200px;position:relative;"
+      style-border="position:absolute;left:0;top:0;width:100%;height:100%;"
+      style-hours="position:absolute;left:5%;top:5%;width:90%;height:90%;"
+      style-minutes="position:absolute;left:10%;top:10%;width:80%;height:80%;"
+      style-seconds="position:absolute;left:15%;top:15%;width:70%;height:70%;"
+      style-label="position:absolute;left:0;top:0;width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;font-size:16px;text-align:center;"
+      style-sublabel="font-size:12px;"
+    ></de-timer-compact>
+
+    <!--de-timer-compact auto-start sublabel-text="hrs:min:sec"
+      date-year="2024" date-month="12" date-day="25"
+      date-hour="0" date-minute="0" date-second="0"
+    ></de-timer-compact>
+    Time Since Page Load
+    <de-timer-compact auto-start sublabel-text="hrs:min:sec"></de-timer-compact>
+    Time Since Start of Year
+    <de-timer-compact auto-start sublabel-text="hrs:min:sec"
+      date-year="2024" date-month="1" date-day="1"
+      date-hour="0" date-minute="0" date-second="0"
+    ></de-timer-compact>
+    Time Since I Was Born
+    <de-timer-compact auto-start sublabel-text="hrs:min:sec"
+      date-year="1971" date-month="11" date-day="13"
+      date-hour="0" date-minute="0" date-second="0"
+    ></de-timer-compact-->
+
+  </body>
+</html>

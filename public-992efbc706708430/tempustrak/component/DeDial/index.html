@@ -1,0 +1,466 @@
+<html>
+
+  <head>
+    <link rel="stylesheet" href="./style.css">
+    <script src="./index.js" type="module"></script>
+
+    <style>
+      body
+      {
+        background-color: #000;
+        color: #fff;
+        margin: 0;
+        padding: 50px;
+        display: flex;
+        flex-direction: column;
+        gap: 50px;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 19px;
+      }
+      article
+      {
+        display: flex;
+        gap: 20px;
+      }
+      de-dial
+      {
+        min-width: 150px;
+        height: 150px;
+      }
+      h1
+      {
+        margin-top: 0;
+        padding-top: 0;
+        font-size: 1.5rem;
+      }
+      code
+      {
+        display: block;
+        margin: 10px 0 0 0;
+        color: #0f0;
+        background-color: #030;
+        padding: 20px;
+        border-radius: 10px;
+        font-size: 0.9rem;
+      }
+      de-action-btn
+      {
+        margin: 10px 0 0 0;
+      }
+      tab
+      {
+        display: inline-block;
+        padding: 0 20px 0 0;
+        margin: 0;
+        font-size: 0;
+      }
+
+      /* Styles for example 8 =========================================================== */
+
+      #dial9
+      {
+        border-radius: 150px;
+        stroke: #6f6;
+        fill: url(#radialGradient);
+        stroke-width: 20px;
+      }
+      #dial9 .label
+      {
+        font-size: 20px;
+        color: #fff;
+        background-color: #000;
+        width: 100px;
+        height: 100px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 150px;
+      }
+      .tick0
+      {
+        stop-color: #f00;
+      }
+      .tick1
+      {
+        stop-color: #f20;
+      }
+      .tick2
+      {
+        stop-color: #f40;
+      }
+      .tick3
+      {
+        stop-color: #f60;
+      }
+      .tick4
+      {
+        stop-color: #f80;
+      }
+      .tick5
+      {
+        stop-color: #fa0;
+      }
+      .tick6
+      {
+        stop-color: #fc0;
+      }
+      .tick7
+      {
+        stop-color: #ff0;
+      }
+      .tick8
+      {
+        stop-color: #ff2;
+      }
+      .tick9
+      {
+        stop-color: #ff4;
+      }
+      .tick10
+      {
+        stop-color: #ff6;
+      }
+
+      /* Styles for example 9 =========================================================== */
+
+      #dial10
+      {
+        background: conic-gradient(#666, #ccc, #666, #ccc, #666);
+        stroke: #d22;
+        border-radius: 150px;
+        stroke-width: 90px;
+      }
+      #dial10 .label
+      {
+        font-size: 20px;
+        color: #fff;
+        background-color: #000;
+        width: 35px;
+        height: 35px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 35px;
+      }
+
+      /* Styles for example 10 ========================================================== */
+
+      #clock
+      {
+        position: relative;
+        display: inline-block;
+        overflow: hidden;
+        min-width: 150px;
+        height: 150px;
+      }
+      #dial_spin, #dial_sec, #dial_min, #dial_hour, #clock_label
+      {
+        position: absolute;
+        stroke-width: 8px;
+      }
+      #dial_spin
+      {
+        width: 160px;
+        height: 160px;
+        stroke: #0f0;
+        top: -5px;
+        left: -5px;
+        animation: spin 20s linear infinite;
+      }
+      #dial_sec
+      {
+        width: 150px;
+        height: 150px;
+        stroke: #ff0;
+        top: 0;
+        left: 0;
+      }
+      #dial_min
+      {
+        min-width: 134px;
+        width: 134px;
+        height: 134px;
+        stroke: #f80;
+        top: 8px;
+        left: 8px;
+      }
+      #dial_hrs
+      {
+        min-width: 120px;
+        width: 120px;
+        height: 120px;
+        stroke: #f00;
+        top: 15px;
+        left: 15px;
+      }
+      #clock_label
+      {
+        width: 146px;
+        height: 146px;
+        top: 0;
+        left: 0;
+        border: 2px solid #44f;
+        border-radius: 200px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      @keyframes spin
+      {
+        from
+        {
+          transform: rotate(0deg);
+        }
+        to
+        {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+
+    <script type="module">
+      // Code for example 8 =============================================================
+
+      dial9.addEventListener("completed", On_Dial_Completed);
+      dial9.addEventListener("tick", On_Dial_Tick);
+      function On_Dial_Tick()
+      {
+        const gs_elem = dial9.querySelector(".grad-stop");
+        gs_elem.classList.remove
+        ("tick0", "tick1", "tick2", "tick3", "tick4", "tick5", 
+          "tick6", "tick7", "tick8", "tick9", "tick10");
+        gs_elem.classList.add("tick" + dial9.value);
+      }
+      function On_Dial_Completed()
+      {
+        dial9.labelText = "Kaboom!";
+        setTimeout(() => dial9.start(), 3000);
+      }
+
+      // Code for example 10 ============================================================
+
+      setInterval(Update_Clock, 1000);
+      function Update_Clock()
+      {
+        const date = new Date();
+        const hh = date.getHours();
+        const mm = date.getMinutes();
+        const ss = date.getSeconds();
+        dial_sec.value = ss;
+        dial_min.value = mm;
+        dial_hrs.value = hh;
+        clock_label.innerText = hh + ":" + mm + ":" + ss;
+      }
+    </script>
+  </head>
+
+  <body>
+
+    <div>
+      <h1>De-Dial Component Examples</h1>
+      Listed below are various examples of the de-dial component along with the relevant
+      HTML and Javascript code. The corresponding CSS has been ommitted but can be
+      obtained within this page's HTML source code.
+    </div>
+
+    <article>
+      <de-dial id="dial1" value="10"></de-dial>
+      <div>
+        <h1>Example 1 - Basic Dial</h1>
+        This example shows a basic dial with default options. Its value is set to the
+        maximum so that we can see every "tick". Note that the length of the
+        ticks (tick-width) is the same as the gap between them (gap-width). This is
+        because both are set to 1 (default value).
+        <code>&lt;de-dial value="10"&gt;&lt;/de-dial&gt;</code>
+      </div>
+    </article>
+
+    <article>
+      <de-dial id="dial2" value="10" gap-width="4"></de-dial>
+      <div>
+        <h1>Example 2 - Tick & Gap Length</h1>
+        This example shows a basic dial but this time the gap-width is set to 4 and
+        the tick-width is set to the default value of 1. In this scenario, we can see
+        that the gaps are now 4 times bigger than the ticks. Tick and gap widths are
+        relative to one another and have no units. 
+        <code>&lt;de-dial value="10" gap-width="4"&gt;&lt;/de-dial&gt;</code>
+      </div>
+    </article>
+
+    <article>
+      <de-dial id="dial3" value="100" max-value="100"></de-dial>
+      <div>
+        <h1>Example 3 - Many Ticks</h1>
+        In this example, the number of ticks has been increased to 100 (max-value).
+        Note that the ticks and gaps are smaller but still of equal length since both 
+        are set to the default value of 1.
+        <code>&lt;de-dial value="100" max-value="100"&gt;&lt;/de-dial&gt;</code>
+      </div>
+    </article>
+
+    <article>
+      <de-dial id="dial4" value="4" max-value="4" gap-width="40"></de-dial>
+      <div>
+        <h1>Example 4 - Few Ticks</h1>
+        In this example, the number of ticks has been decreased to 4 (max-value) and
+        the gap length (gap-width) has been increased to 40. This means that the gaps
+        will be 40 times longer than the ticks, which are still set to the default
+        value of 1.
+        <code>&lt;de-dial value="4" max-value="4" gap-width="40"&gt;&lt;/de-dial&gt;</code>
+      </div>
+    </article>
+
+    <article>
+      <de-dial id="dial5" auto-start auto-stop show-label></de-dial>
+      <div>
+        <h1>Example 5 - Counter</h1>
+        This is an example of the counter functionality. The dial will immediately start 
+        counting down (auto-start) from 0 to 10 and then stop (auto-stop). If you missed this, 
+        just click the "Restart" button. Notice that it also displays the current value
+        (show-label).<br>
+        <de-action-btn for="dial5" for-action="restart">Restart</de-action-btn>
+        <code>&lt;de-dial auto-start auto-stop show-label&gt;&lt;/de-dial&gt;</code>
+      </div>
+    </article>
+
+    <article>
+      <de-dial id="dial6" auto-start auto-stop show-label count-reverse></de-dial>
+      <div>
+        <h1>Example 6 - Reverse Counter</h1>
+        The dial can also be set to count backwards (count-reverse).<br>
+        <de-action-btn for="dial6" for-action="restart">Restart</de-action-btn>
+        <code>&lt;de-dial auto-start auto-stop show-label count-reverse&gt;&lt;/de-dial&gt;</code>
+      </div>
+    </article>
+
+    <article>
+      <de-dial id="dial7" max-value="100" wait-millis="10" auto-start show-label></de-dial>
+      <div>
+        <h1>Example 7 - Tick Rate</h1>
+        In this example, we have reduced the tick rate (wait-millis) from the default
+        of 1000 milliseconds (1 second) to 10 milliseconds. This means the count will
+        occur much faster. Notice that because we have not indicated that the count should
+        stop (auto-stop) the dial starts again.
+        <code>&lt;de-dial max-value="100" wait-millis="10" auto-start show-label&gt;&lt;/de-dial&gt;</code>
+      </div>
+    </article>
+
+    <article>
+      <de-dial id="dial9" max-value="10" tick-width="10" auto-start auto-stop show-label count-reverse>
+        <defs slot="svg">
+          <radialGradient id="radialGradient" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+            <stop offset="75%" style="stop-opacity:1" class="grad-stop"></stop>
+            <stop offset="100%" style="stop-color:rgb(0,0,0); stop-opacity:1"></stop>
+          </radialGradient>
+        </defs>
+      </de-dial>
+      <div>
+        <h1>Example 8 - Counter Events</h1>
+        In this example, we make use of the "tick" event, the "completed" event, and the 
+        "svg" slot. The "tick" event fires everytime the dial counts up or down. 
+        The "completed" event fires when the dial reaches the maximum (max-value) value or 0. This depends
+        on whether the count-reverse attribute is set. The "svg" slot allows us to insert
+        additional svg elements into the dial. In this case, we are injecting a radial
+        gradient.<br>
+        <p>In this "tick" event function we change the css classes so that the edges of the
+        dial change colour from yellow to red.</p>
+        <p>In the "completed" event function we display the word "Kaboom!" (labelText) and 
+        restart the count (start() function).</p>
+        <code>
+          // HTML<br>
+          &lt;de-dial id="dial9" max-value="10" tick-width="10" auto-start auto-stop show-label count-reverse&gt;<br>
+          <tab></tab>&lt;defs slot="svg"&gt;<br>
+          <tab></tab><tab></tab>&lt;radialGradient id="radialGradient" cx="50%" cy="50%" r="50%" fx="50%" fy="50%"&gt;<br>
+          <tab></tab><tab></tab><tab></tab>&lt;stop offset="75%" style="stop-opacity:1" class="grad-stop"&gt;&lt;/stop&gt;<br>
+          <tab></tab><tab></tab><tab></tab>&lt;stop offset="100%" style="stop-color:rgb(0,0,0); stop-opacity:1"&gt;&lt;/stop&gt;<br>
+          <tab></tab><tab></tab>&lt;/radialGradient&gt;<br>
+          <tab></tab>&lt;/defs&gt;<br>
+          &lt;/de-dial&gt;<br>
+          <br>
+          // Javascript<br>
+          dial9.addEventListener("completed", On_Dial_Completed);<br>
+          dial9.addEventListener("tick", On_Dial_Tick);<br>
+          function On_Dial_Tick()<br>
+          {<br>
+            <tab></tab>const gs_elem = dial9.querySelector(".grad-stop");<br>
+            <tab></tab>gs_elem.classList.remove<br>
+            <tab></tab><tab></tab>("tick0", "tick1", "tick2", "tick3", "tick4", "tick5", <br>
+            <tab></tab><tab></tab>"tick6", "tick7", "tick8", "tick9", "tick10");<br>
+            <tab></tab>gs_elem.classList.add("tick" + dial9.value);<br>
+          }<br>
+          function On_Dial_Completed()<br>
+          {<br>
+            <tab></tab>dial9.labelText = "Kaboom!";<br>
+            <tab></tab>setTimeout(() => dial9.start(), 3000);<br>
+          }<br>
+        </code>
+      </div>
+    </article>
+
+    <article>
+      <de-dial id="dial10" max-value="40" viewbox-radius="145" auto-start show-label></de-dial>
+      <div>
+        <h1>Example 9 - Action Buttons</h1>
+        In this example, we have made use of the viewbox-radius attribute to adjust the
+        rendering area of the dial to accommodate the extra wide ticks. Additionally, we
+        make use of the action buttons to control the counter.<br>
+        Notice that no Javascript is required. All we need do is link the buttons to the
+        appropriate dial element (for attribute) and indicate which action will be triggered.
+        In this case, there are 4 actions to choose from: start, stop, pause and reset.<br>
+        <de-action-btn for="dial10" for-action="start">Start</de-action-btn>
+        <de-action-btn for="dial10" for-action="stop">Stop</de-action-btn>
+        <de-action-btn for="dial10" for-action="toggle">Pause / Continue</de-action-btn>
+        <de-action-btn for="dial10" for-action="reset">Reset</de-action-btn>
+        <code>
+          &lt;de-dial id="dial10" max-value="40" viewbox-radius="145" auto-start show-label&gt;&lt;/de-dial&gt;<br>
+          &lt;de-action-btn for="dial10" for-action="start"&gt;Start&lt;/de-action-btn&gt;<br>
+          &lt;de-action-btn for="dial10" for-action="stop"&gt;Stop&lt;/de-action-btn&gt;<br>
+          &lt;de-action-btn for="dial10" for-action="toggle"&gt;Pause / Continue&lt;/de-action-btn&gt;<br>
+          &lt;de-action-btn for="dial10" for-action="reset"&gt;Reset&lt;/de-action-btn&gt;<br>
+        </code>
+      </div>
+    </article>
+
+    <article>
+      <div id="clock">
+        <de-dial id="dial_spin" max-value="100" value="100" gap-width="2"></de-dial>
+        <de-dial id="dial_sec" max-value="59" value="59"></de-dial>
+        <de-dial id="dial_min" max-value="59" value="59"></de-dial>
+        <de-dial id="dial_hrs" max-value="23" value="23"></de-dial>
+        <span id="clock_label">0:0:0</span>
+      </div>
+      <div>
+        <h1>Example 10 - Sample Clock</h1>
+        In this, the final example, we combine several dials to create a clock that displays
+        the current time. Each dial is rendered above the others such that the outer yellow 
+        dial shows seconds, the inner orange dial shows minutes, and the inner red dial
+        shows hours (24hr format). Additional, we display the time as text in the middle of
+        the clock and a decorative green dial along the outer edge.<br>
+        <code>
+          // HTML<br>
+          &lt;de-dial id="dial_spin" max-value="100" value="100" gap-width="2"&gt;&lt;/de-dial&gt;<br>
+          &lt;de-dial id="dial_sec" max-value="59" value="59"&gt;&lt;/de-dial&gt;<br>
+          &lt;de-dial id="dial_min" max-value="59" value="59"&gt;&lt;/de-dial&gt;<br>
+          &lt;de-dial id="dial_hrs" max-value="23" value="23"&gt;&lt;/de-dial&gt;<br>
+          &lt;span id="clock_label"&gt;0:0:0&lt;/span&gt;<br>
+          <br>
+          // Javascript<br>
+          setInterval(Update_Clock, 1000);<br>
+          function Update_Clock()<br>
+          {<br>
+            <tab></tab>const date = new Date();<br>
+            <tab></tab>const hh = date.getHours();<br>
+            <tab></tab>const mm = date.getMinutes();<br>
+            <tab></tab>const ss = date.getSeconds();<br>
+            <tab></tab>dial_sec.value = ss;<br>
+            <tab></tab>dial_min.value = mm;<br>
+            <tab></tab>dial_hrs.value = hh;<br>
+            <tab></tab>clock_label.innerText = hh + ":" + mm + ":" + ss;<br>
+          }<br>
+        </code>
+      </div>
+    </article>
+
+  </body>
+
+</html>

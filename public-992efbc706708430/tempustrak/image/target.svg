@@ -1,0 +1,21 @@
+<svg viewBox="-100 -100 200 200" stroke-width=".3" xmlns="http://www.w3.org/2000/svg" version="1">
+  <defs>
+    <linearGradient id="tl" x1="0" y1="0" x2="-100" y2="-100" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0f08" offset="0%" />
+      <stop stop-color="#0f00" offset="50%" />
+    </linearGradient>
+    <linearGradient id="br" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0f08" offset="0%" />
+      <stop stop-color="#0f00" offset="50%" />
+    </linearGradient>
+  </defs>
+
+  <line x1="0" y1="0" x2="100" y2="0" stroke="url(#br)"/>
+  <line x1="0" y1="0" x2="0" y2="100" stroke="url(#br)"/>
+
+  <line x1="-100" y1="0" x2="0" y2="0" stroke="url(#tl)" />
+  <line x1="0" y1="-100" x2="0" y2="0" stroke="url(#tl)"/>
+
+  <circle cx="0" cy="0" r="10" fill="none" stroke="#0f04"/>
+  <circle cx="0" cy="0" r="5" fill="none" stroke="#0f04"/>
+</svg>
