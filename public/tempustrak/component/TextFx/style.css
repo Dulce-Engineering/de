@@ -1,0 +1,33 @@
+text-fx
+{
+  position: relative;
+  display: inline-block;
+}
+
+text-fx .mask
+{
+  position: absolute;
+  xwidth: 100%;
+  height: 100%;
+  background-color: #fff;
+  right: 0;
+  top: 0;
+}
+
+text-fx .reveal
+{
+  border-left: 3px solid #f00;
+  animation: reveal 0.4s linear forwards;
+}
+
+@keyframes reveal 
+{
+  from 
+  {
+    width: 100%;
+  }
+  to 
+  {
+    width: 0%;
+  }
+}

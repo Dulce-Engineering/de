@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en">
+
+  <head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-KMFPTFXKGX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-KMFPTFXKGX');
+    </script>
+
+    <link rel="manifest" href="/porottoz/manifest.json">
+    <title>RJR - </title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+    <meta name="author" content="Jose Ramirez">
+    <meta name="robots" content="index, follow"> 
+    <meta property="og:title" content="Porottoz">
+    <meta property="og:description" content="">
+    <meta property="og:image" content="https://dulceeng.com.au/porottoz/image/screenshot-landscape.png">
+    <meta property="og:url" content="https://dulceeng.com.au/porottoz">
+    <meta property="og:type" content="website">
+    <link rel="shortcut icon" href="./image/favicon.ico">
+
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap');
+      @import url('https://fonts.googleapis.com/css2?family=Rye&family=Slabo+27px&display=swap');
+      @import url('https://fonts.googleapis.com/css2?family=Esteban&display=swap');
+      @import url('https://fonts.googleapis.com/css2?family=Imperial+Script&display=swap');
+      @import url('https://fonts.googleapis.com/css2?family=Miss+Fajardose&display=swap');
+      @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap');
+
+      :root 
+      {
+        --blue: #75ADDDaa;
+        --white: #ffffffaa;
+        --yellow: #F5B232aa;
+
+        font-family: "Esteban", serif;
+        font-weight: 400;
+        font-style: normal;
+        font-size: 21px;
+      }
+
+      #ads_elem
+      {
+        height: 80px;
+        overflow: hidden;
+        width: 100%;
+      }
+
+      html
+      {
+        background: radial-gradient(circle at bottom, var(--yellow) 0%, var(--white) 20%, var(--blue) 70%);
+        background-attachment: fixed;
+      }
+      body, header, main, nav, article
+      {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        *
+        {
+          width: fit-content;
+        }
+      }
+      body
+      {
+        min-height: 100vh;
+        margin: 0;
+      }
+
+      header
+      {
+        flex-grow: 1;
+        justify-content: center;
+
+        nav
+        {
+          background-color: #990b0b;
+          transform: skewY(-8deg);
+          padding: 50px;
+
+          h1
+          {
+            font-family: "Rye", serif;
+            font-size: 3rem;
+            margin: 20px 0 10px 0;
+
+            background: linear-gradient(to right, #ff0000, #00ff00, #0000ff);
+            background-clip: text;
+            color: transparent;
+          }
+        }
+      }
+
+      h1, h2, h3
+      {
+        xfont-family: "Imperial Script", cursive;
+        xfont-family: "Miss Fajardose", cursive;
+        font-family: "Great Vibes", cursive;
+        font-weight: 400;
+        font-style: normal;
+        margin: 0;
+        padding: 0;
+      }
+      h1
+      {
+        font-size: 3rem;
+        margin: 0 0 40px 0;
+      }
+      h2
+      {
+        font-size: 2rem;
+        margin: 0 0 40px 0;
+      }
+      h3
+      {
+        font-size: 1rem;
+      }
+      p
+      {
+        margin: 0 0 20px 0;
+        padding: 0;
+      }
+
+      @media screen and (min-width: 768px)
+      {
+      }
+      @media screen and (max-width: 768px)
+      {
+      }
+    </style>
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Website",
+      "name": "Porottoz",
+      "url": "https://dulceeng.com.au/porottoz",
+      "description": "",
+      "image": "https://dulceeng.com.au/porottoz/image/screenshot-landscape.png"
+    }
+    </script>
+
+    <script type="module">
+      import Utils from "../lib/Utils.js";
+      import DeDialogForm from "../component/DeDialogForm/index.js";
+
+      Init();
+      async function Init()
+      {
+        if ("serviceWorker" in navigator) 
+        {
+          //await navigator.serviceWorker.register("./lib/service-worker.js");
+        }
+
+        const observer = new MutationObserver(On_Mutation);
+        On_Mutation.observer = observer;
+        observer.observe(document.documentElement, { childList: true, subtree: false });
+        
+        function On_Mutation(mutations)
+        {
+          for (const mutation of mutations)
+          {
+            for (const node of mutation.addedNodes)
+            {
+              if (ads_elem && node.nodeType === 1 && node.nodeName == "IFRAME")
+              {
+                node.style.cssText = "width:100%;position:relative;border:none;";
+                ads_elem.appendChild(node);
+
+                console.log("iframe intercepted.");
+              }
+            }
+          }
+        }
+      }
+
+      Main();
+      function Main()
+      {
+      }
+
+      // events =========================================================================
+
+      // rendering ======================================================================
+
+    </script>
+
+    <script src="https://vemtoutcheeg.com/400/8903613"></script>
+  </head>
+
+  <body>
+    <div id="ads_elem"></div>
+
+    <header>
+      <nav>
+        <h1 slot="title">Yo Vengo De America Del Sur!</h1>
+        <h2 slot="title">Jose Ramirez - El Entrerriano</h2>
+        <!--
+        <button id="add_file_btn"><span class="text">Add File</span></button>
+        <button id="del_all_btn" hidden><span class="text">Delete All</span></button>
+        -->
+      </nav>
+    </header>
+
+    <main id="docs" style="display:none;">
+      <article>
+        <h1 slot="title">Yo Vengo De America Del Sur!</h1>
+        <div>
+          <p>
+            Yo vengo de América del Sur...<br>
+            ...y hoy te traigo mi mensaje,<br>
+            en azul y blanco carruaje<br>
+            ....que es mi bandera Argentina.
+          </p>
+          <p>
+            Por ti... porti mi Patria se inclina,<br>
+            en un saludo cordial...<br>
+            y soy un grito triunfal<br>
+            de la América Latina!
+          </p>
+          <p>
+            Desde el Río de la Plata<br>
+            que besa Uruguay, tierra hermana,<br>
+            hasta Venezuela y las Guayanas...<br>
+            quiero que llegue mi canción...<br>
+            clarinada de rebelión<br>
+            que dió una Raza bizarra<br>
+            León que afiló sus garras<br>
+            y ha de morir con honor!
+          </p>
+          <p>
+            Dame tu mano Ecuador,...<br>
+            Brasil, Bolivia, El Paraguay,<br>
+            Perú, Colombia, Uruguay<br>
+            ...es hora que nos juntemos,<br>
+            vamos a unirnos y juremos<br>
+            ser leales como una Madre<br>
+            "tiremos juntos Compadre"<br>
+            vamos hermano chileno,<br>
+            que juntos venceremos<br>
+            unidos en la razón!
+          </p>
+          <p>
+            Deja que brote el amor...<br>
+            que se borren las fronteras<br>
+            que dividió nuestras Razas,<br>
+            de sentir Americano!
+          </p>
+          <p>
+            Vamos a unirnos hermanos<br>
+            en un mismo pabellón,<br>
+            y que el grito se haga canción<br>
+            por una sola bandera...<br>
+            y que la metralla extranjera<br>
+            que enlutó mi corazón,<br>
+            se pudran en un rincón<br>
+            del absurdo Coloniaje,...<br>
+            ...y mi llanto, se hara coraje...<br>
+            por la América del Sur!
+          </p>
+        </div>
+      </article>
+    </main>
+
+    <footer style="display:none;">
+      © Copyright Jose Ramirez 2025. All rights reserved. v1
+    </footer>
+  </body>
+</html>

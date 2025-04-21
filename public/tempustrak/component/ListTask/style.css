@@ -1,0 +1,66 @@
+
+list-task
+{
+  xborder: 1px solid #fff;
+  list-style-type: none;
+  padding: 10px 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 15px;
+  height: fit-content;
+  width: 100%;
+  overflow: hidden;
+}
+list-task button-task
+{
+  width: 150px;
+  height: 150px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  text-align: center;
+  border: 2px solid #a00;
+  border-radius: 150px;
+  position: relative;
+  transform-style: preserve-3d;
+  transform: rotateY(0deg);
+  transition: transform 1.5s;
+  -webkit-tap-highlight-color: transparent;
+}
+list-task button-task.running
+{
+  transform: rotateY(360deg);
+  border: 2px solid #0a0;
+}
+list-task button-task .menu-btn
+{
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+list-task button-task .time-name
+{
+  xtext-shadow: 
+    10px 0px 5px #aaa,
+    -10px 0px 5px #aaa;
+}
+list-task button-task .time-label,.charge-label
+{
+  font-family: "Share Tech Mono", monospace;
+  color: #0cc;
+  xtext-shadow: 
+    5px 0px 5px #0aa,
+    -5px 0px 5px #0aa;
+}
+list-task .icon
+{
+  width: 32px;
+  width: 32px;
+}

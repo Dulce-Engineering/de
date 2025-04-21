@@ -1,0 +1,98 @@
+
+de-dialog-form dialog
+{
+  border: none;
+  background-color: #fff;
+  color: #111;
+  padding: 30px 40px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+de-dialog-form dialog[open]
+{
+  animation: do-open 0.5s ease-out;
+}
+
+@keyframes do-open 
+{
+  from 
+  {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  to 
+  {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+de-dialog-form dialog::backdrop
+{
+  opacity: 0.66;
+  background-color: #000;
+}
+
+de-dialog-form header,
+de-dialog-form h1
+{
+  font-family: "Playfair Display";
+  font-size: 2.5rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  margin: 0 0 20px 0;
+}
+
+de-dialog-form main
+{
+  grid-template-columns: 1fr 2fr;
+  display: grid;
+  gap: 10px;
+  align-items: center;
+  margin: 0;
+}
+
+de-dialog-form input
+{
+  border: none;
+  background-color: #ccc;
+  padding: 8px 10px;
+  font-size: 1rem;
+  font-weight: 400;
+  font-family: "Poppins", sans-serif;
+}
+de-dialog-form input[type="radio"]
+{
+  justify-self: start;
+}
+de-dialog-form label
+{
+  text-align: right;
+}
+
+de-dialog-form footer
+{
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  gap: 10px;
+  margin: 20px 0 10px 0;
+}
+
+de-dialog-form button
+{
+  border: none;
+  background-color: #000;
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 700;
+  font-family: "Poppins";
+  text-transform: uppercase;
+  padding: 15px 25px;
+  cursor: pointer;
+  letter-spacing: 1px;
+  display: inline-flex;
+  align-items: center;
+}

@@ -16,7 +16,7 @@
     <link href="ico/apple-touch-icon-114-precomposed.png" rel="apple-touch-icon" sizes="114x114">
     <link href="ico/apple-touch-icon-72-precomposed.png" rel="apple-touch-icon" sizes="72x72">
     <link href="ico/apple-touch-icon-57-precomposed.png" rel="apple-touch-icon">
-    <link href="ico/favicon.png" rel="shortcut icon">
+    <link href="favicon.ico" rel="shortcut icon">
     <!-- CSS FILES -->
     <link rel="stylesheet" href="css/animate.min.css">
     <link rel="stylesheet" href="css/hamburger-menu.css">
@@ -34,10 +34,30 @@
       .project-detail .project
       {
         padding-top: 20px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
       }
       .project-detail .project h2
       {
         font-size: 2em;
+        margin-top: 40px;
+        grid-column-start: 1;
+        grid-column-end: 3;
+      }
+      .project-detail .project h2 + p
+      {
+        xgrid-column-start: 1;
+        xgrid-column-end: 3;
+      }
+      .project-detail .project h2 + p + div
+      {
+        text-align: center;
+      }
+      .project-detail .project .lead
+      {
+        grid-column-start: 1;
+        grid-column-end: 3;
       }
       .project-detail .project code
       {
@@ -64,7 +84,15 @@
       }
       de-dial
       {
-        margin: 0 0 0 30px;
+        xmargin: 0 0 0 30px;
+      }
+      de-timer de-dial
+      {
+        margin: 0;
+      }
+      de-timer-compact de-dial
+      {
+        margin: 0;
       }
     </style>
   </head>
@@ -93,14 +121,17 @@
           <div class="container">
             <div class="project-navbar">
               <ul class="navbar">
-                <li><a href="dedial/docs-sp.html#bkimage">BACKGROUND IMAGE</a></li>
-                <li><a href="dedial/docs-sp.html#clock">  CLOCK DIAL</a></li>
-                <li><a href="dedial/docs-sp.html#dedial"> FULL DIAL</a></li>
-                <li><a href="dedial/docs-sp.html#hours">  HOURS DIAL</a></li>
-                <li><a href="dedial/docs-sp.html#large">  LARGE DIAL</a></li>
-                <li><a href="dedial/docs-sp.html#minsecs">MINUTES/SECONDS DIAL</a></li>
-                <li><a href="dedial/docs-sp.html#target"> TARGET</a></li>
-                <li><a href="dedial/docs-sp.html#text">   TEXT</a></li>
+                <li><a href="dedial/docs-sp.html#bkimage">  BACKGROUND IMAGE</a></li>
+                <li><a href="dedial/docs-sp.html#clock">    CLOCK</a></li>
+                <li><a href="dedial/docs-sp.html#clockdial">CLOCK DIAL</a></li>
+                <li><a href="dedial/docs-sp.html#compact">  COMPACT TIMER</a></li>
+                <li><a href="dedial/docs-sp.html#dedial">   FULL DIAL</a></li>
+                <li><a href="dedial/docs-sp.html#hours">    HOURS DIAL</a></li>
+                <li><a href="dedial/docs-sp.html#large">    LARGE DIAL</a></li>
+                <li><a href="dedial/docs-sp.html#minsecs">  MINUTES/SECONDS DIAL</a></li>
+                <li><a href="dedial/docs-sp.html#target">   TARGET</a></li>
+                <li><a href="dedial/docs-sp.html#text">     TEXT</a></li>
+                <li><a href="dedial/docs-sp.html#timer">    TIMER</a></li>
               </ul>
             </div>
 
@@ -125,8 +156,135 @@
               <code>default: 50vh</code>
             </div>
 
-            <!-- Clock Dial -->
+            <!-- Clock -->
             <div class="project" id="clock">
+              <h2>Clock Settings</h2>
+              <p>
+                This block can be used to render traditional 12 hour circular clocks. 
+                It includes 
+              </p>
+              <div style="position:relative;">
+                <de-clock auto-start 
+                  style="display:inline-block;border-radius:100%;position:relative;fill:none;width:150px;height:150px;margin:0;"
+                  style-face="position:absolute;left:0;top:0;width:100%;height:100%;"
+                  style-ticks-hr="stroke:#000;stroke-width:15px;display:inline-block;width:100%;height:100%;transform:rotate(-1deg);"
+                  style-ticks-min="stroke:#f00;stroke-width:10px;position:absolute;left:0;top:0;width:100%;height:100%;"
+                  style-numbers="stroke:none;fill:#000;font-size:25px;"
+                  style-hand-hr="stroke:none;fill:#000;"
+                  style-hand-min="stroke:none;fill:#777;"
+                  style-hand-sec="stroke:#f00;stroke-width:1px;"
+                  ></de-clock>
+              </div>
+              
+              <p class="lead">Auto-Start</p>
+              <p>
+                Checkbox setting that indicates whether the clock should start as 
+                soon as it becomes visible. If not set, the clock can only be started 
+                by calling the start() method.
+              </p>
+              <code>default: on</code>
+
+              <p class="lead">CSS</p>
+              <p>
+                Text setting for specifying CSS attributes for the entire clock component.
+              </p>
+              <code>default: display:inline-block;border-radius:100%;position:relative;</code>
+
+              <p class="lead">CSS - Face</p>
+              <p>
+                Text setting for specifying CSS attributes for the SVG component that renders
+                the numbers and clock hands.
+              </p>
+              <code>default: position:absolute;left:0;top:0;width:100%;height:100%;</code>
+
+              <p class="lead">CSS - Hour Hand</p>
+              <p>
+                Text setting for specifying CSS attributes for the SVG element that renders
+                the hour hand.
+              </p>
+              <code>default: stroke:none;fill:#000;</code>
+
+              <p class="lead">CSS - Hour Marks</p>
+              <p>
+                Text setting for specifying CSS attributes for the component that renders
+                the hour marks.
+              </p>
+              <code>default: stroke:#000;stroke-width:15px;display:inline-block;width:100%;height:100%;transform:rotate(-1deg);</code>
+
+              <p class="lead">CSS - Min/Sec Marks</p>
+              <p>
+                Text setting for specifying CSS attributes for the component that renders
+                the minute/seconds marks.
+              </p>
+              <code>default: stroke:#f00;stroke-width:10px;position:absolute;left:0;top:0;width:100%;height:100%;</code>
+
+              <p class="lead">CSS - Minute Hand</p>
+              <p>
+                Text setting for specifying CSS attributes for the SVG element that renders
+                the minutes hand.
+              </p>
+              <code>default: stroke:none;fill:#777;</code>
+
+              <p class="lead">CSS - Numbers</p>
+              <p>
+                Text setting for specifying CSS attributes for the SVG element that renders
+                the numbers.
+              </p>
+              <code>default: stroke:none;fill:#000;font-size:25px;</code>
+
+              <p class="lead">CSS - Seconds Hand</p>
+              <p>
+                Text setting for specifying CSS attributes for the SVG element that renders
+                the seconds hand.
+              </p>
+              <code>default: stroke:#f00;stroke-width:1px;</code>
+
+              <p class="lead">Hour</p>
+              <p>
+                Text setting for specifying the current hour on the clock. The value supplied
+                should be a number between 1 and 12 inclusive.
+              </p>
+              <code>default: empty</code>
+
+              <p class="lead">HTML Id.</p>
+              <p>
+                Text setting for specifying the HTML ID of the dial.
+              </p>
+              <code>default: empty</code>
+
+              <p class="lead">Minute</p>
+              <p>
+                Text setting for specifying the current minute on the clock. The value supplied
+                should be a number between 1 and 59 inclusive.
+              </p>
+              <code>default: empty</code>
+
+              <p class="lead">Seconds</p>
+              <p>
+                Text setting for specifying the current second on the clock. The value supplied
+                should be a number between 1 and 59 inclusive.
+              </p>
+              <code>default: empty</code>
+
+              <p class="lead">Size</p>
+              <p>
+                Text setting to specify the width and height of the entire dial component. 
+                Any CSS value is allowed.
+              </p>
+              <code>default: 150px</code>
+
+              <p class="lead">Time Zone</p>
+              <p>
+                Text setting to specify the timezone of the clock. 
+                Any <a href="https://en.wikipedia.org/wiki/List_of_tz_database_time_zones">IANA timezone identifier</a>
+                is supported.
+              </p>
+              <code>default: empty</code>
+
+            </div>
+
+            <!-- Clock Dial -->
+            <div class="project" id="clockdial">
               <h2>Clock Dial Settings</h2>
               <p>
                 This block can be used to render clock-style dial markings that include 12 hour
@@ -142,7 +300,14 @@
                   tick-width="1"
                   gap-width="10"
                   style-svg="display:inline-block;border-radius:100%;"
-                  style="fill:none;stroke:#000;stroke-width:15px;width:150px;height:150px;transform:rotate(-91deg);display:inline-block;border-radius:100%;"
+                  style="fill:none;stroke:#000;stroke-width:15px;
+                    width:150px;
+                    height:150px;
+                    transform:translate(-50%,-50%) rotate(-91deg);
+                    position:absolute;
+                    left:50%;
+                    top:50%;
+                    display:inline-block;border-radius:100%;"
                 ></de-dial>
                 <de-dial 
                   value="60"
@@ -150,7 +315,14 @@
                   tick-width="1"
                   gap-width="10"
                   style-svg="display:inline-block;border-radius:100%;"
-                  style="fill:none;stroke:#000;stroke-width:10px;width:150px;height:150px;transform:rotate(-90deg);position:absolute;left:0;top:0;display:inline-block;border-radius:100%;"
+                  style="fill:none;stroke:#000;stroke-width:10px;
+                    width:150px;
+                    height:150px;
+                    transform:translate(-50%,-50%) rotate(-90deg);
+                    position:absolute;
+                    left:50%;
+                    top:50%;
+                    display:inline-block;border-radius:100%;"
                 ></de-dial>
               </div>
             </div>
@@ -343,14 +515,16 @@
                 properties available for customisation. Please refer to the 
                 <a href="dedial/docs-sp.html#dedial">full dial documentation</a> for more details.
               </p>
-              <de-dial 
-                value="12"
-                max-value="12"
-                tick-width="1"
-                gap-width="10"
-                style-svg="display:inline-block;border-radius:100%;"
-                style="fill:none;stroke:#000;stroke-width:15px;width:150px;height:150px;transform:rotate(-91deg);display:inline-block;border-radius:100%;"
-              ></de-dial>
+              <div>
+                <de-dial 
+                  value="12"
+                  max-value="12"
+                  tick-width="1"
+                  gap-width="10"
+                  style-svg="display:inline-block;border-radius:100%;"
+                  style="fill:none;stroke:#000;stroke-width:15px;width:150px;height:150px;transform:rotate(-91deg);display:inline-block;border-radius:100%;"
+                ></de-dial>
+              </div>
             </div>
 
             <!-- Large Dial -->
@@ -363,21 +537,23 @@
                 properties available for customisation. Please refer to the 
                 <a href="dedial/docs-sp.html#dedial">full dial documentation</a> for more details.
               </p>
-              <de-dial 
-                value="50"
-                max-value="50"
-                tick-width="2"
-                gap-width="10"
-                viewbox-radius="140"
-                style="
-                  fill:none;
-                  stroke:#00f;
-                  stroke-width:100px;
-                  width:150px;
-                  height:150px;
-                  display:inline-block;border-radius:100%;
-                "
-              ></de-dial>            
+              <div>
+                <de-dial 
+                  value="50"
+                  max-value="50"
+                  tick-width="2"
+                  gap-width="10"
+                  viewbox-radius="140"
+                  style="
+                    fill:none;
+                    stroke:#00f;
+                    stroke-width:100px;
+                    width:150px;
+                    height:150px;
+                    display:inline-block;border-radius:100%;
+                  "
+                ></de-dial>            
+              </div>
             </div>
 
             <!-- Min/Sec Dial -->
@@ -390,14 +566,16 @@
                 properties available for customisation. Please refer to the 
                 <a href="dedial/docs-sp.html#dedial">full dial documentation</a> for more details.
               </p>
-              <de-dial 
-                value="60"
-                max-value="60"
-                tick-width="1"
-                gap-width="10"
-                style-svg="display:inline-block;border-radius:100%;"
-                style="fill:none;stroke:#000;stroke-width:10px;width:150px;height:150px;transform:rotate(-90deg);display:inline-block;border-radius:100%;"
-              ></de-dial>
+              <div>
+                <de-dial 
+                  value="60"
+                  max-value="60"
+                  tick-width="1"
+                  gap-width="10"
+                  style-svg="display:inline-block;border-radius:100%;"
+                  style="fill:none;stroke:#000;stroke-width:10px;width:150px;height:150px;transform:rotate(-90deg);display:inline-block;border-radius:100%;"
+                ></de-dial>
+              </div>
             </div>
 
             <!-- Target -->
@@ -410,13 +588,15 @@
                 properties available for customisation. Please refer to the 
                 <a href="dedial/docs-sp.html#dedial">full dial documentation</a> for more details.
               </p>
-              <de-dial 
-                value="4"
-                gap-width="10"
-                max-value="4"
-                tick-width="1"
-                style="fill:none;stroke:#f00;stroke-width:20px;width:150px;height:150px;transform:rotate(-94deg);display:inline-block;border-radius:100%;"
-              ></de-dial>
+              <div>
+                <de-dial 
+                  value="4"
+                  gap-width="10"
+                  max-value="4"
+                  tick-width="1"
+                  style="fill:none;stroke:#f00;stroke-width:20px;width:150px;height:150px;transform:rotate(-94deg);display:inline-block;border-radius:100%;"
+                ></de-dial>
+              </div>
             </div>
 
             <!-- Text -->
@@ -438,6 +618,305 @@
                 Text setting for specifying any CSS styling to be applied to the text.
               </p>
               <code>default: empty</code>
+            </div>
+
+            <!-- Timer -->
+            <div class="project" id="timer">
+              <h2>Timer Settings</h2>
+              <p>
+                This block renders a timer split into four dials showing the days, hours, minutes, 
+                and seconds to or from a certain date and time. If none is specified, the timer
+                will count from the current time.
+              </p>
+              <div style="position:relative;">
+                <de-timer 
+                  show-labels
+                  auto-start 
+                  style-counter="display:inline-block;position:relative;width:100px;height:100px;"
+                  style-shadow="stroke:#ddd;"
+                  style-anim="stroke:#f00;position:absolute;top:-12px;left:-12px;width:calc(100% + 24px);height:calc(100% + 24px);stroke-width:5px;border-radius:100%;overflow:hidden;"
+                  style-label="position:absolute;left:0;top:0;width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;font-size:32px;line-height:32px;"
+                  style-label-sub="font-size:14px;line-height:14px;"
+                  style-dial="transform:rotate(-90deg);"
+                  xstyle-day="animation:dedial-spin 100s infinite linear;"
+                  xstyle-hrs="animation:dedial-spin 70s infinite linear;"
+                  xstyle-min="animation:dedial-spin 30s infinite linear;"
+                  xstyle-sec="animation:dedial-spin 10s infinite linear;"
+                  style="
+                    margin: 0;
+                    font-family: Arial, Helvetica, sans-serif;
+                    display: inline-flex;
+                    gap: 16px;
+                    text-align: center;
+                    stroke: #000;
+                    stroke-width: 10px;
+                    fill: none;
+                  "
+                ></de-timer>
+              </div>
+
+              <p class="lead">24hr Time</p>
+              <p>
+                String setting to specify the time to count from or to. The time
+                must be in the 24 hour format hh:mm:ss. If none is specified, the current time is used.
+              </p>
+              <code>default: empty</code>
+              
+              <p class="lead">Auto-Start</p>
+              <p>
+                Checkbox setting that indicates whether the timer should start as 
+                soon as it becomes visible. If not set, the timer can only be started 
+                by calling the start() method.
+              </p>
+              <code>default: on</code>
+
+              <p class="lead">Counter Size</p>
+              <p>
+                Text setting to specify the width and height of a single dial. As there are
+                four dials, the total block width will be four times the counter size.
+                Any CSS size value is allowed.
+              </p>
+              <code>default: 100px</code>
+
+              <p class="lead">Date</p>
+              <p>
+                String setting to specify the date to count from or to. The date
+                must be in the format yyyy-mm-dd. If none is specified, the current date is used.
+              </p>
+              <code>default: empty</code>
+
+              <p class="lead">HTML Id.</p>
+              <p>
+                Text setting for specifying the HTML ID of the timer.
+              </p>
+              <code>default: empty</code>
+
+              <p class="lead">Label - Days</p>
+              <p>
+                Text setting for specifying a label for the "days" dial. If no label text is 
+                specified, the default "days" label will be used.
+              </p>
+              <code>default: empty</code>
+
+              <p class="lead">Label - Hours</p>
+              <p>
+                Text setting for specifying a label for the "hours" dial. If no label text is 
+                specified, the default "hours" label will be used.
+              </p>
+              <code>default: empty</code>
+
+              <p class="lead">Label - Minutes</p>
+              <p>
+                Text setting for specifying a label for the "minutes" dial. If no label text is 
+                specified, the default "minutes" label will be used.
+              </p>
+              <code>default: empty</code>
+
+              <p class="lead">Label - Seconds</p>
+              <p>
+                Text setting for specifying a label for the "seconds" dial. If no label text is 
+                specified, the default "seconds" label will be used.
+              </p>
+              <code>default: empty</code>
+
+              <p class="lead">Colour - Dial Border</p>
+              <p>
+                Colour picker setting for setting the colour of the external border dials.
+              </p>
+              <code>default: #f00</code>
+
+              <p class="lead">Colour - Dial Inactive Marks</p>
+              <p>
+                Colour picker setting for setting the colour of the "inactive" dial marks.
+              </p>
+              <code>default: #ddd</code>
+
+              <p class="lead">Colour - Dial Marks</p>
+              <p>
+                Colour picker setting for setting the colour of the "active" dial marks.
+              </p>
+              <code>default: #000</code>
+
+              <p class="lead">CSS</p>
+              <p>
+                Text setting for specifying CSS attributes for the entire timer component.
+              </p>
+              <code>default: font-family: Arial, Helvetica, sans-serif;</code>
+
+              <p class="lead">CSS - Label</p>
+              <p>
+                Text setting for specifying CSS attributes for the dial labels.
+              </p>
+              <code>default: font-size:14px;line-height:14px;</code>
+
+              <p class="lead">CSS - Value</p>
+              <p>
+                Text setting for specifying CSS attributes for the dial values and labels.
+              </p>
+              <code>default: position:absolute;left:0;top:0;width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;font-size:32px;line-height:32px;</code>
+
+            </div>
+
+            <!-- Compact Timer -->
+            <div class="project" id="compact">
+              <h2>Compact Timer Settings</h2>
+              <p>
+                This block renders a compact timer with three concentric dials showing the hours, minutes, 
+                and seconds to or from a certain date and time. If none is specified, the timer
+                will count from the current time.
+              </p>
+              <div style="position:relative;">
+                <de-timer-compact 
+                  auto-start
+                  label="hrs:min:sec"
+                  sublabel-text="hrs:min:sec"
+                  show-labels
+                
+                  style-border="
+                    position:absolute;
+                    stroke-width:4px;
+                    left:0;
+                    top:0;
+                    width:100%;
+                    height:100%;
+                    animation:10s linear 0s infinite normal none running dedial-spin;
+                    stroke:#f00;
+                  "
+                  style-hours=
+                  "
+                    position:absolute;
+                    left:5%;
+                    top:5%;
+                    width:90%;
+                    height:90%;
+                    transform:rotate(-90deg);
+                    stroke:#000;
+                  "
+                  style-minutes=
+                  "
+                    position:absolute;
+                    left:10%;
+                    top:10%;
+                    width:80%;
+                    height:80%;
+                    transform:rotate(-90deg);
+                    stroke:#000;
+                  "
+                  style-seconds=
+                  "
+                    position:absolute;
+                    left:15%;
+                    top:15%;
+                    width:70%;
+                    height:70%;
+                    transform:rotate(-90deg);
+                    stroke:#000;
+                  "
+                  style-label=
+                  "
+                    position:absolute;
+                    left:0;
+                    top:0;
+                    width:100%;
+                    height:100%;
+                    display:flex;
+                    flex-direction:column;
+                    justify-content:center;
+                    text-align:center;
+                    font-size:16px;font-weight:bold;line-height:16px;
+                  "
+                  style-sublabel="font-size:12px;"
+                  style-shadow="stroke:#ddd;"
+                  style="
+                    position:relative;
+                    display:inline-block;
+                    width:150px;
+                    height:150px;
+                    fill:none;stroke-width:8px;
+                    margin:0;
+                  "
+                >
+                </de-timer-compact>
+              </div>
+
+              <p class="lead">24hr Time</p>
+              <p>
+                String setting to specify the time to count from or to. The time
+                must be in the 24 hour format hh:mm:ss. If none is specified, the current time 
+                is used.
+              </p>
+              <code>default: empty</code>
+              
+              <p class="lead">Auto-Start</p>
+              <p>
+                Checkbox setting that indicates whether the timer should start as 
+                soon as it becomes visible. If not set, the timer can only be started 
+                by calling the start() method.
+              </p>
+              <code>default: on</code>
+
+              <p class="lead">Counter Size</p>
+              <p>
+                Text setting to specify the width and height of the timer. 
+                Any CSS size value is allowed.
+              </p>
+              <code>default: 200px</code>
+
+              <p class="lead">Date</p>
+              <p>
+                String setting to specify the date to count from or to. The date
+                must be in the format yyyy-mm-dd. If none is specified, the current date is used.
+              </p>
+              <code>default: empty</code>
+
+              <p class="lead">HTML Id.</p>
+              <p>
+                Text setting for specifying the HTML ID of the timer.
+              </p>
+              <code>default: empty</code>
+
+              <p class="lead">Label</p>
+              <p>
+                Text setting for specifying a label for the timer value.
+              </p>
+              <code>default: hrs:min:sec</code>
+
+              <p class="lead">Colour - Dial Border</p>
+              <p>
+                Colour picker setting for the colour of the external border dial.
+              </p>
+              <code>default: #f00</code>
+
+              <p class="lead">Colour - Dial Inactive Marks</p>
+              <p>
+                Colour picker setting for the colour of the "inactive" dial marks.
+              </p>
+              <code>default: #ddd</code>
+
+              <p class="lead">Colour - Dial Marks</p>
+              <p>
+                Colour picker setting for the colour of the "active" dial marks.
+              </p>
+              <code>default: #000</code>
+
+              <p class="lead">CSS</p>
+              <p>
+                Text setting for specifying CSS attributes for the entire timer component.
+              </p>
+              <code>default: fill:none;stroke-width:8px;</code>
+
+              <p class="lead">CSS - Label</p>
+              <p>
+                Text setting for specifying CSS attributes for the dial labels.
+              </p>
+              <code>default: font-size:12px;</code>
+
+              <p class="lead">CSS - Value</p>
+              <p>
+                Text setting for specifying CSS attributes for the dial values and labels.
+              </p>
+              <code>default: font-size:16px;font-weight:bold;line-height:16px;</code>
+
             </div>
 
           </div>

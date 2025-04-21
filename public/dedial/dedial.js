@@ -51,13 +51,42 @@ class Utils
     }
   }
 
+  static Get_Attribute(elem, name, def)
+  {
+    return Utils.Has_Attribute(elem, name) ? elem.getAttribute(name) : def;
+  }
+  
+  static Get_Attribute_Bool(elem, name, def)
+  {
+    let value = def || false;
+  
+    if (elem.hasAttribute(name))
+    {
+      let value_str = elem.getAttribute(name);
+      if (Utils.Is_Empty(value_str))
+      {
+        value = true;
+      }
+      else
+      {
+        value_str = value_str.toLowerCase().trim();
+        if (value_str == "true" || value_str == "yes" || value_str == "1" || value_str == "on")
+        {
+          value = true;
+        }
+      }
+    }
+  
+    return value;
+  }
+
   static Get_Attribute_Int(elem, name, def)
   {
     let value = def || 0;
   
-    if (elem.hasAttribute(name))
+    const value_str = Utils.Get_Attribute(elem, name, null);
+    if (value_str)
     {
-      const value_str = elem.getAttribute(name);
       const value_int = parseInt(value_str);
       if (!isNaN(value_int))
       {
@@ -68,6 +97,11 @@ class Utils
     return value;
   }
   
+  static Has_Attribute(elem, name)
+  {
+    return elem.hasAttribute(name) && !Utils.Is_Empty(elem.getAttribute(name));
+  }
+
   static Is_Empty(items)
   {
     let res = false;
@@ -118,12 +152,54 @@ class Utils
     return Object.keys(obj).length === 0 && obj.constructor === Object;
   }
 
+  static Parse_Bool(str)
+  {
+    let value = false;
+    if (!Utils.Is_Empty(str))
+    {
+      str = str.toLowerCase().trim();
+      if (str == "true" || str == "yes" || str == "1" || str == "on")
+      {
+        value = true;
+      }
+    }
+
+    return value;
+  }
+
+  static Parse_Int(str, def = 0)
+  {
+    let value = def;
+    if (!Utils.Is_Empty(str))
+    {
+      const value_int = parseInt(str);
+      if (!isNaN(value_int))
+      {
+        value = value_int;
+      }
+    }
+
+    return value;
+  }
+
   static Register_Element(elem_class)
   {
     const comp_class = customElements.get(elem_class.tname);
     if (comp_class == undefined)
     {
       customElements.define(elem_class.tname, elem_class);
+    }
+  }
+
+  static Set_Attribute(elem, attr_name, value)
+  {
+    if (value)
+    {
+      elem.setAttribute(attr_name, value);
+    }
+    else
+    {
+      elem.removeAttribute(attr_name);
     }
   }
 
@@ -135,6 +211,95 @@ class Utils
       const id_value = elem.getAttribute(attr_name);
       dest_elem[id_value] = elem;
     }
+  }
+
+  static Set_Styles(parent_elem)
+  {
+    for (const attr_name of parent_elem.getAttributeNames())
+    {
+      if (attr_name == "style-str")
+      {
+        Utils.Set_Style(parent_elem, parent_elem, attr_name);
+      }
+      else if (attr_name.startsWith("style-"))
+      {
+        //const style_tokens = attr_name.split("-");
+        const elem_name = attr_name.substring(6);
+
+        const cid_elem = parent_elem.querySelector("[cid=" + elem_name + "]");
+        if (cid_elem)
+        {
+          Utils.Set_Style(parent_elem, cid_elem, attr_name);
+        }
+        else
+        {
+          for (const class_elem of parent_elem.querySelectorAll("." + elem_name))
+          {
+            Utils.Set_Style(parent_elem, class_elem, attr_name);
+          }
+        }
+      }
+    }
+  }
+
+  static Set_Style(src_elem, style_elem, attr_name)
+  {
+    if (Utils.Has_Attribute(src_elem, attr_name) && style_elem)
+    {
+      const css = src_elem.getAttribute(attr_name);
+      style_elem.style = css;
+    }
+  }
+
+  static Time_Strs_To_Millis(date_str, time_str, period_str)
+  {
+    let target_millis = null;
+
+    if (!Utils.Is_Empty(period_str))
+    {
+      const millis = parseInt(period_str);
+      target_millis = Date.now() + millis;
+    }
+    else if (!Utils.Is_Empty(date_str) || !Utils.Is_Empty(time_str))
+    {
+      const date = new Date();
+
+      if (!Utils.Is_Empty(date_str))
+      {
+        const date_parts = date_str.split("-");
+        if (date_parts?.length > 2)
+        {
+          const year = Utils.Parse_Int(date_parts[0]);
+          const month = Utils.Parse_Int(date_parts[1]);
+          const day = Utils.Parse_Int(date_parts[2]);
+          date.setDate(day);
+          date.setMonth(month-1);
+          date.setFullYear(year);
+          date.setHours(0);
+          date.setMinutes(0);
+          date.setSeconds(0);
+          date.setMilliseconds(0);
+        }
+      }
+
+      if (!Utils.Is_Empty(time_str))
+      {
+        const time_parts = time_str.split(":");
+        if (time_parts?.length > 1)
+        {
+          const hr = Utils.Parse_Int(time_parts[0]);
+          const min = Utils.Parse_Int(time_parts[1]);
+          const sec = Utils.Parse_Int(time_parts[2]);
+          date.setHours(hr);
+          date.setMinutes(min);
+          date.setSeconds(sec);
+        }
+      }
+      
+      target_millis = date.getTime();
+    }
+
+    return target_millis;
   }
 
   static To_Template(html, src_elems) 
@@ -266,15 +431,6 @@ class DeDialMarks extends HTMLElement
     return this.Calc_Ticks_Length() + this.Calc_Base_Length();
   }
 
-  Set_Style(elem, attr_name)
-  {
-    if (this.hasAttribute(attr_name))
-    {
-      const css = this.getAttribute(attr_name);
-      elem.style = css;
-    }
-  }
-
   Update()
   {
     let stroke_dasharray = null;
@@ -347,7 +503,7 @@ class DeDialMarks extends HTMLElement
     this.innerHTML = html;
     Utils.Set_Id_Shortcuts(this, this, "cid");
 
-    this.Set_Style(this.svg_elem, "style-svg");
+    Utils.Set_Style(this, this.svg_elem, "style-svg");
 
     this.Update();
   }
@@ -380,6 +536,18 @@ class DeGauge extends HTMLElement
   {
     return Utils.Get_Attribute_Int(this, "value", DeGauge.DEF_MAX);
   }
+
+  /* 
+    base-type
+    circle-radius
+    gap-width
+    max-value
+    show-shadow
+    style-svg
+    tick-width
+    value
+    viewbox-radius
+  */
 
   Calc_Ticks_Length(value)
   {
@@ -429,15 +597,6 @@ class DeGauge extends HTMLElement
   Calc_Remaining_Length(value)
   {
     return this.Calc_Path_Length() - this.Calc_Ticks_Length(value);
-  }
-
-  Set_Style(elem, attr_name)
-  {
-    if (this.hasAttribute(attr_name))
-    {
-      const css = this.getAttribute(attr_name);
-      elem.style = css;
-    }
   }
 
   Calc_Dash_Array(value)
@@ -537,182 +696,28 @@ class DeGauge extends HTMLElement
     this.innerHTML = html;
     Utils.Set_Id_Shortcuts(this, this, "cid");
 
-    this.Set_Style(this.svg_elem, "style-svg");
+    Utils.Set_Style(this, this.svg_elem, "style-svg");
 
     this.Update();
   }
 }
 
-class DeClockDial extends HTMLElement
+class DeCounter extends HTMLElement
 {
-  static tname = "de-clock-dial";
-
-  connectedCallback()
-  {
-    this.innerHTML = `
-      <de-dialmarks value="12" tick-width="1" gap-width="10" class="hours"></de-dialmarks>
-      <de-dialmarks value="60" tick-width="1" gap-width="10" class="minutes"></de-dialmarks>
-    `;
-  }
-}
-
-class DeClock extends HTMLElement
-{
-  static tname = "de-clock";
-
-  interval_id = null;
-
-  constructor()
-  {
-    super();
-    Utils.Bind(this, "On_");
-  }
-
-  connectedCallback()
-  {
-    this.Render();
-  }
-
-  start()
-  {
-    if (!this.hasAttribute("time-str"))
-    {
-      this.interval_id = setInterval(this.On_Update, Utils.MILLIS_SECOND);
-    }
-  }
-
-  stop()
-  {
-    if (this.interval_id)
-    {
-      clearInterval(this.interval_id);
-      this.interval_id = null;
-    }
-  }
-
-  toggle()
-  {
-    if (this.interval_id)
-    {
-      this.stop();
-    }
-    else
-    {
-      this.start();
-    }
-  }
-
-  On_Update()
-  {
-    let now = new Date();
-    if (this.hasAttribute("time-str"))
-    {
-      now = new Date(this.getAttribute("time-str"));
-    }
-
-    let hr = now.getHours() % 12;
-    let min = now.getMinutes();
-    let sec = now.getSeconds();
-    if (this.hasAttribute("time-zone"))
-    {
-      const timeZone = this.getAttribute("time-zone");
-      hr = parseInt(now.toLocaleString("en-AU", {timeZone, hour12: false, hour: "numeric"}));
-      min = parseInt(now.toLocaleString("en-AU", {timeZone, minute: "numeric"}));
-      sec = parseInt(now.toLocaleString("en-AU", {timeZone, second: "numeric"}));
-    }
-
-    this.hr_elem.style = `transform: rotate(${hr*30-180}deg)`;
-    this.min_elem.style = `transform: rotate(${min*6-180}deg)`;
-    this.sec_elem.style = `transform: rotate(${sec*6-180}deg)`;
-
-  }
-
-  Render()
-  {
-    const html = `
-      <de-clock-dial></de-clock-dial>
-      <svg viewBox="-100 -100 200 200" width="100%" height="100%" class="hands">
-        <path cid="hr_elem"  class="hand-hr"  d="M 0,50 L 8,0 0,-10 -8,0 z" />
-        <path cid="min_elem" class="hand-min" d="M 0,80 L 5,0 0,-10 -5,0 z" />
-        <path cid="sec_elem" class="hand-sec" d="M 0,80 L 0,-10 z" />
-
-        <text x=  "0" y="-77" text-anchor="middle" dominant-baseline="hanging">12</text>
-
-        <text x= "45" y="-67" text-anchor="end"    dominant-baseline="hanging">1</text>
-        <text x= "67" y="-42" text-anchor="end"    dominant-baseline="hanging">2</text>
-
-        <text x= "78" y=  "0" text-anchor="end"    dominant-baseline="middle">3</text>
-
-        <text x= "67" y= "42" text-anchor="end"    dominant-baseline="text-bottom">4</text>
-        <text x= "38" y= "68" text-anchor="end"    dominant-baseline="text-bottom">5</text>
-
-        <text x=  "0" y= "77" text-anchor="middle" dominant-baseline="text-bottom">6</text>
-
-        <text x="-38" y= "68" text-anchor="start" dominant-baseline="text-bottom">7</text>
-        <text x="-67" y= "42" text-anchor="start" dominant-baseline="text-bottom">8</text>
-
-        <text x="-78" y=  "0" text-anchor="start" dominant-baseline="middle">9</text>
-
-        <text x="-70" y="-42" text-anchor="start" dominant-baseline="hanging">10</text>
-        <text x="-45" y="-67" text-anchor="start" dominant-baseline="hanging">11</text>
-      </svg>
-    `;
-    this.innerHTML = html;
-    Utils.Set_Id_Shortcuts(this, this, "cid");
-
-    this.On_Update();
-
-    if (this.hasAttribute("auto-start"))
-    {
-      this.start();
-    }
-  }
-}
-
-class DeDial extends HTMLElement
-{
-  static tname = "de-dial";
+  static tname = "de-counter";
   static DEF_MAX = 10;
   static DEF_TICK_WIDTH = 1;
   static DEF_GAP_WIDTH = 1;
-  static DEF_WAIT_MILLIS = 1000;
   static DEF_CIRCLE_RADIUS = 90;
   static DEF_VIEW_RADIUS = 100;
-
-  constructor()
-  {
-    super();
-    Utils.Bind(this, "On_");
-  }
 
   connectedCallback()
   {
     this.Render();
-  }
-
-  attributeChangedCallback(name, old_value, new_value)
-  {
-    
   }
 
   set value(new_value)
   {
-    const max_value = Utils.Get_Attribute_Int(this, "max-value", DeDial.DEF_MAX);
-    const has_overflow = this.hasAttribute("has-overflow");
-
-    if (new_value == null || new_value == undefined)
-    {
-      new_value = 0;
-    }
-    else if (new_value > max_value && !has_overflow)
-    {
-      new_value = 0;
-    }
-    else if (new_value < 0 && !has_overflow)
-    {
-      new_value = max_value;
-    }
-  
     this.setAttribute("value", new_value);
     if (this.isConnected)
     {
@@ -722,34 +727,105 @@ class DeDial extends HTMLElement
 
   get value()
   {
-    return Utils.Get_Attribute_Int(this, "value");
+    return Utils.Get_Attribute_Int(this, "value", DeCounter.DEF_MAX);
   }
 
-  set labelText(str)
+  Calc_Ticks_Length(value)
   {
-    const prefix = this.hasAttribute("label-prefix") ? this.getAttribute("label-prefix") : "";
-    const postfix = this.hasAttribute("label-postfix") ? this.getAttribute("label-postfix") : "";
+    const tick_width = Utils.Get_Attribute_Int(this, "tick-width", DeCounter.DEF_TICK_WIDTH);
+    const gap_width = Utils.Get_Attribute_Int(this, "gap-width", DeCounter.DEF_GAP_WIDTH);
+    let ticks_length = value * (tick_width + gap_width) - gap_width;
 
-    this.text_elem.innerHTML = prefix + str + postfix;
+    return ticks_length;
   }
 
-  // auto-start
-  // auto-stop
-  // circle-radius
-  // count-reverse
-  // gap-width
-  // label-prefix
-  // label-postfix
-  // max-value
-  // show-label
-  // stop-href
-  // style-host
-  // style-label
-  // style-svg
-  // tick-width
-  // value
-  // viewbox-radius
-  // wait-millis
+  Calc_Base_Length()
+  {
+    const base_type = this.getAttribute("base-type");
+    const max_value = Utils.Get_Attribute_Int(this, "max-value", DeCounter.DEF_MAX);
+    const gap_width = Utils.Get_Attribute_Int(this, "gap-width", DeCounter.DEF_GAP_WIDTH);
+    let base_length = 0;
+
+    if (base_type == "small")
+    {
+      const ticks_length = this.Calc_Ticks_Length(max_value);
+      base_length = ticks_length * 0.5;
+    }
+    else if (base_type == "medium")
+    {
+      const ticks_length = this.Calc_Ticks_Length(max_value);
+      base_length = ticks_length;
+    }
+    else if (base_type == "large")
+    {
+      const ticks_length = this.Calc_Ticks_Length(max_value);
+      base_length = ticks_length * 2;
+    }
+    else
+    {
+      base_length = gap_width;
+    }
+
+    return base_length;
+  }
+
+  Calc_Path_Length()
+  {
+    const max_value = Utils.Get_Attribute_Int(this, "max-value", DeCounter.DEF_MAX);
+    return this.Calc_Ticks_Length(max_value) + this.Calc_Base_Length();
+  }
+
+  Calc_Remaining_Length(value)
+  {
+    return this.Calc_Path_Length() - this.Calc_Ticks_Length(value);
+  }
+
+  Calc_Dash_Array(value)
+  {
+    let stroke_dasharray = null;
+    const max_value = Utils.Get_Attribute_Int(this, "max-value", DeCounter.DEF_MAX);
+
+    if (value < 0)
+    {
+      value = 0;
+    }
+    else if (value > max_value)
+    {
+      value = max_value;
+    }
+
+    if (value == 0)
+    {
+      stroke_dasharray = "0 1";
+    }
+    else
+    {
+      const tick_width = Utils.Get_Attribute_Int(this, "tick-width", DeCounter.DEF_TICK_WIDTH);
+      const gap_width = Utils.Get_Attribute_Int(this, "gap-width", DeCounter.DEF_GAP_WIDTH);
+
+      stroke_dasharray = "";
+      for (let v = 1; v <= value; v++)
+      {
+        stroke_dasharray += tick_width + " ";
+        if (v != value)
+        {
+          stroke_dasharray += gap_width + " ";
+        }
+        else
+        {
+          stroke_dasharray += this.Calc_Remaining_Length(value);
+        }
+      }
+    }
+
+    //console.log("ticks length value: ", this.Calc_Ticks_Length(value));
+    //console.log("ticks length max: ", this.Calc_Ticks_Length(max_value));
+    //console.log("base length: ", this.Calc_Base_Length());
+    //console.log("path length: ", this.Calc_Path_Length());
+    //console.log("remaining length: ", this.Calc_Remaining_Length(value));
+    
+    return stroke_dasharray;
+  }
 
   start()
   {
@@ -799,13 +875,13 @@ class DeDial extends HTMLElement
     this.start();
   }
 
-  Calc_Path_Length()
+  On_Observe(entries, observer)
   {
-    const max_value = Utils.Get_Attribute_Int(this, "max-value", DeDial.DEF_MAX);
-    const tick_width = Utils.Get_Attribute_Int(this, "tick-width", DeDial.DEF_TICK_WIDTH);
-    const gap_width = Utils.Get_Attribute_Int(this, "gap-width", DeDial.DEF_GAP_WIDTH);
-    const path_length = max_value * (tick_width + gap_width);
-    return path_length;
+    if (entries.length > 0 && entries[0].isIntersecting) 
+    {
+      this.start();
+      observer.unobserve(this);
+    }
   }
 
   On_Interval()
@@ -836,89 +912,37 @@ class DeDial extends HTMLElement
     }
   }
 
-  On_Observe(entries, observer)
-  {
-    if (entries.length > 0 && entries[0].isIntersecting) 
-    {
-      this.start();
-      observer.unobserve(this);
-    }
-  }
-
-  Set_Style(elem, attr_name)
-  {
-    if (this.hasAttribute(attr_name))
-    {
-      const css = this.getAttribute(attr_name);
-      elem.style = css;
-    }
-  }
-
   Update()
   {
-    let stroke_dasharray = null;
-    const max_value = Utils.Get_Attribute_Int(this, "max-value", DeDial.DEF_MAX);
-    const tick_width = Utils.Get_Attribute_Int(this, "tick-width", DeDial.DEF_TICK_WIDTH);
-    const gap_width = Utils.Get_Attribute_Int(this, "gap-width", DeDial.DEF_GAP_WIDTH);
-    const path_length = this.Calc_Path_Length();
-
-    let value = this.value;
-    if (value > max_value)
-    {
-      value = max_value;
-    }
-    else if (value < 0)
-    {
-      value = 0;
-    }
-
-    if (value == 0)
-    {
-      stroke_dasharray = "0 " + path_length;
-    }
-    else if (value == 1)
-    {
-      stroke_dasharray = "" + tick_width + " " + path_length;
-    }
-    else //if (value > 1 && value <= max_value)
-    {
-      const tick = "" + gap_width + " " + tick_width + " ";
-      stroke_dasharray = "" + tick_width + " " + tick.repeat(value - 1) + path_length;
-    }
-
+    const value = Utils.Get_Attribute_Int(this, "value", DeCounter.DEF_MAX);
+    const stroke_dasharray = this.Calc_Dash_Array(value);
     if (stroke_dasharray)
     {
       this.circle_elem.setAttribute("stroke-dasharray", stroke_dasharray);
-    }
-
-    if (this.hasAttribute("show-label"))
-    {
-      this.labelText = this.value;
     }
   }
 
   Render()
   {
     const path_length = this.Calc_Path_Length();
-    const tick_width = Utils.Get_Attribute_Int(this, "tick-width", DeDial.DEF_TICK_WIDTH);
-    const gap_width = Utils.Get_Attribute_Int(this, "gap-width", DeDial.DEF_GAP_WIDTH);
 
-    const viewbox_radius = Utils.Get_Attribute_Int(this, "viewbox-radius", DeDial.DEF_VIEW_RADIUS);
+    const viewbox_radius = Utils.Get_Attribute_Int(this, "viewbox-radius", DeCounter.DEF_VIEW_RADIUS);
     const viewbox_diameter = Math.abs(viewbox_radius) * 2;
     const view_box = 
       "-" + viewbox_radius + " -" + viewbox_radius + 
       " " + viewbox_diameter + " " + viewbox_diameter;
-    const circle_radius = Utils.Get_Attribute_Int(this, "circle-radius", DeDial.DEF_CIRCLE_RADIUS);
-
+    const circle_radius = Utils.Get_Attribute_Int(this, "circle-radius", DeCounter.DEF_CIRCLE_RADIUS);
+    
     let shadow_svg = "";
     if (this.hasAttribute("show-shadow"))
     {
+      const max_value = Utils.Get_Attribute_Int(this, "max-value", DeCounter.DEF_MAX);
       shadow_svg = `
         <circle 
           cid="shadow_elem"
           cx="0" cy="0" r="${circle_radius}" 
           pathLength="${path_length}"
-          stroke-dasharray="${tick_width} ${gap_width}" 
+          stroke-dasharray="${this.Calc_Dash_Array(max_value)}" 
           class="shadow"
         />
       `;
@@ -926,7 +950,6 @@ class DeDial extends HTMLElement
 
     const html = `
       <svg cid="svg_elem" viewBox="${view_box}" class="dial">
-        <slot name="svg"></slot>
         ${shadow_svg}
         <circle 
           cid="circle_elem"
@@ -935,15 +958,11 @@ class DeDial extends HTMLElement
           stroke-dasharray="0 ${path_length}" 
         />
       </svg>
-      <span cid="text_elem" class="label"></span>
     `;
-    const template = Utils.To_Template(html, this);
-    this.innerHTML = template.innerHTML;
+    this.innerHTML = html;
     Utils.Set_Id_Shortcuts(this, this, "cid");
 
-    this.Set_Style(this, "style-host");
-    this.Set_Style(this.svg_elem, "style-svg");
-    this.Set_Style(this.text_elem, "style-label");
+    Utils.Set_Style(this, this.svg_elem, "style-svg");
 
     this.Update();
 
@@ -957,9 +976,25 @@ class DeDial extends HTMLElement
   }
 }
 
-class DeTimer extends HTMLElement
+class DeClockDial extends HTMLElement
 {
-  static tname = "de-timer";
+  static tname = "de-clock-dial";
+
+  connectedCallback()
+  {
+    this.innerHTML = `
+      <de-dialmarks cid="ticks_min_elem" value="60" tick-width="1" gap-width="10" class="minutes"></de-dialmarks>
+      <de-dialmarks cid="ticks_hr_elem" value="12" tick-width="1" gap-width="10" class="hours"></de-dialmarks>
+    `;
+    Utils.Set_Id_Shortcuts(this, this, "cid");
+  }
+}
+
+class DeClock extends HTMLElement
+{
+  static tname = "de-clock";
+
+  interval_id = null;
 
   constructor()
   {
@@ -971,39 +1006,552 @@ class DeTimer extends HTMLElement
   {
     this.Render();
   }
-  
-  Get_Date()
+
+  static observedAttributes = 
+  [
+    "auto-start",
+    "style-str",
+    "style-face",
+    "style-hand-hr",
+    "style-hand-min",
+    "style-hand-sec",
+    "style-ticks-hr",
+    "style-ticks-min",
+    "style-numbers",
+    "date-hour",
+    "date-minute",
+    "date-second",
+    "time-zone",
+  ];
+  attributeChangedCallback(name, old_value, new_value)
   {
-    const now_date = new Date();
-    let def_year = now_date.getFullYear();
-    const def_date = new Date(def_year, 10, 13, 0, 0, 0);
-    if (def_date.getTime() <= now_date.getTime())
+    this.Render();
+  }
+
+  start()
+  {
+    if (!this.interval_id && !Utils.Has_Attribute(this, "time-str"))
     {
-      def_year++;
+      this.interval_id = setInterval(this.On_Update, Utils.MILLIS_SECOND);
+    }
+  }
+
+  stop()
+  {
+    if (this.interval_id)
+    {
+      clearInterval(this.interval_id);
+      this.interval_id = null;
+    }
+  }
+
+  toggle()
+  {
+    if (this.interval_id)
+    {
+      this.stop();
+    }
+    else
+    {
+      this.start();
+    }
+  }
+
+  On_Update()
+  {
+    let now = new Date();
+    if (!Utils.Is_Empty(this.getAttribute("date-hour")))
+    {
+      now.setHours(Utils.Get_Attribute_Int(this, "date-hour"));
+    }
+    if (!Utils.Is_Empty(this.getAttribute("date-minute")))
+    {
+      now.setMinutes(Utils.Get_Attribute_Int(this, "date-minute"));
+    }
+    if (!Utils.Is_Empty(this.getAttribute("date-second")))
+    {
+      now.setSeconds(Utils.Get_Attribute_Int(this, "date-second"));
+    }
+    
+    let hr = now.getHours() % 12;
+    let min = now.getMinutes();
+    let sec = now.getSeconds();
+
+    const timeZone = this.getAttribute("time-zone");
+    if (!Utils.Is_Empty(timeZone))
+    {
+      try
+      {
+        hr = parseInt(now.toLocaleString("en-AU", {timeZone, hour12: false, hour: "numeric"}));
+        min = parseInt(now.toLocaleString("en-AU", {timeZone, minute: "numeric"}));
+        sec = parseInt(now.toLocaleString("en-AU", {timeZone, second: "numeric"}));
+      }
+      catch (e)
+      {
+        if (e.name != "RangeError") console.error(e);
+      }
     }
 
-    const yr = Utils.Get_Attribute_Int(this, "date-year", def_year);
-    const mth = Utils.Get_Attribute_Int(this, "date-month", 11);
-    const day = Utils.Get_Attribute_Int(this, "date-day", 13);
-    const hr = Utils.Get_Attribute_Int(this, "date-hour", 0);
-    const min = Utils.Get_Attribute_Int(this, "date-minute", 0);
-    const sec = Utils.Get_Attribute_Int(this, "date-second", 0);
-    const date = new Date(yr, mth-1, day, hr, min, sec);
+    this.hr_elem.style = `transform: rotate(${hr*30-180}deg);` + this.style_hand_hr;
+    this.min_elem.style = `transform: rotate(${min*6-180}deg);` + this.style_hand_min;
+    this.sec_elem.style = `transform: rotate(${sec*6-180}deg);` + this.style_hand_sec;
+  }
 
-    return date;
+  Render()
+  {
+    const html = `
+      <de-clock-dial cid="ticks_elem"></de-clock-dial>
+      <svg cid="face_elem" viewBox="-100 -100 200 200" width="100%" height="100%" class="hands">
+
+        <text x=  "0" y="-77" text-anchor="middle" dominant-baseline="hanging">12</text>
+
+        <text x= "41" y="-67" text-anchor="end"    dominant-baseline="hanging">1</text>
+        <text x= "67" y="-42" text-anchor="end"    dominant-baseline="hanging">2</text>
+
+        <text x= "78" y=  "2" text-anchor="end"    dominant-baseline="middle">3</text>
+
+        <text x= "67" y= "42" text-anchor="end"    dominant-baseline="text-bottom">4</text>
+        <text x= "41" y= "68" text-anchor="end"    dominant-baseline="text-bottom">5</text>
+
+        <text x=  "0" y= "77" text-anchor="middle" dominant-baseline="text-bottom">6</text>
+
+        <text x="-38" y= "68" text-anchor="start" dominant-baseline="text-bottom">7</text>
+        <text x="-67" y= "42" text-anchor="start" dominant-baseline="text-bottom">8</text>
+
+        <text x="-78" y=  "2" text-anchor="start" dominant-baseline="middle">9</text>
+
+        <text x="-70" y="-42" text-anchor="start" dominant-baseline="hanging">10</text>
+        <text x="-45" y="-67" text-anchor="start" dominant-baseline="hanging">11</text>
+
+        <path cid="hr_elem"  class="hand-hr"  d="M 0,50 L 8,0 0,-10 -8,0 z" />
+        <path cid="min_elem" class="hand-min" d="M 0,80 L 5,0 0,-10 -5,0 z" />
+        <path cid="sec_elem" class="hand-sec" d="M 0,80 L 0,-10 z" />
+
+      </svg>
+    `;
+    this.innerHTML = html;
+    Utils.Set_Id_Shortcuts(this, this, "cid");
+
+    Utils.Set_Style(this, this, "style-str");
+    Utils.Set_Style(this, this.face_elem, "style-face");
+    Utils.Set_Style(this, this.ticks_elem.ticks_hr_elem, "style-ticks-hr");
+    Utils.Set_Style(this, this.ticks_elem.ticks_min_elem, "style-ticks-min");
+    for (const elem of this.querySelectorAll("text"))
+      Utils.Set_Style(this, elem, "style-numbers");      
+
+    this.style_hand_hr = this.hasAttribute("style-hand-hr") ? this.getAttribute("style-hand-hr") : "";
+    this.style_hand_min = this.hasAttribute("style-hand-min") ? this.getAttribute("style-hand-min") : "";
+    this.style_hand_sec = this.hasAttribute("style-hand-sec") ? this.getAttribute("style-hand-sec") : "";
+
+    this.On_Update();
+
+    const auto_start = Utils.Get_Attribute_Bool(this, "auto-start", false);
+    if (auto_start)
+    {
+      this.start();
+    }
+  }
+}
+
+class DeDial extends HTMLElement
+{
+  static tname = "de-dial";
+  static DEF_MAX = 10;
+  static DEF_TICK_WIDTH = 1;
+  static DEF_GAP_WIDTH = 1;
+  static DEF_WAIT_MILLIS = 1000;
+  static DEF_CIRCLE_RADIUS = 90;
+  static DEF_VIEW_RADIUS = 100;
+
+  constructor()
+  {
+    super();
+    Utils.Bind(this, "On_");
+  }
+
+  connectedCallback()
+  {
+    this.Render();
+  }
+
+  static observedAttributes = 
+  [
+    'auto-start', 
+    "auto-stop",
+    "count-reverse",
+    "gap-width", 
+    "has-overflow",
+    "label-postfix",
+    "label-prefix",
+    "label-sub",
+    "max-value",
+    "pause-millis",
+    "show-label",
+    "show-shadow",
+    "stop-href",
+    "tick-width",
+    "value",
+    "viewbox-radius",
+    "wait-millis",
+    "style-host",
+    "style-label",
+    "style-shadow",
+    "style-svg",
+  ];
+  attributeChangedCallback(name, old_value, new_value)
+  {
+    if (name == "value")
+    {
+      this.Update();
+    }
+    else
+    {
+      this.Render();
+    }
+    //console.log("DeDial.attributeChangedCallback(name, old_value, new_value):", name, old_value, new_value);
+  }
+
+  set value(new_value)
+  {
+    const max_value = Utils.Get_Attribute_Int(this, "max-value", DeDial.DEF_MAX);
+    const has_overflow = this.hasAttribute("has-overflow");
+
+    if (new_value == null || new_value == undefined)
+    {
+      new_value = 0;
+    }
+    else if (new_value > max_value && !has_overflow)
+    {
+      new_value = 0;
+    }
+    else if (new_value < 0 && !has_overflow)
+    {
+      new_value = max_value;
+    }
+  
+    this.setAttribute("value", new_value);
+  }
+
+  get value()
+  {
+    return Utils.Get_Attribute_Int(this, "value");
+  }
+
+  set labelText(str)
+  {
+    const show_label = Utils.Get_Attribute_Bool(this, "show-label");
+    if (show_label)
+    {
+      const prefix = this.hasAttribute("label-prefix") ? this.getAttribute("label-prefix") : "";
+      const postfix = this.hasAttribute("label-postfix") ? this.getAttribute("label-postfix") : "";
+
+      this.text_elem.innerHTML = prefix + str + postfix;
+    }
+  }
+
+  start()
+  {
+    this.stop();
+    const wait_millis = Utils.Get_Attribute_Int(this, "wait-millis", DeDial.DEF_WAIT_MILLIS);
+    this.interval_id = setInterval(this.On_Interval, wait_millis);
+  }
+
+  stop()
+  {
+    if (this.interval_id)
+    {
+      clearInterval(this.interval_id);
+      this.interval_id = null;
+    }
+  }
+
+  toggle()
+  {
+    if (this.interval_id)
+    {
+      this.stop();
+    }
+    else
+    {
+      this.start();
+    }
+  }
+
+  reset()
+  {
+    const count_reverse = Utils.Get_Attribute_Bool(this, "count-reverse");
+    if (count_reverse)
+    {
+      const max_value = Utils.Get_Attribute_Int(this, "max-value", DeDial.DEF_MAX);
+      this.value = max_value;
+    }
+    else
+    {
+      this.value = 0;
+    }
+  }
+
+  restart()
+  {
+    this.stop();
+    this.reset();
+    this.start();
+  }
+
+  Set_Observe(value)
+  {
+    if (value === true && this.interval_id == null)
+    {
+      if (!this.observer)
+      {
+        const options = { root: null, rootMargin: '0px', threshold: 0.5 };
+        this.observer = new IntersectionObserver(this.On_Observe, options);
+      }
+
+      this.observer.observe(this);
+    }
+    else
+    {
+      if (this.observer)
+      {
+        this.observer.unobserve(this);
+      }
+    }
+  }
+
+  Calc_Path_Length()
+  {
+    const max_value = Utils.Get_Attribute_Int(this, "max-value", DeDial.DEF_MAX);
+    const tick_width = Utils.Get_Attribute_Int(this, "tick-width", DeDial.DEF_TICK_WIDTH);
+    const gap_width = Utils.Get_Attribute_Int(this, "gap-width", DeDial.DEF_GAP_WIDTH);
+    const path_length = max_value * (tick_width + gap_width);
+    return path_length;
+  }
+
+  On_Interval()
+  {
+    const max_value = Utils.Get_Attribute_Int(this, "max-value", DeDial.DEF_MAX);
+    const count_reverse = Utils.Get_Attribute_Bool(this, "count-reverse");
+
+    const inc = count_reverse ? -1 : 1;
+    this.value += inc;
+
+    this.dispatchEvent(new Event("tick"));
+
+    const auto_stop = Utils.Get_Attribute_Bool(this, "auto-stop");
+    const is_terminal_value = 
+      (count_reverse && this.value == 0) || (!count_reverse && this.value == max_value);
+    if (is_terminal_value)
+    {
+      this.dispatchEvent(new Event("completed"));
+      if (auto_stop)
+      {
+        this.stop();
+      }
+      if (this.hasAttribute("stop-href"))
+      {
+        const stop_href = this.getAttribute("stop-href");
+        window.location.href = stop_href;
+      }
+
+      const pause_millis = Utils.Get_Attribute_Int(this, "pause-millis");
+      if (!auto_stop && pause_millis > 0)
+      {
+        this.stop();
+        setTimeout(() => this.start(), pause_millis);
+      }
+    }
+  }
+
+  On_Observe(entries, observer)
+  {
+    if (entries.length > 0 && entries[0].isIntersecting) 
+    {
+      this.start();
+      observer.unobserve(this);
+    }
+  }
+
+  Update()
+  {
+    if (this.isConnected)
+    {
+      let stroke_dasharray = null;
+      const max_value = Utils.Get_Attribute_Int(this, "max-value", DeDial.DEF_MAX);
+      const tick_width = Utils.Get_Attribute_Int(this, "tick-width", DeDial.DEF_TICK_WIDTH);
+      const gap_width = Utils.Get_Attribute_Int(this, "gap-width", DeDial.DEF_GAP_WIDTH);
+      const path_length = this.Calc_Path_Length();
+
+      let value = this.value;
+      if (value > max_value)
+      {
+        value = max_value;
+      }
+      else if (value < 0)
+      {
+        value = 0;
+      }
+
+      if (value == 0)
+      {
+        stroke_dasharray = "0 " + path_length;
+      }
+      else if (value == 1)
+      {
+        stroke_dasharray = "" + tick_width + " " + path_length;
+      }
+      else //if (value > 1 && value <= max_value)
+      {
+        const tick = "" + gap_width + " " + tick_width + " ";
+        stroke_dasharray = "" + tick_width + " " + tick.repeat(value - 1) + path_length;
+      }
+
+      if (stroke_dasharray)
+      {
+        this.circle_elem.setAttribute("stroke-dasharray", stroke_dasharray);
+      }
+
+      this.labelText = this.value;
+    }
+  }
+
+  Render()
+  {
+    //console.log("DeDial.Render()");
+    if (this.isConnected)
+    {
+      const path_length = this.Calc_Path_Length();
+      const tick_width = Utils.Get_Attribute_Int(this, "tick-width", DeDial.DEF_TICK_WIDTH);
+      const gap_width = Utils.Get_Attribute_Int(this, "gap-width", DeDial.DEF_GAP_WIDTH);
+
+      const viewbox_radius = Utils.Get_Attribute_Int(this, "viewbox-radius", DeDial.DEF_VIEW_RADIUS);
+      const viewbox_diameter = Math.abs(viewbox_radius) * 2;
+      const view_box = 
+        "-" + viewbox_radius + " -" + viewbox_radius + 
+        " " + viewbox_diameter + " " + viewbox_diameter;
+      const circle_radius = Utils.Get_Attribute_Int(this, "circle-radius", DeDial.DEF_CIRCLE_RADIUS);
+
+      let shadow_svg = "";
+      const show_shadow = Utils.Get_Attribute_Bool(this, "show-shadow");
+      if (show_shadow)
+      {
+        shadow_svg = `
+          <circle 
+            cid="shadow_elem"
+            cx="0" cy="0" r="${circle_radius}" 
+            pathLength="${path_length}"
+            stroke-dasharray="${tick_width} ${gap_width}" 
+            class="shadow"
+          />
+        `;
+      }
+
+      let label_html = "";
+      const show_label = Utils.Get_Attribute_Bool(this, "show-label");
+      if (show_label)
+      {
+        const label_sub = Utils.Get_Attribute(this, "label-sub", "");
+        label_html = `
+          <div cid="label_elem" class="label">
+            <span cid="text_elem"></span>
+            <span cid="subtext_elem" class="label-sub">${label_sub}</span>
+          </div>
+        `;
+      }
+  
+      const html = `
+        <svg cid="svg_elem" viewBox="${view_box}" class="dial">
+          <slot name="svg"></slot>
+          ${shadow_svg}
+          <circle 
+            cid="circle_elem"
+            cx="0" cy="0" r="${circle_radius}" 
+            pathLength="${path_length}"
+            stroke-dasharray="0 ${path_length}" 
+            class="active-marks"
+          />
+        </svg>
+        ${label_html}
+      `;
+      const template = Utils.To_Template(html, this);
+      this.innerHTML = template.innerHTML;
+      Utils.Set_Id_Shortcuts(this, this, "cid");
+
+      Utils.Set_Style(this, this, "style-host");
+      Utils.Set_Style(this, this.svg_elem, "style-svg");
+      Utils.Set_Styles(this);
+
+      this.Update();
+
+      const auto_start = Utils.Get_Attribute_Bool(this, "auto-start", false);
+      this.Set_Observe(auto_start);
+    }
+  }
+}
+
+class DeTimer extends HTMLElement
+{
+  static tname = "de-timer";
+
+  constructor()
+  {
+    super();
+    this.target_date = null;
+    Utils.Bind(this, "On_");
+  }
+
+  connectedCallback()
+  {
+    this.Render();
+  }
+
+  static observedAttributes = 
+  [
+    "millis",
+    "auto-start",
+    "auto-stop",
+    "date",
+    "time",
+    "show-labels",
+    "label-sec",
+    "label-min",
+    "label-hr",
+    "label-day",
+    "style-label",
+    "style-shadow",
+    "style-dial",
+    "style-str",
+    "style-hrs",
+    "style-min",
+    "style-sec",
+    "style-anim",
+    "style-label-sub",
+    "style-counter",
+    "style-day",
+    "style-ticks",
+  ];
+  attributeChangedCallback(name, old_value, new_value)
+  {
+    if (name == "date" || name == "time" || name == "millis")
+    {
+      const date_str = this.getAttribute("date");
+      const time_str = this.getAttribute("time");
+      const period_str = this.getAttribute("millis");
+      this.target_date = Utils.Time_Strs_To_Millis(date_str, time_str, period_str)
+    }
+    else
+    {
+      this.Render();
+    }
   }
 
   Check_Completed(value, elem)
   {
-    if (value == 0 && !elem.is_completed)
+    if (elem.prev_value != undefined && value == 0 && elem.prev_value != 0)
     {
       this.On_Dial_Completed(elem);
-      elem.is_completed = true;
     }
-    else if (value != 0)
-    {
-      elem.is_completed = false;
-    }
+    elem.prev_value = value;
   }
 
   Split_Timespan(millis)
@@ -1027,37 +1575,27 @@ class DeTimer extends HTMLElement
 
   // attributes =========================================================================
 
-  // auto-start
-  // auto-stop
-  // label-sec
-  // label-min
-  // label-hr
-  // label-day
-  // show-labels
-  // stop-href
-
-  // style-host
-  // style-label
-  // style-svg
-  // value
-
   // properties =========================================================================
 
-  // value
-  // labelText
+  set time(value_int)
+  {
+    this.target_date = value_int;
+    this.Update_Timer();
+  }
 
   // methods ============================================================================
 
   start()
   {
-    this.interval_id = setInterval(this.On_Interval, 1000);
+    this.stop();
+    this.On_Interval();
   }
 
   stop()
   {
     if (this.interval_id)
     {
-      clearInterval(this.interval_id);
+      clearTimeout(this.interval_id);
       this.interval_id = null;
     }
   }
@@ -1079,6 +1617,7 @@ class DeTimer extends HTMLElement
   On_Dial_Completed(elem)
   {
     elem.addEventListener("animationend", this.On_Animation_End);
+    elem.addEventListener("transitionend", this.On_Animation_End);
     elem.classList.add("completed");
   }
 
@@ -1086,159 +1625,179 @@ class DeTimer extends HTMLElement
   {
     event.target.classList.remove("completed");
     event.target.removeEventListener("animationend", this.On_Animation_End);
+    event.target.removeEventListener("transitionend", this.On_Animation_End);
   }
 
   On_Interval()
   {
-    const now = Date.now();
-    const target_date = this.Get_Date();
-    const timespan_millis = Math.abs(target_date.getTime() - now);
-    const timespan = this.Split_Timespan(timespan_millis);
-
-    this.Update_Timer(timespan);
+    this.Update_Timer();
 
     this.dispatchEvent(new Event("tick"));
 
-    const auto_stop = this.hasAttribute("auto-stop");
-    const is_terminal_value = now >= target_date.getTime();
-    if (auto_stop && is_terminal_value)
+    const now = Date.now();
+    const is_terminal_value = now >= this.target_date;
+    const auto_stop = Utils.Get_Attribute_Bool(this, "auto-stop");
+
+    if (is_terminal_value && auto_stop)
     {
       this.stop();
-      this.dispatchEvent(new Event("completed"));
+    }
+    else
+    {
+      this.interval_id = setTimeout(this.On_Interval, 1000);
+    }
 
-      if (this.hasAttribute("stop-href"))
-      {
-        const stop_href = this.getAttribute("stop-href");
-        window.location.href = stop_href;
-      }
+    if (this.prev_date && this.prev_date <= this.target_date && now > this.target_date)
+    {
+      this.dispatchEvent(new Event("completed"));
+    }
+    this.prev_date = now;
+
+    if (is_terminal_value && this.hasAttribute("stop-href"))
+    {
+      const stop_href = this.getAttribute("stop-href");
+      window.location.href = stop_href;
     }
   }
 
   // rendering ==========================================================================
 
-  Update_Timer(timespan)
+  Update_Timer()
   {
-    this.days_elem.value = timespan.days;
-    this.hours_elem.value = timespan.hrs;
-    this.minutes_elem.value = timespan.mins;
-    this.seconds_elem.value = timespan.secs;
+    if (this.isConnected)
+    {
+      const now = Date.now();
+      const millis = Math.abs(this.target_date - now);
+      const timespan = this.Split_Timespan(millis);
 
-    this.Check_Completed(timespan.days, this.days_counter_elem);
-    this.Check_Completed(timespan.hrs, this.hours_counter_elem);
-    this.Check_Completed(timespan.mins, this.minutes_counter_elem);
-    this.Check_Completed(timespan.secs, this.seconds_counter_elem);
+      this.days_elem.value = timespan.days;
+      this.hours_elem.value = timespan.hrs;
+      this.minutes_elem.value = timespan.mins;
+      this.seconds_elem.value = timespan.secs;
+
+      this.Check_Completed(timespan.days, this.days_counter_elem);
+      this.Check_Completed(timespan.hrs, this.hours_counter_elem);
+      this.Check_Completed(timespan.mins, this.minutes_counter_elem);
+      this.Check_Completed(timespan.secs, this.seconds_counter_elem);
+    }
   }
 
   Render()
   {
-    let 
-      label_postfix_sec = "", 
-      label_postfix_min = "", 
-      label_postfix_hr = "", 
-      label_postfix_day = "";
-    const label_sec = this.hasAttribute("label-sec") ? this.getAttribute("label-sec") : "seconds";
-    const label_min = this.hasAttribute("label-min") ? this.getAttribute("label-min") : "minutes";
-    const label_hr = this.hasAttribute("label-hr") ? this.getAttribute("label-hr") : "hours";
-    const label_day = this.hasAttribute("label-day") ? this.getAttribute("label-day") : "days";
-
-    if (this.hasAttribute("show-labels"))
+    if (this.isConnected)
     {
-      label_postfix_sec = "label-postfix=\"<br><span class='text-label'>" + label_sec + "</span>\"";
-      label_postfix_min = "label-postfix=\"<br><span class='text-label'>" + label_min + "</span>\"";
-      label_postfix_hr = "label-postfix=\"<br><span class='text-label'>" + label_hr + "</span>\"";
-      label_postfix_day = "label-postfix=\"<br><span class='text-label'>" + label_day + "</span>\"";
-    }
+      const max_marks = 60;
+      let 
+        label_postfix_sec = "", 
+        label_postfix_min = "", 
+        label_postfix_hrs = "", 
+        label_postfix_day = "";
+      const show_labels = Utils.Get_Attribute_Bool(this, "show-labels");
+      if (show_labels)
+      {
+        const label_sec = Utils.Get_Attribute(this, "label-sec", "seconds");
+        const label_min = Utils.Get_Attribute(this, "label-min", "minutes");
+        const label_hrs = Utils.Get_Attribute(this, "label-hrs", "hours");
+        const label_day = Utils.Get_Attribute(this, "label-day", "days");
 
-    const html = `
-      <div cid="days_counter_elem" class="counter">
-        <de-dial cid="days_elem" max-value="364" show-label show-shadow has-overflow
-          ${label_postfix_day}
-          class="ticks"></de-dial>
-        <de-dial class="anim-border days" max-value="80" value="80" gap-width="2"></de-dial>
-      </div>
-      <div cid="hours_counter_elem" class="counter">
-        <de-dial cid="hours_elem" max-value="23" show-label show-shadow
-          ${label_postfix_hr}
-          class="ticks"></de-dial>
-        <de-dial class="anim-border hours" max-value="80" value="80" gap-width="2"></de-dial>
-      </div>
-      <div cid="minutes_counter_elem" class="counter">
-        <de-dial cid="minutes_elem" max-value="59" show-label show-shadow
-          ${label_postfix_min}
-          class="ticks"></de-dial>
-        <de-dial class="anim-border minutes" max-value="80" value="80" gap-width="2"></de-dial>
-      </div>
-      <div cid="seconds_counter_elem" class="counter">
-        <de-dial cid="seconds_elem" max-value="59" show-label show-shadow
-          ${label_postfix_sec}
-          class="ticks"></de-dial>
-        <de-dial class="anim-border seconds" max-value="80" value="80" gap-width="2"></de-dial>
-      </div>
-    `;
-    this.innerHTML = html;
-    Utils.Set_Id_Shortcuts(this, this, "cid");
+        label_postfix_sec = "label-sub=\"" + label_sec + "\"";
+        label_postfix_min = "label-sub=\"" + label_min + "\"";
+        label_postfix_hrs = "label-sub=\"" + label_hrs + "\"";
+        label_postfix_day = "label-sub=\"" + label_day + "\"";
+      }
 
-    const auto_start = this.hasAttribute("auto-start");
-    if (auto_start)
-    {
-      this.start();
+      const html = `
+        <div cid="days_counter_elem" class="counter">
+          <de-dial cid="days_elem" max-value="100" show-label show-shadow has-overflow ${label_postfix_day} class="ticks"></de-dial>
+          <de-dial cid="anim_day_elem" class="anim-border days" max-value="${max_marks}" value="${max_marks}" gap-width="1"></de-dial>
+        </div>
+        <div cid="hours_counter_elem" class="counter">
+          <de-dial cid="hours_elem" tick-width="5" gap-width="1" max-value="23" show-label show-shadow ${label_postfix_hrs} class="ticks"></de-dial>
+          <de-dial cid="anim_hrs_elem" class="anim-border hours" max-value="${max_marks}" value="${max_marks}" gap-width="1"></de-dial>
+        </div>
+        <div cid="minutes_counter_elem" class="counter">
+          <de-dial cid="minutes_elem" tick-width="2" gap-width="1" max-value="59" show-label show-shadow ${label_postfix_min} class="ticks"></de-dial>
+          <de-dial cid="anim_min_elem" class="anim-border minutes" max-value="${max_marks}" value="${max_marks}" gap-width="1"></de-dial>
+        </div>
+        <div cid="seconds_counter_elem" class="counter">
+          <de-dial cid="seconds_elem" tick-width="2" gap-width="1" max-value="59" show-label show-shadow ${label_postfix_sec} class="ticks"></de-dial>
+          <de-dial cid="anim_sec_elem" class="anim-border seconds" max-value="${max_marks}" value="${max_marks}" gap-width="1"></de-dial>
+        </div>
+      `;
+      this.innerHTML = html;
+      Utils.Set_Id_Shortcuts(this, this, "cid");
+
+      for (const elem of this.querySelectorAll(".counter"))
+        Utils.Set_Style(this, elem, "style-counter");
+      
+      for (const elem of this.querySelectorAll(".shadow"))
+        Utils.Set_Style(this, elem, "style-shadow");
+      
+      for (const elem of this.querySelectorAll(".label"))
+        Utils.Set_Style(this, elem, "style-label");
+      
+      for (const elem of this.querySelectorAll(".label-sub"))
+        Utils.Set_Style(this, elem, "style-label-sub");
+      
+      for (const elem of this.querySelectorAll(".dial"))
+        Utils.Set_Style(this, elem, "style-dial");
+      
+      for (const elem of this.querySelectorAll(".ticks"))
+        Utils.Set_Style(this, elem, "style-ticks");
+
+      let css = this.getAttribute("style-anim") + this.getAttribute("style-day");
+      this.anim_day_elem.style = css;
+      css = this.getAttribute("style-anim") + this.getAttribute("style-hrs");
+      this.anim_hrs_elem.style = css;
+      css = this.getAttribute("style-anim") + this.getAttribute("style-min");
+      this.anim_min_elem.style = css;
+      css = this.getAttribute("style-anim") + this.getAttribute("style-sec");
+      this.anim_sec_elem.style = css;
+
+      Utils.Set_Style(this, this, "style-str");
+
+      const auto_start = Utils.Get_Attribute_Bool(this, "auto-start");
+      if (auto_start)
+      {
+        this.start();
+      }
     }
   }
 }
 
-class DeTimerCompact extends HTMLElement
+class DeTimerCompact extends DeTimer
 {
   static tname = "de-timer-compact";
 
-  constructor()
-  {
-    super();
-    Utils.Bind(this, "On_");
-  }
-
-  connectedCallback()
-  {
-    this.Render();
-  }
-  
-  Get_Date()
-  {
-    const now_date = new Date();
-    let def_year = now_date.getFullYear();
-    const def_date = new Date(def_year, 10, 13, 0, 0, 0);
-    if (def_date.getTime() <= now_date.getTime())
-    {
-      def_year++;
-    }
-
-    const yr = Utils.Get_Attribute_Int(this, "date-year", def_year);
-    const mth = Utils.Get_Attribute_Int(this, "date-month", 11);
-    const day = Utils.Get_Attribute_Int(this, "date-day", 13);
-    const hr = Utils.Get_Attribute_Int(this, "date-hour", 0);
-    const min = Utils.Get_Attribute_Int(this, "date-minute", 0);
-    const sec = Utils.Get_Attribute_Int(this, "date-second", 0);
-    const date = new Date(yr, mth-1, day, hr, min, sec);
-
-    return date;
-  }
-
-  Check_Completed(value, elem)
-  {
-    if (value == 0 && !elem.is_completed)
-    {
-      this.On_Dial_Completed(elem);
-      elem.is_completed = true;
-    }
-    else if (value != 0)
-    {
-      elem.is_completed = false;
-    }
-  }
+  static observedAttributes = 
+  [
+    "millis",
+    "auto-start",
+    "auto-stop",
+    "date",
+    "time",
+    "sublabel-text",
+    "style-label",
+    "style-shadow",
+    "style-dial",
+    "style-str",
+    "style-hrs",
+    "style-mins",
+    "style-secs",
+    "style-anim-border",
+    "style-sublabel",
+  ];
 
   Split_Timespan(millis)
   {
     const res = {};
-    
+        
+    if (this.hasAttribute("split-days"))
+    {
+      res.days = Math.floor(millis / Utils.MILLIS_DAY);
+      millis = millis % Utils.MILLIS_DAY;
+    }
+
     res.hrs = Math.floor(millis / Utils.MILLIS_HOUR);
     millis = millis % Utils.MILLIS_HOUR;
       
@@ -1253,137 +1812,73 @@ class DeTimerCompact extends HTMLElement
 
   // attributes =========================================================================
 
-  // auto-start
-  // auto-stop
-  // label-sec
-  // label-min
-  // label-hr
-  // label-day
-  // show-labels
-  // stop-href
-
-  // style-host
-  // style-label
-  // style-svg
-  // value
-
   // properties =========================================================================
-
-  // value
-  // labelText
 
   // methods ============================================================================
 
-  start()
-  {
-    this.interval_id = setInterval(this.On_Interval, 1000);
-  }
-
-  stop()
-  {
-    if (this.interval_id)
-    {
-      clearInterval(this.interval_id);
-      this.interval_id = null;
-    }
-  }
-
-  toggle()
-  {
-    if (this.interval_id)
-    {
-      this.stop();
-    }
-    else
-    {
-      this.start();
-    }
-  }
-
   // events =============================================================================
-
-  On_Dial_Completed(elem)
-  {
-    elem.addEventListener("animationend", this.On_Animation_End);
-    elem.classList.add("completed");
-  }
-
-  On_Animation_End(event)
-  {
-    event.target.classList.remove("completed");
-    event.target.removeEventListener("animationend", this.On_Animation_End);
-  }
-
-  On_Interval()
-  {
-    const now = Date.now();
-    const target_date = this.Get_Date();
-    const timespan_millis = Math.abs(target_date.getTime() - now);
-    const timespan = this.Split_Timespan(timespan_millis);
-
-    this.Update_Timer(timespan);
-
-    this.dispatchEvent(new Event("tick"));
-
-    const auto_stop = this.hasAttribute("auto-stop");
-    const is_terminal_value = now >= target_date.getTime();
-    if (auto_stop && is_terminal_value)
-    {
-      this.stop();
-      this.dispatchEvent(new Event("completed"));
-
-      if (this.hasAttribute("stop-href"))
-      {
-        const stop_href = this.getAttribute("stop-href");
-        window.location.href = stop_href;
-      }
-    }
-  }
 
   // rendering ==========================================================================
 
-  Update_Timer(timespan)
+  Update_Timer()
   {
-    this.hours_elem.value = timespan.hrs;
-    this.minutes_elem.value = timespan.mins;
-    this.seconds_elem.value = timespan.secs;
+    if (this.isConnected)
+    {
+      const now = Date.now();
+      const millis = Math.abs(this.target_date - now);
+      const timespan = this.Split_Timespan(millis);
 
-    this.Check_Completed(timespan.secs, this);
+      this.hours.value = timespan.hrs;
+      this.minutes.value = timespan.mins;
+      this.seconds.value = timespan.secs;
+      const hrs_str = String(timespan.hrs).padStart(2, "0");
+      const mins_str = String(timespan.mins).padStart(2, "0");
+      const secs_str = String(timespan.secs).padStart(2, "0");
+      let label_str = `${hrs_str}:${mins_str}:${secs_str}`;
+
+      if (this.hasAttribute("split-days"))
+      {
+        this.days.value = timespan.days;
+        const days_str = String(timespan.days);
+        label_str = `${days_str} days<br>${label_str}`;
+      }
+
+      this.label_elem.innerHTML = label_str;
+      this.Check_Completed(timespan.secs, this);
+    }
   }
 
   Render()
   {
-    let 
-      label_postfix_sec = "", 
-      label_postfix_min = "", 
-      label_postfix_hr = "";
-    const label_sec = this.hasAttribute("label-sec") ? this.getAttribute("label-sec") : "seconds";
-    const label_min = this.hasAttribute("label-min") ? this.getAttribute("label-min") : "minutes";
-    const label_hr = this.hasAttribute("label-hr") ? this.getAttribute("label-hr") : "hours";
-
-    if (this.hasAttribute("show-labels"))
+    if (this.isConnected)
     {
-      label_postfix_sec = "label-postfix=\"<br><span class='text-label'>" + label_sec + "</span>\"";
-      label_postfix_min = "label-postfix=\"<br><span class='text-label'>" + label_min + "</span>\"";
-      label_postfix_hr = "label-postfix=\"<br><span class='text-label'>" + label_hr + "</span>\"";
-    }
+      const html = `
+        <de-dial cid="days" max-value="100" show-shadow class="days" has-overflow></de-dial>
+        <de-dial cid="hours" max-value="23" tick-width="4" show-shadow class="hrs"></de-dial>
+        <de-dial cid="minutes" max-value="59" show-shadow class="mins"></de-dial>
+        <de-dial cid="seconds" max-value="59" show-shadow class="secs"></de-dial>
+        <de-dialmarks cid="border" class="anim-border" value="80" gap-width="2"></de-dialmarks>
+        <div cid="label" class="label">
+          <span cid="label_elem"></span>
+          <span cid="sublabel" class="sublabel"></span>
+        </div>
+      `;
+      this.innerHTML = html;
+      Utils.Set_Id_Shortcuts(this, this, "cid");
 
-    const html = `
-      <de-dial cid="hours_elem" max-value="23" show-shadow has-overflow
-        class="hrs"></de-dial>
-      <de-dial cid="minutes_elem" max-value="59" show-shadow
-        class="mins"></de-dial>
-      <de-dial cid="seconds_elem" max-value="59" show-shadow
-        class="secs"></de-dial>
-      <de-dialmarks class="anim-border" value="80" gap-width="2"></de-dialmarks>
-    `;
-    this.innerHTML = html;
-    Utils.Set_Id_Shortcuts(this, this, "cid");
+      if (this.hasAttribute("sublabel-text"))
+      {
+        const sublabel_text = this.getAttribute("sublabel-text");
+        this.sublabel.innerHTML = sublabel_text;
+      }
 
-    const auto_start = this.hasAttribute("auto-start");
-    if (auto_start)
-    {
-      this.start();
+      Utils.Set_Styles(this);
+
+      const auto_start = Utils.Get_Attribute_Bool(this, "auto-start");
+      if (auto_start)
+      {
+        this.start();
+      }
     }
   }
 }
@@ -1396,9 +1891,11 @@ Utils.Register_Element(DeActionBtn);
 Utils.Register_Element(DeTimer);
 Utils.Register_Element(DeTimerCompact);
 Utils.Register_Element(DeGauge);
+Utils.Register_Element(DeCounter);
 
 export default 
 {
+  Utils,
   DeDial,
   DeActionBtn
 };

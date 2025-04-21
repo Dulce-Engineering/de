@@ -1,4 +1,48 @@
-import Utils from "../Utils.js";
+import Utils from "../../lib/Utils.js";
+
+const ease = 
+{
+  exponentialIn: (t) => {
+    return t == 0.0 ? t : Math.pow(2.0, 10.0 * (t - 1.0));
+  },
+  exponentialOut: (t) => {
+    return t == 1.0 ? t : 1.0 - Math.pow(2.0, -10.0 * t);
+  },
+  exponentialInOut: (t) => {
+    return t == 0.0 || t == 1.0
+      ? t
+      : t < 0.5
+        ? +0.5 * Math.pow(2.0, (20.0 * t) - 10.0)
+        : -0.5 * Math.pow(2.0, 10.0 - (t * 20.0)) + 1.0;
+  },
+  sineOut: (t) => {
+    const HALF_PI = 1.5707963267948966;
+    return Math.sin(t * HALF_PI);
+  },
+  circularInOut: (t) => {
+    return t < 0.5
+        ? 0.5 * (1.0 - Math.sqrt(1.0 - 4.0 * t * t))
+        : 0.5 * (Math.sqrt((3.0 - 2.0 * t) * (2.0 * t - 1.0)) + 1.0);
+  },
+  cubicIn: (t) => {
+    return t * t * t;
+  },
+  cubicOut: (t) => {
+    const f = t - 1.0;
+    return f * f * f + 1.0;
+  },
+  cubicInOut: (t) => {
+    return t < 0.5
+      ? 4.0 * t * t * t
+      : 0.5 * Math.pow(2.0 * t - 2.0, 3.0) + 1.0;
+  },
+  quadraticOut: (t) => {
+    return -t * (t - 2.0);
+  },
+  quarticOut: (t) => {
+    return Math.pow(t - 1.0, 3.0) * (1.0 - t) + 1.0;
+  },
+}
 
 class ShapeOverlays 
 {
@@ -16,7 +60,8 @@ class ShapeOverlays
     this.isAnimating = false;
   }
 
-  toggle() {
+  toggle() 
+  {
     this.isAnimating = true;
     for (var i = 0; i < this.numPoints; i++) {
       this.delayPointsArray[i] = 0;
@@ -28,7 +73,8 @@ class ShapeOverlays
     }
   }
 
-  open() {
+  open() 
+  {
     this.isOpened = true;
     this.elm.classList.add('is-opened');
     $("body").addClass('overflow-hidden');
@@ -36,7 +82,8 @@ class ShapeOverlays
     this.renderLoop();
   }
 
-  close() {
+  close() 
+  {
     this.isOpened = false;
     this.elm.classList.remove('is-opened');
     $("body").removeClass('overflow-hidden');
@@ -44,18 +91,21 @@ class ShapeOverlays
     this.renderLoop();
   }
 
-  updatePath(time) {
+  updatePath(time) 
+  {
     const points = [];
-    for (var i = 0; i < this.numPoints; i++) {
+    for (var i = 0; i < this.numPoints; i++) 
+    {
       const thisEase = this.isOpened ? 
-                        (i == 1) ? ease.cubicOut : ease.cubicInOut:
-                        (i == 1) ? ease.cubicInOut : ease.cubicOut;
+        (i == 1) ? ease.cubicOut : ease.cubicInOut:
+        (i == 1) ? ease.cubicInOut : ease.cubicOut;
       points[i] = thisEase(Math.min(Math.max(time - this.delayPointsArray[i], 0) / this.duration, 1)) * 100
     }
 
     let str = '';
     str += (this.isOpened) ? `M 0 0 V ${points[0]} ` : `M 0 ${points[0]} `;
-    for (var i = 0; i < this.numPoints - 1; i++) {
+    for (var i = 0; i < this.numPoints - 1; i++) 
+    {
       const p = (i + 1) / (this.numPoints - 1) * 100;
       const cp = p - (1 / (this.numPoints - 1) * 100) / 2;
       str += `C ${cp} ${points[i]} ${cp} ${points[i + 1]} ${p} ${points[i + 1]} `;
@@ -64,26 +114,37 @@ class ShapeOverlays
     return str;
   }
 
-  render() {
-    if (this.isOpened) {
-      for (var i = 0; i < this.path.length; i++) {
-        this.path[i].setAttribute('d', this.updatePath(Date.now() - (this.timeStart + this.delayPerPath * i)));
+  render() 
+  {
+    if (this.isOpened) 
+    {
+      for (var i = 0; i < this.path.length; i++) 
+      {
+        const time = Date.now() - (this.timeStart + this.delayPerPath * i);
+        const path_str = this.updatePath(time);
+        this.path[i].setAttribute('d', path_str);
       }
-    } else {
-      for (var i = 0; i < this.path.length; i++) {
-        this.path[i].setAttribute('d', this.updatePath(Date.now() - (this.timeStart + this.delayPerPath * (this.path.length - i - 1))));
+    } 
+    else 
+    {
+      for (var i = 0; i < this.path.length; i++) 
+      {
+        const time = Date.now() - (this.timeStart + this.delayPerPath * (this.path.length - i - 1));
+        const path_str = this.updatePath(time);
+        this.path[i].setAttribute('d', path_str);
       }
     }
   }
 
-  renderLoop() {
+  renderLoop() 
+  {
     this.render();
-    if (Date.now() - this.timeStart < this.duration + this.delayPerPath * (this.path.length - 1) + this.delayPointsMax) {
-      requestAnimationFrame(() => {
-        this.renderLoop();
-      });
+    if (Date.now() - this.timeStart < this.duration + this.delayPerPath * (this.path.length - 1) + this.delayPointsMax) 
+    {
+      requestAnimationFrame(() => {this.renderLoop();});
     }
-    else {
+    else 
+    {
       this.isAnimating = false;
     }
   }
@@ -133,11 +194,14 @@ class DeHeader extends HTMLElement
   {
     this.innerHTML = `
       <ul cid="gNavItems" class="hamburger-navigation">
-        <li><a href="index.html">Home</a></li>
-        <li><a href="index.html#clients">Clients</a></li>
-        <li><a href="index.html#services">Services</a></li>
+        <li><a href="/index.html">Home</a></li>
+        <!--li><a href="/index.html#clients">Clients</a></li>
+        <li><a href="/index.html#services">Services</a></li-->
         <li><a href="/dedial/index.html">DeDial Component</a></li>
-        <li><a href="/dedial/docs.html">DeDial Reference</a></li>
+        <li><a href="/tempustoi">TempusToi</a></li>
+        <li><a href="/tempustrak">TempusTrak</a></li>
+        <li><a href="/magnihube">Magnihube</a></li>
+        <li><a href="/porottoz">Porottoz</a></li>
       </ul>
 
       <svg cid="elmOverlay" class="shape-overlays" viewBox="0 0 100 100" preserveAspectRatio="none">

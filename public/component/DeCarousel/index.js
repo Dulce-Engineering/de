@@ -1,4 +1,4 @@
-import Utils from "../Utils.js";
+import Utils from "../../lib/Utils.js";
 
 class DeCarousel extends HTMLElement
 {

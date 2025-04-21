@@ -1,0 +1,83 @@
+﻿<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Canviito - Editor</title>
+
+    <link type="text/css" rel="stylesheet" href="./style/main.css" />
+    <link type="text/css" rel="stylesheet" href="./style/Shape_Dlg.css" />
+    <link type="text/css" rel="stylesheet" href="./style/Shape_List.css" />
+    <link type="text/css" rel="stylesheet" href="./style/Android_Code.css" />
+    <link type="text/css" rel="stylesheet" href="./style/Canvas_Code.css" />
+    <link type="text/css" rel="stylesheet" href="./style/Path_Code.css" />
+    <link type="text/css" rel="stylesheet" href="./style/Shape_Editor.css" />
+    <link type="text/css" rel="stylesheet" href="./style/Remote_Ctrl.css" />
+    <style>
+      html, body
+      {
+        color: #fff;
+        min-width: 800px;
+        overflow: hidden;
+        text-align: center;
+      }
+    </style>
+    
+    <script type="module">
+      import "./component/Shape_Editor.js";
+      import "./component/Shape_List.js";
+
+      window.onload = Main;
+      window.onresize = OnResize;
+      let remote_ctrl;
+
+      function Main()
+      {
+        shapes_elem.on_change_fn = Shapes_OnChange;
+        
+        editor_elem.on_change_fn = Editor_OnChange;
+        editor_elem.Set_Shapes(shapes_elem.shapes);
+
+        OnResize();
+      }
+
+      function OnResize()
+      {
+        let size;
+        let width = window.innerWidth;
+        let height = window.innerHeight;
+        if (width<height)
+        {
+          size = width;
+        }
+        else if (height<width)
+        {
+          size = height;
+        }
+
+        editor_elem.Resize(width, height);      
+      }
+
+      // fires when a change is made on the shape list
+      function Shapes_OnChange(shapes)
+      {
+        //console.log("Shapes_OnChange()");
+        shapes_elem.Save();
+        editor_elem.Set_Shapes(shapes);
+      }
+
+      // fires when a change is made via the canvas editor
+      function Editor_OnChange(plant)
+      {
+        //console.log("Editor_OnChange()");
+        shapes_elem.Save();
+        shapes_elem.requestUpdate();
+      }
+    </script>
+  </head>
+
+  <body>
+    <shape-editor id="editor_elem"></shape-editor>
+    <shape-list id="shapes_elem"></shape-list>
+  </body>
+</html>
