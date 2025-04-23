@@ -12,25 +12,68 @@
       gtag('config', 'G-KMFPTFXKGX');
     </script>
 
-    <link rel="manifest" href="/porottoz/manifest.json">
-    <title>Magnigube</title>
+    <link rel="manifest" href="/job-woper/manifest.json">
+    <title>Job Woper</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="keywords" content="">
     <meta name="author" content="Dulce Engineering Pty. Ltd.">
     <meta name="robots" content="index, follow"> 
-    <meta property="og:title" content="Porottoz">
+    <meta property="og:title" content="Job Woper">
     <meta property="og:description" content="">
-    <meta property="og:image" content="https://dulceeng.com.au/porottoz/image/screenshot-landscape.png">
-    <meta property="og:url" content="https://dulceeng.com.au/porottoz">
+    <meta property="og:image" content="https://dulceeng.com.au/job-woper/image/screenshot-landscape.png">
+    <meta property="og:url" content="https://dulceeng.com.au/job-woper">
     <meta property="og:type" content="website">
     <link rel="shortcut icon" href="./image/favicon.ico">
     
     <style>
+      @font-face
+      {
+        font-family: hyperspace-bold;
+        src: url("font/Hyperspace Bold.otf");
+      }
+      @font-face
+      {
+        font-family: hyperspace;
+        src: url("font/Hyperspace.otf");
+      }
+      @font-face
+      {
+        font-family: octagonal-ultra-light;
+        src: url("font/octaul-017.ttf");
+      }
+      @font-face
+      {
+        font-family: octagonal-light;
+        src: url("font/octal-017.ttf");
+      }
+      @font-face
+      {
+        font-family: octagonal-regular;
+        src: url("font/octar-017.ttf");
+      }
+      @font-face
+      {
+        font-family: octagonal-bold;
+        src: url("font/octab-017.ttf");
+      }
+
       :root 
       {
         --pink: #FFB6C1; /* #FFB6C1, #FFC0CB, #FFD6E7 */
+
+        background-color: #000;
+        color: #00ff00;
+        font-family: octagonal-bold;
+        font-size: 14px;
+        text-shadow: #00ff00 0px 0px 10px;
+        letter-spacing: 1px;
+
+        background-image: url(image/world_map.svg);
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
       }
 
       #ads_elem
@@ -52,6 +95,23 @@
       {
         width: fit-content;
       }
+      header
+      {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      button 
+      {
+        background-color: #440;
+        color: #ff0;
+        font-family: hyperspace-bold;
+        padding: 6px 8px;
+        font-size: 14px;
+        border: none;
+        letter-spacing: 2px;
+        cursor: pointer;
+      }
 
       @media screen and (min-width: 768px)
       {
@@ -65,10 +125,10 @@
     {
       "@context": "https://schema.org",
       "@type": "Website",
-      "name": "Porottoz",
-      "url": "https://dulceeng.com.au/porottoz",
+      "name": "Job Woper",
+      "url": "https://dulceeng.com.au/job-woper",
       "description": "",
-      "image": "https://dulceeng.com.au/porottoz/image/screenshot-landscape.png"
+      "image": "https://dulceeng.com.au/job-woper/image/screenshot-landscape.png"
     }
     </script>
 
@@ -127,9 +187,9 @@
 
     <header>
 
-      <h1><span>XXX</span></h1>
+      <h1><span>Job Woper</span></h1>
       <nav>
-        <button id="add_file_btn"><span class="text">Add File</span></button>
+        <button id="add_file_btn"><span class="text">Add Chart</span></button>
         <button id="del_all_btn" hidden><span class="text">Delete All</span></button>
       </nav>
     </header>
