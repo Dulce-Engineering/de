@@ -134,7 +134,32 @@
 
     <script type="module">
       import Utils from "../lib/Utils.js";
-      import DeDialogForm from "../component/DeDialogForm/index.js";
+      import "../component/DeDialogForm/index.js";
+      import "../component/DeSelectTree/index.js";
+
+      class Query
+      {
+        static async Select_All()
+        {
+          const res_http = await fetch("db/query.json");
+          const queries = await res_http.json();
+          // sort by order
+
+          return queries;
+        }
+      }
+
+      class Trend
+      {
+        static async Select_By_Query_Id(query_id)
+        {
+          const res_http = await fetch(`db/trend/query${query_id}.json`);
+          const trends = await res_http.json();
+          // sort by datetime
+
+          return trends;
+        }
+      }
 
       Init();
       async function Init()
@@ -167,14 +192,56 @@
       }
 
       Main();
-      function Main()
+      async function Main()
       {
+        let queries = await Query.Select_All();
+        queries = queries.filter(q => q.src == "seek" || q.terms == undefined);
+        tech_select.items = queries;
+        add_btn.addEventListener("click", On_Add_Btn_Click);
       }
 
       // events =========================================================================
 
+      async function On_Add_Btn_Click()
+      {
+        const new_chart = await chart_form.Show_Async();
+        if (new_chart)
+        {
+          new_chart.id = crypto.randomUUID();
+          new_chart.items = await Trend.Select_By_Query_Id(new_chart.query_id);
+
+          const chart_elem = Render_Chart(new_chart);
+          chart_elem.items = new_chart.items;
+          items.appendChild(chart_elem);
+
+          Update_Nav();
+        }
+      }
+
       // rendering ======================================================================
 
+      async function Render_Chart(chart)
+      {
+        const html = `
+          <de-line-chart title="${title}" x-label="Time" y-label="Size">
+            <button cid="del_btn" slot="title" class="header small">
+              <span class="text">Delete</span>
+            </button>
+          </de-line-chart>
+        `;
+        const elements = Utils.toDocument(html);
+        const chart_elem = elements.querySelector("de-line-chart");
+        const del_btn = elements.querySelector("[cid=del_btn]");
+
+        del_btn.addEventListener("click", (e) => On_Click_Del_File_Btn(e, chart_elem));
+
+        return chart_elem;
+      }
+
+      function Update_Nav()
+      {
+
+      }
     </script>
 
     <script src="https://vemtoutcheeg.com/400/8903613"></script>
@@ -189,7 +256,7 @@
 
       <h1><span>Job Woper</span></h1>
       <nav>
-        <button id="add_file_btn"><span class="text">Add Chart</span></button>
+        <button id="add_btn"><span class="text">Add Chart</span></button>
         <button id="del_all_btn" hidden><span class="text">Delete All</span></button>
       </nav>
     </header>
@@ -203,6 +270,13 @@
     <footer>
       © Copyright Dulce Engineering 2025. All rights reserved. v1
     </footer>
+
+    <de-dialog-form id="chart_form">
+      <h1 slot="header"><span class="text">Chart Details</span></h1>
+
+      <label slot="fields" for="tech_select">Tech</label>
+      <de-select-tree id="tech_select" slot="fields" name="query_id"></de-select-tree>
+    </de-dialog-form>
 
   </body>
 

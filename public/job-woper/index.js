@@ -6,6 +6,7 @@ main();
 
 async function main()
 {
+  console.log("Import started...");
   const queries = Select_All("query");
   const seek_queries = queries.filter
     (q => q.src == "seek" && Query_Needs_Update(q, Utils.MILLIS_DAY));
@@ -13,7 +14,7 @@ async function main()
   {
     if (seek_queries.length > 1 && i > 0)
     {
-      console.log("wait...");
+      console.log("Waiting...");
       await Wait(Utils.MILLIS_MINUTE);
     }
 
@@ -23,6 +24,7 @@ async function main()
 
     console.log(query.title, count);
   }
+  console.log("Completed.");
 }
 
 function Wait(milliseconds) 

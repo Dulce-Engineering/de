@@ -29,7 +29,7 @@ class DeDialogForm extends HTMLElement
 
   Set_Obj(obj)
   {
-    const input_elements = this.querySelectorAll("[name]");
+    const input_elements = this.main_elem.querySelectorAll("[name]");
     for (const input_elem of input_elements)
     {
       const field_name = input_elem.getAttribute("name");
@@ -67,7 +67,7 @@ class DeDialogForm extends HTMLElement
           obj[field_name] = input_elem.value;
         }
       }
-      else
+      else if (input_elem.tagName != "DETAILS")
       {
         obj[field_name] = null;
       }
@@ -174,7 +174,7 @@ class DeDialogForm extends HTMLElement
         <header>
           <slot name="header"></slot>
         </header>
-        <main>
+        <main cid="main_elem">
           <slot name="fields"></slot>
         </main>
         <footer>
