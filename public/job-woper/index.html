@@ -101,6 +101,10 @@
         flex-direction: column;
         align-items: center;
       }
+      main
+      {
+        width: 100%;
+      }
       button 
       {
         background-color: #440;
@@ -111,6 +115,72 @@
         border: none;
         letter-spacing: 2px;
         cursor: pointer;
+      }
+
+      de-line-chart
+      {
+        display: block;
+        background-color: #ffe7;
+        margin: 20px 0;
+
+        svg
+        {
+          width: 100%;
+          xheight: 400px;
+          xborder: 1px solid #f00;
+        }
+        .axis-label
+        {
+          font-size: 1rem;
+        }
+        .title
+        {
+          margin: 15px 35px 10px 35px;
+          padding: 0;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 20px;
+        }
+        .title > span
+        {
+          font-size: 1.2rem;
+          font-weight: 100;
+          overflow-wrap: anywhere;
+        }
+        .summary
+        {
+          display: grid;
+          grid-template-columns: 1fr 1fr 1fr 2fr;
+          gap: 10px;
+        }
+        .header
+        { 
+          justify-self: start;
+        }
+        .label
+        { 
+          justify-self: end;
+          text-decoration: underline;
+        }
+        .ranges
+        {
+          padding: 0 4.5% 0 10%;
+          height: 0;
+          overflow: hidden;
+          display: flex;
+          align-items: flex-start;
+          transition: height 0.3s ease-in-out;
+        }
+        .time-range
+        {
+          width: 100%;
+        }
+        .highlight
+        {
+          fill: #0f03;
+          visibility: hidden;
+        }
       }
 
       @media screen and (min-width: 768px)
@@ -136,6 +206,7 @@
       import Utils from "../lib/Utils.js";
       import "../component/DeDialogForm/index.js";
       import "../component/DeSelectTree/index.js";
+      import "../component/DeLineChart/index.js";
 
       class Query
       {
@@ -197,22 +268,26 @@
         let queries = await Query.Select_All();
         queries = queries.filter(q => q.src == "seek" || q.terms == undefined);
         tech_select.items = queries;
-        add_btn.addEventListener("click", On_Add_Btn_Click);
+        add_btn.addEventListener("click", () => On_Add_Btn_Click(queries));
       }
 
       // events =========================================================================
 
-      async function On_Add_Btn_Click()
+      async function On_Add_Btn_Click(queries)
       {
         const new_chart = await chart_form.Show_Async();
         if (new_chart)
         {
+          const trends = await Trend.Select_By_Query_Id(new_chart.query_id);
+          const data = trends.map(t => {return {x: t.datetime, y: t.count}});
+
           new_chart.id = crypto.randomUUID();
-          new_chart.items = await Trend.Select_By_Query_Id(new_chart.query_id);
+          new_chart.query = queries.find(q => q.id == new_chart.query_id);
+          new_chart.items = data;
 
           const chart_elem = Render_Chart(new_chart);
+          items.append(chart_elem);
           chart_elem.items = new_chart.items;
-          items.appendChild(chart_elem);
 
           Update_Nav();
         }
@@ -220,10 +295,10 @@
 
       // rendering ======================================================================
 
-      async function Render_Chart(chart)
+      function Render_Chart(chart)
       {
         const html = `
-          <de-line-chart title="${title}" x-label="Time" y-label="Size">
+          <de-line-chart title="${chart.query.title}" x-label="Time" y-label="Usage">
             <button cid="del_btn" slot="title" class="header small">
               <span class="text">Delete</span>
             </button>
@@ -270,6 +345,10 @@
     <footer>
       © Copyright Dulce Engineering 2025. All rights reserved. v1
     </footer>
+
+    <template>
+
+    </template>
 
     <de-dialog-form id="chart_form">
       <h1 slot="header"><span class="text">Chart Details</span></h1>

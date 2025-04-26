@@ -32,7 +32,7 @@ class DeLineChart extends HTMLElement
   set items(data)
   {
     this.data = data;
-    this.Render_Chart(data);
+    this.Render_Chart();
   }
 
   set highlight_start(value)
