@@ -86,6 +86,30 @@
     "title": "Node.js",
     "src": "seek"
   },
+  {
+    "id": "-aws",
+    "order": 12,
+    "parent_id": "-LyNZdkPSml0ICKDdZb-",
+    "terms": "aws",
+    "title": "AWS",
+    "src": "seek"
+  },
+  {
+    "id": "-azure",
+    "order": 13,
+    "parent_id": "-LyNZdkPSml0ICKDdZb-",
+    "terms": "azure",
+    "title": "Azure",
+    "src": "seek"
+  },
+  {
+    "id": "-google-cloud",
+    "order": 14,
+    "parent_id": "-LyNZdkPSml0ICKDdZb-",
+    "terms": "google cloud",
+    "title": "Google Cloud",
+    "src": "seek"
+  },
 
   {
     "id": "-KpPWAFGBhe6CxLYn22r",
