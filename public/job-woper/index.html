@@ -64,6 +64,10 @@
         --main: #4af;
         --border: #fff;
         --highlight: #fff;
+        --x1: #f00;
+        --x2: #ff0;
+        --x3: #0f0;
+        --x4: #44f;
 
         background-color: #000;
         font-family: octagonal-bold;
@@ -260,14 +264,14 @@
       {
         let queries = await Query.Select_All();
         queries = queries.filter(q => q.src == "seek" || q.terms == undefined);
+        queries.sort((a, b) => a.order - b.order);
+
         tech_select.items = queries;
         add_btn.addEventListener("click", On_Add_Btn_Click);
 
         const json_str = localStorage.getItem(storage_key);
         const charts = JSON.parse(json_str);
         Render_Charts(charts);
-
-        //window.addEventListener("changecharts", On_Change_Items);
       }
 
       function Get_Charts()
@@ -292,16 +296,8 @@
         {
           new_chart.id = crypto.randomUUID();
 
-          //const trends = await Trend.Select_By_Query_Id(new_chart.query_id);
-          //const data = trends.map(t => {return {x: t.datetime, y: t.count}});
-
           await Render_Chart(new_chart);
           On_Change_Items();
-          //window.dispatchEvent(new Event("changecharts"));
-          //items.append(chart_elem);
-          //chart_elem.obj = new_chart;
-          //chart_elem.items = data;
-
           Update_Nav();
         }
       }
@@ -334,6 +330,9 @@
 
         const html = `
           <de-line-chart title="${query.title}" x-label="Time" y-label="Usage">
+            <button cid="tech_btn" slot="title" class="header small">
+              <span class="text">Add Tech</span>
+            </button>
             <button cid="del_btn" slot="title" class="header small">
               <span class="text">Delete</span>
             </button>
@@ -352,7 +351,45 @@
         chart_elem.obj = chart;
         chart_elem.items = data;
 
+        Render_Summary(chart_elem);
+
         return chart_elem;
+      }
+
+      function Render_Summary(chart_elem)
+      {
+        const html = `
+          <table>
+            <thead>
+              <tr>
+                <th></th>
+                <th>Minimum</th>
+                <th>Maximum</th>
+                <th>Difference</th>
+                <th>Average</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Time</td>
+                <td cid="min_time"></td>
+                <td cid="max_time"></td>
+                <td cid="diff_time"></td>
+                <td cid="avg_time"></td>
+              </tr>
+              <tr>
+                <td>Usage</td>
+                <td cid="min_usage"></td>
+                <td cid="max_usage"></td>
+                <td cid="diff_usage"></td>
+                <td cid="avg_usage"></td>
+              </tr>
+            </tbody>
+          </table>
+        `;
+        const elements = Utils.toDocument(html);
+
+        chart_elem.append(elements);
       }
 
       function Update_Nav()
