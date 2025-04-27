@@ -12,7 +12,7 @@
       gtag('config', 'G-KMFPTFXKGX');
     </script>
 
-    <link rel="manifest" href="/job-woper/manifest.json">
+    <link rel="xmanifest" href="/job-woper/manifest.json">
     <title>Job Woper</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -61,14 +61,18 @@
 
       :root 
       {
-        --pink: #FFB6C1; /* #FFB6C1, #FFC0CB, #FFD6E7 */
+        --main: #4af;
+        --border: #fff;
+        --highlight: #fff;
 
         background-color: #000;
-        color: #00ff00;
         font-family: octagonal-bold;
-        font-size: 14px;
-        text-shadow: #00ff00 0px 0px 10px;
+        font-size: 16px;
         letter-spacing: 1px;
+
+        stroke: var(--main);
+        color: var(--main);
+        text-shadow: var(--main) 0px 0px 10px;
 
         background-image: url(image/world_map.svg);
         background-size: cover;
@@ -104,6 +108,11 @@
       main
       {
         width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        padding: 40px;
+        box-sizing: border-box;
       }
       button 
       {
@@ -120,8 +129,8 @@
       de-line-chart
       {
         display: block;
-        background-color: #ffe7;
-        margin: 20px 0;
+        background-color: #0008;
+        border: 4px solid var(--border);
 
         svg
         {
@@ -129,9 +138,20 @@
           xheight: 400px;
           xborder: 1px solid #f00;
         }
+        .data-point
+        {
+          stroke: none;
+          fill: var(--highlight);
+        }
         .axis-label
         {
-          font-size: 1rem;
+          stroke: var(--highlight);
+          stroke-width: 0.5px;
+          text-shadow: var(--highlight) 0px 0px 10px;
+        }
+        .axis-line
+        {
+          stroke-width: 2px;
         }
         .title
         {
@@ -148,37 +168,8 @@
           font-weight: 100;
           overflow-wrap: anywhere;
         }
-        .summary
-        {
-          display: grid;
-          grid-template-columns: 1fr 1fr 1fr 2fr;
-          gap: 10px;
-        }
-        .header
-        { 
-          justify-self: start;
-        }
-        .label
-        { 
-          justify-self: end;
-          text-decoration: underline;
-        }
-        .ranges
-        {
-          padding: 0 4.5% 0 10%;
-          height: 0;
-          overflow: hidden;
-          display: flex;
-          align-items: flex-start;
-          transition: height 0.3s ease-in-out;
-        }
-        .time-range
-        {
-          width: 100%;
-        }
         .highlight
         {
-          fill: #0f03;
           visibility: hidden;
         }
       }
@@ -207,6 +198,8 @@
       import "../component/DeDialogForm/index.js";
       import "../component/DeSelectTree/index.js";
       import "../component/DeLineChart/index.js";
+
+      const storage_key = "jobwoper-charts";
 
       class Query
       {
@@ -268,47 +261,96 @@
         let queries = await Query.Select_All();
         queries = queries.filter(q => q.src == "seek" || q.terms == undefined);
         tech_select.items = queries;
-        add_btn.addEventListener("click", () => On_Add_Btn_Click(queries));
+        add_btn.addEventListener("click", On_Add_Btn_Click);
+
+        const json_str = localStorage.getItem(storage_key);
+        const charts = JSON.parse(json_str);
+        Render_Charts(charts);
+
+        //window.addEventListener("changecharts", On_Change_Items);
+      }
+
+      function Get_Charts()
+      {
+        const charts = [];
+
+        const chart_elems = items.querySelectorAll("de-line-chart");
+        for (const chart_elem of chart_elems)
+        {
+          charts.push(chart_elem.obj);
+        }
+
+        return charts;
       }
 
       // events =========================================================================
 
-      async function On_Add_Btn_Click(queries)
+      async function On_Add_Btn_Click()
       {
         const new_chart = await chart_form.Show_Async();
         if (new_chart)
         {
-          const trends = await Trend.Select_By_Query_Id(new_chart.query_id);
-          const data = trends.map(t => {return {x: t.datetime, y: t.count}});
-
           new_chart.id = crypto.randomUUID();
-          new_chart.query = queries.find(q => q.id == new_chart.query_id);
-          new_chart.items = data;
 
-          const chart_elem = Render_Chart(new_chart);
-          items.append(chart_elem);
-          chart_elem.items = new_chart.items;
+          //const trends = await Trend.Select_By_Query_Id(new_chart.query_id);
+          //const data = trends.map(t => {return {x: t.datetime, y: t.count}});
+
+          await Render_Chart(new_chart);
+          On_Change_Items();
+          //window.dispatchEvent(new Event("changecharts"));
+          //items.append(chart_elem);
+          //chart_elem.obj = new_chart;
+          //chart_elem.items = data;
 
           Update_Nav();
         }
       }
+      
+      function On_Change_Items()
+      {
+        const charts = Get_Charts();
+        const json_str = JSON.stringify(charts);
+        localStorage.setItem(storage_key, json_str);
+      }
 
       // rendering ======================================================================
 
-      function Render_Chart(chart)
+      function Render_Charts(charts)
       {
+        items.replaceChildren();
+        if (charts)
+        {
+          for (const chart of charts)
+          {
+            Render_Chart(chart);
+          }
+        }
+      }
+
+      async function Render_Chart(chart)
+      {
+        const queries = await Query.Select_All();
+        const query = queries.find(q => q.id == chart.query_id);
+
         const html = `
-          <de-line-chart title="${chart.query.title}" x-label="Time" y-label="Usage">
+          <de-line-chart title="${query.title}" x-label="Time" y-label="Usage">
             <button cid="del_btn" slot="title" class="header small">
               <span class="text">Delete</span>
             </button>
           </de-line-chart>
         `;
         const elements = Utils.toDocument(html);
-        const chart_elem = elements.querySelector("de-line-chart");
-        const del_btn = elements.querySelector("[cid=del_btn]");
 
+        const del_btn = elements.querySelector("[cid=del_btn]");
         del_btn.addEventListener("click", (e) => On_Click_Del_File_Btn(e, chart_elem));
+
+        const trends = await Trend.Select_By_Query_Id(chart.query_id);
+        const data = trends.map(t => {return {x: t.datetime, y: t.count}});
+
+        const chart_elem = elements.querySelector("de-line-chart");
+        items.append(chart_elem);
+        chart_elem.obj = chart;
+        chart_elem.items = data;
 
         return chart_elem;
       }

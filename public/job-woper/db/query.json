@@ -110,6 +110,38 @@
     "title": "Google Cloud",
     "src": "seek"
   },
+  {
+    "id": "-bootstrap",
+    "order": 2,
+    "parent_id": "-LwWfF7mtKhMWsxlyxZt",
+    "terms": "bootstrap",
+    "title": "Bootstrap",
+    "src": "seek"
+  },
+  {
+    "id": "-jquery",
+    "order": 3,
+    "parent_id": "-LwWfF7mtKhMWsxlyxZt",
+    "terms": "jquery",
+    "title": "jQuery",
+    "src": "seek"
+  },
+  {
+    "id": "-typescript",
+    "order": 11,
+    "parent_id": "-Ly2dHMN0mVIHgQF269I",
+    "terms": "typescript",
+    "title": "TypeScript",
+    "src": "seek"
+  },
+  {
+    "id": "-knockout",
+    "order": 11,
+    "parent_id": "-Ly2dHMN0mVIHgQF269I",
+    "terms": "knockout",
+    "title": "Knockout",
+    "src": "seek"
+  },
 
   {
     "id": "-KpPWAFGBhe6CxLYn22r",

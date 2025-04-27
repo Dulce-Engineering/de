@@ -142,9 +142,7 @@ class DeLineChart extends HTMLElement
       pathData += ` L ${p.x},${p.y}`;
     }
     path.setAttribute("d", pathData);
-    path.setAttribute("stroke", "blue");
-    path.setAttribute("stroke-width", "2");
-    path.setAttribute("fill", "none");
+    path.classList.add("data-line");
 
     return path;
   }
@@ -159,7 +157,7 @@ class DeLineChart extends HTMLElement
       circle.setAttribute("cx", point.x);
       circle.setAttribute("cy", point.y);
       circle.setAttribute("r", "4");
-      circle.setAttribute("fill", "red");
+      circle.classList.add("data-point");
       elements.push(circle);
     }
   
@@ -190,8 +188,8 @@ class DeLineChart extends HTMLElement
     const xAxis = document.createElementNS("http://www.w3.org/2000/svg", "line");
     xAxis.setAttribute("x1", x1); xAxis.setAttribute("y1", y1);
     xAxis.setAttribute("x2", x2); xAxis.setAttribute("y2", y2);
-    xAxis.setAttribute("stroke", "black");
-    xAxis.setAttribute("stroke-width", "2");
+    xAxis.classList.add("axis-line");
+    xAxis.classList.add("axis-x");
 
     const x = x1 + 40;
     const y = y1 - 20;
@@ -217,8 +215,8 @@ class DeLineChart extends HTMLElement
     const yAxis = document.createElementNS("http://www.w3.org/2000/svg", "line");
     yAxis.setAttribute("x1", x1); yAxis.setAttribute("y1", y1);
     yAxis.setAttribute("x2", x2); yAxis.setAttribute("y2", y2);
-    yAxis.setAttribute("stroke", "black");
-    yAxis.setAttribute("stroke-width", "1");
+    yAxis.classList.add("axis-line");
+    yAxis.classList.add("axis-y");
 
     const x = x1 - 20;
     const y = y1 + 40;
