@@ -1601,8 +1601,15 @@ class Utils
     return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}`;
   }
 
-  static Split_Time(millis)
+  static Split_Time(millis, include_days = false)
   {
+    let days = null;
+    if (include_days)
+    {
+      days = Math.trunc(millis/Utils.MILLIS_DAY);
+      millis = millis % Utils.MILLIS_DAY;
+    }
+
     const hrs = Math.trunc(millis/Utils.MILLIS_HOUR);
     millis = millis % Utils.MILLIS_HOUR;
 
@@ -1614,6 +1621,7 @@ class Utils
 
     const time = 
     {
+      days,
       hrs,
       mins,
       secs,

@@ -200,7 +200,7 @@
     <script type="module">
       import Utils from "../lib/Utils.js";
       import "../component/DeDialogForm/index.js";
-      import "../component/DeSelectTree/index.js";
+      import "../component/DeInputTree/index.js";
       import "../component/DeLineChart/index.js";
 
       const storage_key = "jobwoper-charts";
@@ -309,6 +309,13 @@
         localStorage.setItem(storage_key, json_str);
       }
 
+      function On_Click_Del_Btn(e, chart_elem)
+      {
+        chart_elem.remove();
+        On_Change_Items();
+        Update_Nav();
+      }
+
       // rendering ======================================================================
 
       function Render_Charts(charts)
@@ -326,7 +333,7 @@
       async function Render_Chart(chart)
       {
         const queries = await Query.Select_All();
-        const query = queries.find(q => q.id == chart.query_id);
+        const query = queries.find(q => q.id == chart.query_ids[0]);
 
         const html = `
           <de-line-chart title="${query.title}" x-label="Time" y-label="Usage">
@@ -341,53 +348,71 @@
         const elements = Utils.toDocument(html);
 
         const del_btn = elements.querySelector("[cid=del_btn]");
-        del_btn.addEventListener("click", (e) => On_Click_Del_File_Btn(e, chart_elem));
+        del_btn.addEventListener("click", (e) => On_Click_Del_Btn(e, chart_elem));
 
-        const trends = await Trend.Select_By_Query_Id(chart.query_id);
-        const data = trends.map(t => {return {x: t.datetime, y: t.count}});
+        const data = [];
+        for (const query_id of chart.query_ids)
+        {
+          const trends = await Trend.Select_By_Query_Id(query_id);
+          const trend_data = trends.map(t => {return {x: t.datetime, y: t.count}});
+          data.push(trend_data);
+        }
 
         const chart_elem = elements.querySelector("de-line-chart");
         items.append(chart_elem);
         chart_elem.obj = chart;
         chart_elem.items = data;
 
-        Render_Summary(chart_elem);
+        Render_Summary(chart_elem, trends);
 
         return chart_elem;
       }
 
-      function Render_Summary(chart_elem)
+      function Render_Summary(chart_elem, items)
       {
+        const min_item = Utils.Minimum(items, "datetime");
+        const min_time = min_item.datetime;
+        const min_date = new Date(min_item.datetime);
+
+        const max_item = Utils.Maximum(items, "datetime");
+        const max_time = max_item.datetime;
+        const max_date = new Date(max_item.datetime);
+
+        const d_time = max_time - min_time;
+        const d_days = Math.floor(d_time / Utils.MILLIS_DAY);
+
+        const min_count = min_item.count;
+        const max_count = max_item.count;
+        const d_count = max_count - min_count;
+
         const html = `
           <table>
             <thead>
               <tr>
                 <th></th>
-                <th>Minimum</th>
-                <th>Maximum</th>
-                <th>Difference</th>
-                <th>Average</th>
+                <th>Start</th>
+                <th>End</th>
+                <th>Change</th>
               </tr>
             </thead>
             <tbody>
               <tr>
                 <td>Time</td>
-                <td cid="min_time"></td>
-                <td cid="max_time"></td>
-                <td cid="diff_time"></td>
-                <td cid="avg_time"></td>
+                <td cid="min_time">${min_date.toLocaleDateString()}</td>
+                <td cid="max_time">${max_date.toLocaleDateString()}</td>
+                <td cid="diff_time">${d_days} days</td>
               </tr>
               <tr>
                 <td>Usage</td>
-                <td cid="min_usage"></td>
-                <td cid="max_usage"></td>
-                <td cid="diff_usage"></td>
-                <td cid="avg_usage"></td>
+                <td cid="min_usage">${min_count}</td>
+                <td cid="max_usage">${max_count}</td>
+                <td cid="diff_usage">${d_count}</td>
               </tr>
             </tbody>
           </table>
         `;
         const elements = Utils.toDocument(html);
+        //Utils.Set_Id_Shortcuts(elements, elements, "cid");
 
         chart_elem.append(elements);
       }
@@ -431,9 +456,8 @@
 
     <de-dialog-form id="chart_form">
       <h1 slot="header"><span class="text">Chart Details</span></h1>
-
       <label slot="fields" for="tech_select">Tech</label>
-      <de-select-tree id="tech_select" slot="fields" name="query_id"></de-select-tree>
+      <de-input-tree id="tech_select" slot="fields" name="query_ids"></de-input-tree>
     </de-dialog-form>
 
   </body>

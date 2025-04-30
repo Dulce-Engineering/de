@@ -68,6 +68,19 @@ class DeLineChart extends HTMLElement
     return {x1, x2};
   }
 
+  Set_Bounds()
+  {
+    this.data_bounds =
+    {
+      min_x: Math.min(...this.data.map((d) => d.x)),
+      min_y: Math.min(...this.data.map((d) => d.y)),
+      max_x: Math.max(...this.data.map((d) => d.x)),
+      max_y: Math.max(...this.data.map((d) => d.y)),
+    };
+    this.data_bounds.width = this.data_bounds.max_x - this.data_bounds.min_x;
+    this.data_bounds.height = this.data_bounds.max_y - this.data_bounds.min_y;
+  }
+
   Render_Chart() 
   {
     if (this.isConnected)
@@ -75,24 +88,19 @@ class DeLineChart extends HTMLElement
       this.svg.replaceChildren();
       if (this.data && this.data.length > 0) 
       {
-        this.data_bounds =
-        {
-          min_x: Math.min(...this.data.map((d) => d.x)),
-          min_y: Math.min(...this.data.map((d) => d.y)),
-          max_x: Math.max(...this.data.map((d) => d.x)),
-          max_y: Math.max(...this.data.map((d) => d.y)),
-        };
-        this.data_bounds.width = this.data_bounds.max_x - this.data_bounds.min_x;
-        this.data_bounds.height = this.data_bounds.max_y - this.data_bounds.min_y;
+        this.Set_Bounds();
 
         //const title_elem = this.Render_Title();
         //this.svg.appendChild(title_elem);
 
-        const path = this.Render_Line(this.data);
-        this.svg.appendChild(path);
+        for (const line_data of this.data)
+        {
+          const path = this.Render_Line(line_data);
+          this.svg.appendChild(path);
 
-        const circles = this.Render_Data_Points(this.data);
-        this.svg.append(...circles);
+          const circles = this.Render_Data_Points(line_data);
+          this.svg.append(...circles);
+        }
 
         const xAxis = this.Render_X_Axis();
         this.svg.append(...xAxis);
