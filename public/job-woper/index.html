@@ -263,7 +263,7 @@
       async function Main()
       {
         let queries = await Query.Select_All();
-        queries = queries.filter(q => q.src == "seek" || q.terms == undefined);
+        queries = queries.filter(q => q.src == "seek" || q.src == undefined);
         queries.sort((a, b) => a.order - b.order);
 
         tech_select.items = queries;

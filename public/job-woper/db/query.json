@@ -218,6 +218,328 @@
     "title": "Xamarin",
     "src": "seek"
   },
+  {
+    "id": "-javascript",
+    "order": 9,
+    "parent_id": "-Ly2dHMN0mVIHgQF269I",
+    "terms": "javascript",
+    "title": "JavaScript",
+    "src": "seek"
+  },
+  {
+    "id": "-rest",
+    "parent_id": "-LyNZwjaVsXz1S61u7Vo",
+    "terms": "rest",
+    "title": "REST",
+    "src": "seek"
+  },
+  {
+    "id": "-rpc",
+    "parent_id": "-LyNZwjaVsXz1S61u7Vo",
+    "terms": "rpc",
+    "title": "RPC",
+    "src": "seek"
+  },
+  {
+    "id": "-graphql",
+    "parent_id": "-LyNZwjaVsXz1S61u7Vo",
+    "terms": "graphql",
+    "title": "GraphQL",
+    "src": "seek"
+  },
+  {
+    "id": "-grpc",
+    "parent_id": "-LyNZwjaVsXz1S61u7Vo",
+    "terms": "grpc",
+    "title": "gRPC",
+    "src": "seek"
+  },
+  {
+    "id": "-aurelia",
+    "order": 6,
+    "parent_id": "-LwWfF7mtKhMWsxlyxZt",
+    "terms": "aurelia",
+    "title": "Aurelia",
+    "src": "seek"
+  },
+  {
+    "id": "-kotlin",
+    "order": 9,
+    "parent_id": "-Ly2dHMN0mVIHgQF269I",
+    "terms": "kotlin",
+    "title": "Kotlin",
+    "src": "seek"
+  },
+  {
+    "id": "-webassembly",
+    "parent_id": "-LwWfF7mtKhMWsxlyxZt",
+    "terms": "webassembly",
+    "title": "WebAssembly",
+    "src": "seek"
+  },
+  {
+    "id": "-golang",
+    "parent_id": "-Ly2dHMN0mVIHgQF269I",
+    "terms": "golang",
+    "title": "Golang",
+    "src": "seek"
+  },
+  {
+    "id": "-svelte",
+    "parent_id": "-LwWfF7mtKhMWsxlyxZt",
+    "terms": "svelte",
+    "title": "Svelte",
+    "src": "seek"
+  },
+  {
+    "id": "-flutter",
+    "parent_id": "-LwWfF7mtKhMWsxlyxZt",
+    "terms": "flutter",
+    "title": "Flutter",
+    "src": "seek"
+  },
+  {
+    "id": "-docker",
+    "parent_id": "-NfxZpScHyso4o26SkIi",
+    "terms": "docker",
+    "title": "Docker",
+    "src": "seek"
+  },
+  {
+    "id": "-firebase",
+    "parent_id": "-LyNZdkPSml0ICKDdZb-",
+    "terms": "firebase",
+    "title": "Firebase",
+    "src": "seek"
+  },
+  {
+    "id": "-css",
+    "parent_id": "-LwWfF7mtKhMWsxlyxZt",
+    "terms": "css",
+    "title": "CSS",
+    "src": "seek"
+  },
+  {
+    "id": "-html",
+    "parent_id": "-LwWfF7mtKhMWsxlyxZt",
+    "terms": "html (css or web or javascript)",
+    "title": "HTML",
+    "src": "seek"
+  },
+  {
+    "id": "-sql",
+    "parent_id": "-M1iJTpFvdzFwzo3ua5x",
+    "terms": "sql",
+    "title": "SQL",
+    "src": "seek"
+  },
+  {
+    "id": "-mongodb",
+    "parent_id": "-M1iJTpFvdzFwzo3ua5x",
+    "terms": "mongodb",
+    "title": "MongoDb",
+    "src": "seek"
+  },
+  {
+    "id": "-spring",
+    "parent_id": "-NfxZpScHyso4o26SkIi",
+    "terms": "spring framework",
+    "title": "Spring Framework",
+    "src": "seek"
+  },
+  {
+    "id": "-perl",
+    "parent_id": "-Ly2dHMN0mVIHgQF269I",
+    "terms": "perl",
+    "title": "Perl",
+    "src": "seek"
+  },
+  {
+    "id": "-python",
+    "parent_id": "-Ly2dHMN0mVIHgQF269I",
+    "terms": "python",
+    "title": "Python",
+    "src": "seek"
+  },
+  {
+    "id": "-cpp",
+    "parent_id": "-Ly2dHMN0mVIHgQF269I",
+    "terms": "c%2B%2B",
+    "title": "C++",
+    "src": "seek"
+  },
+  {
+    "id": "-linux",
+    "parent_id": "-M2BbrtNSakijKSSwN2t",
+    "terms": "linux",
+    "title": "Linux",
+    "src": "seek"
+  },
+  {
+    "id": "-unix",
+    "parent_id": "-M2BbrtNSakijKSSwN2t",
+    "terms": "unix",
+    "title": "Unix",
+    "src": "seek"
+  },
+  {
+    "id": "-openapi",
+    "terms": "openapi",
+    "title": "OpenAPI",
+    "src": "seek"
+  },
+  {
+    "id": "-swagger",
+    "terms": "swagger",
+    "title": "Swagger",
+    "src": "seek"
+  },
+  {
+    "id": "-blazor",
+    "parent_id": "-LwWfF7mtKhMWsxlyxZt",
+    "terms": "blazor",
+    "title": "Blazor",
+    "src": "seek"
+  },
+  {
+    "id": "-spring-boot",
+    "parent_id": "-NfxZpScHyso4o26SkIi",
+    "terms": "spring boot",
+    "title": "Spring Boot",
+    "src": "seek"
+  },
+  {
+    "id": "-kafka",
+    "parent_id": "-NfxZpScHyso4o26SkIi",
+    "terms": "kafka",
+    "title": "Kafka",
+    "src": "seek"
+  },
+  {
+    "id": "-kubernetes",
+    "parent_id": "-NfxZpScHyso4o26SkIi",
+    "terms": "kubernetes",
+    "title": "Kubernetes",
+    "src": "seek"
+  },
+  {
+    "id": "-mariadb",
+    "parent_id": "-M1iJTpFvdzFwzo3ua5x",
+    "terms": "mariadb",
+    "title": "MariaDB",
+    "src": "seek"
+  },
+  {
+    "id": "-nuxt",
+    "parent_id": "-LwWfF7mtKhMWsxlyxZt",
+    "terms": "nuxt",
+    "title": "NUXT",
+    "src": "seek"
+  },
+  {
+    "id": "-gen-ai",
+    "terms": "generative ai",
+    "title": "Generative AI",
+    "src": "seek"
+  },
+  {
+    "id": "-nextjs",
+    "parent_id": "-LwWfF7mtKhMWsxlyxZt",
+    "terms": "next.js or nextjs",
+    "title": "Next.js",
+    "src": "seek"
+  },
+  {
+    "id": "-dynamodb",
+    "parent_id": "-M1iJTpFvdzFwzo3ua5x",
+    "terms": "dynamodb",
+    "title": "DynamoDB",
+    "src": "seek"
+  },
+  {
+    "id": "-redis",
+    "parent_id": "-M1iJTpFvdzFwzo3ua5x",
+    "terms": "redis",
+    "title": "Redis",
+    "src": "seek"
+  },
+  {
+    "id": "-woocommerce",
+    "parent_id": "-Ng2lDSKaq7aIbJDSPb9",
+    "terms": "woocommerce",
+    "title": "WooCommerce",
+    "src": "seek"
+  },
+  {
+    "id": "-joomla",
+    "parent_id": "-Ng2lDSKaq7aIbJDSPb9",
+    "terms": "joomla",
+    "title": "Joomla",
+    "src": "seek"
+  },
+  {
+    "id": "-aem",
+    "parent_id": "-Ng2lDSKaq7aIbJDSPb9",
+    "terms": "\"adobe experience manager\" or aem",
+    "title": "AEM",
+    "src": "seek"
+  },
+  {
+    "id": "-wordpress",
+    "parent_id": "-Ng2lDSKaq7aIbJDSPb9",
+    "terms": "wordpress",
+    "title": "Wordpress",
+    "src": "seek"
+  },
+  {
+    "id": "-wix",
+    "parent_id": "-Ng2lDSKaq7aIbJDSPb9",
+    "terms": "wix",
+    "title": "Wix",
+    "src": "seek"
+  },
+  {
+    "id": "-shopify",
+    "parent_id": "-Ng2lDSKaq7aIbJDSPb9",
+    "terms": "shopify",
+    "title": "Shopify",
+    "src": "seek"
+  },
+  {
+    "id": "-drupal",
+    "parent_id": "-Ng2lDSKaq7aIbJDSPb9",
+    "terms": "drupal",
+    "title": "Drupal",
+    "src": "seek"
+  },
+  {
+    "id": "-bigcommerce",
+    "parent_id": "-Ng2lDSKaq7aIbJDSPb9",
+    "terms": "bigcommerce",
+    "title": "BigCommerce",
+    "src": "seek"
+  },
+  {
+    "id": "-magento",
+    "parent_id": "-Ng2lDSKaq7aIbJDSPb9",
+    "terms": "magento",
+    "title": "Magento",
+    "src": "seek"
+  },
+  {
+    "id": "-jsdoc",
+    "parent_id": "-LwWfF7mtKhMWsxlyxZt",
+    "terms": "jsdoc",
+    "title": "JSDoc",
+    "src": "seek"
+  },
+  {
+    "id": "-solidjs",
+    "parent_id": "-LwWfF7mtKhMWsxlyxZt",
+    "terms": "solid.js or solidjs",
+    "title": "Solid.js",
+    "src": "seek"
+  },
 
   {
     "id": "-KpPWAFGBhe6CxLYn22r",
@@ -513,8 +835,7 @@
   {
     "id": "-LwWfF7mtKhMWsxlyxZt",
     "order": 7,
-    "title": "Frontend",
-    "src": "indeed"
+    "title": "Frontend"
   },
   {
     "id": "-LxKK1blZ8bvKKPfzTLh",
@@ -533,26 +854,22 @@
   {
     "id": "-Ly2dHMN0mVIHgQF269I",
     "order": 8,
-    "title": "Languages",
-    "src": "indeed"
+    "title": "Languages"
   },
   {
     "id": "-LyNZdkPSml0ICKDdZb-",
     "order": 3,
-    "title": "Cloud",
-    "src": "indeed"
+    "title": "Cloud"
   },
   {
     "id": "-LyNZs9AzS32s0srUPss",
     "order": 2,
-    "title": "Blockchain",
-    "src": "indeed"
+    "title": "Blockchain"
   },
   {
     "id": "-LyNZwjaVsXz1S61u7Vo",
     "order": 5,
-    "title": "Communication",
-    "src": "indeed"
+    "title": "Communication"
   },
   {
     "id": "-LyRu61y4vPuAhe5PTEG",
@@ -571,8 +888,7 @@
   {
     "id": "-M1iJTpFvdzFwzo3ua5x",
     "order": 6,
-    "title": "Database",
-    "src": "indeed"
+    "title": "Database"
   },
   {
     "id": "-M2AynhHv9dQop_AnRgx",
@@ -633,8 +949,7 @@
   {
     "id": "-M2BbrtNSakijKSSwN2t",
     "order": 9,
-    "title": "Operating System",
-    "src": "indeed"
+    "title": "Operating System"
   },
   {
     "id": "-MEND8621EseZJcLX5RP",
@@ -699,8 +1014,7 @@
   {
     "id": "-NfxZpScHyso4o26SkIi",
     "order": 1,
-    "title": "Back-End",
-    "src": "indeed"
+    "title": "Back-End"
   },
   {
     "id": "-NfxjqPbCAJmuQmWI2oG",
@@ -726,8 +1040,7 @@
   {
     "id": "-Ng2lDSKaq7aIbJDSPb9",
     "order": 4,
-    "title": "CMS",
-    "src": "indeed"
+    "title": "CMS"
   },
   {
     "id": "-Ng2oMzJQGDzbCqCfhHG",

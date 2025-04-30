@@ -80,7 +80,14 @@ function Select_All(table)
   let res = [];
 
   try {res = Read_File(path); }
-  catch {res = [];}
+  catch (e) 
+  {
+    ///res = [];
+    if (!(e.code == "ENOENT" && e.errno == -4058 && e.syscall == "open"))
+    {
+      console.error(e);
+    }
+  }
 
   return res;
 }
