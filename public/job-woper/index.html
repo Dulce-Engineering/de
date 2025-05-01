@@ -203,7 +203,7 @@
       import "../component/DeInputTree/index.js";
       import "../component/DeLineChart/index.js";
 
-      const storage_key = "jobwoper-charts";
+      const storage_key = "jobwoper";
 
       class Query
       {
@@ -296,7 +296,7 @@
         {
           new_chart.id = crypto.randomUUID();
 
-          await Render_Chart(new_chart);
+          //await Render_Chart(new_chart);
           On_Change_Items();
           Update_Nav();
         }
