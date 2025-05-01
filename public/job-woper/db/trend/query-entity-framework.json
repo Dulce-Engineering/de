@@ -22,5 +22,11 @@
     "datetime": 1745901509402,
     "id": "da176841-0e6b-4106-80d6-8e5ba0084381",
     "query_id": "-entity-framework"
+  },
+  {
+    "count": 100,
+    "datetime": 1746059668372,
+    "id": "90dd9a4a-ca08-49cb-a529-dbd7dec26c21",
+    "query_id": "-entity-framework"
   }
 ]
