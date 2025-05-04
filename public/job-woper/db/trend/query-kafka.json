@@ -4,5 +4,11 @@
     "datetime": 1745973695451,
     "id": "b3c189a8-49eb-421b-bd0c-ae0847f92162",
     "query_id": "-kafka"
+  },
+  {
+    "count": 137,
+    "datetime": 1746346166542,
+    "id": "c408fcf5-e2cd-4a93-a1cb-c71b20e2be14",
+    "query_id": "-kafka"
   }
 ]

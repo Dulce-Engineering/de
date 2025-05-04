@@ -4,5 +4,11 @@
     "datetime": 1745973816358,
     "id": "a5947b42-d70a-49ee-9e74-43eb158d332c",
     "query_id": "-mariadb"
+  },
+  {
+    "count": 6,
+    "datetime": 1746346287546,
+    "id": "381e1918-ed0a-46bb-a233-47b9b2499441",
+    "query_id": "-mariadb"
   }
 ]

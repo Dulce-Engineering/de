@@ -4,5 +4,11 @@
     "datetime": 1745974118967,
     "id": "32e48e24-517f-4840-a036-c23ce52defef",
     "query_id": "-redis"
+  },
+  {
+    "count": 100,
+    "datetime": 1746346589789,
+    "id": "c614cc64-d02a-4ae1-9504-f111f7946320",
+    "query_id": "-redis"
   }
 ]

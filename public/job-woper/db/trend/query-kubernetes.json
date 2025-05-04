@@ -4,5 +4,11 @@
     "datetime": 1745973756042,
     "id": "08299257-7620-43cd-8ad5-e8e706ff3284",
     "query_id": "-kubernetes"
+  },
+  {
+    "count": 527,
+    "datetime": 1746346227283,
+    "id": "6982e346-39eb-47b9-a6c4-7b74c437597e",
+    "query_id": "-kubernetes"
   }
 ]
