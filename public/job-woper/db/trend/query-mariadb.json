@@ -10,5 +10,11 @@
     "datetime": 1746346287546,
     "id": "381e1918-ed0a-46bb-a233-47b9b2499441",
     "query_id": "-mariadb"
+  },
+  {
+    "count": 6,
+    "datetime": 1746440579527,
+    "id": "7164e35e-b3c7-41a2-95e6-33c3bc884c1a",
+    "query_id": "-mariadb"
   }
 ]

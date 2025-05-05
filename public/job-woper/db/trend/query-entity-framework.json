@@ -34,5 +34,11 @@
     "datetime": 1746343021426,
     "id": "7e2ea8ad-8d36-4f4a-8e60-ec8150c70e76",
     "query_id": "-entity-framework"
+  },
+  {
+    "count": 100,
+    "datetime": 1746437311146,
+    "id": "f9b40ed9-ac48-4d02-b75e-2ecf504cfd5b",
+    "query_id": "-entity-framework"
   }
 ]
