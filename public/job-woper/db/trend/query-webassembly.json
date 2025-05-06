@@ -16,5 +16,11 @@
     "datetime": 1746439247089,
     "id": "80f55efd-0c8a-42ef-b1cc-cd84e292aaad",
     "query_id": "-webassembly"
+  },
+  {
+    "count": 100,
+    "datetime": 1746529039897,
+    "id": "e02dc17f-efbb-457b-abd7-6fb5b3427545",
+    "query_id": "-webassembly"
   }
 ]
