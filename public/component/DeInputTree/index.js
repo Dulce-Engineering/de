@@ -78,7 +78,7 @@ class DeInputTree extends HTMLElement
       if (this.Has_Children(objs, child_obj.id))
       {
         html += `
-          <details name="${name}">
+          <details x-name="${name}">
             <summary>${child_obj.title}</summary>
             ${this.Render_Item(objs, child_obj.id)}
           </details>
