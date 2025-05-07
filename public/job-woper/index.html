@@ -350,12 +350,11 @@
         const del_btn = elements.querySelector("[cid=del_btn]");
         del_btn.addEventListener("click", (e) => On_Click_Del_Btn(e, chart_elem));
 
-        const data = {};
+        const data = {}, trends = {};
         for (const query_id of chart.query_ids)
         {
-          const trends = await Trend.Select_By_Query_Id(query_id);
-          const trend_data = trends.map(t => {return {x: t.datetime, y: t.count}});
-          data[query_id] = trend_data;
+          trends[query_id] = await Trend.Select_By_Query_Id(query_id);
+          data[query_id] = trends[query_id].map(t => {return {x: t.datetime, y: t.count}});
         }
 
         const chart_elem = elements.querySelector("de-line-chart");
@@ -363,12 +362,12 @@
         chart_elem.obj = chart;
         chart_elem.items = data;
 
-        Render_Summary(chart_elem, data);
+        Render_Summary(chart_elem, trends, queries);
 
         return chart_elem;
       }
 
-      function Render_Summary(chart_elem, data)
+      function Render_Summary(chart_elem, data, queries)
       {
         const items = Object.values(data).flat();
 
@@ -383,9 +382,28 @@
         const d_time = max_time - min_time;
         const d_days = Math.floor(d_time / Utils.MILLIS_DAY);
 
-        const min_count = min_item.count;
-        const max_count = max_item.count;
-        const d_count = max_count - min_count;
+        let rows_html = "";
+        for (const query_id in data)
+        {
+          const items = data[query_id];
+          const min_item = Utils.Minimum(items, "datetime");
+          const max_item = Utils.Maximum(items, "datetime");
+
+          const min_count = min_item.count;
+          const max_count = max_item.count;
+          const d_count = max_count - min_count;
+
+          const query = queries.find(q => q.id == query_id);
+
+          rows_html += `
+            <tr>
+              <td>Usage - ${query.title}</td>
+              <td cid="min_usage">${min_count}</td>
+              <td cid="max_usage">${max_count}</td>
+              <td cid="diff_usage">${d_count}</td>
+            </tr>
+          `;
+        }
 
         const html = `
           <table>
@@ -404,12 +422,7 @@
                 <td cid="max_time">${max_date.toLocaleDateString()}</td>
                 <td cid="diff_time">${d_days} days</td>
               </tr>
-              <tr>
-                <td>Usage</td>
-                <td cid="min_usage">${min_count}</td>
-                <td cid="max_usage">${max_count}</td>
-                <td cid="diff_usage">${d_count}</td>
-              </tr>
+              ${rows_html}
             </tbody>
           </table>
         `;
