@@ -64,6 +64,16 @@
         --main: #4af;
         --border: #fff;
         --highlight: #fff;
+        --shade: #0008;
+
+        --c0: #fff;
+        --c1: #00f;
+        --c2: #0f0;
+        --c3: #0ff;
+        --c4: #f00;
+        --c5: #f0f;
+        --c6: #ff0;
+
         --x1: #f00;
         --x2: #ff0;
         --x3: #0f0;
@@ -133,7 +143,7 @@
       de-line-chart
       {
         display: block;
-        background-color: #0008;
+        background-color: var(--shade);
         border: 4px solid var(--border);
 
         svg
@@ -176,6 +186,78 @@
         {
           visibility: hidden;
         }
+        table
+        {
+          margin: 0 35px 20px 35px;
+          border-collapse: separate;
+          border-spacing: 20px 0;
+
+          th
+          {
+            color: var(--highlight);
+          }
+          th:nth-child(n+2), td:nth-child(n+2)
+          {
+            text-align: left;
+          }
+          td:first-child
+          {
+            text-align: right;
+          }
+        }
+      }
+
+      de-input-tree
+      {
+        xdisplay: flex;
+        xflex-direction: column;
+        xgap: 8px;
+
+        details div
+        {
+          margin-left: 20px;
+        }
+        details
+        {
+        }
+        summary
+        {
+          padding: 0 0 0 10px;
+          margin: 0 0 8px 0;
+        }
+        summary::marker
+        {
+          display: block;
+          width: 25px;
+          height: 25px;
+        }
+        input[type=checkbox]
+        {
+          margin: 0;
+          width: 25px;
+          height: 25px;
+          color: #f00;
+          background-color: #f00;
+          border: 2px solid #f00;
+        }
+        .item
+        {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          margin-bottom: 8px;
+        }
+      }
+
+      de-dialog-form
+      {
+        dialog
+        {
+          background-color: var(--shade);
+          border: 4px solid var(--border);
+          color: var(--main);
+        }
+
       }
 
       @media screen and (min-width: 768px)
@@ -383,6 +465,7 @@
         const d_days = Math.floor(d_time / Utils.MILLIS_DAY);
 
         let rows_html = "";
+        let color = 0;
         for (const query_id in data)
         {
           const items = data[query_id];
@@ -397,12 +480,17 @@
 
           rows_html += `
             <tr>
-              <td>Usage - ${query.title}</td>
+              <td>
+                Usage - ${query.title} 
+                <span style="color:var(--c${color});">&#9632;</span>
+              </td>
               <td cid="min_usage">${min_count}</td>
               <td cid="max_usage">${max_count}</td>
               <td cid="diff_usage">${d_count}</td>
             </tr>
           `;
+
+          color++;
         }
 
         const html = `

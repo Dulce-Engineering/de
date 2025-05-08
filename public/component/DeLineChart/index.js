@@ -97,6 +97,7 @@ class DeLineChart extends HTMLElement
         //const title_elem = this.Render_Title();
         //this.svg.appendChild(title_elem);
 
+        this.color = 0;
         for (const key in this.data)
         {
           const line_data = this.data[key];
@@ -157,6 +158,9 @@ class DeLineChart extends HTMLElement
     }
     path.setAttribute("d", pathData);
     path.classList.add("data-line");
+    path.style.stroke = "var(--c" + this.color;
+
+    this.color++;
 
     return path;
   }
