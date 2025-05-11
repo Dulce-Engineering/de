@@ -28,5 +28,11 @@
     "datetime": 1746704301203,
     "id": "d61174cd-1a7a-46c4-b1bb-754ab9aa2040",
     "query_id": "-wordpress"
+  },
+  {
+    "count": 177,
+    "datetime": 1746935595288,
+    "id": "8a7e5b39-d1ec-47e1-bb75-5f8303e345b6",
+    "query_id": "-wordpress"
   }
 ]
