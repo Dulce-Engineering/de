@@ -1,8 +1,8 @@
-# Honeywell Table Component
+# DE Table Component
 
-## hw-table
+## de-table
 
-Used to render tables.
+Used to render tables that automatically map object fields to table columns.
 
 ### Attributes 
 - items: [object] - Array of items to render.

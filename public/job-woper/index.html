@@ -174,7 +174,7 @@
           margin: 15px 35px 10px 35px;
           padding: 0;
           display: flex;
-          justify-content: space-between;
+          justify-content: flex-end;
           align-items: center;
           gap: 20px;
         }
@@ -183,6 +183,7 @@
           font-size: 1.2rem;
           font-weight: 100;
           overflow-wrap: anywhere;
+          flex-grow: 1;
         }
         .highlight
         {
@@ -309,6 +310,7 @@
       import "../component/DeDialogForm/index.js";
       import "../component/DeInputTree/index.js";
       import "../component/DeLineChart/index.js";
+      import "../component/DeInputList/index.js";
 
       const storage_key = "jobwoper";
 
@@ -375,10 +377,14 @@
 
         tech_select.items = queries;
         add_btn.addEventListener("click", On_Add_Btn_Click);
+        //edit_btn.addEventListener("click", On_Edit_Btn_Click);
 
         const json_str = localStorage.getItem(storage_key);
         const charts = JSON.parse(json_str);
         Render_Charts(charts);
+
+        chart_list.value = charts;
+        chart_list.addEventListener("render", On_Render_Chart);
       }
 
       function Get_Charts()
@@ -396,6 +402,13 @@
 
       // events =========================================================================
 
+      function On_Change_Items()
+      {
+        const charts = Get_Charts();
+        const json_str = JSON.stringify(charts);
+        localStorage.setItem(storage_key, json_str);
+      }
+
       async function On_Add_Btn_Click()
       {
         const new_chart = await chart_form.Show_Async();
@@ -409,11 +422,16 @@
         }
       }
       
-      function On_Change_Items()
+      async function On_Edit_Btn_Click(e, chart_elem)
       {
-        const charts = Get_Charts();
-        const json_str = JSON.stringify(charts);
-        localStorage.setItem(storage_key, json_str);
+        const chart = chart_elem.obj;
+        const new_chart = await chart_form.Show_Async(chart);
+        if (new_chart)
+        {
+          await Render_Chart(new_chart);
+          On_Change_Items();
+          Update_Nav();
+        }
       }
 
       function On_Click_Del_Btn(e, chart_elem)
@@ -423,6 +441,11 @@
         Update_Nav();
       }
 
+      function On_Render_Chart()
+      {
+
+      }
+      
       // rendering ======================================================================
 
       function Render_Charts(charts)
@@ -443,9 +466,9 @@
         const query = queries.find(q => q.id == chart.query_ids[0]);
 
         const html = `
-          <de-line-chart title="${query.title}" x-label="Time" y-label="Usage">
-            <button cid="tech_btn" slot="title" class="header small">
-              <span class="text">Add Tech</span>
+          <de-line-chart title="${chart.title || "Chart"}" x-label="Time" y-label="Usage">
+            <button cid="edit_btn" slot="title" class="header small">
+              <span class="text">Edit</span>
             </button>
             <button cid="del_btn" slot="title" class="header small">
               <span class="text">Delete</span>
@@ -456,6 +479,7 @@
 
         const del_btn = elements.querySelector("[cid=del_btn]");
         del_btn.addEventListener("click", (e) => On_Click_Del_Btn(e, chart_elem));
+        del_btn.addEventListener("edit_btn", (e) => On_Click_Edit_Btn(e, chart_elem));
 
         const data = {}, trends = {};
         for (const query_id of chart.query_ids)
@@ -568,6 +592,38 @@
       </nav>
     </header>
 
+    <de-input-list id="chart_list">
+
+      <de-line-chart x-label="Time" y-label="Usage">
+        <button cid="edit_btn" slot="title" class="header small">
+          <span class="text">Edit</span>
+        </button>
+        <button cid="del_btn" slot="title" class="header small">
+          <span class="text">Delete</span>
+        </button>
+      </de-line-chart>
+
+      <table>
+        <thead>
+          <tr>
+            <th></th>
+            <th>Start</th>
+            <th>End</th>
+            <th>Change</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Time</td>
+            <td cid="min_time"></td>
+            <td cid="max_time"></td>
+            <td cid="diff_time"></td>
+          </tr>
+        </tbody>
+      </table>
+
+    </de-input-list>
+
     <main id="items">
     </main>
 
@@ -577,10 +633,6 @@
     <footer>
       © Copyright Dulce Engineering 2025. All rights reserved. v1
     </footer>
-
-    <template>
-
-    </template>
 
     <de-dialog-form id="chart_form">
       <h1 slot="header"><span class="text">Chart Details</span></h1>

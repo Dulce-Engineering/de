@@ -3,7 +3,7 @@ import Utils from "../../lib/Utils.js";
 
 class DeTable extends HTMLElement
 {
-  static tname = "hw-table";
+  static tname = "de-table";
 
   constructor()
   {

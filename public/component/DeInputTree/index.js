@@ -44,15 +44,17 @@ class DeInputTree extends HTMLElement
 
   set value(id)
   {
-    this.selected_id = id;
+    //this.selected_id = id;
     if (id)
     {
-      const item = this.items.find(o => o.id == id);
+      //const item = this.items.find(o => o.id == id);
       //this.selected_item.innerText = item.title;
     }
     else
     {
       //this.selected_item.innerText = "None";
+      const items = this.querySelectorAll("input[type=checkbox]");
+      items.forEach(item => item.checked = false);
     }
   }
 
