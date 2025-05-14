@@ -121,7 +121,7 @@
         flex-direction: column;
         align-items: center;
       }
-      main
+      main, de-input-list
       {
         width: 100%;
         display: flex;
@@ -142,7 +142,7 @@
         cursor: pointer;
       }
 
-      de-line-chart
+      de-input-list li
       {
         display: block;
         background-color: var(--shade);
@@ -191,7 +191,7 @@
         }
         table
         {
-          margin: 0 35px 20px 35px;
+          margin: -24px 35px 20px 35px;
           border-collapse: separate;
           border-spacing: 20px 0;
 
@@ -377,36 +377,23 @@
 
         tech_select.items = queries;
         add_btn.addEventListener("click", On_Add_Btn_Click);
-        //edit_btn.addEventListener("click", On_Edit_Btn_Click);
 
         const json_str = localStorage.getItem(storage_key);
         const charts = JSON.parse(json_str);
-        Render_Charts(charts);
 
-        chart_list.value = charts;
         chart_list.addEventListener("render", On_Render_Chart);
-      }
-
-      function Get_Charts()
-      {
-        const charts = [];
-
-        const chart_elems = items.querySelectorAll("de-line-chart");
-        for (const chart_elem of chart_elems)
-        {
-          charts.push(chart_elem.obj);
-        }
-
-        return charts;
+        chart_list.addEventListener("change", On_Change_Items);
+        chart_list.value = charts;
       }
 
       // events =========================================================================
 
       function On_Change_Items()
       {
-        const charts = Get_Charts();
+        const charts = chart_list.value;
         const json_str = JSON.stringify(charts);
         localStorage.setItem(storage_key, json_str);
+        Update_Nav();
       }
 
       async function On_Add_Btn_Click()
@@ -415,72 +402,25 @@
         if (new_chart)
         {
           new_chart.id = crypto.randomUUID();
-
-          await Render_Chart(new_chart);
-          On_Change_Items();
-          Update_Nav();
+          chart_list.Add(new_chart);
         }
       }
-      
-      async function On_Edit_Btn_Click(e, chart_elem)
+
+      async function On_Edit_Btn_Click(e, chart)
       {
-        const chart = chart_elem.obj;
         const new_chart = await chart_form.Show_Async(chart);
         if (new_chart)
         {
-          await Render_Chart(new_chart);
-          On_Change_Items();
-          Update_Nav();
+          chart_list.Add(new_chart);
         }
       }
 
-      function On_Click_Del_Btn(e, chart_elem)
+      async function On_Render_Chart(event)
       {
-        chart_elem.remove();
-        On_Change_Items();
-        Update_Nav();
-      }
+        const item_elem = event.target;
+        const chart = item_elem.item_obj;
 
-      function On_Render_Chart()
-      {
-
-      }
-      
-      // rendering ======================================================================
-
-      function Render_Charts(charts)
-      {
-        items.replaceChildren();
-        if (charts)
-        {
-          for (const chart of charts)
-          {
-            Render_Chart(chart);
-          }
-        }
-      }
-
-      async function Render_Chart(chart)
-      {
         const queries = await Query.Select_All();
-        const query = queries.find(q => q.id == chart.query_ids[0]);
-
-        const html = `
-          <de-line-chart title="${chart.title || "Chart"}" x-label="Time" y-label="Usage">
-            <button cid="edit_btn" slot="title" class="header small">
-              <span class="text">Edit</span>
-            </button>
-            <button cid="del_btn" slot="title" class="header small">
-              <span class="text">Delete</span>
-            </button>
-          </de-line-chart>
-        `;
-        const elements = Utils.toDocument(html);
-
-        const del_btn = elements.querySelector("[cid=del_btn]");
-        del_btn.addEventListener("click", (e) => On_Click_Del_Btn(e, chart_elem));
-        del_btn.addEventListener("edit_btn", (e) => On_Click_Edit_Btn(e, chart_elem));
-
         const data = {}, trends = {};
         for (const query_id of chart.query_ids)
         {
@@ -488,17 +428,16 @@
           data[query_id] = trends[query_id].map(t => {return {x: t.datetime, y: t.count}});
         }
 
-        const chart_elem = elements.querySelector("de-line-chart");
-        items.append(chart_elem);
-        chart_elem.obj = chart;
-        chart_elem.items = data;
-
-        Render_Summary(chart_elem, trends, queries);
-
-        return chart_elem;
+        item_elem.chart_elem.setAttribute("title", chart.title || "Chart");
+        item_elem.chart_elem.del_btn.addEventListener("click", (e) => chart_list.Remove(chart.id));
+        item_elem.chart_elem.edit_btn.addEventListener("click", (e) => On_Edit_Btn_Click(e, chart));
+        item_elem.chart_elem.items = data;
+        Render_Summary(item_elem, trends, queries);
       }
+      
+      // rendering ======================================================================
 
-      function Render_Summary(chart_elem, data, queries)
+      function Render_Summary(item_elem, data, queries)
       {
         const items = Object.values(data).flat();
 
@@ -513,7 +452,6 @@
         const d_time = max_time - min_time;
         const d_days = Math.floor(d_time / Utils.MILLIS_DAY);
 
-        let rows_html = "";
         let color = 0;
         for (const query_id in data)
         {
@@ -527,7 +465,7 @@
 
           const query = queries.find(q => q.id == query_id);
 
-          rows_html += `
+          const html = `
             <tr>
               <td>
                 Usage - ${query.title} 
@@ -538,35 +476,14 @@
               <td cid="diff_usage">${d_count}</td>
             </tr>
           `;
+          item_elem.body_elem.insertAdjacentHTML('beforeend', html);
 
           color++;
         }
 
-        const html = `
-          <table>
-            <thead>
-              <tr>
-                <th></th>
-                <th>Start</th>
-                <th>End</th>
-                <th>Change</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Time</td>
-                <td cid="min_time">${min_date.toLocaleDateString()}</td>
-                <td cid="max_time">${max_date.toLocaleDateString()}</td>
-                <td cid="diff_time">${d_days} days</td>
-              </tr>
-              ${rows_html}
-            </tbody>
-          </table>
-        `;
-        const elements = Utils.toDocument(html);
-        //Utils.Set_Id_Shortcuts(elements, elements, "cid");
-
-        chart_elem.append(elements);
+        item_elem.min_time.innerText = min_date.toLocaleDateString();
+        item_elem.max_time.innerText = max_date.toLocaleDateString();
+        item_elem.diff_time.innerText = `${d_days} days`;
       }
 
       function Update_Nav()
@@ -584,7 +501,6 @@
     <div id="ads_elem"></div>
 
     <header>
-
       <h1><span>Job Woper</span></h1>
       <nav>
         <button id="add_btn"><span class="text">Add Chart</span></button>
@@ -594,7 +510,7 @@
 
     <de-input-list id="chart_list">
 
-      <de-line-chart x-label="Time" y-label="Usage">
+      <de-line-chart cid="chart_elem" x-label="Time" y-label="Usage">
         <button cid="edit_btn" slot="title" class="header small">
           <span class="text">Edit</span>
         </button>
@@ -612,7 +528,7 @@
             <th>Change</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody cid="body_elem">
           <tr>
             <td>Time</td>
             <td cid="min_time"></td>
@@ -623,9 +539,6 @@
       </table>
 
     </de-input-list>
-
-    <main id="items">
-    </main>
 
     <main id="docs">
     </main>

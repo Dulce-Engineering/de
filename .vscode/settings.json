@@ -1,4 +1,13 @@
 {
   "liveServer.settings.port": 80,
-  "liveServer.settings.root": "/public"
+  "liveServer.settings.root": "/public",
+  "liveServer.settings.ignoreFiles": 
+  [
+    ".vscode/**", // Often good to ignore the .vscode folder itself
+    "**/node_modules/**", // Ignores the entire node_modules directory
+    "dist/**", // Ignores a 'dist' or build output folder
+    "logs/**", // Ignores a 'logs' folder
+    "**/*.log", // Ignores all files with the .log extension
+    "public/job-woper/db/**" // Ignores a specific folder named 'ignored_folder_name'
+  ]
 }

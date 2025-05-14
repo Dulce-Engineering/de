@@ -49,6 +49,18 @@ class DeLineChart extends HTMLElement
     this.Set_Highlight(h);
   }
 
+  static observedAttributes = [ "title" ];
+  attributeChangedCallback(name, old_value, new_value)
+  { 
+    if (this.isConnected)
+    {
+      if (name == "title" && this.title_elem)
+      {
+        this.title_elem.innerHTML = new_value;
+      }
+    }
+  }
+
   Set_Highlight(h)
   {
     if (h.x1 >= 0 && h.x2 <= this.plot_width && 
@@ -182,20 +194,20 @@ class DeLineChart extends HTMLElement
     return elements;
   }
 
-  Render_Title()
+  /*Render_Title()
   {
     const x = -this.padding_axis - this.padding_left + 40;
     const y = this.plot_height + 40;
-    const label_elem = document.createElementNS("http://www.w3.org/2000/svg", "text");
-    label_elem.setAttribute("x", x); 
-    label_elem.setAttribute("y", y);
-    label_elem.setAttribute("transform-origin", `${x} ${y}`);
-    label_elem.setAttribute("transform", "scale(1, -1)");
-    label_elem.classList.add("title");
-    label_elem.innerHTML = this.title;
+    this.label_elem = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    this.label_elem.setAttribute("x", x); 
+    this.label_elem.setAttribute("y", y);
+    this.label_elem.setAttribute("transform-origin", `${x} ${y}`);
+    this.label_elem.setAttribute("transform", "scale(1, -1)");
+    this.label_elem.classList.add("title");
+    this.label_elem.innerHTML = this.title;
 
-    return label_elem;
-  }
+    return this.label_elem;
+  }*/
 
   Render_X_Axis()
   {
@@ -261,8 +273,8 @@ class DeLineChart extends HTMLElement
       const title = this.getAttribute("title") || "Title";
 
       const html = `
-        <h1 cid="title_elem" class="title">
-          <span>${title}</span>
+        <h1 class="title">
+          <span cid="title_elem">${title}</span>
           <slot name="title"></slot>
         </h1>
         <svg 

@@ -12,10 +12,6 @@ const items =
 ];
 
 list.addEventListener("render", On_Render_Item);
-//list.addEventListener("add", On_Add_Item);
-//list.addEventListener("edit", On_Edit_Item);
-//list.addEventListener("delete", On_Delete_Item);
-list.addEventListener("update", On_update_Item);
 list.value = items;
 
 function On_Render_Item(event)
@@ -40,15 +36,25 @@ function On_Render_Item(event)
 ```
 
 ## Slots
+None
 
 ## Attributes
+None
 
 ## Fields
 ### value
+Read/Write array of objects representing items to be rendered.
+Each item must have an "id" field.
 
 ## Events
-### save
+### change
+Fires when an item is added or removed.
+### render
+Fires when an item needs to be rendered.
+Rendering will be based on the given template.
 
 ## Methods
-### Add()
-### Remove()
+### Add(item)
+Method to use when adding an item to the list.
+### Remove(item_id)
+Method to remove items from the list

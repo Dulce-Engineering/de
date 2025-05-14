@@ -23,14 +23,6 @@ class DeInputTree extends HTMLElement
   {
     let html = this.Render_Item(objs, null);
     this.innerHTML = html;
-
-    /*this.querySelectorAll(".item").forEach(item =>
-    {
-      const obj_id = item.getAttribute("item-id");
-      const obj = objs.find(o => o.id == obj_id);
-      item.obj = obj;
-      item.addEventListener("click", this.On_Selected_Item_Click);
-    });*/
   }
 
   get value()
@@ -42,19 +34,18 @@ class DeInputTree extends HTMLElement
     return checked_values;
   }
 
-  set value(id)
+  set value(objs)
   {
-    //this.selected_id = id;
-    if (id)
+    const checkboxes = this.querySelectorAll("input[type=checkbox]");
+    if (objs)
     {
-      //const item = this.items.find(o => o.id == id);
-      //this.selected_item.innerText = item.title;
+      const checkboxes_array = Array.from(checkboxes);
+      const to_check = checkboxes_array.filter(elem => objs.includes(elem.value));
+      to_check.forEach(elem => elem.checked = true);
     }
     else
     {
-      //this.selected_item.innerText = "None";
-      const items = this.querySelectorAll("input[type=checkbox]");
-      items.forEach(item => item.checked = false);
+      checkboxes.forEach(elem => elem.checked = false);
     }
   }
 
@@ -106,14 +97,6 @@ class DeInputTree extends HTMLElement
   {
     return objs.filter(o => o.parent_id == obj_id).length > 0;
   }
-
-  /*On_Selected_Item_Click(event)
-  {
-    const item = event.target.obj;
-    this.selected_id = item.id;
-    this.selected_item.innerText = item.title;
-    this.items_block.hidePopover();
-  }*/
 
   render()
   {

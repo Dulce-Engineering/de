@@ -2,7 +2,7 @@ import Utils from "../../lib/Utils.js";
 
 class DeInputList extends HTMLElement
 {
-  static tname = "p-budgets";
+  static tname = "de-input-list";
 
   //static observedAttributes = [ "attribute-name" ];
   //attributeChangedCallback(name, old_value, new_value) { }
@@ -18,12 +18,12 @@ class DeInputList extends HTMLElement
     this.Render();
   }
 
-  set value(items)
+  set value(item_objs)
   {
     this.replaceChildren();
-    if (items)
+    if (item_objs)
     {
-      for (const item of items)
+      for (const item of item_objs)
       {
         this.Add(item, false);
       }
@@ -32,15 +32,15 @@ class DeInputList extends HTMLElement
 
   get value()
   {
-    const items = [];
+    const item_objs = [];
 
     const item_elems = this.querySelectorAll("li");
     for (const item_elem of item_elems)
     {
-      items.push(item_elem.budget);
+      item_objs.push(item_elem.item_obj);
     }
 
-    return items;
+    return item_objs;
   }
 
   get length()
@@ -48,23 +48,19 @@ class DeInputList extends HTMLElement
     return this.querySelectorAll("li").length;
   }
 
-  Add(item, with_events = true)
+  Add(item_obj, with_events = true)
   {
-    const item_elem = this.Render_Item(item);
-
-    const old_elem = this.Find(item.id);
+    const item_elem = this.Render_Item(item_obj);
+    const old_elem = this.Find_Item_Elem(item_obj.id);
     if (old_elem)
     {
-      // fire update event
       old_elem.replaceWith(item_elem);
     }
     else
     {
-      // fire add event
       this.appendChild(item_elem);
     }
-
-    this.Update_Budget_Funds(item_elem);
+    item_elem.dispatchEvent(new Event("render", {bubbles:true}));
 
     if (with_events)
     {
@@ -72,9 +68,9 @@ class DeInputList extends HTMLElement
     }
   }
 
-  Remove(item)
+  Remove(obj_id)
   {
-    const item_elem = this.Find(item.id);
+    const item_elem = this.Find_Item_Elem(obj_id);
     if (item_elem)
     {
       this.removeChild(item_elem);
@@ -82,19 +78,19 @@ class DeInputList extends HTMLElement
     }
   }
 
-  Find(id)
+  Find_Item_Elem(obj_id)
   {
     let res = null;
 
-    if (id)
+    if (obj_id)
     {
-      const budget_elems = this.querySelectorAll("li");
-      for (const budget_elem of budget_elems)
+      const item_elems = this.querySelectorAll("li");
+      for (const item_elem of item_elems)
       {
-        const budget = budget_elem.budget;
-        if (budget.id == id)
+        const obj = item_elem.item_obj;
+        if (obj.id == obj_id)
         {
-          res = budget_elem;
+          res = item_elem;
         }
       }
     }
@@ -102,17 +98,19 @@ class DeInputList extends HTMLElement
     return res;
   }
 
-  Render_Item(item)
+  // creates a copy of the line-item template with attached item object
+  // and shortcut links
+  Render_Item(item_obj)
   {
     const item_elem = this.template_elem.cloneNode(true);
-    item_elem.item = item;
+    item_elem.item_obj = item_obj;
     Utils.Set_Id_Shortcuts(item_elem, item_elem, "cid");
-    
-    item_elem.dispatchEvent(new Event("render"));
 
     return item_elem;
   }
 
+  // create a line-item and move all child elements to it.
+  // this line-item will act as a template for rendering each item.
   Render()
   {
     this.template_elem = document.createElement("li");
