@@ -27,7 +27,7 @@
     "id": "-entity-framework",
     "order": 19,
     "parent_id": "-M1iJTpFvdzFwzo3ua5x",
-    "terms": "entity framework",
+    "terms": "\"entity framework\"",
     "title": "Entity Framework",
     "src": "seek"
   },
@@ -194,7 +194,7 @@
     "id": "-web-components",
     "order": 7,
     "parent_id": "-LwWfF7mtKhMWsxlyxZt",
-    "terms": "web components",
+    "terms": "\"web components\"",
     "title": "Web Components",
     "src": "seek"
   },

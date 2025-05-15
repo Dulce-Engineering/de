@@ -41,7 +41,12 @@ class DeInputTree extends HTMLElement
     {
       const checkboxes_array = Array.from(checkboxes);
       const to_check = checkboxes_array.filter(elem => objs.includes(elem.value));
-      to_check.forEach(elem => elem.checked = true);
+      to_check.forEach(Checkbox);
+      function Checkbox(elem)
+      {
+        elem.checked = true;
+        //this.Open(elem.value);
+      }
     }
     else
     {
@@ -49,11 +54,40 @@ class DeInputTree extends HTMLElement
     }
   }
 
+  Open(id)
+  {
+    // find checkbox where value = id
+    // find all parent details elements
+    // const detail_elems = Utils.Find_Parents(checkbox_elem, "DETAILS");
+    // set attribute open = true
+  }
+
   Render_Item(objs, parent_id)
   {
     const name = this.getAttribute("name");
     let html = "";
-    const child_objs = objs.filter(o => Has_Parent(o, parent_id));
+    let child_objs = objs.filter(o => Has_Parent(o, parent_id));
+    child_objs.sort(Sort_By_Order);
+    function Sort_By_Order(a, b)
+    {
+      if (a.order && b.order)
+      {
+        return a.order - b.order;
+      }
+      else if (a.order)
+      {
+        return -1;
+      }
+      else if (b.order)
+      {
+        return 1;
+      }
+      else
+      {
+        return 0;
+      }
+    }
+
     function Has_Parent(o, parent_id)
     {
       if (parent_id == null || parent_id == undefined)

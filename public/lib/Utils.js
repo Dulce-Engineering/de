@@ -552,82 +552,6 @@ class Utils
     return res;
   }
 
-   /**
-   * Registers a custom element with the browser.
-   *
-   * This function checks if a custom element (identified by its tag name) has already been
-   * defined in the browser's custom element registry. If not, it defines the element using
-   * the provided class. Optionally, it can also handle hydrating existing elements in the
-   * DOM that match the tag name but have not yet been associated with the custom element
-   * class.
-   *
-   * @async
-   * @static
-   * @param {CustomElementConstructor} elem_class - The class that defines the custom element.
-   *   This class should have a static `tname` property that specifies the tag name for the
-   *   element (e.g., "my-custom-element").
-   * @param {string} [hydration_class] - An optional CSS class name. If provided, this function
-   *   will search the DOM for elements matching the custom element's tag name that do *not*
-   *   have this class and will add the class to them. This is used for hydrating elements
-   *   that were present in the initial HTML but have not yet been connected to the custom
-   *   element class.
-   * @returns {Promise<void>} A promise that resolves when the element is defined and any
-   *   hydration is complete.
-   *
-   * @example
-   * // Define a simple custom element class:
-   * class MyElement extends HTMLElement {
-   *   static tname = "my-element";
-   *   // ... other class properties and methods ...
-   * }
-   *
-   * // Register the element (without hydration):
-   * Utils.Register_Element(MyElement);
-   *
-   * // Register the element with hydration:
-   * Utils.Register_Element(MyElement, "hydrated");
-   * // Any <my-element> in the initial HTML that doesn't have the "hydrated"
-   * // class will get it.
-   */
-  static async Register_Element(elem_class, hydration_class)
-  {
-    const tag_name = elem_class.tname;
-    const comp_class = customElements.get(tag_name);
-    if (comp_class == undefined)
-    {
-      if (hydration_class)
-      {
-        await customElements.whenDefined(tag_name);
-        const elements = document.querySelectorAll(tag_name + ':not(.' + hydration_class + ')');
-        elements.forEach(e => {e.classList.add(hydration_class)});
-      }
-      customElements.define(tag_name, elem_class);
-    }
-  }
-
-  static async Render_Wait(container_elem, fn)
-  {
-    container_elem.classList.add("waiting");
-    await fn();
-    container_elem.classList.remove("waiting");
-  }
-
-  static async Render_Wait_Btn(container_elem, fn, class_name)
-  {
-    let container_class_name = class_name;
-    if (Utils.isEmpty(class_name) || class_name == "debug")
-    {
-      container_class_name = "waiting_btn";
-    }
-
-    container_elem.classList.add(container_class_name);
-    if (class_name != "debug")
-  {
-    await fn();
-      container_elem.classList.remove(container_class_name);
-    }
-  }
-
   static Set_APIs_Auth(token, apis)
   {
     for (const comp_class_name in apis)
@@ -660,131 +584,6 @@ class Utils
     }
 
     return res;
-  }
-
-  /**
-   * Sets up shortcuts to elements within a source element based on their attribute values.
-   *
-   * This function iterates through all descendants of a source element (`src_elem`) that have a
-   * specified attribute (defaulting to "id"). For each such element, it adds a property to a
-   * destination object (`dest_elem`) where the property name is the value of the attribute, and
-   * the property value is the element itself. This provides a convenient way to access elements
-   * directly by their attribute value without having to use `querySelector` repeatedly.
-   *
-   * @static
-   * @param {Element} src_elem - The source element to search within.
-   * @param {object} dest_elem - The destination object to add the shortcuts to. This is usually
-   *   a DOM element or a plain JavaScript object.
-   * @param {string} [attr_name="id"] - The name of the attribute to use as the basis for the
-   *   shortcuts. Defaults to "id".
-   *
-   * @example
-   * // Assuming you have the following HTML:
-   * // <div id="my-container">
-   * //   <button id="my-button">Click me</button>
-   * //   <input id="my-input" type="text" />
-   * // </div>
-   *
-   * const myContainer = document.getElementById("my-container");
-   * const shortcuts = {}; // Create an empty object to store shortcuts
-   *
-   * // Call Set_Id_Shortcuts to create shortcuts in the `shortcuts` object:
-   * Utils.Set_Id_Shortcuts(myContainer, shortcuts);
-   *
-   * // Now you can access the button and input directly:
-   * console.log(shortcuts["my-button"]); // Logs the <button> element.
-   * console.log(shortcuts["my-input"]);  // Logs the <input> element.
-   * 
-   * // Use it directly in the destination
-   * Utils.Set_Id_Shortcuts(myContainer, myContainer);
-   * // Now you can access the button and input directly:
-   * console.log(myContainer["my-button"]); // Logs the <button> element.
-   * console.log(myContainer["my-input"]);  // Logs the <input> element.
-   *
-   * // Using a custom attribute, for example "cid":
-   * // <div id="my-container">
-   * //   <button cid="my-button">Click me</button>
-   * //   <input cid="my-input" type="text" />
-   * // </div>
-   * const shortcuts2 = {}; 
-   * Utils.Set_Id_Shortcuts(myContainer, shortcuts2, "cid");
-   * console.log(shortcuts2["my-button"]); // Logs the <button> element.
-   * console.log(shortcuts2["my-input"]);  // Logs the <input> element.
-   */
-  static Set_Id_Shortcuts(src_elem, dest_elem, attr_name = "id")
-  {
-    const elements = src_elem.querySelectorAll("[" + attr_name + "]");
-    for (const elem of elements)
-    {
-      const id_value = elem.getAttribute(attr_name);
-      dest_elem[id_value] = elem;
-    }
-  }
-
-  static Set_Local_Storge_Json(key, value)
-  {
-    const value_str = JSON.stringify(value);
-    localStorage.setItem(key, value_str);
-  }
-
-  static setOptions(method, xApiKey, contentType, body, auth)
-  {
-    const options =
-    {
-      method,
-      headers:
-      {
-        'Content-Type': contentType,
-        'x-api-key': xApiKey
-      }
-    };
-
-    if (body)
-    {
-      options.body = body;
-    }
-    if (auth)
-    {
-      options.headers.Authorization = auth;
-    }
-
-    return options;
-  }
-
-  static Set_Store_Id(user_uid, id)
-  {
-    if (user_uid)
-    {
-      const key = "store_id." + user_uid;
-      localStorage.setItem(key, id);
-    }
-  }
-
-  static Show(id, parent_elem)
-  {
-    if (!parent_elem)
-    {
-      parent_elem = document;
-    }
-
-    const elem = parent_elem.querySelector("#" + id);
-    Utils.Show_Element(elem);
-  }
-
-  static Show_Element(elem)
-  {
-    if (elem)
-    {
-      const def_display = getComputedStyle(elem).getPropertyValue("--def-display");
-      if (def_display)
-      {
-        elem.style.display = def_display;
-      }
-      else
-      {
-        elem.style.removeProperty("display");
-      }
-    }
   }
 
   static sleep(ms)
@@ -949,26 +748,6 @@ class Utils
     }
   }
 
-  static toDocument(html, src_elems) 
-  {
-    return Utils.To_Template(html, src_elems).content;
-  }
-
-  static Get_Slot_Content(src_elems, slot_name)
-  {
-    return src_elems.querySelector(`[slot='${slot_name}']`);
-  }
-
-  static toElement(html) 
-  {
-    return Utils.toDocument(html).firstChild;
-  }
-
-  static toElements(html) 
-  {
-    return Utils.toDocument(html).childNodes;
-  }
-
   static toEmptyStr(value)
   {
     let res = value;
@@ -1029,6 +808,209 @@ class Utils
     return obj;
   }
 
+  static toValueArray(str)
+  {
+    let res = null;
+    const strArray = Utils.toArray(str);
+
+    if (strArray)
+    {
+      res = strArray.map(item => item.value);
+    }
+
+    return res;
+  }
+
+  // HTML ===========================================================
+
+  static Get_Slot_Content(src_elems, slot_name)
+  {
+    return src_elems.querySelector(`[slot='${slot_name}']`);
+  }
+
+   /**
+   * Registers a custom element with the browser.
+   *
+   * This function checks if a custom element (identified by its tag name) has already been
+   * defined in the browser's custom element registry. If not, it defines the element using
+   * the provided class. Optionally, it can also handle hydrating existing elements in the
+   * DOM that match the tag name but have not yet been associated with the custom element
+   * class.
+   *
+   * @async
+   * @static
+   * @param {CustomElementConstructor} elem_class - The class that defines the custom element.
+   *   This class should have a static `tname` property that specifies the tag name for the
+   *   element (e.g., "my-custom-element").
+   * @param {string} [hydration_class] - An optional CSS class name. If provided, this function
+   *   will search the DOM for elements matching the custom element's tag name that do *not*
+   *   have this class and will add the class to them. This is used for hydrating elements
+   *   that were present in the initial HTML but have not yet been connected to the custom
+   *   element class.
+   * @returns {Promise<void>} A promise that resolves when the element is defined and any
+   *   hydration is complete.
+   *
+   * @example
+   * // Define a simple custom element class:
+   * class MyElement extends HTMLElement {
+   *   static tname = "my-element";
+   *   // ... other class properties and methods ...
+   * }
+   *
+   * // Register the element (without hydration):
+   * Utils.Register_Element(MyElement);
+   *
+   * // Register the element with hydration:
+   * Utils.Register_Element(MyElement, "hydrated");
+   * // Any <my-element> in the initial HTML that doesn't have the "hydrated"
+   * // class will get it.
+   */
+  static async Register_Element(elem_class, hydration_class)
+  {
+    const tag_name = elem_class.tname;
+    const comp_class = customElements.get(tag_name);
+    if (comp_class == undefined)
+    {
+      if (hydration_class)
+      {
+        await customElements.whenDefined(tag_name);
+        const elements = document.querySelectorAll(tag_name + ':not(.' + hydration_class + ')');
+        elements.forEach(e => {e.classList.add(hydration_class)});
+      }
+      customElements.define(tag_name, elem_class);
+    }
+  }
+
+  static async Render_Wait(container_elem, fn)
+  {
+    container_elem.classList.add("waiting");
+    await fn();
+    container_elem.classList.remove("waiting");
+  }
+
+  static async Render_Wait_Btn(container_elem, fn, class_name)
+  {
+    let container_class_name = class_name;
+    if (Utils.isEmpty(class_name) || class_name == "debug")
+    {
+      container_class_name = "waiting_btn";
+    }
+
+    container_elem.classList.add(container_class_name);
+    if (class_name != "debug")
+  {
+    await fn();
+      container_elem.classList.remove(container_class_name);
+    }
+  }
+
+  /**
+   * Sets up shortcuts to elements within a source element based on their attribute values.
+   *
+   * This function iterates through all descendants of a source element (`src_elem`) that have a
+   * specified attribute (defaulting to "id"). For each such element, it adds a property to a
+   * destination object (`dest_elem`) where the property name is the value of the attribute, and
+   * the property value is the element itself. This provides a convenient way to access elements
+   * directly by their attribute value without having to use `querySelector` repeatedly.
+   *
+   * @static
+   * @param {Element} src_elem - The source element to search within.
+   * @param {object} dest_elem - The destination object to add the shortcuts to. This is usually
+   *   a DOM element or a plain JavaScript object.
+   * @param {string} [attr_name="id"] - The name of the attribute to use as the basis for the
+   *   shortcuts. Defaults to "id".
+   *
+   * @example
+   * // Assuming you have the following HTML:
+   * // <div id="my-container">
+   * //   <button id="my-button">Click me</button>
+   * //   <input id="my-input" type="text" />
+   * // </div>
+   *
+   * const myContainer = document.getElementById("my-container");
+   * const shortcuts = {}; // Create an empty object to store shortcuts
+   *
+   * // Call Set_Id_Shortcuts to create shortcuts in the `shortcuts` object:
+   * Utils.Set_Id_Shortcuts(myContainer, shortcuts);
+   *
+   * // Now you can access the button and input directly:
+   * console.log(shortcuts["my-button"]); // Logs the <button> element.
+   * console.log(shortcuts["my-input"]);  // Logs the <input> element.
+   * 
+   * // Use it directly in the destination
+   * Utils.Set_Id_Shortcuts(myContainer, myContainer);
+   * // Now you can access the button and input directly:
+   * console.log(myContainer["my-button"]); // Logs the <button> element.
+   * console.log(myContainer["my-input"]);  // Logs the <input> element.
+   *
+   * // Using a custom attribute, for example "cid":
+   * // <div id="my-container">
+   * //   <button cid="my-button">Click me</button>
+   * //   <input cid="my-input" type="text" />
+   * // </div>
+   * const shortcuts2 = {}; 
+   * Utils.Set_Id_Shortcuts(myContainer, shortcuts2, "cid");
+   * console.log(shortcuts2["my-button"]); // Logs the <button> element.
+   * console.log(shortcuts2["my-input"]);  // Logs the <input> element.
+   */
+  static Set_Id_Shortcuts(src_elem, dest_elem, attr_name = "id")
+  {
+    const elements = src_elem.querySelectorAll("[" + attr_name + "]");
+    for (const elem of elements)
+    {
+      const id_value = elem.getAttribute(attr_name);
+      dest_elem[id_value] = elem;
+    }
+  }
+
+  static Set_Local_Storge_Json(key, value)
+  {
+    const value_str = JSON.stringify(value);
+    localStorage.setItem(key, value_str);
+  }
+
+  static Show(id, parent_elem)
+  {
+    if (!parent_elem)
+    {
+      parent_elem = document;
+    }
+
+    const elem = parent_elem.querySelector("#" + id);
+    Utils.Show_Element(elem);
+  }
+
+  static Show_Element(elem)
+  {
+    if (elem)
+    {
+      const def_display = getComputedStyle(elem).getPropertyValue("--def-display");
+      if (def_display)
+      {
+        elem.style.display = def_display;
+      }
+      else
+      {
+        elem.style.removeProperty("display");
+      }
+    }
+  }
+
+  static toDocument(html, src_elems) 
+  {
+    return Utils.To_Template(html, src_elems).content;
+  }
+
+  static toElement(html) 
+  {
+    return Utils.toDocument(html).firstChild;
+  }
+
+  static toElements(html) 
+  {
+    return Utils.toDocument(html).childNodes;
+  }
+
   static To_Template(html, src_elems) 
   {
     const template = document.createElement('template');
@@ -1052,19 +1034,6 @@ class Utils
     }
   
     return template;
-  }
-
-  static toValueArray(str)
-  {
-    let res = null;
-    const strArray = Utils.toArray(str);
-
-    if (strArray)
-    {
-      res = strArray.map(item => item.value);
-    }
-
-    return res;
   }
 
   static On_Enter_Do_Click(button)
@@ -1188,6 +1157,25 @@ class Utils
     }
 
     return { x, y };
+  }
+
+  static Find_Parents(element, tagName) 
+  {
+    const matchingParents = [];
+    let currentElement = element.parentNode;
+
+    tagName = tagName.toUpperCase();
+
+    while (currentElement) 
+    {
+      if (currentElement.tagName === tagName) 
+      {
+        matchingParents.push(currentElement);
+      }
+      currentElement = currentElement.parentNode;
+    }
+
+    return matchingParents.length > 0 ? matchingParents : null;
   }
 
   static Is_Circle_Circle_Collision(x1, y1, r1, x2, y2, r2)
