@@ -46,5 +46,11 @@
     "datetime": 1747227087216,
     "id": "2c8baa25-2777-4d33-af39-09e7ad147ce7",
     "query_id": "-ethereum"
+  },
+  {
+    "count": 100,
+    "datetime": 1747356487985,
+    "id": "83797c3a-904f-4f94-a785-57fc00185b8e",
+    "query_id": "-ethereum"
   }
 ]

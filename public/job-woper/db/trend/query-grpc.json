@@ -40,5 +40,11 @@
     "datetime": 1747227812846,
     "id": "c8b1f720-ceb5-433c-8374-4b9ee7ed35bb",
     "query_id": "-grpc"
+  },
+  {
+    "count": 39,
+    "datetime": 1747357216987,
+    "id": "c2ec03a6-7361-4a5c-8031-014b7733f97a",
+    "query_id": "-grpc"
   }
 ]
