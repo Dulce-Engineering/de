@@ -3,12 +3,14 @@
   "version": "1.0.0",
   "main": "index.js",
   "type": "module",
-  "scripts": 
-  {
+  "scripts": {
     "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Dulce Engineering",
   "license": "ISC",
-  "description": ""
+  "description": "",
+  "dependencies": {
+    "playwright": "^1.52.0"
+  }
 }

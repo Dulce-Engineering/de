@@ -1,6 +1,7 @@
 import Utils from "../lib/Utils.mjs";
 import fs from 'node:fs';
 import crypto from 'node:crypto';
+import pw from "playwright";
 
 main();
 
@@ -14,17 +15,59 @@ async function main()
   {
     if (seek_queries.length > 1 && i > 0)
     {
-      console.log("Waiting...");
       await Wait(Utils.MILLIS_MINUTE);
     }
 
     const query = seek_queries[i];
-    const count = await Query_Get_Trend_Count(query);
-    Trend_Insert_Count(query, count);
+    const count = await Query_Get_Trend_Count2(query);
+    if (count>0)
+    {
+      Trend_Insert_Count(query, count);
+    }
 
-    console.log(query.title, count);
+    console.log(query.title, count, "...");
   }
   console.log("Completed.");
+}
+
+// uses playwright
+async function Query_Get_Trend_Count2(query)
+{
+  let count = 0;
+  const base_url = "https://www.seek.com.au";
+  const search_str = query.terms.replace(" ", "-");
+  const classification = "information-communication-technology";
+  const url = 
+    base_url + "/" +
+    search_str + "-jobs-in-" +
+    classification;
+
+  const browser = await pw.chromium.launch({ headless: false }); 
+  const page = await browser.newPage();
+  try 
+  {
+    await page.goto(url, { waitUntil: 'domcontentloaded' }); 
+    const count_elem = await page.$('[data-automation="totalJobsCount"]');
+    if (count_elem) 
+    {
+      const count_str = await count_elem.textContent();
+      count = Utils.To_Int(count_str);
+    } 
+    else 
+    {
+      console.log('element not found.');
+    }
+  } 
+  catch (error) 
+  {
+    console.error(error);
+  } 
+  finally 
+  {
+    await browser.close();
+  }
+
+  return count;
 }
 
 function Wait(milliseconds) 
@@ -92,8 +135,13 @@ function Select_All(table)
   return res;
 }
 
+// uses fetch
 async function Query_Get_Trend_Count(query)
 {
+  let count = 0;
+  let err_msg = null;
+  let res_text = null;
+
   const base_url = "https://www.seek.com.au";
   const search_str = query.terms.replace(" ", "-");
   const classification = "information-communication-technology";
@@ -107,18 +155,44 @@ async function Query_Get_Trend_Count(query)
     search_str + "-jobs-in-" +
     classification;
   const res_http = await fetch(url);
-  const res_text = await res_http.text();
+  res_text = await res_http.text();
+  if (res_http.ok)
+  {
+    // find relevant html element
+    const elem_start_index = res_text.indexOf("totalJobsCount");
+    if (elem_start_index >= 0)
+    {
+      const elem_end_index = res_text.indexOf(">", elem_start_index);
 
-  // find relevant html element
-  const elem_start_index = res_text.indexOf("totalJobsCount");
-  const elem_end_index = res_text.indexOf(">", elem_start_index);
+      // extract job count
+      const value_start_index = elem_end_index + 1;
+      const value_end_index = res_text.indexOf("<", value_start_index);
+      
+      const count_str = res_text.substring(value_start_index, value_end_index);
+      count = Utils.To_Int(count_str);
+    }
+    else
+    {
+      err_msg = "key not found: totalJobsCount";
+    }
+  }
+  else
+  {
+    err_msg = "fetch failed";
+  }
 
-  // extract job count
-  const value_start_index = elem_end_index + 1;
-  const value_end_index = res_text.indexOf("<", value_start_index);
-  
-  const count_str = res_text.substring(value_start_index, value_end_index);
-  const count = Utils.To_Int(count_str);
+  if (err_msg)
+  {
+    console.error("msg:", err_msg);
+    console.error(`for query: ${query.title} (ID: ${query.id})`);
+    console.error("URL fetched:", url);
+    if (res_text)
+    {
+      const timestamp = Date.now();
+      const filename = `log/query_${query.id}_${timestamp}.html`;
+      fs.writeFileSync(filename, res_text, 'utf8');
+    }
+  }
 
   return count;
 }

@@ -1,62 +1,8 @@
 [
   {
-    "count": 2079,
-    "datetime": 1745724843546,
-    "id": "9250cc8a-edbd-4e2b-ad4c-ef7e6ce92a1c",
-    "query_id": "-aws"
-  },
-  {
-    "count": 2071,
-    "datetime": 1745901992996,
-    "id": "468c0ec3-d6ed-4b27-b655-ae70aa5d86f0",
-    "query_id": "-aws"
-  },
-  {
-    "count": 1979,
-    "datetime": 1746343504999,
-    "id": "b4362d7c-e10e-4052-b6d8-42a1fe9798f7",
-    "query_id": "-aws"
-  },
-  {
-    "count": 1996,
-    "datetime": 1746437794744,
-    "id": "cc820316-d8ff-4c58-9c74-6e9947fddad3",
-    "query_id": "-aws"
-  },
-  {
-    "count": 2089,
-    "datetime": 1746527552551,
-    "id": "876cb8af-f3b0-42ab-8db1-39dcf9737c2d",
-    "query_id": "-aws"
-  },
-  {
-    "count": 2052,
-    "datetime": 1746654940563,
-    "id": "f2a5ce90-fb75-4176-8593-e3bd21afb7cb",
-    "query_id": "-aws"
-  },
-  {
-    "count": 1948,
-    "datetime": 1746932270229,
-    "id": "daa59413-58b6-4a7e-9eeb-f9d711637945",
-    "query_id": "-aws"
-  },
-  {
-    "count": 2041,
-    "datetime": 1747226542679,
-    "id": "dd5d9d25-243d-49ab-a653-248f172a802b",
-    "query_id": "-aws"
-  },
-  {
-    "count": 2031,
-    "datetime": 1747355940728,
-    "id": "79cd5365-1158-4493-a9cb-3ff02f11ef17",
-    "query_id": "-aws"
-  },
-  {
-    "count": 1956,
-    "datetime": 1747608753378,
-    "id": "efc893dc-efea-4349-bfc1-f67a6bac8b9f",
+    "count": 2205,
+    "datetime": 1747914908630,
+    "id": "cede4ece-26d8-49ab-a117-4b1d55e4b7c0",
     "query_id": "-aws"
   }
 ]
