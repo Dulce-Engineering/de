@@ -540,6 +540,24 @@
     "title": "Solid.js",
     "src": "seek"
   },
+  {
+    "id": "-frontend",
+    "terms": "front end developer",
+    "title": "Front End Developer",
+    "src": "seek"
+  },
+  {
+    "id": "-backend",
+    "terms": "backend developer",
+    "title": "Backend Developer",
+    "src": "seek"
+  },
+  {
+    "id": "-fullstack",
+    "terms": "full stack developer",
+    "title": "Full Stack Developer",
+    "src": "seek"
+  },
 
   {
     "id": "-KpPWAFGBhe6CxLYn22r",

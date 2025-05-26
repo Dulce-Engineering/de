@@ -58,5 +58,11 @@
     "datetime": 1747913765163,
     "id": "1d94e82e-1c22-4c72-b515-991a9c7cc249",
     "query_id": "-rpc"
+  },
+  {
+    "count": 1,
+    "datetime": 1748216302837,
+    "id": "db6b00b6-d66f-4698-b054-48dd684c146e",
+    "query_id": "-rpc"
   }
 ]
