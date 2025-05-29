@@ -4,5 +4,11 @@
     "datetime": 1748219053456,
     "id": "7235ff69-689d-4b8a-9ebf-c4edcdb3c32d",
     "query_id": "-frontend"
+  },
+  {
+    "count": 994,
+    "datetime": 1748523806848,
+    "id": "6b162d86-a502-45a2-9fcf-1e0dc29545fe",
+    "query_id": "-frontend"
   }
 ]
