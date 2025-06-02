@@ -11,6 +11,9 @@ async function main()
   const queries = Select_All("query");
   const seek_queries = queries.filter
     (q => q.src == "seek" && Query_Needs_Update(q, Utils.MILLIS_DAY));
+  const browser = await pw.chromium.launch({ headless: false }); 
+  const page = await browser.newPage();
+
   for (let i = 0; i < seek_queries.length; ++i)
   {
     if (seek_queries.length > 1 && i > 0)
@@ -19,7 +22,7 @@ async function main()
     }
 
     const query = seek_queries[i];
-    const count = await Query_Get_Trend_Count2(query);
+    const count = await Query_Get_Trend_Count2(query, page);
     if (count>0)
     {
       Trend_Insert_Count(query, count);
@@ -27,11 +30,13 @@ async function main()
 
     console.log(query.title, count, "...");
   }
+
+  await browser.close();
   console.log("Completed.");
 }
 
 // uses playwright
-async function Query_Get_Trend_Count2(query)
+async function Query_Get_Trend_Count2(query, page)
 {
   let count = 0;
   const base_url = "https://www.seek.com.au";
@@ -42,12 +47,17 @@ async function Query_Get_Trend_Count2(query)
     search_str + "-jobs-in-" +
     classification;
 
-  const browser = await pw.chromium.launch({ headless: false }); 
-  const page = await browser.newPage();
+  //const browser = await pw.chromium.launch({ headless: false }); 
+  //const page = await browser.newPage();
   try 
   {
-    await page.goto(url, { waitUntil: 'domcontentloaded' }); 
-    const count_elem = await page.$('[data-automation="totalJobsCount"]');
+    //await page.goto(url, { waitUntil: 'domcontentloaded' }); 
+    await page.goto(url); 
+    //await page.waitForTimeout(5000);
+    //await page.pause();
+    //const count_elem = await page.$('[data-automation="totalJobsCount"]');
+    //const app_elem = await page.locator('#app');
+    const count_elem = await page.locator("[data-automation='totalJobsCount']");
     if (count_elem) 
     {
       const count_str = await count_elem.textContent();
@@ -62,10 +72,10 @@ async function Query_Get_Trend_Count2(query)
   {
     console.error(error);
   } 
-  finally 
+  /*finally 
   {
     await browser.close();
-  }
+  }*/
 
   return count;
 }
