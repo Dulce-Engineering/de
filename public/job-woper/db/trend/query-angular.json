@@ -100,5 +100,11 @@
     "datetime": 1748778156893,
     "id": "32012a13-ea5b-4da6-afe6-f09da68edf2b",
     "query_id": "-angular"
+  },
+  {
+    "count": 809,
+    "datetime": 1748939480011,
+    "id": "74db18d3-53a0-403a-98c5-abfcf1f9c771",
+    "query_id": "-angular"
   }
 ]

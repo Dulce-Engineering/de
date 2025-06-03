@@ -88,5 +88,11 @@
     "datetime": 1748778986137,
     "id": "4f219297-fdd6-400a-9c37-63493aed4ba8",
     "query_id": "-java"
+  },
+  {
+    "count": 2500,
+    "datetime": 1748939916715,
+    "id": "7b3d63a0-e347-437a-9ca6-6702d68d9c5a",
+    "query_id": "-java"
   }
 ]
