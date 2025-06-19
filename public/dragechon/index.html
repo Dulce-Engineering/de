@@ -1,129 +1,62 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
+
   <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Device Tilt Detection</title>
-    <style>
-        html, body
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser-arcade-physics.min.js"></script>
+    <script>
+      class Example extends Phaser.Scene
+      {
+        preload ()
         {
-          height: 100%;
-          background-color: #000;
-          color: #fff;
-        }
-        body 
-        { 
-          position: relative;
-          font-family: sans-serif; 
-          padding: 0;
-          margin: 0; 
+            this.load.image('sky', 'assets/sky.png');
+            this.load.image('ground', 'assets/platform.png');
+            this.load.image('star', 'assets/star.png');
+            this.load.image('bomb', 'assets/bomb.png');
+            this.load.spritesheet('dude', 
+                'assets/dude.png',
+                { frameWidth: 32, frameHeight: 48 }
+            );
         }
 
-        #view_elem
+        create ()
         {
-          width: 100%;
-          height: 100%;
-          display: block;
-          font-size: 0;
+          this.add.image(400, 300, 'sky');
 
-          canvas
-          {
-            width: 100%;
-            height: 100%;
-          }
-        }
-        #left_btn, #right_btn
-        {
-          position: absolute;
-          bottom: 50px;
-          width: 50px;
-          height: 50px;
-        }
-        #left_btn
-        {
-          left: 50px;
-        }
-        #right_btn
-        {
-          right: 50px;
-        }
-    </style>
-    <script type="module">
-      import "../component/DeViewport/index.js";
+          platforms = this.physics.add.staticGroup();
 
-      const house = new Path2D();
-      house.moveTo(0, 100);
-      house.lineTo(50, -50);
-      house.lineTo(-50, -50);
-      house.closePath();
+          platforms.create(400, 568, 'ground').setScale(2).refreshBody();
 
-      const objs =
-      [
+          platforms.create(600, 400, 'ground');
+          platforms.create(50, 250, 'ground');
+          platforms.create(750, 220, 'ground');
+        }
+
+        update()
         {
-          id: "player",
-          pos: {x: 0, y: 0},
-          scale: {x: 1, y: 1},
-          angle: 0,
-          path: house,
-          Render(ctx)
-          {
-            ctx.fillStyle = "#00f";
-            ctx.fill(house);
-          }
+          
+        }
+      }
+
+      const config = 
+      {
+        type: Phaser.AUTO,
+        width: 800,
+        height: 600,
+        physics: {
+            default: 'arcade',
+            arcade: {
+                gravity: { y: 300 },
+                debug: false
+            }
         },
-      ];
+        scene: Example,
+      };
 
-      Main();
-      function Main()
-      {
-        if (window.DeviceOrientationEvent)
-        {
-          // window.addEventListener('deviceorientation', On_Change_Tilt);
-        }
-
-        view_elem.origin.strokeStyle = "#0f0";
-        view_elem.canvas.style.backgroundColor = "#000";
-        view_elem.drawables = objs;
-
-        left_btn.addEventListener('click', On_Left_Click);
-        right_btn.addEventListener('click', On_Right_Click);
-      }
-
-      function On_Left_Click()
-      {
-        view_elem.camera.angle += 1;
-        view_elem.Render_Update();
-      }
-
-      function On_Right_Click()
-      {
-      }
-      
-      function On_Change_Tilt(event)
-      {
-        const orientation_values = {
-          alpha: event.alpha, // Rotation around Z-axis (compass heading, 0-360 degrees)
-          beta: event.beta,   // Rotation around X-axis (front-to-back tilt, -180 to 180 degrees)
-          gamma: event.gamma, // Rotation around Y-axis (side-to-side tilt, -90 to 90 degrees)
-          absolute: event.absolute
-        };
-
-        //console.log('Alpha (Z-axis): ' + orientation_values.alpha);
-        //console.log('Beta (X-axis - front/back): ' + orientation_values.beta);
-        //console.log('Gamma (Y-axis - left/right): ' + orientation_values.gamma);
-        //console.log('Absolute: ' + orientation_values.absolute);
-
-        alpha_element.textContent = orientation_values.alpha !== null ? orientation_values.alpha.toFixed(2) : 'N/A';
-        beta_element.textContent = orientation_values.beta !== null ? orientation_values.beta.toFixed(2) : 'N/A';
-        gamma_element.textContent = orientation_values.gamma !== null ? orientation_values.gamma.toFixed(2) : 'N/A';
-      }
+      const game = new Phaser.Game(config);
     </script>
   </head>
 
   <body>
-    <de-viewport id="view_elem"></de-viewport>
-    <button id="left_btn">&lt;</button>
-    <button id="right_btn">&gt;</button>
   </body>
 
 </html>
