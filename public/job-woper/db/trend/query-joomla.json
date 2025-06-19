@@ -82,5 +82,29 @@
     "datetime": 1748943426273,
     "id": "1c3ff4ce-77b8-4606-9c11-0ddae0b5f636",
     "query_id": "-joomla"
+  },
+  {
+    "count": 106,
+    "datetime": 1749192095229,
+    "id": "1ef27ca3-1915-42e2-a3cf-6b2fa1d90a07",
+    "query_id": "-joomla"
+  },
+  {
+    "count": 106,
+    "datetime": 1749358329641,
+    "id": "dd65b464-d5a9-42cd-9e0c-55e478c37582",
+    "query_id": "-joomla"
+  },
+  {
+    "count": 108,
+    "datetime": 1749601932956,
+    "id": "37914dee-7a52-4e9d-b7d2-77f3e6c8147e",
+    "query_id": "-joomla"
+  },
+  {
+    "count": 108,
+    "datetime": 1750290344984,
+    "id": "52fa1227-defa-4adf-8621-5928bb8aaca5",
+    "query_id": "-joomla"
   }
 ]
