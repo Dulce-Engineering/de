@@ -57,7 +57,7 @@ async function Query_Get_Trend_Count2(query, page)
     //await page.pause();
     //const count_elem = await page.$('[data-automation="totalJobsCount"]');
     //const app_elem = await page.locator('#app');
-    const count_elem = await page.locator("[data-automation='totalJobsCount']");
+    const count_elem = await page.locator("[data-automation='totalJobsCountBcues']");
     if (count_elem) 
     {
       const count_str = await count_elem.textContent();

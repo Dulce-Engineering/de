@@ -1515,8 +1515,13 @@ class Utils
 
     if (!Utils.isEmpty(str_value))
     {
-      str_value = str_value.replace(",", "");
-      res = parseInt(str_value);
+      const s = String(str_value).trim();
+      const sign = s.startsWith('-') ? '-' : '';
+      const digits = s.replace(/\D/g, '');
+      if (digits)
+      {
+        res = parseInt(sign + digits, 10);
+      }
     }
 
     return res;
