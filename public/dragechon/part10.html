@@ -6,11 +6,20 @@
     <title>Dragechon</title>
     <script src="//cdn.jsdelivr.net/npm/phaser@3.88.2/dist/phaser.js"></script>
     <style type="text/css">
+        html
+        {
+          width: 100vw;
+          height: 100vh;
+        }
         body 
         {
-            margin: 0;
-            padding: 0;
-            font-size: 0;
+          width: 100vw;
+          height: 100vh;
+          margin: 0;
+          padding: 0;
+          font-size: 0;
+          background-color: #888;
+          overflow: hidden;
         }
         canvas
         {
@@ -39,10 +48,11 @@
         },
         scale:
         {
-          width: window.innerWidth,
-          height: window.innerHeight,
-          xmode: Phaser.Scale.FIT,
-          xautoCenter: Phaser.Scale.CENTER_BOTH
+          xwidth: 1000,
+          xheight: 1000,
+          mode: Phaser.Scale.ENVELOP,
+          //mode: Phaser.Scale.FIT,
+          autoCenter: Phaser.Scale.CENTER_BOTH
         }
       };
 
@@ -102,26 +112,23 @@
 
         const star_settings = 
         {
-          key: 'star', repeat: 10, active: true, visible: true, collideWorldBounds: true
+          key: 'star', repeat: 50, active: true, visible: true, 
+          collideWorldBounds: true
         }
         stars = this.physics.add.group(star_settings);
-        const radius = 200;
-        const starChildren = stars.getChildren();
-        const angleStep = (2 * Math.PI) / starChildren.length;
-        for (let i = 0; i < starChildren.length; i++)
-        {
-          const star = starChildren[i];
 
-          const angle = i * angleStep;
-          const x = start_pos.x + radius * Math.cos(angle);
-          const y = start_pos.y + radius * Math.sin(angle);
-          star.setPosition(x, y);
+        // Place stars randomly within the world bounds
+        Phaser.Actions.RandomRectangle(stars.getChildren(), new Phaser.Geom.Rectangle(0, 0, config.width, config.height));
+
+        stars.children.iterate(function (star)
+        {
           star.setBounce(1);
 
-          const velocityRotation = 
-            Phaser.Math.Angle.Between(start_pos.x, start_pos.y, star.x, star.y);
-          this.physics.velocityFromRotation(velocityRotation, 100, star.body.velocity);
-        }
+          // Give each star a random initial velocity
+          const initialSpeed = Phaser.Math.Between(50, 150);
+          const initialAngle = Phaser.Math.FloatBetween(0, 2 * Math.PI);
+          this.physics.velocityFromRotation(initialAngle, initialSpeed, star.body.velocity);
+        }, this);
 
         bombs = this.physics.add.group();
 
@@ -134,7 +141,7 @@
         var camera = this.cameras.main;
         //camera.setSize(window.innerWidth, window.innerHeight);
         //camera.setViewport(0, 0, window.innerWidth, window.innerHeight);
-        camera.setZoom(3);
+        //camera.setZoom(2);
         camera.startFollow(player);
 
         if (window.DeviceOrientationEvent) 
@@ -153,18 +160,50 @@
 
       function On_Update ()
       {
-          if (gameOver)
+        if (gameOver)
+        {
+          return;
+        }
+
+        // turn player towards tilt
+        player.angle += deviceOrientationGamma/2;
+
+        const speed = 100;
+        const direction = player.rotation - Math.PI / 2;
+        this.physics.velocityFromRotation(direction, speed, player.body.velocity);
+
+        this.cameras.main.rotation = -player.rotation;
+
+        const MAX_SPEED = 150;
+        const STEERING_FORCE = 0.05; // A small value (0 to 1) for gentle steering (lerp factor)
+        const COHESION_WEIGHT = 1.1;   // How strongly stars are attracted to the center of their neighbors
+        const ALIGNMENT_WEIGHT = 1.2;  // How strongly stars try to match the average velocity
+        const SEPARATION_WEIGHT = 1.2; // How strongly stars try to avoid crowding. Usually the highest weight.
+        const FLEE_WEIGHT = 1.0;       // How strongly stars flee from the player.
+        const PLAYER_FLEE_RADIUS = 100;
+        stars.getChildren().forEach(star => 
+        {
+          const neighbours = Get_Stars_In_Radius(star, 100);
+          let desiredDirection = new Phaser.Math.Vector2(0, 0);
+
+          const cohesion = Calculate_Cohesion_Vector(star, neighbours);
+          desiredDirection.add(cohesion.normalize().scale(COHESION_WEIGHT));
+
+          const alignment = Calculate_Alignment_Vector(neighbours);
+          desiredDirection.add(alignment.normalize().scale(ALIGNMENT_WEIGHT));
+
+          const separation = Calculate_Separation_Vector(star, neighbours);
+          desiredDirection.add(separation.normalize().scale(SEPARATION_WEIGHT));
+
+          const flee = Calculate_Flee_Vector_From_Player(star, player, PLAYER_FLEE_RADIUS);
+          desiredDirection.add(flee.normalize().scale(FLEE_WEIGHT));
+
+          if (desiredDirection.length() > 0)
           {
-              return;
+            const desiredVelocity = desiredDirection.normalize().scale(MAX_SPEED);
+            star.body.velocity.lerp(desiredVelocity, STEERING_FORCE);
           }
-
-          player.angle += deviceOrientationGamma/2;
-
-          const speed = 100;
-          const direction = player.rotation - Math.PI / 2;
-          this.physics.velocityFromRotation(direction, speed, player.body.velocity);
-
-          this.cameras.main.rotation = -player.rotation;
+        });
       }
 
       function On_Overlap_Star (player, star)
@@ -201,6 +240,128 @@
           player.anims.play('turn');
 
           gameOver = true;
+      }
+
+      function Get_Stars_In_Radius(centerStar, radius)
+      {
+        const nearbyStars = [];
+        stars.getChildren().forEach(star => 
+        {
+          if (star !== centerStar) 
+          {
+            const distance = Phaser.Math.Distance.Between
+              (centerStar.x, centerStar.y, star.x, star.y);
+            if (distance <= radius) 
+            {
+              nearbyStars.push(star);
+            }
+          }
+        });
+        return nearbyStars;
+      }
+
+      /**
+       * Calculates a vector pointing towards the average position of a group of neighbors.
+       * This is the "cohesion" component of a flocking algorithm.
+       * @param {Phaser.Physics.Arcade.Sprite} star The star to calculate the vector for.
+       * @param {Phaser.Physics.Arcade.Sprite[]} neighbours An array of neighboring stars.
+       * @returns {Phaser.Math.Vector2} A vector representing the direction towards the center of the neighbors.
+       */
+      function Calculate_Cohesion_Vector(star, neighbours)
+      {
+        if (neighbours.length === 0) {
+          return new Phaser.Math.Vector2(0, 0); // Return a zero vector if no neighbors
+        }
+
+        // Calculate the average position (center of mass) of the neighbors
+        let averageX = 0;
+        let averageY = 0;
+        neighbours.forEach(n => {
+          averageX += n.x;
+          averageY += n.y;
+        });
+        averageX /= neighbours.length;
+        averageY /= neighbours.length;
+
+        // Create a vector pointing from the current star to the center of mass.
+        const cohesionVector = new Phaser.Math.Vector2(averageX - star.x, averageY - star.y);
+
+        return cohesionVector;
+      }
+
+      /**
+       * Calculates a vector representing the average heading of a group of neighbors.
+       * This is the "alignment" component of a flocking algorithm.
+       * @param {Phaser.Physics.Arcade.Sprite[]} neighbours An array of neighboring stars.
+       * @returns {Phaser.Math.Vector2} A vector representing the average velocity of the neighbors.
+       */
+      function Calculate_Alignment_Vector(neighbours)
+      {
+        if (neighbours.length === 0) 
+        {
+          return new Phaser.Math.Vector2(0, 0); // Return a zero vector if no neighbors
+        }
+
+        // Calculate the average velocity of the neighbors
+        const averageVector = new Phaser.Math.Vector2(0, 0);
+        neighbours.forEach(n => 
+        {
+          averageVector.add(n.body.velocity);
+        });
+
+        return averageVector.scale(1 / neighbours.length);
+      }
+
+      /**
+       * Calculates a repulsion vector to steer a star away from the player.
+       * The force is inversely proportional to the distance, meaning it's very strong
+       * when close and weak when far away.
+       * @param {Phaser.Physics.Arcade.Sprite} star The star to calculate the vector for.
+       * @param {Phaser.Physics.Arcade.Sprite} player The player object to flee from.
+       * @param {number} fleeRadius The radius within which the star will start fleeing.
+       * @returns {Phaser.Math.Vector2} A vector representing the repulsion force from the player.
+       */
+      function Calculate_Flee_Vector_From_Player(star, player, fleeRadius)
+      {
+        const fleeVector = new Phaser.Math.Vector2(0, 0);
+        const distance = Phaser.Math.Distance.Between(star.x, star.y, player.x, player.y);
+
+        if (distance > 0 && distance < fleeRadius) {
+          // Calculate a vector pointing away from the player.
+          const repulsionForce = new Phaser.Math.Vector2(star.x - player.x, star.y - player.y);
+          // The force is inversely proportional to the distance. Closer player pushes harder.
+          fleeVector.add(repulsionForce.normalize().scale(1 / distance));
+        }
+
+        return fleeVector;
+      }
+
+      /**
+       * Calculates a vector to steer away from crowded neighbors.
+       * This is the "separation" component of a flocking algorithm.
+       * @param {Phaser.Physics.Arcade.Sprite} star The star to calculate the vector for.
+       * @param {Phaser.Physics.Arcade.Sprite[]} neighbours An array of neighboring stars.
+       * @returns {Phaser.Math.Vector2} A vector representing the direction to steer to avoid crowding.
+       */
+      function Calculate_Separation_Vector(star, neighbours)
+      {
+        const separationVector = new Phaser.Math.Vector2(0, 0);
+        if (neighbours.length === 0) {
+          return separationVector;
+        }
+
+        neighbours.forEach(n => {
+          const distance = Phaser.Math.Distance.Between(star.x, star.y, n.x, n.y);
+          
+          if (distance > 0) {
+            // Calculate a vector pointing away from the neighbor.
+            const repulsionForce = new Phaser.Math.Vector2(star.x - n.x, star.y - n.y);
+            // The force is inversely proportional to the distance. Closer neighbors push harder.
+            separationVector.add(repulsionForce.normalize().scale(1 / distance));
+          }
+        });
+
+        return separationVector;
       }
     </script>
   </head>
