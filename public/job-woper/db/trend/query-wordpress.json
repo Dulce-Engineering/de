@@ -106,5 +106,11 @@
     "datetime": 1750290490871,
     "id": "d832dad9-1018-46e2-bf95-630568041336",
     "query_id": "-wordpress"
+  },
+  {
+    "count": 207,
+    "datetime": 1750754730378,
+    "id": "25ddda71-3402-48a8-a2e5-90d112973a83",
+    "query_id": "-wordpress"
   }
 ]

@@ -106,5 +106,11 @@
     "datetime": 1750290218956,
     "id": "aa83e94b-3de8-4508-a760-270212609f31",
     "query_id": "-redis"
+  },
+  {
+    "count": 106,
+    "datetime": 1750754481856,
+    "id": "ab9cc0ff-1a99-4f68-bca2-2284c6086982",
+    "query_id": "-redis"
   }
 ]
