@@ -47,19 +47,11 @@ async function Query_Get_Trend_Count2(query, page)
     search_str + "-jobs-in-" +
     classification;
 
-  //const browser = await pw.chromium.launch({ headless: false }); 
-  //const page = await browser.newPage();
   try 
   {
-    //await page.goto(url, { waitUntil: 'domcontentloaded' }); 
     await page.goto(url); 
-    //await page.waitForTimeout(5000);
-    //await page.pause();
-    //const app_elem = await page.locator('#app');
 
-    let count_elem = null;
-    count_elem = await page.locator('[data-automation="totalJobsCount"]');
-    if (!count_elem) count_elem = await page.locator("[data-automation='totalJobsCountBcues']");
+    const count_elem = await Find_Job_Count_Elem(page);
     if (count_elem) 
     {
       const count_str = await count_elem.textContent();
@@ -74,12 +66,21 @@ async function Query_Get_Trend_Count2(query, page)
   {
     console.error(error);
   } 
-  /*finally 
-  {
-    await browser.close();
-  }*/
 
   return count;
+}
+
+async function Find_Job_Count_Elem(page)
+{
+  let count_elem = page.locator('[data-automation="totalJobsCount"]');
+  if (await count_elem.count() == 0) 
+    count_elem = page.locator("[data-automation='totalJobsCountBcues']");
+  if (await count_elem.count() == 0) 
+    count_elem = page.locator("[data-automation='totalJobsMessage']:first-child");
+  if (await count_elem.count() == 0) 
+    count_elem = null;
+  
+  return count_elem;
 }
 
 function Wait(milliseconds) 

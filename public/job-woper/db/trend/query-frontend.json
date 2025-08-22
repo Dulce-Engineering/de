@@ -52,5 +52,11 @@
     "datetime": 1750755258405,
     "id": "b082f368-fe37-4e70-8b1f-edfed951b3d1",
     "query_id": "-frontend"
+  },
+  {
+    "count": 691,
+    "datetime": 1755843483736,
+    "id": "17a9a98b-bfd4-4a50-aea9-96f5c0e3f937",
+    "query_id": "-frontend"
   }
 ]
