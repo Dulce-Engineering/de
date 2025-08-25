@@ -124,5 +124,11 @@
     "datetime": 1755842303714,
     "id": "7e12c235-de15-4a90-9955-a800ebd85dda",
     "query_id": "-kafka"
+  },
+  {
+    "count": 377,
+    "datetime": 1756086194948,
+    "id": "cec41c3f-a4f4-4c8a-b85f-64487888d01f",
+    "query_id": "-kafka"
   }
 ]
