@@ -138,6 +138,9 @@
       {
         color: var(--orange);
         font-size: 1.5rem;
+        display: flex;
+        gap: 4px;
+        align-items: center;
       }
       dialog footer
       {
@@ -635,6 +638,7 @@
     <script type="module">
       import DE from "/dedial/dedial.js";
       import "/component/DeInputPeriod/index.js";
+      import "/component/DeInputRepeat/index.js";
 
       Main();
       async function Main()
@@ -648,6 +652,7 @@
         del_all_btn.addEventListener("click", On_Click_Del_All);
         ok_btn.addEventListener("click", On_Click_Ok);
         sound_btn.addEventListener("click", On_Click_Sound);
+        timer_date.addEventListener("change", On_Date_Change);
 
         Render_Timers();
         Update_Nav();
@@ -786,6 +791,11 @@
         const elems = e.composedPath();
         const counter_elem = elems.find(elem => elem.classList.contains("counter"));
         timer_elem.On_Dial_Completed(counter_elem);
+      }
+
+      function On_Date_Change(e)
+      {
+        timer_repeat.date = timer_date.value;
       }
 
       // rendering ================================================================================
@@ -1002,7 +1012,8 @@
         const res =
         {
           title: timer_title.value,
-          time
+          time,
+          recurrence: timer_repeat.value
         };
 
         return res;
@@ -1131,6 +1142,7 @@
         </header>
 
         <main>
+          <!-- title -->
           <div class="field">
             <label>
               <button class="info" popovertarget="title_info" type="button">i</button>
@@ -1139,6 +1151,7 @@
             </label>
             <input id="timer_title" type="text">
           </div>
+          <!-- date -->
           <div class="field">
             <label>
               <button class="info" popovertarget="date_info" type="button">i</button>
@@ -1147,6 +1160,7 @@
             </label>
             <input id="timer_date" type="date">
           </div>
+          <!-- time -->
           <div class="field">
             <label>
               <button class="info" popovertarget="time_info" type="button">i</button>
@@ -1155,6 +1169,7 @@
             </label>
             <input id="timer_time" type="time">
           </div>
+          <!-- period -->
           <div class="field">
             <label>
               <button class="info" popovertarget="period_info" type="button">i</button>
@@ -1164,8 +1179,16 @@
               </div>
               Period
             </label>
-            <input id="xtimer_millis" type="number" hidden>
             <de-input-period id="timer_millis"></de-input-period>
+          </div>
+          <!-- repeat -->
+          <div class="field">
+            <label>
+              <button class="info" popovertarget="repeaat_info" type="button">i</button>
+              <div popover id="repeaat_info">to do</div>
+              Recurrence
+            </label>
+            <de-input-repeat id="timer_repeat"></de-input-repeat>
           </div>
         </main>
 
