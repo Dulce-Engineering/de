@@ -130,5 +130,11 @@
     "datetime": 1756085073446,
     "id": "4c5774ac-c8db-47ca-9405-54a2cd7477a9",
     "query_id": "-svelte"
+  },
+  {
+    "count": 6,
+    "datetime": 1756446299643,
+    "id": "f42d509f-fffd-46b4-9c8f-364bd22ce73e",
+    "query_id": "-svelte"
   }
 ]
