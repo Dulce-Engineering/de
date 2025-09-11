@@ -478,11 +478,6 @@ class Utils
     return api.default;
   }
 
-  static Is_Empty(items)
-  {
-    return Utils.isEmpty(items);
-  }
-
   static isEmpty(items)
   {
     let res = false;

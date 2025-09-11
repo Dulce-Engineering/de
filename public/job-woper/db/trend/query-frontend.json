@@ -70,5 +70,11 @@
     "datetime": 1756448613597,
     "id": "8b188104-9fa0-40cc-94b4-7565c558cd2a",
     "query_id": "-frontend"
+  },
+  {
+    "count": 722,
+    "datetime": 1757578227747,
+    "id": "5ad7a571-b776-4952-8f29-4f37d5a43b2e",
+    "query_id": "-frontend"
   }
 ]
