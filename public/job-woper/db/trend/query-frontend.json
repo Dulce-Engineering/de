@@ -76,5 +76,11 @@
     "datetime": 1757578227747,
     "id": "5ad7a571-b776-4952-8f29-4f37d5a43b2e",
     "query_id": "-frontend"
+  },
+  {
+    "count": 659,
+    "datetime": 1757901195409,
+    "id": "e254a558-847d-4951-8b6b-adc55f97400a",
+    "query_id": "-frontend"
   }
 ]
