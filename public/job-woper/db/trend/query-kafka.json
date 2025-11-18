@@ -154,5 +154,11 @@
     "datetime": 1758587049655,
     "id": "2b87e9ee-d42d-4991-b7fa-560e70532e22",
     "query_id": "-kafka"
+  },
+  {
+    "count": 437,
+    "datetime": 1759466806624,
+    "id": "a79a82dc-8c3a-4c1c-a685-73c2c490d7a5",
+    "query_id": "-kafka"
   }
 ]
