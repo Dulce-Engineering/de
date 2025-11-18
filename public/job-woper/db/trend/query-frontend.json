@@ -94,5 +94,11 @@
     "datetime": 1759467994907,
     "id": "109ab55b-eba0-403d-8580-112a7d9f1b54",
     "query_id": "-frontend"
+  },
+  {
+    "count": 739,
+    "datetime": 1763509880123,
+    "id": "463335a8-aca1-47ce-8b2f-c1710a5364fa",
+    "query_id": "-frontend"
   }
 ]
