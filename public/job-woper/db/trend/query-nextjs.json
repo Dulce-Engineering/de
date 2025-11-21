@@ -166,5 +166,11 @@
     "datetime": 1763509005261,
     "id": "3d2c2192-dd2d-4557-8d2c-c3f9f826782a",
     "query_id": "-nextjs"
+  },
+  {
+    "count": 120,
+    "datetime": 1763694530642,
+    "id": "3a44e5f9-b392-4f20-a006-3c74654c7386",
+    "query_id": "-nextjs"
   }
 ]
