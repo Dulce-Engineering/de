@@ -172,5 +172,11 @@
     "datetime": 1763694718705,
     "id": "b0c7ad24-1adb-483a-89f4-8d7955fa4d8d",
     "query_id": "-woocommerce"
+  },
+  {
+    "count": 31,
+    "datetime": 1764200727863,
+    "id": "f7d7fd0d-fcb4-44b3-b069-46d8c8efc1f2",
+    "query_id": "-woocommerce"
   }
 ]
