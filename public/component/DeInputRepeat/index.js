@@ -55,7 +55,7 @@ class DeInputRepeat extends HTMLElement
 
     const res =
     {
-      rate: this.repeat_every.value,
+      rate: parseInt(this.repeat_every.value),
       scale: this.repeat_scale.value,
       weekdays,
       month,
@@ -73,8 +73,8 @@ class DeInputRepeat extends HTMLElement
   
   On_Repeat_Scale_Change()
   {
-    this.repeat_weekdays.hidden = this.repeat_scale.value != "SCALE_WEEK";
-    this.repeat_month.hidden = this.repeat_scale.value != "SCALE_MONTH";
+    //this.repeat_weekdays.hidden = this.repeat_scale.value != "SCALE_WEEK";
+    //this.repeat_month.hidden = this.repeat_scale.value != "SCALE_MONTH";
   }
 
   On_Reset()
@@ -129,7 +129,7 @@ class DeInputRepeat extends HTMLElement
     const html = `
       <div>
         <label><slot name="header"></slot>Repeat every</label>
-        <input cid="repeat_every" type="number" value="1">
+        <input cid="repeat_every" type="number" value="0">
         <select cid="repeat_scale">
           <option value="SCALE_DAY">days</option>
           <option value="SCALE_WEEK">weeks</option>

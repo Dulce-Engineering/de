@@ -111,7 +111,6 @@
           display: flex;
           flex-direction: column;
           gap: 20px;
-          padding: 6%;
         }
         main
         {
@@ -608,6 +607,16 @@
         }
       }
 
+      @media screen and (min-width: 768px)
+      {
+        dialog, .dialog
+        {
+          form
+          {
+            padding: 6%;
+          }
+        }
+      }
       @media screen and (max-width: 768px)
       {
         html
@@ -625,7 +634,7 @@
         }
         input
         {
-          font-size: 1.5rem;
+          font-size: 1.2rem;
         }
         button
         {
@@ -691,9 +700,25 @@
     </script>
   
     <script type="module">
-      import DE from "/dedial/dedial.js";
-      import "/component/DeInputPeriod/index.js";
-      import "/component/DeInputRepeat/index.js";
+      import DE from "/dedial/dedial.js?v=3";
+      import "/component/DeInputPeriod/index.js?v=3";
+      import "/component/DeInputRepeat/index.js?v=3";
+
+      /**
+       * @typedef {object} Repeat
+       * @property {number} rate - The frequency of the recurrence (e.g., 1 for every, 2 for every other).
+       * @property {'SCALE_DAY'|'SCALE_WEEK'|'SCALE_MONTH'|'SCALE_YEAR'} scale - The time unit for the recurrence.
+       * @property {string} [weekdays] - A comma-separated list of weekdays for weekly recurrence (e.g., 'WEEKDAYS_MONDAY,WEEKDAYS_TUESDAY').
+       * @property {'MONTH_DAY'|'MONTH_WEEK'} month - MONTH_DAY indicates that the event should recur on the same day of the month. MONTH_WEEK indicates that the event should recur on the same day and week of the month.
+       */
+
+      /**
+       * @typedef {object} Timer
+       * @property {number} id - The unique identifier for the timer (timestamp).
+       * @property {string} title - The optional title of the timer.
+       * @property {number} time - The target time in milliseconds since the epoch.
+       * @property {Repeat} recurrence - Optional recurrence rules for the timer.
+       */
 
       Main();
       async function Main()
@@ -712,6 +737,7 @@
         save_btn.addEventListener("click", On_Click_Save);
         load_btn.addEventListener("click", On_Click_Load);
 
+        Increment_Timers();
         Render_Timers();
         Update_Nav();
         
@@ -748,7 +774,7 @@
       function On_Click_Load()
       {
         menu_panel.hidePopover();
-        
+
         const input = document.createElement("input");
         input.type = "file";
         input.accept = ".json,.tt,application/json";
@@ -778,7 +804,7 @@
       function On_Click_Save()
       {
         const json_str = localStorage.getItem("tempustoi");
-        if (!json_str)
+        if (json_str)
         {
           const blob = new Blob([json_str], { type: "application/json" });
           const url = URL.createObjectURL(blob);
@@ -853,9 +879,21 @@
       function On_Timer_Completed(e)
       {
         const timer_elem = e.target;
-        Update_Alarm(timer_elem.timer.id, true);
+        const timer = timer_elem.timer;
+        if (timer.recurrence.rate > 0)
+        {
+          Increment_Timer(timer);
+          Save_Timer(timer);
+        }
 
-        alarm.play();
+        Alarm_On(timer.id);
+        setTimeout(On_Timeout, 30000);
+
+        function On_Timeout()
+        {
+          Alarm_Off(timer.id);
+          Render_Timer(timer);
+        }
       }
 
       function On_Click_Quiet(e) 
@@ -910,7 +948,7 @@
 
       // rendering ================================================================================
 
-      function Set_Animations()
+      function Set_Animations(panel_elem)
       {
         let show_animations = true;
         const show_animations_str = localStorage.getItem("tempustoi-show-anim");
@@ -920,26 +958,17 @@
         }
         if (show_animations)
         {
-          let dials = document.querySelectorAll(".seconds");
-          for (let dial of dials)
-          {
-            dial.classList.add("anim-seconds");
-          }
-          dials = document.querySelectorAll(".minutes");
-          for (let dial of dials)
-          {
-            dial.classList.add("anim-minutes");
-          }
-          dials = document.querySelectorAll(".hours");
-          for (let dial of dials)
-          {
-            dial.classList.add("anim-hours");
-          }
-          dials = document.querySelectorAll(".days");
-          for (let dial of dials)
-          {
-            dial.classList.add("anim-days");
-          }
+          let dial = panel_elem.querySelector(".seconds");
+          dial.classList.add("anim-seconds");
+
+          dial = panel_elem.querySelector(".minutes");
+          dial.classList.add("anim-minutes");
+
+          dial = panel_elem.querySelector(".hours");
+          dial.classList.add("anim-hours");
+
+          dial = panel_elem.querySelector(".days");
+          dial.classList.add("anim-days");
         }
       }
 
@@ -955,13 +984,16 @@
             const id = parseInt(timer.id.slice(6));
             timer.id = id;
           }
-          Render_Timer(timer)
-        }
 
-        Set_Animations();
+          const panel_elem = document.createElement("div");
+          panel_elem.id = "panel_" + timer.id;
+          panel_elem.classList.add("timer-panel");
+          timers_elem.append(panel_elem);
+          Render_Timer(timer);
+        }
       }
 
-      function Render_Title(timer)
+      function Render_Timer_Title(timer)
       {
         let date_str = "";
         if (timer.time)
@@ -998,28 +1030,28 @@
 
       function Render_Timer(timer)
       {
-        const title_html = Render_Title(timer);
+        const title_html = Render_Timer_Title(timer);
         const timer_elem_id = "timer_" + timer.id;
         const del_btn_id = "del_btn_" + timer.id;
         const stop_btn_id = "stop_btn_" + timer.id;
         const quiet_btn_id = "quiet_btn_" + timer.id;
         const panel_id = "panel_" + timer.id;
+
         const html = `
-          <div id="${panel_id}" class="timer-panel">
-            <header class="timer">
-              ${title_html}
-              <button id="${quiet_btn_id}" hidden>Silence!</button>
-              <button id="${stop_btn_id}" class="stop-btn img">
-                <img src="../images/pause.svg" alt="Pause">
-              </button>
-              <button id="${del_btn_id}" class="del-btn img">
-                <img src="../images/bin.svg" alt="Delete">
-              </button>
-            </header>
-            <de-timer id="${timer_elem_id}" show-labels></de-timer>
-          </div>
+          <header class="timer">
+            ${title_html}
+            <button id="${quiet_btn_id}" hidden>Silence!</button>
+            <button id="${stop_btn_id}" class="stop-btn img">
+              <img src="../images/pause.svg" alt="Pause">
+            </button>
+            <button id="${del_btn_id}" class="del-btn img">
+              <img src="../images/bin.svg" alt="Delete">
+            </button>
+          </header>
+          <de-timer id="${timer_elem_id}" show-labels></de-timer>
         `;
-        timers_elem.insertAdjacentHTML("beforeend", html);
+        const panel_elem = document.getElementById(panel_id);
+        panel_elem.innerHTML = html;
 
         const timer_elem = document.getElementById(timer_elem_id);
         timer_elem.timer = timer;
@@ -1040,6 +1072,8 @@
         const del_btn_elem = document.getElementById(del_btn_id);
         del_btn_elem.timer = timer;
         del_btn_elem.addEventListener("click", On_Click_Delete);
+
+        Set_Animations(panel_elem);
       }
 
       function Update_Nav()
@@ -1068,23 +1102,30 @@
         }
       }
 
-      function Update_Alarm(timer_id, is_on)
+      function Alarm_On(timer_id)
       {
+        alarm.play();
+
         const quiet_btn_elem = document.getElementById("quiet_btn_" + timer_id);
         const panel_elem = document.getElementById("panel_" + timer_id);
         if (quiet_btn_elem && panel_elem)
         {
-          if (is_on)
-          {
-            setTimeout(() => Update_Alarm(timer_id, false), 30000);
-            quiet_btn_elem.hidden = false;
-            panel_elem.classList.add("alarm");
-          }
-          else
-          {
-            quiet_btn_elem.hidden = true;
-            panel_elem.classList.remove("alarm");
-          }
+          quiet_btn_elem.hidden = false;
+          panel_elem.classList.add("alarm");
+        }
+      }
+
+      function Alarm_Off(timer_id)
+      {
+        alarm.pause();
+        alarm.currentTime = 0;
+
+        const quiet_btn_elem = document.getElementById("quiet_btn_" + timer_id);
+        const panel_elem = document.getElementById("panel_" + timer_id);
+        if (quiet_btn_elem && panel_elem)
+        {
+          quiet_btn_elem.hidden = true;
+          panel_elem.classList.remove("alarm");
         }
       }
 
@@ -1145,12 +1186,17 @@
         return timers;
       }
 
+      function Save_Timers(timers)
+      {
+        localStorage.setItem("tempustoi", JSON.stringify(timers));
+      }
+
       function Save_Timer(timer)
       {
         let timers = Select_Timers() || [];
         timers = timers.filter(t => t.id != timer.id);
         timers.push(timer);
-        localStorage.setItem("tempustoi", JSON.stringify(timers));
+        Save_Timers(timers);
       }
 
       function Delete_Timers()
@@ -1175,6 +1221,60 @@
         }
       }
 
+      function Increment_Timers()
+      {
+        let is_incremented = false;
+        let timers = Select_Timers() || [];
+        for (const timer of timers)
+        {
+          is_incremented = is_incremented || Increment_Timer(timer);
+        }
+
+        if (is_incremented)
+        {
+          Save_Timers(timers);
+        }
+      }
+
+      function Increment_Timer(timer)
+      {
+        let res = false;
+
+        if (timer?.recurrence?.rate > 0)
+        {
+          let next_time = new Date(timer.time);
+
+          // Always increment to a future time
+          while (next_time.getTime() <= Date.now()) 
+          {
+            switch (timer.recurrence.scale) 
+            {
+              case 'SCALE_DAY':
+                next_time.setDate(next_time.getDate() + timer.recurrence.rate);
+                res = true;
+                break;
+              case 'SCALE_WEEK':
+                next_time.setDate(next_time.getDate() + (timer.recurrence.rate * 7));
+                // todo: include days of week
+                res = true;
+                break;
+              case 'SCALE_MONTH':
+                next_time.setMonth(next_time.getMonth() + timer.recurrence.rate);
+                // todo: include day of week eg fourth thursday of month
+                res = true;
+                break;
+              case 'SCALE_YEAR':
+                next_time.setFullYear(next_time.getFullYear() + timer.recurrence.rate);
+                res = true;
+                break;
+            }
+          }
+
+          timer.time = next_time.getTime();
+        }
+
+        return res;
+      }
     </script>
 
     <script src="https://vemtoutcheeg.com/400/8903613" defer></script>
@@ -1345,7 +1445,7 @@
     </audio>
   
     <footer>
-      © Copyright Dulce Engineering 2025. All rights reserved. v3
+      © Copyright Dulce Engineering 2025. All rights reserved. v=3
     </footer>
   </body>
 
