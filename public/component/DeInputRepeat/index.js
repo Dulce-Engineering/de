@@ -31,7 +31,7 @@ class DeInputRepeat extends HTMLElement
 
   set date(value)
   {
-    this.start_date = value;
+    this.start_date = value || Date.now();
     this.Update_Month();
   }
 
@@ -126,9 +126,9 @@ class DeInputRepeat extends HTMLElement
 
   Render()
   {
-    this.innerHTML = `
+    const html = `
       <div>
-        <label>Repeat every</label>
+        <label><slot name="header"></slot>Repeat every</label>
         <input cid="repeat_every" type="number" value="1">
         <select cid="repeat_scale">
           <option value="SCALE_DAY">days</option>
@@ -140,13 +140,34 @@ class DeInputRepeat extends HTMLElement
 
       <div cid="repeat_weekdays" hidden>
         <label>Repeat on</label>
-        <input cid="monday" value="WEEKDAYS_MONDAY" type="checkbox">
-        <input cid="tuesday" value="WEEKDAYS_TUESDAY" type="checkbox">
-        <input cid="wednesday" value="WEEKDAYS_WEDNESDAY" type="checkbox">
-        <input cid="thursday" value="WEEKDAYS_THURSDAY" type="checkbox">
-        <input cid="friday" value="WEEKDAYS_FRIDAY" type="checkbox">
-        <input cid="saturday" value="WEEKDAYS_SATURDAY" type="checkbox">
-        <input cid="sunday" value="WEEKDAYS_SUNDAY" type="checkbox">
+        <label class="day">
+          Monday
+          <input cid="monday" value="WEEKDAYS_MONDAY" type="checkbox">
+        </label>
+        <label class="day">
+          Tuesday
+          <input cid="tuesday" value="WEEKDAYS_TUESDAY" type="checkbox">
+        </label>
+        <label class="day">
+          Wednesday
+          <input cid="wednesday" value="WEEKDAYS_WEDNESDAY" type="checkbox">
+        </label>
+        <label class="day">
+          Thursday
+          <input cid="thursday" value="WEEKDAYS_THURSDAY" type="checkbox">
+        </label>
+        <label class="day">
+          Friday
+          <input cid="friday" value="WEEKDAYS_FRIDAY" type="checkbox">
+        </label>
+        <label class="day">
+          Saturday
+          <input cid="saturday" value="WEEKDAYS_SATURDAY" type="checkbox">
+        </label>
+        <label class="day">
+          Sunday
+          <input cid="sunday" value="WEEKDAYS_SUNDAY" type="checkbox">
+        </label>
       </div>
 
       <select cid="repeat_month" hidden>
@@ -160,6 +181,8 @@ class DeInputRepeat extends HTMLElement
         </option>
       </select>
     `;
+    const elems = Utils.toDocument(html, this);
+    this.replaceChildren(elems);
     Utils.Set_Id_Shortcuts(this, this, "cid");
 
     this.repeat_scale.addEventListener("change", this.On_Repeat_Scale_Change);

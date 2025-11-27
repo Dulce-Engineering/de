@@ -46,14 +46,11 @@
         width: 100%;
         min-height: 100vh;
         font-size: 20px;
-      }
-      html, dialog
-      {
         background: 
           radial-gradient(circle farthest-corner at 50% 10%, var(--green) 10%, rgb(from var(--green) calc(r / 2) calc( g / 2) calc(b / 2))) no-repeat;
           /* rgb(from var(--green) calc(r / 2) calc( g / 2) calc(b / 2)); */
       }
-      html, body, input, button
+      html, body, input, button, select
       {
         font-family: "Roboto Slab", serif;
         font-optical-sizing: auto;
@@ -95,59 +92,94 @@
         text-align: center;
       }
 
-      dialog
+      dialog, .dialog
       {
         width: 60%;
+        background: 
+          radial-gradient(circle farthest-corner at 50% 10%, var(--green) 10%, rgb(from var(--green) calc(r / 2) calc( g / 2) calc(b / 2))) no-repeat;
+      
+        &[open]
+        {
+          transform-origin: 50% 0%;
+        }
+        &::backdrop
+        {
+          background: radial-gradient(circle farthest-corner at center, #000a, #0002);
+        }
+        form
+        {
+          display: flex;
+          flex-direction: column;
+          gap: 20px;
+          padding: 6%;
+        }
+        main
+        {
+          display: flex;
+          flex-direction: column;
+          gap: 32px;
+        }
+        .msg
+        {
+          text-align: center;
+        }
+        .field
+        {
+          display: flex;
+          flex-direction: column;
+          gap: 0px;
+          width: 100%;
+        }
+        label
+        {
+          color: var(--orange);
+          font-size: 1.5rem;
+          display: flex;
+          gap: 4px;
+          align-items: center;
+        }
+        footer
+        {
+          display: flex;
+          justify-content: center;
+          gap: 10px;
+          width: 100%;
+        }
+      }
+      dialog
+      {
         transition: display 1s allow-discrete;
         animation: fall 1s ease-out forwards;
+
+        &[open]
+        {
+          animation: swingIn 1.5s ease-out forwards;
+        }
       }
-      dialog[open]
+      #menu_panel
       {
-        transform-origin: 50% 0%;
-        animation: swingIn 1.5s ease-out forwards;
-      }
-      dialog::backdrop
-      {
-        background: radial-gradient(circle farthest-corner at center, #000a, #0002);
-      }
-      dialog form
-      {
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
-        padding: 6%;
-      }
-      dialog main
-      {
-        display: flex;
-        flex-direction: column;
-        gap: 32px;
-      }
-      dialog .msg
-      {
-        text-align: center;
-      }
-      dialog .field
-      {
-        display: flex;
-        flex-direction: column;
-        gap: 0px;
-        width: 100%;
-      }
-      dialog label
-      {
-        color: var(--orange);
-        font-size: 1.5rem;
-        display: flex;
-        gap: 4px;
-        align-items: center;
-      }
-      dialog footer
-      {
-        display: flex;
-        justify-content: center;
-        gap: 10px;
-        width: 100%;
+        width: fit-content;
+
+        form
+        {
+          align-items: center;
+          padding: 20px;
+
+          header
+          {
+            font-size: 3rem;
+            margin-bottom: -16px;
+          }
+          header svg
+          {
+            width: 100%;
+            text-shadow: -0.2vw 0.2vw 0 var(--orange);
+          }
+        }
+        button
+        {
+          width: 100%;
+        }
       }
 
       nav
@@ -237,7 +269,7 @@
         height: 24px;
         pointer-events: none;
       }
-      input
+      input, select
       {
         border: none;
         border-bottom: 1px solid var(--red);
@@ -251,6 +283,10 @@
       {
         border-bottom: 1px solid var(--white);
         outline: none;
+      }
+      select option
+      {
+        background-color: var(--green);
       }
       [popover]
       {
@@ -293,7 +329,7 @@
         margin: 0 0 20px 0;
         xdisplay: none;
       }
-      #about_info
+      #about_panel
       {
         text-align: justify;
         font-size: 1.4rem;
@@ -310,6 +346,18 @@
       .timer-panel:first-child
       {
         border-top: none;
+      }
+      input[cid=repeat_every]
+      {
+        width: 5ch;
+      }
+      #timer_date
+      {
+        width: 15ch;
+      }
+      #timer_time
+      {
+        width: 10ch;
       }
 
       de-clock
@@ -476,6 +524,12 @@
         width: 25%;
       }
 
+      input[type="date"]::-webkit-calendar-picker-indicator,
+      input[type="time"]::-webkit-calendar-picker-indicator 
+      {
+        filter: invert(1);
+      }
+
       @keyframes dedial-spin
       {
         from
@@ -606,7 +660,7 @@
           height: 48px;
         }
 
-        #about_info
+        #about_panel
         {
           padding: 20px;
           width: 80%;
@@ -624,6 +678,7 @@
       }
     </style>
 
+    <!-- metadata -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -653,6 +708,9 @@
         ok_btn.addEventListener("click", On_Click_Ok);
         sound_btn.addEventListener("click", On_Click_Sound);
         timer_date.addEventListener("change", On_Date_Change);
+        about_btn.addEventListener("click", On_Click_About);
+        save_btn.addEventListener("click", On_Click_Save);
+        load_btn.addEventListener("click", On_Click_Load);
 
         Render_Timers();
         Update_Nav();
@@ -686,6 +744,58 @@
       }
 
       // events ===================================================================================
+
+      function On_Click_Load()
+      {
+        menu_panel.hidePopover();
+        
+        const input = document.createElement("input");
+        input.type = "file";
+        input.accept = ".json,.tt,application/json";
+        input.onchange = On_Change_File;
+        input.click();
+
+        function On_Change_File(event)
+        {
+          const file = event.target.files[0];
+          if (file)
+          {
+            const reader = new FileReader();
+            reader.onload = On_Load_File;
+            reader.readAsText(file);
+          }
+        }
+        
+        function On_Load_File(reader_event)
+        {
+          const content = reader_event.target.result;
+          localStorage.setItem("tempustoi", content);
+          Render_Timers();
+          Update_Nav();
+        }
+      }
+
+      function On_Click_Save()
+      {
+        const json_str = localStorage.getItem("tempustoi");
+        if (!json_str)
+        {
+          const blob = new Blob([json_str], { type: "application/json" });
+          const url = URL.createObjectURL(blob);
+
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = "tempustoi.tt";
+          link.click();
+          
+          URL.revokeObjectURL(url);
+        }
+      }
+
+      function On_Click_About()
+      {
+        about_panel.showPopover();
+      }
 
       function On_Click_Sound()
       {
@@ -939,17 +1049,18 @@
 
         if (!has_timers)
         {
-          about_info.removeAttribute("popover");
+          about_panel.removeAttribute("popover");
           bk.hidden = false;
         }
         else
         {
-          about_info.setAttribute("popover", "auto");
+          about_panel.setAttribute("popover", "auto");
           bk.hidden = true;
         }
 
         about_btn.hidden = !has_timers;
         del_all_btn.hidden = !has_timers;
+        save_btn.hidden = !has_timers;
 
         if (window.matchMedia("(display-mode: standalone)").matches)
         {
@@ -1032,7 +1143,6 @@
         }
 
         return timers;
-        //return null;
       }
 
       function Save_Timer(timer)
@@ -1106,14 +1216,34 @@
       <button id="add_btn" class="img">
         <img src="../images/plus.svg" alt="Add">
       </button>
-      <button id="del_all_btn" class="img" hidden>
-        <img src="../images/bin.svg" alt="Delete">
+      <button id="menu_btn" class="img" popovertarget="menu_panel">
+        <img src="../images/menu.svg" alt="Menu">
       </button>
-      <button id="about_btn" popovertarget="about_info">About</button>
       <button id="sound_btn">Sound Off</button>
     </nav>
 
-    <div popover id="about_info">
+    <div popover id="menu_panel" class="dialog">
+      <form method="dialog">
+        <header>
+          <svg viewBox="0 0 320 80">
+            <path id="arcPath" d="M 0 70 A 250 100 0 0 1 320 70" fill="none" stroke="none"/>
+            <text>
+              <textPath href="#arcPath" startOffset="50%" text-anchor="middle">
+                Menu
+              </textPath>
+            </text>
+          </svg>
+        </header>
+        <button id="about_btn">About</button>
+        <button id="load_btn">Load</button>
+        <button id="save_btn">Save</button>
+        <button>Add Timer</button>
+        <button>Add Event</button>
+        <button id="del_all_btn">Delete All</button>
+      </form>
+    </div>
+
+    <div popover id="about_panel">
       <p>
         TempusToi is a simple task scheduling tool that helps you stay on 
         top of deadlines. 
@@ -1183,12 +1313,10 @@
           </div>
           <!-- repeat -->
           <div class="field">
-            <label>
-              <button class="info" popovertarget="repeaat_info" type="button">i</button>
-              <div popover id="repeaat_info">to do</div>
-              Recurrence
-            </label>
-            <de-input-repeat id="timer_repeat"></de-input-repeat>
+            <de-input-repeat id="timer_repeat">
+              <button slot="header" class="info" popovertarget="repeaat_info" type="button">i</button>
+              <div slot="header" popover id="repeaat_info">to do</div>
+            </de-input-repeat>
           </div>
         </main>
 
@@ -1217,7 +1345,7 @@
     </audio>
   
     <footer>
-      © Copyright Dulce Engineering 2025. All rights reserved. v2
+      © Copyright Dulce Engineering 2025. All rights reserved. v3
     </footer>
   </body>
 
