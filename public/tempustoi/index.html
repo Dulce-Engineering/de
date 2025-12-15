@@ -155,31 +155,6 @@
           animation: swingIn 1.5s ease-out forwards;
         }
       }
-      #menu_panel
-      {
-        width: fit-content;
-
-        form
-        {
-          align-items: center;
-          padding: 20px;
-
-          header
-          {
-            font-size: 3rem;
-            margin-bottom: -16px;
-          }
-          header svg
-          {
-            width: 100%;
-            text-shadow: -0.2vw 0.2vw 0 var(--orange);
-          }
-        }
-        button
-        {
-          width: 100%;
-        }
-      }
 
       nav
       {
@@ -299,6 +274,43 @@
         border-radius: 100%;
       }
 
+      #menu_panel
+      {
+        width: fit-content;
+
+        form
+        {
+          align-items: center;
+          padding: 20px;
+
+          header
+          {
+            font-size: 3rem;
+            margin-bottom: -16px;
+            position: relative;
+
+            button
+            {
+              position: absolute;
+              top: 0;
+              right: 0;
+            }
+          }
+          header svg
+          {
+            width: 100%;
+            text-shadow: -0.2vw 0.2vw 0 var(--orange);
+          }
+          > button
+          {
+            xwidth: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 4px;
+          }
+        }
+      }
       #bk
       {
         position: absolute;
@@ -371,6 +383,23 @@
         margin: auto auto;
         top: calc(50% - 100px);
         left: calc(50% - 100px);
+
+        text
+        {
+          stroke: none;
+        }
+        .hand-hr
+        {
+          stroke: none;
+        }
+        .hand-min
+        {
+          stroke: none;
+        }
+        .hand-sec
+        {
+          fill: none;
+        }
       }
       de-clock-dial
       {
@@ -385,32 +414,16 @@
         top: 0; bottom: 0;
         fill: none;
         stroke-width: 10px;
-      }
-      de-dialmarks.hours
-      {
-        transform: rotate(-1deg);
-      }
-      de-dialmarks.minutes
-      {
 
-      }
-      de-clock text
-      {
-        stroke: none;
-      }
-      de-clock .hand-hr
-      {
-        stroke: none;
-      }
-      de-clock .hand-min
-      {
-        stroke: none;
-      }
-      de-clock .hand-sec
-      {
-        fill: none;
-      }
+        &.hours
+        {
+          transform: rotate(-1deg);
+        }
+        &.minutes
+        {
 
+        }
+      }
       de-timer
       {
         display:flex;
@@ -511,16 +524,16 @@
           animation: dedial-spin-y 1s forwards linear;
         } 
       }
-
       de-input-period
       {
         display: flex;
         flex-direction: row;
         gap: 10px;
-      }
-      de-input-period input
-      {
-        width: 25%;
+
+        input
+        {
+          width: 25%;
+        }
       }
 
       input[type="date"]::-webkit-calendar-picker-indicator,
@@ -729,6 +742,8 @@
         }
 
         add_btn.addEventListener("click", On_Click_Add);
+        add_timer_btn.addEventListener("click", On_Click_Add);
+        add_event_btn.addEventListener("click", On_Click_Add);
         del_all_btn.addEventListener("click", On_Click_Del_All);
         ok_btn.addEventListener("click", On_Click_Ok);
         sound_btn.addEventListener("click", On_Click_Sound);
@@ -736,6 +751,7 @@
         about_btn.addEventListener("click", On_Click_About);
         save_btn.addEventListener("click", On_Click_Save);
         load_btn.addEventListener("click", On_Click_Load);
+        menu_close_btn.addEventListener("click", On_Click_Close_Menu);
 
         Increment_Timers();
         Render_Timers();
@@ -770,6 +786,16 @@
       }
 
       // events ===================================================================================
+
+      function On_Click_Close_Menu()
+      {
+        menu_panel.hidePopover();
+      }
+
+      function On_Click_About()
+      {
+        about_panel.showPopover();
+      }
 
       function On_Click_Load()
       {
@@ -818,21 +844,23 @@
         }
       }
 
-      function On_Click_About()
+      function On_Click_Add()
       {
-        about_panel.showPopover();
+        timer_form.reset();
+        timer_dlg.showModal();
+      }
+
+      function On_Click_Del_All()
+      {
+        confirm_msg.innerText = " you want to delete all timers";
+        confirm_ok_btn.onclick = On_Click_Del_All_Ok;
+        confirm_dlg.showModal();
       }
 
       function On_Click_Sound()
       {
         sound_btn.innerText = "Sound On";
         sound_btn.classList.add("on");
-      }
-
-      function On_Click_Add()
-      {
-        timer_form.reset();
-        timer_dlg.showModal();
       }
 
       function On_Click_Delete(e)
@@ -894,13 +922,6 @@
       {
         const timer = e.target.timer;
         Alarm_Off(timer);
-      }
-
-      function On_Click_Del_All()
-      {
-        confirm_msg.innerText = " you want to delete all timers";
-        confirm_ok_btn.onclick = On_Click_Del_All_Ok;
-        confirm_dlg.showModal();
       }
 
       function On_Click_Del_All_Ok()
@@ -1324,13 +1345,34 @@
               </textPath>
             </text>
           </svg>
+          <button id="menu_close_btn" class="img">
+            <img src="../images/close.svg" alt="Menu">
+          </button>
         </header>
-        <button id="about_btn">About</button>
-        <button id="load_btn">Load</button>
-        <button id="save_btn">Save</button>
-        <button>Add Timer</button>
-        <button>Add Event</button>
-        <button id="del_all_btn">Delete All</button>
+        <button id="about_btn">
+          <img src="../images/about.svg" alt="about">
+          About
+        </button>
+        <button id="load_btn">
+          <img src="../images/upload.svg" alt="load">
+          Load
+        </button>
+        <button id="save_btn">
+          <img src="../images/download.svg" alt="save">
+          Save
+        </button>
+        <button id="add_timer_btn">
+          <img src="../images/timer.svg" alt="add timer">
+          Add Timer
+        </button>
+        <button id="add_event_btn">
+          <img src="../images/event.svg" alt="add event">
+          Add Event
+        </button>
+        <button id="del_all_btn">
+          <img src="../images/bin.svg" alt="delete all">
+          Delete All
+        </button>
       </form>
     </div>
 
