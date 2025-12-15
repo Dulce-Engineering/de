@@ -18,7 +18,8 @@ async function main()
   {
     if (seek_queries.length > 1 && i > 0)
     {
-      await Wait(Utils.MILLIS_MINUTE);
+      //await Wait(Utils.MILLIS_MINUTE);
+      await Wait(Utils.MILLIS_SECOND * 15);
     }
 
     const query = seek_queries[i];

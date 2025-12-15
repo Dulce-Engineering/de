@@ -184,5 +184,11 @@
     "datetime": 1765162904594,
     "id": "dcda8747-3aff-49ff-b671-90ce4c72496b",
     "query_id": "-graphql"
+  },
+  {
+    "count": 60,
+    "datetime": 1765778975081,
+    "id": "c0dc6fcb-28de-4e15-b593-18235729911b",
+    "query_id": "-graphql"
   }
 ]
