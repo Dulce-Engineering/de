@@ -754,7 +754,8 @@
         menu_close_btn.addEventListener("click", On_Click_Close_Menu);
 
         Increment_Timers();
-        Render_Timers();
+        const timers = Select_Timers();
+        Render_Timers(timers);
         Update_Nav();
         
         Ads();
@@ -820,9 +821,9 @@
         
         function On_Load_File(reader_event)
         {
-          const content = reader_event.target.result;
-          localStorage.setItem("tempustoi", content);
-          Render_Timers();
+          const timers = reader_event.target.result;
+          Save_Timers(timers);
+          Render_Timers(timers);
           Update_Nav();
         }
       }
@@ -900,7 +901,8 @@
 
         Save_Timer(timer);
 
-        Render_Timers();
+        const timers = Select_Timers();
+        Render_Timers(timers);
         Update_Nav();
       }
 
@@ -984,11 +986,11 @@
         }
       }
 
-      function Render_Timers()
+      function Render_Timers(timers)
       {
         document.querySelectorAll(".timer-panel").forEach((elem) => elem.remove());
 
-        const timers = Select_Timers() || [];
+        Sort_Timers(timers);
         for (const timer of timers)
         {
           if (typeof timer.id =="string" && timer.id.startsWith("timer_"))
@@ -1138,7 +1140,9 @@
           panel_elem.classList.remove("alarm");
         }
 
-        Render_Timer(timer);
+        //Render_Timer(timer);
+        const timers = Select_Timers();
+        Render_Timers(timers);
       }
 
       // misc =====================================================================================
@@ -1185,6 +1189,20 @@
 
       // db =======================================================================================
 
+      function Sort_Timers(timers)
+      {
+        const now = Date.now();
+        timers.sort(By_Now);
+        function By_Now(t1, t2)
+        {
+          if (t1.time > now && t2.time > now) return t1.time - t2.time;
+          else if (t1.time < now && t2.time < now) return t2.time - t1.time;
+          else if (t1.time > now) return -1;
+          else if (t2.time > now) return 1;
+          else return 0;
+        }
+      }
+
       function Select_Timers()
       {
         let timers = null;
@@ -1192,7 +1210,6 @@
         if (timers_str)
         {
           timers = JSON.parse(timers_str);
-          timers = timers.sort((t1, t2) => t1.time - t2.time);
         }
 
         return timers;
@@ -1228,7 +1245,7 @@
           }
           else
           {
-            localStorage.setItem("tempustoi", JSON.stringify(timers));
+            Save_Timers(timers);
           }
         }
       }
