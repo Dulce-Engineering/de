@@ -190,5 +190,11 @@
     "datetime": 1765779502164,
     "id": "9f45e9bf-ac86-44bc-939d-f2b82eb9094a",
     "query_id": "-mariadb"
+  },
+  {
+    "count": 6,
+    "datetime": 1766102504776,
+    "id": "deddd7c4-5ad2-4bad-b8bb-140503e6b9ba",
+    "query_id": "-mariadb"
   }
 ]

@@ -124,5 +124,11 @@
     "datetime": 1765779800704,
     "id": "d0335d47-7c21-4343-8e6d-c50a66db2a1f",
     "query_id": "-frontend"
+  },
+  {
+    "count": 603,
+    "datetime": 1766102794822,
+    "id": "8addc6fc-410b-41fd-88bd-ffb09f7d422c",
+    "query_id": "-frontend"
   }
 ]

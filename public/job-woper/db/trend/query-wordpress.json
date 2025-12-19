@@ -190,5 +190,11 @@
     "datetime": 1765779660206,
     "id": "2d6303f7-5db4-4c0e-969b-950bf4296ce7",
     "query_id": "-wordpress"
+  },
+  {
+    "count": 35,
+    "datetime": 1766102658558,
+    "id": "ae63076a-5195-4474-9425-dbf13ce9abb2",
+    "query_id": "-wordpress"
   }
 ]
