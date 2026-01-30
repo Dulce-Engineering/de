@@ -420,9 +420,6 @@
       }
       de-clock
       {
-        xposition: absolute;
-        xtop: calc(50% - 100px);
-        xleft: calc(50% - 100px);
         display: block;
         width: 150px;
         height: 150px;
@@ -465,10 +462,6 @@
         &.hours
         {
           transform: rotate(-1deg);
-        }
-        &.minutes
-        {
-
         }
       }
       de-timer
@@ -542,9 +535,6 @@
           box-sizing: border-box;
           transform-style: preserve-3d;
           transform: translateZ(-25px);
-        }
-        .active-marks
-        {
         }
         .shadow
         {
@@ -667,6 +657,7 @@
         }
       }
 
+      /* large screens */
       @media screen and (min-width: 768px)
       {
         dialog, .dialog
@@ -677,6 +668,7 @@
           }
         }
       }
+      /* small screens */
       @media screen and (max-width: 768px)
       {
         html
@@ -708,6 +700,7 @@
           grid-template-rows: auto auto auto;
           width: 320px;
           margin: 0;
+          justify-content: center;
 
           de-clock
           {
