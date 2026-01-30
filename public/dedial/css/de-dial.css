@@ -1,0 +1,28 @@
+
+de-dial
+{
+  position: relative;
+  display: inline-block;
+  width: 150px;
+  height: 150px;
+  color: #fff;
+  stroke: #fff;
+  fill: none;
+  stroke-width: 10px;
+}
+de-dial .shadow
+{
+  stroke: #777;
+}
+de-dial .dial
+{
+  transform: rotate(-90deg);
+}
+de-dial .label
+{
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1.5rem;
+}

@@ -27,5 +27,5 @@ class TemplateComponent extends HTMLElement
   }
 }
 
-Utils.Register_Element(DeSelectTree);
+Utils.Register_Element(TemplateComponent);
 export default TemplateComponent;

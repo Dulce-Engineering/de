@@ -1092,6 +1092,8 @@ class DeClock extends HTMLElement
       }
     }
 
+    hr += min/60;
+
     this.hr_elem.style = `transform: rotate(${hr*30-180}deg);` + this.style_hand_hr;
     this.min_elem.style = `transform: rotate(${min*6-180}deg);` + this.style_hand_min;
     this.sec_elem.style = `transform: rotate(${sec*6-180}deg);` + this.style_hand_sec;

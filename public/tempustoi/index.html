@@ -158,10 +158,39 @@
 
       nav
       {
-        display: flex;
-        justify-content: center;
+        display: grid;
         gap: 10px;
         margin: 0 0 20px 0;
+        color: var(--orange);
+        grid-template-columns: auto auto auto auto;
+        grid-template-rows: auto auto auto;
+        width: 590px;
+        align-items: start;
+        justify-items: center;
+
+        de-clock
+        {
+          grid-column: 1;
+          grid-row: 1 / span 2;
+        }
+        .btns
+        {
+          grid-column: 2 / span 2;
+          grid-row: 1;
+          display: flex;
+          gap: 10px;
+        }
+        #date_elem
+        {
+          grid-column: 2 / span 2;
+          grid-row: 2;
+          text-align: center;
+        }
+        de-sun-moon
+        {
+          grid-column: 4;
+          grid-row: 1 / span 2;
+        }
       }
       header
       {
@@ -371,18 +400,36 @@
         width: 12ch;
       }
 
+      de-sun-moon
+      {
+        position: relative;
+        width: 130px;
+        height: 130px;
+        border: 2px solid var(--orange);
+        border-radius: 100%;
+        overflow: hidden;
+        padding: 8px;
+
+        .mask
+        {
+          position: absolute;
+          left: 0; right: 0;
+          top: 50%; bottom: 0;
+          background-color: var(--orange);
+        }
+      }
       de-clock
       {
-        position: absolute;
+        xposition: absolute;
+        xtop: calc(50% - 100px);
+        xleft: calc(50% - 100px);
         display: block;
-        width: 200px;
-        height: 200px;
+        width: 150px;
+        height: 150px;
         animation: dedial-zoom-spin 5s linear infinite;
-        fill: var(--pink);
-        stroke: var(--pink);
+        fill: var(--orange);
+        stroke: var(--orange);
         margin: auto auto;
-        top: calc(50% - 100px);
-        left: calc(50% - 100px);
 
         text
         {
@@ -655,6 +702,34 @@
           line-height: 1,2rem;
           padding: 5px 12px;
         }
+        nav
+        {
+          grid-template-columns: auto auto;
+          grid-template-rows: auto auto auto;
+          width: 320px;
+          margin: 0;
+
+          de-clock
+          {
+            grid-column: 1;
+            grid-row: 3;
+          }
+          de-sun-moon
+          {
+            grid-column: 2;
+            grid-row: 3;
+          }
+          .btns
+          {
+            grid-column: 1 / span 2;
+            grid-row: 1;
+          }
+          #date_elem
+          {
+            grid-column: 1 / span 2;
+            grid-row: 2;
+          }
+        }
 
         header.timer
         {
@@ -688,6 +763,16 @@
           width: 80%;
         }
 
+        de-clock
+        {
+          width: 120px;
+          height: 120px;
+        }
+        de-sun-moon
+        {
+          width: 100px;
+          height: 100px;
+        }
         de-timer .label-sub
         {
           font-size: min(2.5vw, 30px);
@@ -712,8 +797,10 @@
     }
     </script>
   
+    <!-- page code -->
     <script type="module">
       import DE from "/dedial/dedial.js?v=3";
+      import "./DeSunMoon/index.js?v=3";
       import "/component/DeInputPeriod/index.js?v=3";
       import "/component/DeInputRepeat/index.js?v=3";
 
@@ -757,6 +844,8 @@
         const timers = Select_Timers();
         Render_Timers(timers);
         Update_Nav();
+        date_elem.innerText = 
+          new Date().toLocaleDateString(undefined, { dateStyle: "full" });
         
         Ads();
       }
@@ -1342,13 +1431,18 @@
     </header>
 
     <nav>
-      <button id="add_btn" class="img">
-        <img src="../images/plus.svg" alt="Add">
-      </button>
-      <button id="menu_btn" class="img" popovertarget="menu_panel">
-        <img src="../images/menu.svg" alt="Menu">
-      </button>
-      <button id="sound_btn">Sound Off</button>
+      <de-clock auto-start></de-clock>
+      <div class="btns">
+        <button id="add_btn" class="img">
+          <img src="../images/plus.svg" alt="Add">
+        </button>
+        <button id="menu_btn" class="img" popovertarget="menu_panel">
+          <img src="../images/menu.svg" alt="Menu">
+        </button>
+        <button id="sound_btn">Sound Off</button>
+      </div>
+      <div id="date_elem"></div>
+      <de-sun-moon></de-sun-moon>
     </nav>
 
     <div popover id="menu_panel" class="dialog">
