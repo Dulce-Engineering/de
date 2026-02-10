@@ -130,5 +130,11 @@
     "datetime": 1766102794822,
     "id": "8addc6fc-410b-41fd-88bd-ffb09f7d422c",
     "query_id": "-frontend"
+  },
+  {
+    "count": 765,
+    "datetime": 1770726253897,
+    "id": "ecd77bf1-6739-4c67-ba46-741d7b08893d",
+    "query_id": "-frontend"
   }
 ]
