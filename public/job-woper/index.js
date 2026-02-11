@@ -3,6 +3,8 @@ import fs from 'node:fs';
 import crypto from 'node:crypto';
 import pw from "playwright";
 
+const WAIT_PERIOD = Utils.MILLIS_SECOND * 5;
+
 main();
 
 async function main()
@@ -18,8 +20,7 @@ async function main()
   {
     if (seek_queries.length > 1 && i > 0)
     {
-      //await Wait(Utils.MILLIS_MINUTE);
-      await Wait(Utils.MILLIS_SECOND * 15);
+      await Wait(WAIT_PERIOD);
     }
 
     const query = seek_queries[i];
