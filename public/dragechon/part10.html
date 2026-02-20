@@ -110,6 +110,8 @@
         this.ctx.scoreText = this.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
 
         this.ctx.player = this.physics.add.sprite(start_pos.x, start_pos.y, 'player');
+        this.ctx.player.setScale(0.4);
+        this.ctx.player.body.setSize(145, 129);
         this.ctx.player.play('flying');
 
         //platforms = this.physics.add.staticGroup();
