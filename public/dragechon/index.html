@@ -91,7 +91,8 @@
           scoreText: null,
           cursors: null,
           deviceOrientationGamma: 0,
-          pigs: null
+          pigs: null,
+          background: null
         };
 
         // Create flying dragon animation
@@ -101,6 +102,11 @@
           frameRate: 12,
           repeat: -1
         });
+
+        // Create infinitely scrolling background
+        this.ctx.background = this.add.tileSprite(config.width / 2, config.height / 2, config.width * 4, config.height * 4, 'sky');
+        this.ctx.background.setScrollFactor(1);
+        //this.ctx.background.setDepth(0);
 
         this.ctx.scoreText = this.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
 
@@ -173,36 +179,15 @@
 
         this.cameras.main.rotation = -this.ctx.player.rotation;
 
-        const MAX_SPEED = 150;
-        const STEERING_FORCE = 0.05; // A small value (0 to 1) for gentle steering (lerp factor)
-        const COHESION_WEIGHT = 1.1;   // How strongly stars are attracted to the center of their neighbors
-        const ALIGNMENT_WEIGHT = 1.2;  // How strongly stars try to match the average velocity
-        const SEPARATION_WEIGHT = 1.2; // How strongly stars try to avoid crowding. Usually the highest weight.
-        const FLEE_WEIGHT = 1.0;       // How strongly stars flee from the player.
-        const PLAYER_FLEE_RADIUS = 100;
-        this.ctx.pigs.getChildren().forEach(pig => 
-        {
-          const neighbours = Get_Stars_In_Radius(pig, 100, this.ctx.pigs);
-          let desiredDirection = new Phaser.Math.Vector2(0, 0);
+        // Update background position to match player
+        if (this.ctx.background) {
+          this.ctx.background.x = this.ctx.player.x;
+          this.ctx.background.y = this.ctx.player.y;
+          this.ctx.background.tilePositionX = this.ctx.player.x;
+          this.ctx.background.tilePositionY = this.ctx.player.y;
+        }
 
-          const cohesion = Calculate_Cohesion_Vector(pig, neighbours);
-          desiredDirection.add(cohesion.normalize().scale(COHESION_WEIGHT));
-
-          const alignment = Calculate_Alignment_Vector(neighbours);
-          desiredDirection.add(alignment.normalize().scale(ALIGNMENT_WEIGHT));
-
-          const separation = Calculate_Separation_Vector(pig, neighbours);
-          desiredDirection.add(separation.normalize().scale(SEPARATION_WEIGHT));
-
-          const flee = Calculate_Flee_Vector_From_Player(pig, this.ctx.player, PLAYER_FLEE_RADIUS);
-          desiredDirection.add(flee.normalize().scale(FLEE_WEIGHT));
-
-          if (desiredDirection.length() > 0)
-          {
-            const desiredVelocity = desiredDirection.normalize().scale(MAX_SPEED);
-            pig.body.velocity.lerp(desiredVelocity, STEERING_FORCE);
-          }
-        });
+        Pigs_Update(this.ctx);
       }
 
       function On_Scene_Overlap_Star (player, pig)
@@ -262,6 +247,41 @@
 
         // also respond to device tilt
         ctx.player.angle += ctx.deviceOrientationGamma/2;
+      }
+
+      function Pigs_Update(ctx)
+      {
+        const MAX_SPEED = 150;
+        const STEERING_FORCE = 0.05; // A small value (0 to 1) for gentle steering (lerp factor)
+        const COHESION_WEIGHT = 1.1;   // How strongly pigs are attracted to the center of their neighbors
+        const ALIGNMENT_WEIGHT = 1.2;  // How strongly pigs try to match the average velocity
+        const SEPARATION_WEIGHT = 1.2; // How strongly pigs try to avoid crowding. Usually the highest weight.
+        const FLEE_WEIGHT = 1.0;       // How strongly pigs flee from the player.
+        const PLAYER_FLEE_RADIUS = 100;
+
+        for (const pig of ctx.pigs.getChildren())
+        {
+          const neighbours = Get_Stars_In_Radius(pig, 100, ctx.pigs);
+          let desiredDirection = new Phaser.Math.Vector2(0, 0);
+
+          const cohesion = Calculate_Cohesion_Vector(pig, neighbours);
+          desiredDirection.add(cohesion.normalize().scale(COHESION_WEIGHT));
+
+          const alignment = Calculate_Alignment_Vector(neighbours);
+          desiredDirection.add(alignment.normalize().scale(ALIGNMENT_WEIGHT));
+
+          const separation = Calculate_Separation_Vector(pig, neighbours);
+          desiredDirection.add(separation.normalize().scale(SEPARATION_WEIGHT));
+
+          const flee = Calculate_Flee_Vector_From_Player(pig, ctx.player, PLAYER_FLEE_RADIUS);
+          desiredDirection.add(flee.normalize().scale(FLEE_WEIGHT));
+
+          if (desiredDirection.length() > 0)
+          {
+            const desiredVelocity = desiredDirection.normalize().scale(MAX_SPEED);
+            pig.body.velocity.lerp(desiredVelocity, STEERING_FORCE);
+          }
+        }
       }
 
       function Get_Stars_In_Radius(center_pig, radius, pigs)
