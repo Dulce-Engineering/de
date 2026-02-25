@@ -4,7 +4,7 @@
   <head> 
     <meta charset="UTF-8" />
     <title>Dragechon</title>
-    <script src="//cdn.jsdelivr.net/npm/phaser@3.88.2/dist/phaser.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.90.0/dist/phaser.js"></script>
     <style type="text/css">
         html
         {
@@ -29,36 +29,48 @@
         }
     </style>
     <script type="module">
+      import Player from './lib/Player.js';
 
-      var config = 
+      const MAX_SPEED = 150;
+      const STEERING_FORCE = 0.05; // A small value (0 to 1) for gentle steering (lerp factor)
+      const COHESION_WEIGHT = 1.1;   // How strongly pigs are attracted to the center of their neighbors
+      const ALIGNMENT_WEIGHT = 1.2;  // How strongly pigs try to match the average velocity
+      const SEPARATION_WEIGHT = 1.2; // How strongly pigs try to avoid crowding. Usually the highest weight.
+      const FLEE_WEIGHT = 1.0;       // How strongly pigs flee from the player.
+      const PLAYER_FLEE_RADIUS = 100;
+
+      Main();
+      function Main()
       {
-        type: Phaser.AUTO,
-        width: 1000, //window.innerWidth*3,
-        height: 1000, //window.innerHeight*3,
-        physics: 
+        var config = 
         {
-          default: 'arcade',
-          arcade: { debug: false }
-        },
-        scene: 
-        {
-          preload: On_Scene_Preload,
-          create: On_Scene_Create,
-          update: On_Scene_Update
-        },
-        scale:
-        {
-          xwidth: 1000,
-          xheight: 1000,
-          mode: Phaser.Scale.ENVELOP,
-          //mode: Phaser.Scale.FIT,
-          autoCenter: Phaser.Scale.CENTER_BOTH
-        }
-      };
+          type: Phaser.AUTO,
+          width: 1000, //window.innerWidth*3,
+          height: 1000, //window.innerHeight*3,
+          physics: 
+          {
+            default: 'arcade',
+            arcade: { debug: false }
+          },
+          scene: 
+          {
+            preload: On_Scene_Preload,
+            create: Scene_Create,
+            update: Scene_Update
+          },
+          scale:
+          {
+            xwidth: 1000,
+            xheight: 1000,
+            mode: Phaser.Scale.ENVELOP,
+            //mode: Phaser.Scale.FIT,
+            autoCenter: Phaser.Scale.CENTER_BOTH
+          }
+        };
 
-      var bombs;
-      const start_pos = { x: config.width / 2, y: config.height / 2 };
-      var game = new Phaser.Game(config);
+        var game = new Phaser.Game(config);
+      }
+
 
       // window ===============================================================
 
@@ -66,7 +78,7 @@
       {
         if (event?.gamma) 
         {
-          scene.ctx.deviceOrientationGamma = event.gamma;
+          scene.game.ctx.deviceOrientationGamma = event.gamma;
         }
       }
 
@@ -74,16 +86,16 @@
 
       function On_Scene_Preload ()
       {
-        this.load.image('sky', 'assets/sky.png');
+        this.load.image('bk', 'assets/grass.png');
         this.load.image('ground', 'assets/platform.png');
         this.load.image('star', 'assets/star.png');
         this.load.image('bomb', 'assets/bomb.png');
-        this.load.spritesheet('player', 'assets/dragon-flying.png', { frameWidth: 290, frameHeight: 258 });
+        this.load.spritesheet('player', 'assets/dragon/flying.png', { frameWidth: 290, frameHeight: 258 });
       }
       
-      function On_Scene_Create ()
+      function Scene_Create ()
       {
-        this.ctx = 
+        this.game.ctx = 
         {
           score: 0,
           player: null,
@@ -92,28 +104,20 @@
           cursors: null,
           deviceOrientationGamma: 0,
           pigs: null,
-          background: null
+          background: null,
+          bombs: null
         };
 
-        // Create flying dragon animation
-        this.anims.create({
-          key: 'flying',
-          frames: this.anims.generateFrameNumbers('player', { start: 0, end: 35 }),
-          frameRate: 12,
-          repeat: -1
-        });
-
         // Create infinitely scrolling background
-        this.ctx.background = this.add.tileSprite(config.width / 2, config.height / 2, config.width * 4, config.height * 4, 'sky');
-        this.ctx.background.setScrollFactor(1);
-        //this.ctx.background.setDepth(0);
+        const x = 0; //this.game.config.width / 2;
+        const y = 0; //this.game.config.height / 2;
+        const width = this.game.config.width * 2;
+        const height = this.game.config.height * 2;
+        this.game.ctx.background = this.add.tileSprite(x, y, width, height, 'bk');
+        this.game.ctx.background.setScrollFactor(1);
+        //this.game.ctx.background.setDepth(0);
 
-        this.ctx.scoreText = this.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
-
-        this.ctx.player = this.physics.add.sprite(start_pos.x, start_pos.y, 'player');
-        this.ctx.player.setScale(0.4);
-        this.ctx.player.body.setSize(145, 129);
-        this.ctx.player.play('flying');
+        this.game.ctx.scoreText = this.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
 
         //platforms = this.physics.add.staticGroup();
         //platforms.create(400, 568, 'ground').setScale(2).refreshBody();
@@ -121,166 +125,101 @@
         //platforms.create(50, 250, 'ground');
         //platforms.create(750, 220, 'ground');
 
-        const pig_settings = 
-        {
-          key: 'star', repeat: 50, active: true, visible: true, 
-          collideWorldBounds: true
-        }
-        this.ctx.pigs = this.physics.add.group(pig_settings);
+        this.game.ctx.bombs = this.physics.add.group();
 
-        // Place stars randomly within the world bounds
-        Phaser.Actions.RandomRectangle(this.ctx.pigs.getChildren(), new Phaser.Geom.Rectangle(0, 0, config.width, config.height));
+        Pigs_Create(this, this.game.config);
+        this.game.ctx.player = Player.New(this);
 
-        this.ctx.pigs.children.iterate(function (pig)
-        {
-          pig.setBounce(1);
-
-          // Give each pig a random initial velocity
-          const initialSpeed = Phaser.Math.Between(50, 150);
-          const initialAngle = Phaser.Math.FloatBetween(0, 2 * Math.PI);
-          this.physics.velocityFromRotation(initialAngle, initialSpeed, pig.body.velocity);
-        }, this);
-
-        bombs = this.physics.add.group();
-
-        //this.physics.add.collider(player, platforms);
-        //this.physics.add.collider(stars, platforms);
-        //this.physics.add.collider(bombs, platforms);
-        this.physics.add.collider(this.ctx.player, bombs, On_Scene_Collide_Bomb, null, this);
-        this.physics.add.overlap(this.ctx.player, this.ctx.pigs, On_Scene_Overlap_Star, null, this);
+        //Player_Create(this);
 
         var camera = this.cameras.main;
         //camera.setSize(window.innerWidth, window.innerHeight);
         //camera.setViewport(0, 0, window.innerWidth, window.innerHeight);
         //camera.setZoom(2);
-        camera.startFollow(this.ctx.player);
+        camera.startFollow(this.game.ctx.player);
 
-        // Keyboard input (arrow keys)
-        this.ctx.cursors = this.input.keyboard.createCursorKeys();
-
+        // input
+        this.game.ctx.cursors = this.input.keyboard.createCursorKeys();
         if (window.DeviceOrientationEvent) 
         {
           window.addEventListener('deviceorientation', (e) => On_Window_Tilt(e, this));
         }
       }
 
-      function On_Scene_Update (time, delta)
+      function Scene_Update (time, delta)
       {
-        if (this.ctx.gameOver)
+        if (!this.game.ctx.gameOver)
         {
-          return;
-        }
+          this.game.ctx.player.Update(this, delta);
 
-        Player_Update(this.ctx, delta);
+          // Camera_Update
+          this.cameras.main.rotation = -this.game.ctx.player.rotation;
 
-        const speed = 100;
-        const direction = this.ctx.player.rotation - Math.PI / 2;
-        this.physics.velocityFromRotation(direction, speed, this.ctx.player.body.velocity);
-
-        this.cameras.main.rotation = -this.ctx.player.rotation;
-
-        // Update background position to match player
-        if (this.ctx.background) {
-          this.ctx.background.x = this.ctx.player.x;
-          this.ctx.background.y = this.ctx.player.y;
-          this.ctx.background.tilePositionX = this.ctx.player.x;
-          this.ctx.background.tilePositionY = this.ctx.player.y;
-        }
-
-        Pigs_Update(this.ctx);
-      }
-
-      function On_Scene_Overlap_Star (player, pig)
-      {
-        pig.disableBody(true, true);
-
-        //  Add and update the score
-        this.ctx.score += 10;
-        this.ctx.scoreText.setText('Score: ' + this.ctx.score);
-
-        if (this.ctx.pigs.countActive(true) === 0)
-        {
-          //  A new batch of stars to collect
-          this.ctx.pigs.children.iterate(function (child) {
-            child.enableBody(true, child.x, 0, true, true);
-          });
-
-          var x = (player.x < 400) ? Phaser.Math.Between(400, 800) : 
-            Phaser.Math.Between(0, 400);
-
-          var bomb = bombs.create(x, 16, 'bomb');
-          bomb.setBounce(1);
-          bomb.setCollideWorldBounds(true);
-          bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
-          bomb.allowGravity = false;
-        }
-      }
-
-      function On_Scene_Collide_Bomb (player, bomb)
-      {
-        this.physics.pause();
-
-        //player.setTint(0xff0000);
-        //player.anims.play('turn');
-
-        this.ctx.gameOver = true;
-      }
-
-      function Player_Update(ctx, delta)
-      {
-        // allow arrow-keys to rotate the player (left/right)
-        const ROTATION_SPEED = 1.8; // base degrees per frame
-        const cursors = ctx.cursors;
-        if (cursors)
-        {
-          const frameScale = delta ? (delta / 16.6667) : 1;
-          const rotationAmount = ROTATION_SPEED * frameScale;
-          if (cursors.left.isDown)
-          {
-            ctx.player.angle -= rotationAmount;
+          // Background_Update
+          if (this.game.ctx.background) {
+            this.game.ctx.background.x = this.game.ctx.player.x;
+            this.game.ctx.background.y = this.game.ctx.player.y;
+            this.game.ctx.background.tilePositionX = this.game.ctx.player.x;
+            this.game.ctx.background.tilePositionY = this.game.ctx.player.y;
           }
-          else if (cursors.right.isDown)
+
+          for (const pig of this.game.ctx.pigs.getChildren())
           {
-            ctx.player.angle += rotationAmount;
+            Pig_Update(pig, this, 0);
           }
         }
-
-        // also respond to device tilt
-        ctx.player.angle += ctx.deviceOrientationGamma/2;
       }
 
-      function Pigs_Update(ctx)
+      // pig ==================================================================
+
+      function Pigs_Create(scene, config)
       {
-        const MAX_SPEED = 150;
-        const STEERING_FORCE = 0.05; // A small value (0 to 1) for gentle steering (lerp factor)
-        const COHESION_WEIGHT = 1.1;   // How strongly pigs are attracted to the center of their neighbors
-        const ALIGNMENT_WEIGHT = 1.2;  // How strongly pigs try to match the average velocity
-        const SEPARATION_WEIGHT = 1.2; // How strongly pigs try to avoid crowding. Usually the highest weight.
-        const FLEE_WEIGHT = 1.0;       // How strongly pigs flee from the player.
-        const PLAYER_FLEE_RADIUS = 100;
-
-        for (const pig of ctx.pigs.getChildren())
+        const pig_settings = 
         {
-          const neighbours = Get_Stars_In_Radius(pig, 100, ctx.pigs);
-          let desiredDirection = new Phaser.Math.Vector2(0, 0);
+          key: 'star', 
+          repeat: 50, 
+          active: true, 
+          visible: true, 
+          collideWorldBounds: true
+        }
+        scene.game.ctx.pigs = scene.physics.add.group(pig_settings);
 
-          const cohesion = Calculate_Cohesion_Vector(pig, neighbours);
-          desiredDirection.add(cohesion.normalize().scale(COHESION_WEIGHT));
+        // Place stars randomly within the world bounds
+        Phaser.Actions.RandomRectangle(scene.game.ctx.pigs.getChildren(), 
+          new Phaser.Geom.Rectangle(0, 0, config.width, config.height));
+        
+        scene.game.ctx.pigs.children.iterate(function (pig)
+        {
+          pig.setBounce(1);
 
-          const alignment = Calculate_Alignment_Vector(neighbours);
-          desiredDirection.add(alignment.normalize().scale(ALIGNMENT_WEIGHT));
+          // Give each pig a random initial velocity
+          const initialSpeed = Phaser.Math.Between(50, 150);
+          const initialAngle = Phaser.Math.FloatBetween(0, 2 * Math.PI);
+          scene.physics.velocityFromRotation(initialAngle, initialSpeed, pig.body.velocity);
+        }, scene);
+      }
 
-          const separation = Calculate_Separation_Vector(pig, neighbours);
-          desiredDirection.add(separation.normalize().scale(SEPARATION_WEIGHT));
+      function Pig_Update(pig, scene, delta)
+      {
+        const neighbours = Get_Stars_In_Radius(pig, 100, scene.game.ctx.pigs);
+        let desiredDirection = new Phaser.Math.Vector2(0, 0);
 
-          const flee = Calculate_Flee_Vector_From_Player(pig, ctx.player, PLAYER_FLEE_RADIUS);
-          desiredDirection.add(flee.normalize().scale(FLEE_WEIGHT));
+        const cohesion = Calculate_Cohesion_Vector(pig, neighbours);
+        desiredDirection.add(cohesion.normalize().scale(COHESION_WEIGHT));
 
-          if (desiredDirection.length() > 0)
-          {
-            const desiredVelocity = desiredDirection.normalize().scale(MAX_SPEED);
-            pig.body.velocity.lerp(desiredVelocity, STEERING_FORCE);
-          }
+        const alignment = Calculate_Alignment_Vector(neighbours);
+        desiredDirection.add(alignment.normalize().scale(ALIGNMENT_WEIGHT));
+
+        const separation = Calculate_Separation_Vector(pig, neighbours);
+        desiredDirection.add(separation.normalize().scale(SEPARATION_WEIGHT));
+
+        const flee = Calculate_Flee_Vector_From_Player(pig, scene.game.ctx.player, PLAYER_FLEE_RADIUS);
+        desiredDirection.add(flee.normalize().scale(FLEE_WEIGHT));
+
+        if (desiredDirection.length() > 0)
+        {
+          const desiredVelocity = desiredDirection.normalize().scale(MAX_SPEED);
+          pig.body.velocity.lerp(desiredVelocity, STEERING_FORCE);
         }
       }
 
@@ -405,6 +344,8 @@
 
         return separationVector;
       }
+
+      // misc =================================================================
     </script>
   </head>
 
