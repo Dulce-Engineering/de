@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import crypto from 'node:crypto';
 import pw from "playwright";
 
-const WAIT_PERIOD = Utils.MILLIS_SECOND * 5;
+const WAIT_PERIOD = Utils.MILLIS_SECOND * 3;
 
 main();
 
