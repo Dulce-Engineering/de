@@ -30,14 +30,7 @@
     </style>
     <script type="module">
       import Player from './lib/Player.js';
-
-      const MAX_SPEED = 150;
-      const STEERING_FORCE = 0.05; // A small value (0 to 1) for gentle steering (lerp factor)
-      const COHESION_WEIGHT = 1.1;   // How strongly pigs are attracted to the center of their neighbors
-      const ALIGNMENT_WEIGHT = 1.2;  // How strongly pigs try to match the average velocity
-      const SEPARATION_WEIGHT = 1.2; // How strongly pigs try to avoid crowding. Usually the highest weight.
-      const FLEE_WEIGHT = 1.0;       // How strongly pigs flee from the player.
-      const PLAYER_FLEE_RADIUS = 100;
+      import Pig from './lib/Pig.js';
 
       Main();
       function Main()
@@ -70,7 +63,6 @@
 
         var game = new Phaser.Game(config);
       }
-
 
       // window ===============================================================
 
@@ -127,7 +119,7 @@
 
         this.game.ctx.bombs = this.physics.add.group();
 
-        Pigs_Create(this, this.game.config);
+        this.game.ctx.pigs = Pig.New_Group(this);
         this.game.ctx.player = Player.New(this);
 
         //Player_Create(this);
@@ -150,6 +142,10 @@
       {
         if (!this.game.ctx.gameOver)
         {
+          for (const pig of this.game.ctx.pigs.getChildren())
+          {
+            pig.Update(this, delta);
+          }
           this.game.ctx.player.Update(this, delta);
 
           // Camera_Update
@@ -162,187 +158,7 @@
             this.game.ctx.background.tilePositionX = this.game.ctx.player.x;
             this.game.ctx.background.tilePositionY = this.game.ctx.player.y;
           }
-
-          for (const pig of this.game.ctx.pigs.getChildren())
-          {
-            Pig_Update(pig, this, 0);
-          }
         }
-      }
-
-      // pig ==================================================================
-
-      function Pigs_Create(scene, config)
-      {
-        const pig_settings = 
-        {
-          key: 'star', 
-          repeat: 50, 
-          active: true, 
-          visible: true, 
-          collideWorldBounds: true
-        }
-        scene.game.ctx.pigs = scene.physics.add.group(pig_settings);
-
-        // Place stars randomly within the world bounds
-        Phaser.Actions.RandomRectangle(scene.game.ctx.pigs.getChildren(), 
-          new Phaser.Geom.Rectangle(0, 0, config.width, config.height));
-        
-        scene.game.ctx.pigs.children.iterate(function (pig)
-        {
-          pig.setBounce(1);
-
-          // Give each pig a random initial velocity
-          const initialSpeed = Phaser.Math.Between(50, 150);
-          const initialAngle = Phaser.Math.FloatBetween(0, 2 * Math.PI);
-          scene.physics.velocityFromRotation(initialAngle, initialSpeed, pig.body.velocity);
-        }, scene);
-      }
-
-      function Pig_Update(pig, scene, delta)
-      {
-        const neighbours = Get_Stars_In_Radius(pig, 100, scene.game.ctx.pigs);
-        let desiredDirection = new Phaser.Math.Vector2(0, 0);
-
-        const cohesion = Calculate_Cohesion_Vector(pig, neighbours);
-        desiredDirection.add(cohesion.normalize().scale(COHESION_WEIGHT));
-
-        const alignment = Calculate_Alignment_Vector(neighbours);
-        desiredDirection.add(alignment.normalize().scale(ALIGNMENT_WEIGHT));
-
-        const separation = Calculate_Separation_Vector(pig, neighbours);
-        desiredDirection.add(separation.normalize().scale(SEPARATION_WEIGHT));
-
-        const flee = Calculate_Flee_Vector_From_Player(pig, scene.game.ctx.player, PLAYER_FLEE_RADIUS);
-        desiredDirection.add(flee.normalize().scale(FLEE_WEIGHT));
-
-        if (desiredDirection.length() > 0)
-        {
-          const desiredVelocity = desiredDirection.normalize().scale(MAX_SPEED);
-          pig.body.velocity.lerp(desiredVelocity, STEERING_FORCE);
-        }
-      }
-
-      function Get_Stars_In_Radius(center_pig, radius, pigs)
-      {
-        const nearbyStars = [];
-        pigs.getChildren().forEach(pig => 
-        {
-          if (pig !== center_pig) 
-          {
-            const distance = Phaser.Math.Distance.Between
-              (center_pig.x, center_pig.y, pig.x, pig.y);
-            if (distance <= radius) 
-            {
-              nearbyStars.push(pig);
-            }
-          }
-        });
-        return nearbyStars;
-      }
-
-      /**
-       * Calculates a vector pointing towards the average position of a group of neighbors.
-       * This is the "cohesion" component of a flocking algorithm.
-       * @param {Phaser.Physics.Arcade.Sprite} pig The pig to calculate the vector for.
-       * @param {Phaser.Physics.Arcade.Sprite[]} neighbours An array of neighboring pigs.
-       * @returns {Phaser.Math.Vector2} A vector representing the direction towards the center of the neighbors.
-       */
-      function Calculate_Cohesion_Vector(pig, neighbours)
-      {
-        if (neighbours.length === 0) {
-          return new Phaser.Math.Vector2(0, 0); // Return a zero vector if no neighbors
-        }
-
-        // Calculate the average position (center of mass) of the neighbors
-        let averageX = 0;
-        let averageY = 0;
-        neighbours.forEach(n => {
-          averageX += n.x;
-          averageY += n.y;
-        });
-        averageX /= neighbours.length;
-        averageY /= neighbours.length;
-
-        // Create a vector pointing from the current pig to the center of mass.
-        const cohesionVector = new Phaser.Math.Vector2(averageX - pig.x, averageY - pig.y);
-
-        return cohesionVector;
-      }
-
-      /**
-       * Calculates a vector representing the average heading of a group of neighbors.
-       * This is the "alignment" component of a flocking algorithm.
-       * @param {Phaser.Physics.Arcade.Sprite[]} neighbours An array of neighboring stars.
-       * @returns {Phaser.Math.Vector2} A vector representing the average velocity of the neighbors.
-       */
-      function Calculate_Alignment_Vector(neighbours)
-      {
-        if (neighbours.length === 0) 
-        {
-          return new Phaser.Math.Vector2(0, 0); // Return a zero vector if no neighbors
-        }
-
-        // Calculate the average velocity of the neighbors
-        const averageVector = new Phaser.Math.Vector2(0, 0);
-        neighbours.forEach(n => 
-        {
-          averageVector.add(n.body.velocity);
-        });
-
-        return averageVector.scale(1 / neighbours.length);
-      }
-
-      /**
-       * Calculates a repulsion vector to steer a pig away from the player.
-       * The force is inversely proportional to the distance, meaning it's very strong
-       * when close and weak when far away.
-       * @param {Phaser.Physics.Arcade.Sprite} pig The pig to calculate the vector for.
-       * @param {Phaser.Physics.Arcade.Sprite} player The player object to flee from.
-       * @param {number} fleeRadius The radius within which the pig will start fleeing.
-       * @returns {Phaser.Math.Vector2} A vector representing the repulsion force from the player.
-       */
-      function Calculate_Flee_Vector_From_Player(pig, player, fleeRadius)
-      {
-        const fleeVector = new Phaser.Math.Vector2(0, 0);
-        const distance = Phaser.Math.Distance.Between(pig.x, pig.y, player.x, player.y);
-
-        if (distance > 0 && distance < fleeRadius) {
-          // Calculate a vector pointing away from the player.
-          const repulsionForce = new Phaser.Math.Vector2(pig.x - player.x, pig.y - player.y);
-          // The force is inversely proportional to the distance. Closer player pushes harder.
-          fleeVector.add(repulsionForce.normalize().scale(1 / distance));
-        }
-
-        return fleeVector;
-      }
-
-      /**
-       * Calculates a vector to steer away from crowded neighbors.
-       * This is the "separation" component of a flocking algorithm.
-       * @param {Phaser.Physics.Arcade.Sprite} pig The pig to calculate the vector for.
-       * @param {Phaser.Physics.Arcade.Sprite[]} neighbours An array of neighboring pigs.
-       * @returns {Phaser.Math.Vector2} A vector representing the direction to steer to avoid crowding.
-       */
-      function Calculate_Separation_Vector(pig, neighbours)
-      {
-        const separationVector = new Phaser.Math.Vector2(0, 0);
-        if (neighbours.length === 0) {
-          return separationVector;
-        }
-
-        neighbours.forEach(n => {
-          const distance = Phaser.Math.Distance.Between(pig.x, pig.y, n.x, n.y);
-          
-          if (distance > 0) {
-            // Calculate a vector pointing away from the neighbor.
-            const repulsionForce = new Phaser.Math.Vector2(pig.x - n.x, pig.y - n.y);
-            // The force is inversely proportional to the distance. Closer neighbors push harder.
-            separationVector.add(repulsionForce.normalize().scale(1 / distance));
-          }
-        });
-
-        return separationVector;
       }
 
       // misc =================================================================
