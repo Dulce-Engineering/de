@@ -1,19 +1,27 @@
 # Dragechon
 
+## Celestia
 Celestia is a hungry she-dragon that loves pork.
 
+### Abilities
 - Fart boost - temporary acceleration
 - Fire burst - turn pigs into bbqed pork
+- speed
+- turn rate
 
-speed
-turn rate
+## Pig
+
+## Levels
+1. teach movement
+1. teach chase
+1. teach avoid
 
 ## To Do
-- background image
-- pig animations
 - fix score
+- enemies that chase?
+- obstacles and movements?
 
 ## Links
 Phaser - https://phaser.io/
-Phaser Docs - https://docs.phaser.io/?_gl=1*17dog5s*_ga*MjA2NDkzMzM5LjE3NzE5OTg5NTM.*_ga_7NC8GZ639E*czE3NzE5OTg5NTMkbzEkZzEkdDE3NzE5OTkwNjYkajE3JGwwJGgxMDgzMTg1Mjkw
-Phaser API - https://docs.phaser.io/api-documentation/api-documentation?_gl=1*17dog5s*_ga*MjA2NDkzMzM5LjE3NzE5OTg5NTM.*_ga_7NC8GZ639E*czE3NzE5OTg5NTMkbzEkZzEkdDE3NzE5OTkwNjYkajE3JGwwJGgxMDgzMTg1Mjkw
+Phaser Docs - https://docs.phaser.io
+Phaser API - https://docs.phaser.io/api-documentation/api-documentation

@@ -16,11 +16,8 @@ class Player
     player.body.setSize(145, 129);
     player.play('flying');
 
-    //scene.physics.add.collider(player, platforms);
-    //scene.physics.add.collider(stars, platforms);
-    //scene.physics.add.collider(bombs, platforms);
-    scene.physics.add.collider
-      (player, scene.game.ctx.bombs, () => Player.Collide_Bomb(scene), null, scene);
+    //scene.physics.add.collider
+      //(player, scene.game.ctx.bombs, () => Player.Collide_Bomb(scene), null, scene);
     scene.physics.add.overlap
       (player, scene.game.ctx.pigs, 
         (player, pig) => Player.Overlap_Pig(scene, player, pig), null, scene);
@@ -77,11 +74,11 @@ class Player
       const x = (player.x < 400) ? Phaser.Math.Between(400, 800) : 
         Phaser.Math.Between(0, 400);
 
-      const bomb = scene.game.ctx.bombs.create(x, 16, 'bomb');
+      /*const bomb = scene.game.ctx.bombs.create(x, 16, 'bomb');
       bomb.setBounce(1);
       bomb.setCollideWorldBounds(true);
       bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
-      bomb.allowGravity = false;
+      bomb.allowGravity = false;*/
     }
   }
 

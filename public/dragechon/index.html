@@ -78,9 +78,9 @@
 
       function On_Scene_Preload ()
       {
-        this.load.image('bk', 'assets/grass.png');
+        this.load.image('bk', 'assets/grid.png');
         this.load.image('ground', 'assets/platform.png');
-        this.load.image('star', 'assets/star.png');
+        this.load.image('star', 'assets/pig.png');
         this.load.image('bomb', 'assets/bomb.png');
         this.load.spritesheet('player', 'assets/dragon/flying.png', { frameWidth: 290, frameHeight: 258 });
       }
@@ -97,7 +97,7 @@
           deviceOrientationGamma: 0,
           pigs: null,
           background: null,
-          bombs: null
+          //bombs: null
         };
 
         // Create infinitely scrolling background
@@ -111,18 +111,10 @@
 
         this.game.ctx.scoreText = this.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
 
-        //platforms = this.physics.add.staticGroup();
-        //platforms.create(400, 568, 'ground').setScale(2).refreshBody();
-        //platforms.create(600, 400, 'ground');
-        //platforms.create(50, 250, 'ground');
-        //platforms.create(750, 220, 'ground');
-
-        this.game.ctx.bombs = this.physics.add.group();
+        //this.game.ctx.bombs = this.physics.add.group();
 
         this.game.ctx.pigs = Pig.New_Group(this);
         this.game.ctx.player = Player.New(this);
-
-        //Player_Create(this);
 
         var camera = this.cameras.main;
         //camera.setSize(window.innerWidth, window.innerHeight);

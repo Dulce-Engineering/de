@@ -42,6 +42,8 @@ class Pig
 
   static Update(scene, delta)
   {
+    const vel = this.body.velocity;
+
     const neighbours = Pig.Get_Stars_In_Radius(this, 100, scene.game.ctx.pigs);
     let desiredDirection = new Phaser.Math.Vector2(0, 0);
 
@@ -60,7 +62,12 @@ class Pig
     if (desiredDirection.length() > 0)
     {
       const desiredVelocity = desiredDirection.normalize().scale(MAX_SPEED);
-      this.body.velocity.lerp(desiredVelocity, STEERING_FORCE);
+      vel.lerp(desiredVelocity, STEERING_FORCE);
+    }
+
+    if (vel.lengthSq() > 0.0001) 
+    {
+      this.rotation = vel.angle();
     }
   }
 
