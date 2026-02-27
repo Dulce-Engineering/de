@@ -232,5 +232,11 @@
     "datetime": 1771995295553,
     "id": "41abdde5-7e5a-4530-b1e7-495d44986c54",
     "query_id": "-dynamodb"
+  },
+  {
+    "count": 67,
+    "datetime": 1772171496510,
+    "id": "6d98e7a3-b82c-4222-9fb6-de0637dfaadb",
+    "query_id": "-dynamodb"
   }
 ]
