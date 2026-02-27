@@ -1,163 +1,27 @@
-<!doctype html> 
-<html lang="en"> 
+<!DOCTYPE html>
+<html>
 
-  <head> 
-    <meta charset="UTF-8" />
-    <title>Dragechon</title>
-    <script src="//cdn.jsdelivr.net/npm/phaser@3.90.0/dist/phaser.js"></script>
-    <style type="text/css">
-        html
-        {
-          width: 100vw;
-          height: 100vh;
-        }
-        body 
-        {
-          width: 100vw;
-          height: 100vh;
-          margin: 0;
-          padding: 0;
-          font-size: 0;
-          background-color: #888;
-          overflow: hidden;
-        }
-        canvas
-        {
-          xwidth: 100vw;
-          xheight: 100vh;
-          xdisplay: inline-block;
-        }
-    </style>
+  <head>
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser-arcade-physics.min.js"></script>
     <script type="module">
-      import Player from './lib/Player.js';
-      import Pig from './lib/Pig.js';
 
       Main();
       function Main()
       {
-        var config = 
-        {
-          type: Phaser.AUTO,
-          width: 1000, //window.innerWidth*3,
-          height: 1000, //window.innerHeight*3,
-          physics: 
-          {
-            default: 'arcade',
-            arcade: { debug: false }
-          },
-          scene: 
-          {
-            preload: On_Scene_Preload,
-            create: Scene_Create,
-            update: Scene_Update
-          },
-          scale:
-          {
-            xwidth: 1000,
-            xheight: 1000,
-            mode: Phaser.Scale.ENVELOP,
-            //mode: Phaser.Scale.FIT,
-            autoCenter: Phaser.Scale.CENTER_BOTH
-          }
-        };
-
-        var game = new Phaser.Game(config);
+        start_btn.addEventListener("click", On_Start_Btn_Click);
       }
 
-      // window ===============================================================
-
-      function On_Window_Tilt(event, scene)
+      function On_Start_Btn_Click()
       {
-        if (event?.gamma) 
-        {
-          scene.game.ctx.deviceOrientationGamma = event.gamma;
-        }
+        window.location.href = "level-1.html";
       }
-
-      // scene ================================================================
-
-      function On_Scene_Preload ()
-      {
-        this.load.image('bk', 'assets/grid.png');
-        this.load.image('ground', 'assets/platform.png');
-        this.load.image('star', 'assets/pig.png');
-        this.load.image('bomb', 'assets/bomb.png');
-        this.load.spritesheet('player', 'assets/dragon/flying.png', { frameWidth: 290, frameHeight: 258 });
-      }
-      
-      function Scene_Create ()
-      {
-        this.game.ctx = 
-        {
-          score: 0,
-          player: null,
-          gameOver: false,
-          scoreText: null,
-          cursors: null,
-          deviceOrientationGamma: 0,
-          pigs: null,
-          background: null,
-          //bombs: null
-        };
-
-        // Create infinitely scrolling background
-        const x = 0; //this.game.config.width / 2;
-        const y = 0; //this.game.config.height / 2;
-        const width = this.game.config.width * 2;
-        const height = this.game.config.height * 2;
-        this.game.ctx.background = this.add.tileSprite(x, y, width, height, 'bk');
-        this.game.ctx.background.setScrollFactor(1);
-        //this.game.ctx.background.setDepth(0);
-
-        this.game.ctx.scoreText = this.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
-
-        //this.game.ctx.bombs = this.physics.add.group();
-
-        this.game.ctx.pigs = Pig.New_Group(this);
-        this.game.ctx.player = Player.New(this);
-
-        var camera = this.cameras.main;
-        //camera.setSize(window.innerWidth, window.innerHeight);
-        //camera.setViewport(0, 0, window.innerWidth, window.innerHeight);
-        //camera.setZoom(2);
-        camera.startFollow(this.game.ctx.player);
-
-        // input
-        this.game.ctx.cursors = this.input.keyboard.createCursorKeys();
-        if (window.DeviceOrientationEvent) 
-        {
-          window.addEventListener('deviceorientation', (e) => On_Window_Tilt(e, this));
-        }
-      }
-
-      function Scene_Update (time, delta)
-      {
-        if (!this.game.ctx.gameOver)
-        {
-          for (const pig of this.game.ctx.pigs.getChildren())
-          {
-            pig.Update(this, delta);
-          }
-          this.game.ctx.player.Update(this, delta);
-
-          // Camera_Update
-          this.cameras.main.rotation = -this.game.ctx.player.rotation;
-
-          // Background_Update
-          if (this.game.ctx.background) {
-            this.game.ctx.background.x = this.game.ctx.player.x;
-            this.game.ctx.background.y = this.game.ctx.player.y;
-            this.game.ctx.background.tilePositionX = this.game.ctx.player.x;
-            this.game.ctx.background.tilePositionY = this.game.ctx.player.y;
-          }
-        }
-      }
-
-      // misc =================================================================
     </script>
   </head>
 
   <body>
+    <h1>Dragecon</h1>
+    <h2>Get some pork on your fork!</h2>
+    <button id="start_btn">Start game</button>
   </body>
 
 </html>
