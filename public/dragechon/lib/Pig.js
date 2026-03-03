@@ -71,6 +71,14 @@ class Pig
     }
   }
 
+  static Update_Group(scene, delta)
+  {
+    for (const pig of scene.game.ctx.pigs.getChildren())
+    {
+      pig.Update(scene, delta);
+    }
+  }
+
   static Get_Stars_In_Radius(center_pig, radius, pigs)
   {
     const nearbyStars = [];

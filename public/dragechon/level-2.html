@@ -33,17 +33,14 @@
       import Player from './lib/Player.js';
       import Pig from './lib/Pig.js';
 
-      const WORLD_WIDTH = 1000;
-      const WORLD_HEIGHT = 1000;
-
       Main();
       function Main()
       {
         var config = 
         {
           type: Phaser.AUTO,
-          width: WORLD_WIDTH,
-          height: WORLD_HEIGHT,
+          width: 1000, //window.innerWidth*3,
+          height: 1000, //window.innerHeight*3,
           physics: 
           {
             default: 'arcade',
@@ -51,15 +48,14 @@
           },
           scene: 
           {
-            preload: Scene_Preload,
+            preload: On_Scene_Preload,
             create: Scene_Create,
             update: Scene_Update
           },
           scale:
           {
             mode: Phaser.Scale.ENVELOP,
-            autoCenter: Phaser.Scale.CENTER_BOTH,
-            //zoom: 1
+            autoCenter: Phaser.Scale.CENTER_BOTH
           }
         };
 
@@ -78,19 +74,16 @@
 
       // scene ================================================================
 
-      function Scene_Preload()
+      function On_Scene_Preload ()
       {
-        this.load.image('mountain', 'assets/mountain.png');
         this.load.image('bk', 'assets/grid.png');
         this.load.image('ground', 'assets/platform.png');
         this.load.image('star', 'assets/pig.png');
         this.load.image('bomb', 'assets/bomb.png');
-
-        const sprite_spec = { frameWidth: 290, frameHeight: 258 };
-        this.load.spritesheet('player', 'assets/dragon/flying.png', sprite_spec);
+        this.load.spritesheet('player', 'assets/dragon/flying.png', { frameWidth: 290, frameHeight: 258 });
       }
       
-      function Scene_Create()
+      function Scene_Create ()
       {
         this.game.ctx = 
         {
@@ -114,9 +107,6 @@
         this.game.ctx.background.setScrollFactor(1);
         //this.game.ctx.background.setDepth(0);
 
-        this.physics.world.setBounds
-          (0, 0, this.game.config.width, this.game.config.height);
-
         this.game.ctx.scoreText = this.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
 
         //this.game.ctx.bombs = this.physics.add.group();
@@ -125,12 +115,10 @@
         this.game.ctx.player = Player.New(this);
 
         var camera = this.cameras.main;
-        //camera.useBounds = false;
-        camera.startFollow(this.game.ctx.player);
-        //camera.setSize(1000, 1000);
         //camera.setSize(window.innerWidth, window.innerHeight);
         //camera.setViewport(0, 0, window.innerWidth, window.innerHeight);
-        camera.setZoom(1);
+        //camera.setZoom(2);
+        camera.startFollow(this.game.ctx.player);
 
         // input
         this.game.ctx.cursors = this.input.keyboard.createCursorKeys();
@@ -140,11 +128,14 @@
         }
       }
 
-      function Scene_Update(time, delta)
+      function Scene_Update (time, delta)
       {
         if (!this.game.ctx.gameOver)
         {
-          Pig.Update_Group(this, delta);
+          for (const pig of this.game.ctx.pigs.getChildren())
+          {
+            pig.Update(this, delta);
+          }
           this.game.ctx.player.Update(this, delta);
 
           // Camera_Update

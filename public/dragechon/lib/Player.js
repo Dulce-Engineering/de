@@ -53,7 +53,7 @@ class Player
     const direction = this.rotation - Math.PI / 2;
     scene.physics.velocityFromRotation(direction, speed, this.body.velocity);
 
-    scene.physics.world.wrap(this, 0);
+    scene.physics.world.wrap(this, scene.game.config.width / 2);
   }
 
   static Overlap_Pig (scene, player, pig)
