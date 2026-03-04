@@ -15,12 +15,16 @@ class Player
     player.setScale(0.4);
     player.body.setSize(145, 129);
     player.play('flying');
+    player.setDepth(1);
 
     //scene.physics.add.collider
       //(player, scene.game.ctx.bombs, () => Player.Collide_Bomb(scene), null, scene);
-    scene.physics.add.overlap
-      (player, scene.game.ctx.pigs, 
-        (player, pig) => Player.Overlap_Pig(scene, player, pig), null, scene);
+    if (scene.game.ctx.pigs)
+    {
+      scene.physics.add.overlap
+        (player, scene.game.ctx.pigs, 
+          (player, pig) => Player.Overlap_Pig(scene, player, pig), null, scene);
+    }
 
     player.Update = Player.Update.bind(player);
 
@@ -29,27 +33,9 @@ class Player
 
   static Update(scene, delta)
   {
-    // allow arrow-keys to rotate the player (left/right)
-    const ROTATION_SPEED = 1.8; // base degrees per frame
-    const cursors = scene.game.ctx.cursors;
-    if (cursors)
-    {
-      const frameScale = delta ? (delta / 16.6667) : 1;
-      const rotationAmount = ROTATION_SPEED * frameScale;
-      if (cursors.left.isDown)
-      {
-        this.angle -= rotationAmount;
-      }
-      else if (cursors.right.isDown)
-      {
-        this.angle += rotationAmount;
-      }
-    }
+    this.angle += scene.game.ctx.input.Get_Delta_Angle(delta);
+    const speed = scene.game.ctx.input.Get_Speed(delta);
 
-    // also respond to device tilt
-    this.angle += scene.game.ctx.deviceOrientationGamma/2;
-
-    const speed = 100;
     const direction = this.rotation - Math.PI / 2;
     scene.physics.velocityFromRotation(direction, speed, this.body.velocity);
 
