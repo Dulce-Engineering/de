@@ -49,9 +49,9 @@ class DeLineChart extends HTMLElement
     this.Set_Highlight(h);
   }
 
-  static observedAttributes = [ "title" ];
+  static observedAttributes = ["title"];
   attributeChangedCallback(name, old_value, new_value)
-  { 
+  {
     if (this.isConnected)
     {
       if (name == "title" && this.title_elem)
@@ -63,7 +63,7 @@ class DeLineChart extends HTMLElement
 
   Set_Highlight(h)
   {
-    if (h.x1 >= 0 && h.x2 <= this.plot_width && 
+    if (h.x1 >= 0 && h.x2 <= this.plot_width &&
       h.x1 <= h.x2 && h.x2 >= h.x1)
     {
       this.highlight.setAttribute("x", h.x1);
@@ -74,10 +74,10 @@ class DeLineChart extends HTMLElement
   Get_Highlight()
   {
     const x1 = parseFloat(this.highlight.getAttribute("x"));
-    const w = parseFloat( this.highlight.getAttribute("width"));
+    const w = parseFloat(this.highlight.getAttribute("width"));
     const x2 = x1 + w;
 
-    return {x1, x2};
+    return { x1, x2 };
   }
 
   Set_Bounds()
@@ -113,7 +113,7 @@ class DeLineChart extends HTMLElement
         for (const key in this.data)
         {
           const line_data = this.data[key];
-          
+
           const path = this.Render_Line(line_data);
           this.svg.appendChild(path);
 
@@ -137,7 +137,7 @@ class DeLineChart extends HTMLElement
   {
     const x = (data.x - this.data_bounds.min_x) / this.data_bounds.width * this.plot_width;
     const y = (data.y - this.data_bounds.min_y) / this.data_bounds.height * this.plot_height;
-    return {x, y};
+    return { x, y };
   }
 
   Render_Highlight()
@@ -159,14 +159,68 @@ class DeLineChart extends HTMLElement
   Render_Line(data)
   {
     data = data.sort((a, b) => a.x - b.x);
-    const o = this.Map(data[0]);
+    const points = data.map(d => this.Map(d));
 
     const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-    let pathData = `M ${o.x},${o.y}`;
-    for (let i = 1; i < data.length; i++) 
+    let pathData = "";
+
+    if (points.length > 1) 
     {
-      const p = this.Map(data[i]);
-      pathData += ` L ${p.x},${p.y}`;
+      // Monotone Cubic Interpolation
+      // 1. Calculate slopes (secants)
+      const slopes = [];
+      for (let i = 0; i < points.length - 1; i++)
+      {
+        const dx = points[i + 1].x - points[i].x;
+        const dy = points[i + 1].y - points[i].y;
+        slopes.push(dx === 0 ? Infinity : dy / dx);
+      }
+
+      // 2. Calculate tangents
+      const tangents = [];
+      tangents.push(slopes[0]);
+      for (let i = 0; i < slopes.length - 1; i++)
+      {
+        tangents.push((slopes[i] + slopes[i + 1]) / 2);
+      }
+      tangents.push(slopes[slopes.length - 1]);
+
+      // 3. Enforce monotonicity
+      for (let i = 0; i < slopes.length; i++)
+      {
+        const s = slopes[i];
+        if (s === 0)
+        {
+          tangents[i] = 0;
+          tangents[i + 1] = 0;
+        } 
+        else
+        {
+          const alpha = tangents[i] / s;
+          const beta = tangents[i + 1] / s;
+          const magSq = alpha * alpha + beta * beta;
+          if (magSq > 9)
+          {
+            const tau = 3 / Math.sqrt(magSq);
+            tangents[i] = tau * alpha * s;
+            tangents[i + 1] = tau * beta * s;
+          }
+        }
+      }
+
+      // 4. Generate path
+      pathData = `M ${points[0].x},${points[0].y}`;
+      for (let i = 0; i < points.length - 1; i++)
+      {
+        const p0 = points[i], p1 = points[i + 1];
+        const m0 = tangents[i], m1 = tangents[i + 1];
+        const dx = (p1.x - p0.x) / 3;
+        pathData += ` C ${p0.x + dx},${p0.y + dx * m0} ${p1.x - dx},${p1.y - dx * m1} ${p1.x},${p1.y}`;
+      }
+    }
+    else if (points.length === 1) 
+    {
+      pathData = `M ${points[0].x},${points[0].y}`;
     }
     path.setAttribute("d", pathData);
     path.classList.add("data-line");
@@ -190,7 +244,7 @@ class DeLineChart extends HTMLElement
       circle.classList.add("data-point");
       elements.push(circle);
     }
-  
+
     return elements;
   }
 
@@ -224,7 +278,7 @@ class DeLineChart extends HTMLElement
     const x = x1 + 40;
     const y = y1 - 20;
     const label_elem = document.createElementNS("http://www.w3.org/2000/svg", "text");
-    label_elem.setAttribute("x", x); 
+    label_elem.setAttribute("x", x);
     label_elem.setAttribute("y", y);
     label_elem.setAttribute("alignment-baseline", "hanging");
     label_elem.setAttribute("transform-origin", `${x} ${y}`);
@@ -251,7 +305,7 @@ class DeLineChart extends HTMLElement
     const x = x1 - 20;
     const y = y1 + 40;
     const label_elem = document.createElementNS("http://www.w3.org/2000/svg", "text");
-    label_elem.setAttribute("x", x); 
+    label_elem.setAttribute("x", x);
     label_elem.setAttribute("y", y);
     label_elem.setAttribute("transform-origin", `${x} ${y}`);
     label_elem.setAttribute("transform", "scale(1, -1), rotate(-90)");
