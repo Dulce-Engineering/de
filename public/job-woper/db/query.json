@@ -1136,5 +1136,41 @@
     "terms": "\"solid.js\" or solidjs",
     "title": "Solid.js",
     "src": "indeed"
+  },
+  {
+    "id": "-cto",
+    "terms": "cto",
+    "title": "Chief Technology Officer (CTO)",
+    "src": "seek"
+  },
+  {
+    "id": "-vp",
+    "terms": "vp",
+    "title": "Vice President (VP)",
+    "src": "seek"
+  },
+  {
+    "id": "-lead",
+    "terms": "lead",
+    "title": "Team Lead",
+    "src": "seek"
+  },
+  {
+    "id": "-senior",
+    "terms": "senior",
+    "title": "Senior Level",
+    "src": "seek"
+  },
+  {
+    "id": "-mid",
+    "terms": "mid",
+    "title": "Mid Level",
+    "src": "seek"
+  },
+  {
+    "id": "-junior",
+    "terms": "junior",
+    "title": "Junior Level",
+    "src": "seek"
   }
 ]

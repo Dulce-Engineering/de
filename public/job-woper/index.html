@@ -313,6 +313,15 @@
         }
       }
 
+      .negative
+      {
+        color: #f66;
+      }
+      .positive
+      {
+        color: #0c0;
+      }
+      
       @media screen and (min-width: 768px)
       {
       }
@@ -468,39 +477,42 @@
       {
         const items = Object.values(data).flat();
 
-        const min_item = Utils.Minimum(items, "datetime");
-        const min_time = min_item.datetime;
-        const min_date = new Date(min_item.datetime);
+        const start_item = Utils.Minimum(items, "datetime");
+        const start_time = start_item.datetime;
+        const start_date = new Date(start_item.datetime);
 
-        const max_item = Utils.Maximum(items, "datetime");
-        const max_time = max_item.datetime;
-        const max_date = new Date(max_item.datetime);
+        const end_item = Utils.Maximum(items, "datetime");
+        const end_time = end_item.datetime;
+        const end_date = new Date(end_item.datetime);
 
-        const d_time = max_time - min_time;
+        const d_time = end_time - start_time;
         const d_days = Math.floor(d_time / Utils.MILLIS_DAY);
 
         let color = 0;
         for (const query_id in data)
         {
           const items = data[query_id];
-          const min_item = Utils.Minimum(items, "datetime");
-          const max_item = Utils.Maximum(items, "datetime");
+          const start_item = Utils.Minimum(items, "datetime");
+          const end_item = Utils.Maximum(items, "datetime");
 
-          const min_count = min_item.count;
-          const max_count = max_item.count;
-          const d_count = max_count - min_count;
+          const start_count = start_item.count;
+          const end_count = end_item.count;
+          const d_count = end_count - start_count;
+          const range = start_count + " - " + end_count;
+          const percent_change = ((d_count / start_count) * 100).toFixed(2) + "%";
+          const change_class = d_count > 0 ? "positive" : (d_count < 0 ? "negative" : "neutral");
+          const trend_char = d_count > 0 ? "▲" : (d_count < 0 ? "▼" : "▬");
 
           const query = queries.find(q => q.id == query_id);
 
           const html = `
             <tr>
               <td>
-                Usage - ${query.title} 
+                ${query.title} 
                 <span style="color:var(--c${color});">&#9632;</span>
               </td>
-              <td cid="min_usage">${min_count}</td>
-              <td cid="max_usage">${max_count}</td>
-              <td cid="diff_usage">${d_count}</td>
+              <td cid="range">${range}</td>
+              <td cid="diff_usage" class="${change_class}">${d_count} (${percent_change}) ${trend_char}</td>
             </tr>
           `;
           item_elem.body_elem.insertAdjacentHTML('beforeend', html);
@@ -508,8 +520,7 @@
           color++;
         }
 
-        item_elem.min_time.innerText = min_date.toLocaleDateString();
-        item_elem.max_time.innerText = max_date.toLocaleDateString();
+        item_elem.range_time.innerText = `${start_date.toLocaleDateString()} - ${end_date.toLocaleDateString()}`;
         item_elem.diff_time.innerText = `${d_days} days`;
       }
 
@@ -550,16 +561,14 @@
         <thead>
           <tr>
             <th></th>
-            <th>Start</th>
-            <th>End</th>
+            <th>Range</th>
             <th>Change</th>
           </tr>
         </thead>
         <tbody cid="body_elem">
           <tr>
             <td>Time</td>
-            <td cid="min_time"></td>
-            <td cid="max_time"></td>
+            <td cid="range_time"></td>
             <td cid="diff_time"></td>
           </tr>
         </tbody>
