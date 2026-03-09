@@ -7,11 +7,14 @@ class DeLineChart extends HTMLElement
 
   plot_width = 800;
   plot_height = 200;
+
   padding_top = 10;
   padding_right = 40;
   padding_bottom = 60;
   padding_left = 80;
+
   padding_axis = 20;
+
   data_bounds = null;
   // attr: title = "Title";
   // attr: x-label = "X Axis";
@@ -63,21 +66,29 @@ class DeLineChart extends HTMLElement
 
   Set_Highlight(h)
   {
-    if (h.x1 >= 0 && h.x2 <= this.plot_width &&
+    if (h && h.x1 >= 0 && h.x2 <= this.plot_width &&
       h.x1 <= h.x2 && h.x2 >= h.x1)
     {
       this.highlight.setAttribute("x", h.x1);
       this.highlight.setAttribute("width", h.x2 - h.x1);
     }
+
+    this.highlight.classList.toggle("on", h != null && h != undefined);
   }
 
   Get_Highlight()
   {
-    const x1 = parseFloat(this.highlight.getAttribute("x"));
-    const w = parseFloat(this.highlight.getAttribute("width"));
-    const x2 = x1 + w;
+    let res = null;
 
-    return { x1, x2 };
+    if (this.highlight.classList.contains("on"))
+    {
+      const x1 = parseFloat(this.highlight.getAttribute("x"));
+      const w = parseFloat(this.highlight.getAttribute("width"));
+      const x2 = x1 + w;
+      res = { x1, x2 };
+    }
+
+    return res;
   }
 
   Set_Bounds()
@@ -95,6 +106,211 @@ class DeLineChart extends HTMLElement
     };
     this.data_bounds.width = this.data_bounds.max_x - this.data_bounds.min_x;
     this.data_bounds.height = this.data_bounds.max_y - this.data_bounds.min_y;
+    //console.log("Set_Bounds(): data_bounds =", this.data_bounds);
+  }
+
+  Map_Data_To_SVG_Point(data)
+  {
+    const dx = data.x - this.data_bounds.min_x;
+    const rx = dx / this.data_bounds.width;
+    const x = rx * this.plot_width;
+
+    const dy = data.y - this.data_bounds.min_y;
+    const ry = dy / this.data_bounds.height;
+    const y = ry * this.plot_height;
+
+    return { x, y };
+  }
+
+  Map_SVG_Point_To_Data(svg_pt)
+  {
+    const x = (svg_pt.x / this.plot_width) * this.data_bounds.width + this.data_bounds.min_x;
+    const y = (svg_pt.y / this.plot_height) * this.data_bounds.height + this.data_bounds.min_y;
+    return { x, y };
+  }
+
+  Render_Data_Points(data)
+  {
+    const elements = [];
+    for (const data_point of data) 
+    {
+      const point = this.Map_Data_To_SVG_Point(data_point);
+      const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      circle.setAttribute("cx", point.x);
+      circle.setAttribute("cy", point.y);
+      circle.setAttribute("r", "4");
+      circle.classList.add("data-point");
+      elements.push(circle);
+    }
+
+    return elements;
+  }
+
+  /*Render_Title()
+  {
+    const x = -this.padding_axis - this.padding_left + 40;
+    const y = this.plot_height + 40;
+    this.label_elem = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    this.label_elem.setAttribute("x", x); 
+    this.label_elem.setAttribute("y", y);
+    this.label_elem.setAttribute("transform-origin", `${x} ${y}`);
+    this.label_elem.setAttribute("transform", "scale(1, -1)");
+    this.label_elem.classList.add("title");
+    this.label_elem.innerHTML = this.title;
+
+    return this.label_elem;
+  }*/
+
+  On_SVG_Click(event)
+  {
+    //console.log("On_SVG_Click: client_pt =", event.clientX, event.clientY);
+    const rect = this.svg.getBoundingClientRect();
+
+    const elem_x = event.clientX - rect.left;
+    const elem_y = (rect.top + rect.height) - event.clientY;
+    const elem_pt = { x: elem_x, y: elem_y };
+    //console.log("On_SVG_Click: rect =", rect);
+    //console.log("On_SVG_Click: elem_pt =", elem_pt);
+
+    const svg_x = (elem_x / rect.width * this.Calc_SVG_Width()) + this.Calc_SVG_X_Offset();
+    const svg_y = (elem_y / rect.height * this.Calc_SVG_Height()) + this.Calc_SVG_Y_Offset();
+    const svg_pt = { x: svg_x, y: svg_y };
+    //console.log("On_SVG_Click: elem_pt, svg_pt =", elem_pt, svg_pt);
+
+    const data_pt = this.Map_SVG_Point_To_Data(svg_pt);
+    //console.log("On_SVG_Click: data_pt =", data_pt);
+
+    const nearest_data_pts = {};
+    for (const key in this.data)
+    {
+      const series = this.data[key];
+      const nearest = this.Nearest_Y_For_X(series, data_pt.x);
+      if (nearest)
+      {
+        nearest_data_pts[key] = { x: Math.trunc(data_pt.x), y: nearest.y };
+      }
+    }
+    //console.log("On_SVG_Click: nearest_data_pts =", nearest_data_pts);
+
+    this.dispatchEvent(new CustomEvent("point-selected", {detail: nearest_data_pts}));
+    
+  }
+
+  Nearest_Y_For_X(series, x)
+  {
+    if (!series || series.length === 0) return null;
+
+    // find the point whose x is closest to the provided value
+    let best = series[0];
+    let bestDist = Math.abs(best.x - x);
+    for (let i = 1; i < series.length; i++)
+    {
+      const pt = series[i];
+      const d = Math.abs(pt.x - x);
+      if (d < bestDist)
+      {
+        bestDist = d;
+        best = pt;
+      }
+    }
+    // return a shallow copy to avoid external mutation
+    return { x: best.x, y: best.y };
+  }
+
+  Find_Nearest_Point(clickX, clickY)
+  {
+    let nearestPoint = null;
+    let minDistance = Infinity;
+
+    for (const seriesKey in this.data)
+    {
+      const series = this.data[seriesKey];
+      for (const point of series)
+      {
+        const distance = Math.sqrt((point.x - clickX) ** 2 + (point.y - clickY) ** 2);
+        if (distance < minDistance)
+        {
+          minDistance = distance;
+          nearestPoint = {
+            x: point.x,
+            y: point.y,
+            series: seriesKey
+          };
+        }
+      }
+    }
+
+    return nearestPoint;
+  }
+
+  Calc_SVG_X_Offset()
+  {
+    const x = 0 - this.padding_axis - this.padding_left;
+    //const x = 0 - this.padding_left;
+    return x;
+  }
+
+  Calc_SVG_Y_Offset()
+  {
+    const y = 0 - this.padding_axis - this.padding_bottom;
+    //const y = 0 - this.padding_bottom;
+    return y;
+  }
+
+  Calc_SVG_Width()
+  {
+    const w = 
+      this.plot_width + // data rendering width
+      (this.padding_left + this.padding_right) + // outer padding for axes
+      this.padding_axis; // inner padding for axes
+
+    return w;
+  }
+
+  Calc_SVG_Height()
+  {
+    const h = 
+      this.plot_height + // data rendering height
+      (this.padding_top + this.padding_bottom) + 
+      this.padding_axis;
+
+    return h;
+  }
+
+  // rendering ================================================================
+
+  Render()
+  {
+    if (this.isConnected)
+    {
+      const x = this.Calc_SVG_X_Offset();
+      const y = this.Calc_SVG_Y_Offset();
+      const w = this.Calc_SVG_Width();
+      const h = this.Calc_SVG_Height();
+      const title = this.getAttribute("title") || "Title";
+      //console.log("Render(): x, y, w, h =", x, y, w, h);
+
+      const html = `
+        <h1 class="title">
+          <span cid="title_elem">${title}</span>
+          <slot name="title"></slot>
+        </h1>
+        <svg 
+          cid="svg" 
+          viewBox="${x} ${y} ${w} ${h}" 
+          style="transform: scale(1, -1);"
+          preserveAspectRatio="none"
+        >
+        </svg>
+      `;
+      const elems = Utils.toDocument(html, this);
+      this.replaceChildren(elems);
+      Utils.Set_Id_Shortcuts(this, this, "cid");
+
+      this.svg.addEventListener("click", this.On_SVG_Click);
+
+      this.Render_Chart();
+    }
   }
 
   Render_Chart() 
@@ -133,33 +349,10 @@ class DeLineChart extends HTMLElement
     }
   }
 
-  Map(data)
-  {
-    const x = (data.x - this.data_bounds.min_x) / this.data_bounds.width * this.plot_width;
-    const y = (data.y - this.data_bounds.min_y) / this.data_bounds.height * this.plot_height;
-    return { x, y };
-  }
-
-  Render_Highlight()
-  {
-    const x = 0;
-    const y = 0;
-    const w = this.plot_width;
-    const h = this.plot_height;
-    const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-    rect.setAttribute("x", x);
-    rect.setAttribute("y", y);
-    rect.setAttribute("width", w);
-    rect.setAttribute("height", h);
-    rect.classList.add("highlight");
-
-    return rect;
-  }
-
   Render_Line(data)
   {
     data = data.sort((a, b) => a.x - b.x);
-    const points = data.map(d => this.Map(d));
+    const points = data.map(d => this.Map_Data_To_SVG_Point(d));
 
     const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
     let pathData = "";
@@ -231,38 +424,6 @@ class DeLineChart extends HTMLElement
     return path;
   }
 
-  Render_Data_Points(data)
-  {
-    const elements = [];
-    for (const data_point of data) 
-    {
-      const point = this.Map(data_point);
-      const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-      circle.setAttribute("cx", point.x);
-      circle.setAttribute("cy", point.y);
-      circle.setAttribute("r", "4");
-      circle.classList.add("data-point");
-      elements.push(circle);
-    }
-
-    return elements;
-  }
-
-  /*Render_Title()
-  {
-    const x = -this.padding_axis - this.padding_left + 40;
-    const y = this.plot_height + 40;
-    this.label_elem = document.createElementNS("http://www.w3.org/2000/svg", "text");
-    this.label_elem.setAttribute("x", x); 
-    this.label_elem.setAttribute("y", y);
-    this.label_elem.setAttribute("transform-origin", `${x} ${y}`);
-    this.label_elem.setAttribute("transform", "scale(1, -1)");
-    this.label_elem.classList.add("title");
-    this.label_elem.innerHTML = this.title;
-
-    return this.label_elem;
-  }*/
-
   Render_X_Axis()
   {
     const x1 = -this.padding_axis - 10;
@@ -316,35 +477,20 @@ class DeLineChart extends HTMLElement
     return [yAxis, label_elem];
   }
 
-  Render()
+  Render_Highlight()
   {
-    if (this.isConnected)
-    {
-      const x = 0 - this.padding_axis - this.padding_left;
-      const y = 0 - this.padding_axis - this.padding_bottom;
-      const w = this.plot_width + (this.padding_left + this.padding_right) + this.padding_axis;
-      const h = this.plot_height + (this.padding_top + this.padding_bottom) + this.padding_axis;
-      const title = this.getAttribute("title") || "Title";
+    const x = 0;
+    const y = 0;
+    const w = this.plot_width;
+    const h = this.plot_height;
+    const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+    rect.setAttribute("x", x);
+    rect.setAttribute("y", y);
+    rect.setAttribute("width", w);
+    rect.setAttribute("height", h);
+    rect.classList.add("highlight");
 
-      const html = `
-        <h1 class="title">
-          <span cid="title_elem">${title}</span>
-          <slot name="title"></slot>
-        </h1>
-        <svg 
-          cid="svg" 
-          viewBox="${x} ${y} ${w} ${h}" 
-          style="transform: scale(1, -1);"
-          preserveAspectRatio="none"
-        >
-        </svg>
-      `;
-      const elems = Utils.toDocument(html, this);
-      this.replaceChildren(elems);
-      Utils.Set_Id_Shortcuts(this, this, "cid");
-
-      this.Render_Chart();
-    }
+    return rect;
   }
 }
 

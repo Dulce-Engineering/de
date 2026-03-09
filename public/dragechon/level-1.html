@@ -65,7 +65,7 @@
           this.game.ctx.camera = Camera.New(this);
           this.game.ctx.input = new Input(this, window);
 
-          new Home(this, 0, 0, this.game.ctx.player);
+          new Home(this, 200, 200, this.game.ctx.player);
           new Background(this, this.game.ctx.player);
 
           this.physics.world.setBounds
@@ -74,11 +74,8 @@
 
         update(time, delta)
         {
-          if (!this.game.ctx.gameOver)
-          {
-            this.game.ctx.player.Update(this, delta);
-            this.game.ctx.camera.Update(this, delta);
-          }
+          this.game.ctx.player.Update(this, delta);
+          this.game.ctx.camera.Update(this, delta);
         }
 
         Game_Over()

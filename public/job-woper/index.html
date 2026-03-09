@@ -203,7 +203,7 @@
         }
         table
         {
-          margin: -24px 35px 20px 35px;
+          margin: 0 35px 20px 35px;
           border-collapse: separate;
           border-spacing: 20px 0;
 
@@ -220,6 +220,11 @@
             text-align: right;
           }
         }
+      }
+
+      de-line-chart:hover
+      {
+        cursor: crosshair;
       }
 
       de-input-tree
@@ -468,7 +473,25 @@
         item_elem.chart_elem.del_btn.addEventListener("click", (e) => chart_list.Remove(chart.id));
         item_elem.chart_elem.edit_btn.addEventListener("click", (e) => On_Edit_Btn_Click(e, chart));
         item_elem.chart_elem.items = data;
+        item_elem.chart_elem.addEventListener
+          ("point-selected",  e => On_Pt_Selected(e, item_elem));
         Render_Summary(item_elem, trends, queries);
+      }
+
+      function On_Pt_Selected(event, item_elem)
+      {
+        const query_ids = event.detail;
+        for (const query_id in query_ids) 
+        {
+          const data = query_ids[query_id];
+          const date_str = new Date(data.x).toLocaleDateString();
+          const job_count = data.y;
+
+          item_elem.selection_time.innerText = date_str;
+          const row_elem = item_elem.body_elem.querySelector(`tr[query-id="${query_id}"]`);
+          const usage_elem = row_elem.querySelector(`[cid="selection_usage"]`);
+          usage_elem.innerText = job_count;
+        }
       }
       
       // rendering ======================================================================
@@ -506,13 +529,14 @@
           const query = queries.find(q => q.id == query_id);
 
           const html = `
-            <tr>
+            <tr query-id="${query_id}">
               <td>
                 ${query.title} 
                 <span style="color:var(--c${color});">&#9632;</span>
               </td>
               <td cid="range">${range}</td>
               <td cid="diff_usage" class="${change_class}">${d_count} (${percent_change}) ${trend_char}</td>
+              <td cid="selection_usage">n/a</td>
             </tr>
           `;
           item_elem.body_elem.insertAdjacentHTML('beforeend', html);
@@ -563,6 +587,7 @@
             <th></th>
             <th>Range</th>
             <th>Change</th>
+            <th>Selection</th>
           </tr>
         </thead>
         <tbody cid="body_elem">
@@ -570,6 +595,7 @@
             <td>Time</td>
             <td cid="range_time"></td>
             <td cid="diff_time"></td>
+            <td cid="selection_time"></td>
           </tr>
         </tbody>
       </table>

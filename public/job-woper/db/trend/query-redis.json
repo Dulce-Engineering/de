@@ -244,5 +244,11 @@
     "datetime": 1772755225858,
     "id": "6a5b9ed5-3b7e-4073-84a0-af572f2382c6",
     "query_id": "-redis"
+  },
+  {
+    "count": 348,
+    "datetime": 1773037882600,
+    "id": "f73fe0ae-74ba-4d65-aa25-823475864703",
+    "query_id": "-redis"
   }
 ]
