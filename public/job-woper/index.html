@@ -200,6 +200,21 @@
         .highlight
         {
           visibility: hidden;
+          stroke: none;
+          fill: #ff08;
+        }
+        .highlight.on
+        {
+          visibility: visible;
+        }
+        .input-mask
+        {
+          stroke: none;
+          fill: #0000;
+        }
+        .input-mask:hover
+        {
+          cursor: crosshair;
         }
         table
         {
@@ -220,11 +235,6 @@
             text-align: right;
           }
         }
-      }
-
-      de-line-chart:hover
-      {
-        cursor: crosshair;
       }
 
       de-input-tree
@@ -492,6 +502,12 @@
           const usage_elem = row_elem.querySelector(`[cid="selection_usage"]`);
           usage_elem.innerText = job_count;
         }
+        
+        const first_x = Object.values(query_ids)[0].x;
+        const data_pt = {x: first_x, y: 0};
+        const svg_pt = item_elem.chart_elem.Map_Data_To_SVG_Point(data_pt);
+        const range = {x1: svg_pt.x, x2: svg_pt.x + 5};
+        item_elem.chart_elem.Set_Highlight(range);
       }
       
       // rendering ======================================================================

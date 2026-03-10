@@ -14,6 +14,7 @@ class DeLineChart extends HTMLElement
   padding_left = 80;
 
   padding_axis = 20;
+  overhang_axis = 10;
 
   data_bounds = null;
   // attr: title = "Title";
@@ -64,16 +65,20 @@ class DeLineChart extends HTMLElement
     }
   }
 
-  Set_Highlight(h)
+  Set_Highlight(svg_range)
   {
-    if (h && h.x1 >= 0 && h.x2 <= this.plot_width &&
-      h.x1 <= h.x2 && h.x2 >= h.x1)
+    const range_valid = 
+      svg_range && svg_range.x1 >= 0 && svg_range.x2 <= this.plot_width &&
+      svg_range.x1 <= svg_range.x2 && svg_range.x2 >= svg_range.x1;
+    if (range_valid)
     {
-      this.highlight.setAttribute("x", h.x1);
-      this.highlight.setAttribute("width", h.x2 - h.x1);
+      this.highlight.setAttribute("x", svg_range.x1);
+      const range_width = svg_range.x2 - svg_range.x1;
+      this.highlight.setAttribute("width", range_width);
     }
 
-    this.highlight.classList.toggle("on", h != null && h != undefined);
+    const has_range = svg_range != null && svg_range != undefined;
+    this.highlight.classList.toggle("on", has_range);
   }
 
   Get_Highlight()
@@ -163,22 +168,17 @@ class DeLineChart extends HTMLElement
 
   On_SVG_Click(event)
   {
-    //console.log("On_SVG_Click: client_pt =", event.clientX, event.clientY);
     const rect = this.svg.getBoundingClientRect();
 
     const elem_x = event.clientX - rect.left;
     const elem_y = (rect.top + rect.height) - event.clientY;
     const elem_pt = { x: elem_x, y: elem_y };
-    //console.log("On_SVG_Click: rect =", rect);
-    //console.log("On_SVG_Click: elem_pt =", elem_pt);
 
     const svg_x = (elem_x / rect.width * this.Calc_SVG_Width()) + this.Calc_SVG_X_Offset();
     const svg_y = (elem_y / rect.height * this.Calc_SVG_Height()) + this.Calc_SVG_Y_Offset();
     const svg_pt = { x: svg_x, y: svg_y };
-    //console.log("On_SVG_Click: elem_pt, svg_pt =", elem_pt, svg_pt);
 
     const data_pt = this.Map_SVG_Point_To_Data(svg_pt);
-    //console.log("On_SVG_Click: data_pt =", data_pt);
 
     const nearest_data_pts = {};
     for (const key in this.data)
@@ -190,7 +190,6 @@ class DeLineChart extends HTMLElement
         nearest_data_pts[key] = { x: Math.trunc(data_pt.x), y: nearest.y };
       }
     }
-    //console.log("On_SVG_Click: nearest_data_pts =", nearest_data_pts);
 
     this.dispatchEvent(new CustomEvent("point-selected", {detail: nearest_data_pts}));
     
@@ -246,14 +245,12 @@ class DeLineChart extends HTMLElement
   Calc_SVG_X_Offset()
   {
     const x = 0 - this.padding_axis - this.padding_left;
-    //const x = 0 - this.padding_left;
     return x;
   }
 
   Calc_SVG_Y_Offset()
   {
     const y = 0 - this.padding_axis - this.padding_bottom;
-    //const y = 0 - this.padding_bottom;
     return y;
   }
 
@@ -345,6 +342,9 @@ class DeLineChart extends HTMLElement
 
         this.highlight = this.Render_Highlight();
         this.svg.appendChild(this.highlight);
+
+        this.mask = this.Render_Input_Mask();
+        this.svg.appendChild(this.mask);
       }
     }
   }
@@ -426,7 +426,7 @@ class DeLineChart extends HTMLElement
 
   Render_X_Axis()
   {
-    const x1 = -this.padding_axis - 10;
+    const x1 = -this.padding_axis - this.overhang_axis;
     const y1 = -this.padding_axis;
     const x2 = this.plot_width;
     const y2 = y1;
@@ -454,7 +454,7 @@ class DeLineChart extends HTMLElement
   Render_Y_Axis()
   {
     const x1 = -this.padding_axis;
-    const y1 = -this.padding_axis - 10;
+    const y1 = -this.padding_axis - this.overhang_axis;
     const x2 = x1;
     const y2 = this.plot_height;
     const yAxis = document.createElementNS("http://www.w3.org/2000/svg", "line");
@@ -480,6 +480,22 @@ class DeLineChart extends HTMLElement
   Render_Highlight()
   {
     const x = 0;
+    const y = 0 - this.padding_axis - this.overhang_axis;
+    const w = this.plot_width;
+    const h = this.plot_height + this.padding_axis + this.overhang_axis;
+    const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+    rect.setAttribute("x", x);
+    rect.setAttribute("y", y);
+    rect.setAttribute("width", w);
+    rect.setAttribute("height", h);
+    rect.classList.add("highlight");
+
+    return rect;
+  }
+
+  Render_Input_Mask()
+  {
+    const x = 0;
     const y = 0;
     const w = this.plot_width;
     const h = this.plot_height;
@@ -488,7 +504,7 @@ class DeLineChart extends HTMLElement
     rect.setAttribute("y", y);
     rect.setAttribute("width", w);
     rect.setAttribute("height", h);
-    rect.classList.add("highlight");
+    rect.classList.add("input-mask");
 
     return rect;
   }
