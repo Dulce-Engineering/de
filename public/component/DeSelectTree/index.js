@@ -4,116 +4,152 @@ import Utils from "../../lib/Utils.js";
 class DeSelectTree extends HTMLElement
 {
   static tname = "de-select-tree";
+  static formAssociated = true;
 
   constructor()
   {
     super();
     Utils.Bind(this, "On_");
 
-    this.selected_id = null;
+    this.all_items = null;
   }
 
   connectedCallback()
   {
-    this.render();
+    this.Render();
   }
 
-  /* objs: [{id, parent_id, title}] */
-  set items(objs)
+  formResetCallback() 
   {
-    let html = this.Render_Item(objs, null);
-    this.items_block.innerHTML = html;
+    this.Render_Selected_Items();
+    this.Set_Clear_Btn_Visibility();
+  }
 
-    this.items_block.querySelectorAll(".item").forEach(item =>
-    {
-      const obj_id = item.getAttribute("item-id");
-      const obj = objs.find(o => o.id == obj_id);
-      item.obj = obj;
-      item.addEventListener("click", this.On_Selected_Item_Click);
-    });
+  // properties ===============================================================
+
+  /* objs: [{id, parent_id, title}] */
+  set items(value)
+  {
+    this.all_items = value;
+    this.all_items_tree.items = value;
   }
 
   get value()
   {
-    return this.selected_id;
+    const selected_array = Array.from(this.Get_Item_Elems());
+    const selected_ids = selected_array.map(elem => elem.item_obj.id);
+
+    return selected_ids;
   }
 
-  set value(id)
+  set value(item_ids)
   {
-    this.selected_id = id;
-    if (id)
+    if (!Utils.Is_Empty(item_ids))
     {
-      const item = this.items.find(o => o.id == id);
-      this.selected_item.innerText = item.title;
-    }
-    else
-    {
-      this.selected_item.innerText = "None";
-    }
-  }
-
-  Render_Item(objs, parent_id)
-  {
-    const name = this.getAttribute("name");
-    let html = "";
-    const child_objs = objs.filter(o => Has_Parent(o, parent_id));
-    function Has_Parent(o, parent_id)
-    {
-      if (parent_id == null || parent_id == undefined)
-      {
-        return o.parent_id == null || o.parent_id == undefined;
-      }
-      else
-      {
-        return o.parent_id == parent_id;
-      }
-    }
-    
-    for (const child_obj of child_objs)
-    {
-      if (this.Has_Children(objs, child_obj.id))
-      {
-        html += `
-          <details name="${name}">
-            <summary>${child_obj.title}</summary>
-            ${this.Render_Item(objs, child_obj.id)}
-          </details>
-        `;
-      }
-      else
-      {
-        html += `
-          <div class="item" item-id="${child_obj.id}">${child_obj.title}</div>
-        `;
-      }
+      const selected_items = this.all_items.filter(item => item_ids.includes(item.id));
+      this.Render_Selected_Items(selected_items);
     }
 
-    return html;
+    this.Set_Clear_Btn_Visibility();
   }
 
-  Has_Children(objs, obj_id)
+  // methods ==================================================================
+
+  Get_Item_Elems()
   {
-    return objs.filter(o => o.parent_id == obj_id).length > 0;
+    return this.selected_items.querySelectorAll("li");
   }
 
-  On_Selected_Item_Click(event)
+  // events ==================================================================
+
+  On_Click_Clear_Btn()
   {
-    const item = event.target.obj;
-    this.selected_id = item.id;
-    this.selected_item.innerText = item.title;
-    this.items_block.hidePopover();
+    this.Render_Selected_Items();
   }
 
-  render()
+  On_Click_Item(event)
   {
-    const items_block_id = this.id + "_items_block";
+    const item_id = event.detail;
+    const is_not_selected = !this.value.includes(item_id);
+    if (is_not_selected)
+    {
+      const item = this.all_items.find(item => item.id == item_id);
+      const new_item = this.Render_Selected_Item(item);
+      this.selected_items.append(new_item);
+      this.all_items_tree.hidePopover();
+    }
+
+    this.Set_Clear_Btn_Visibility();
+  }
+
+  On_Click_Remove_Btn(event)
+  {
+    const selected_array = Array.from(this.Get_Item_Elems());
+    const selected_elem = selected_array.find(elem => elem.remove_btn === event.currentTarget);
+    selected_elem.remove();
+
+    this.Set_Clear_Btn_Visibility();
+  }
+
+  // rendering ================================================================
+
+  Set_Clear_Btn_Visibility()
+  {
+    const has_items = this.Get_Item_Elems().length > 0;
+    this.clear_btn.hidden = !has_items;
+  }
+
+  Render_Selected_Items(items)
+  {
+    this.selected_items.replaceChildren();
+    if (!Utils.Is_Empty(items))
+    {
+      for (const item of items)
+      {
+        const elem = this.Render_Selected_Item(item);
+        this.selected_items.append(elem);
+      }
+    }
+  }
+
+  Render_Selected_Item(item)
+  {
+    const remove_char = "&times;";
     const html = `
-      <button cid="selected_item" popovertarget="${items_block_id}" type="button">None</button>
-      <div id="${items_block_id}" cid="items_block" popover></div>
+      <li>
+        ${item.title}
+        <button cid="remove_btn">${remove_char}</button>
+      </li>
     `;
-    const html_elements = Utils.toDocument(html, this);
-    this.replaceChildren(html_elements);
+    const elem = Utils.toElement(html);
+    Utils.Set_Id_Shortcuts(elem, elem, "cid");
+    elem.item_obj = item;
+    elem.remove_btn.addEventListener("click", this.On_Click_Remove_Btn);
+
+    return elem;
+  }
+
+  Render()
+  {
+    const add_char = "&plus;";
+    const clear_char = "&#128465;";
+    const this_id = this.id || "";
+    const tree_id = this_id + "_all_items_tree";
+    const html = `
+      <button 
+        cid="add_btn" 
+        popovertarget="${tree_id}" 
+        popovertargetaction="show" 
+        type="button">${add_char}</button>
+      <button cid="clear_btn" type="button" hidden>${clear_char}</button>
+      <ul cid="selected_items"></ul>
+      <de-tree id="${tree_id}" cid="all_items_tree" popover></de-tree>
+    `;
+    this.innerHTML = html;
     Utils.Set_Id_Shortcuts(this, this, "cid");
+
+    this.all_items_tree.addEventListener("itemclick", this.On_Click_Item);
+    this.clear_btn.addEventListener("click", this.On_Click_Clear_Btn);
   }
 }
 

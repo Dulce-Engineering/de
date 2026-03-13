@@ -66,6 +66,7 @@
         --highlight: #fff;
         --highlight2: #f00;
         --shade: #0008;
+        --input-text: #0f0;
 
         --c0: #fff;
         --c1: #00f;
@@ -236,7 +237,6 @@
           }
         }
       }
-
       de-input-tree
       {
         max-height: 600px;
@@ -258,7 +258,8 @@
         }
         summary::marker
         {
-          display: block;
+          xdisplay: block;
+          display: none;
           font-size: 1.6rem;
         }
         label[for]
@@ -283,7 +284,6 @@
           margin-bottom: 8px;
         }
       }
-
       de-dialog-form
       {
         dialog
@@ -312,6 +312,10 @@
           font-family: octagonal-bold;
           font-size: 1.2rem;
           padding: 5px 10px;
+          margin: 0;
+          background: none;
+          color: var(--input-text);
+          border: 1px solid var(--border);
         }
         main
         {
@@ -327,6 +331,66 @@
           text-align: center;
         }
       }
+      de-select-tree
+      {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        
+        ul
+        {
+          display: flex;
+          list-style: none;
+          margin: 0;
+          padding: 0;
+          gap: 10px;
+          flex-wrap: wrap;
+        }
+        li
+        {
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          border: 1px solid var(--border);
+          padding: 4px;
+
+          button
+          {
+            width: 24px;
+            height: 24px;
+            min-width: 24px;
+            min-height: 24px;
+          }
+        }
+        button
+        {
+          width: 32px;
+          height: 32px;
+          min-width: 32px;
+          min-height: 32px;
+          padding: 0;
+          margin: 0;
+          padding: 0 0 0 4px;
+        }
+      }
+      de-tree
+      {
+        font-size: 1.2rem;
+        cursor: pointer;
+        background: #000;
+        border: 4px solid var(--border);
+        color: var(--input-text);
+        padding: 40px;
+
+        details, .item
+        {
+          margin: 10px 0;
+        }
+        details.item > summary
+        {
+          list-style: inside square;
+        }
+      }
 
       .negative
       {
@@ -335,6 +399,10 @@
       .positive
       {
         color: #0c0;
+      }
+      .hidden, .item.hidden
+      {
+        display: none;
       }
       
       @media screen and (min-width: 768px)
@@ -360,6 +428,8 @@
       import Utils from "../lib/Utils.js";
       import "../component/DeDialogForm/index.js";
       import "../component/DeInputTree/index.js";
+      import "../component/DeTree/index.js";
+      import "../component/DeSelectTree/index.js";
       import "../component/DeLineChart/index.js";
       import "../component/DeInputList/index.js";
 
@@ -630,7 +700,7 @@
       <label slot="fields" for="title">Title</label>
       <input id="title" slot="fields" type="text" name="title"></input>
       <label slot="fields" for="tech_select">Tech</label>
-      <de-input-tree id="tech_select" slot="fields" name="query_ids"></de-input-tree>
+      <de-select-tree id="tech_select" slot="fields" name="query_ids"></de-select-tree>
     </de-dialog-form>
 
   </body>

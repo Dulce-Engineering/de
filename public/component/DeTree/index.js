@@ -3,14 +3,12 @@ import Utils from "../../lib/Utils.js";
 
 class DeInputTree extends HTMLElement
 {
-  static tname = "de-input-tree";
+  static tname = "de-tree";
 
   constructor()
   {
     super();
     Utils.Bind(this, "On_");
-
-    this.selected_ids = null;
   }
 
   connectedCallback()
@@ -24,47 +22,10 @@ class DeInputTree extends HTMLElement
   set items(objs)
   {
     const elems = this.Render_Item(objs, null);
-    this.list_elem.replaceChildren(...elems);
-  }
-
-  get value()
-  {
-    const checked_items = this.querySelectorAll("input[type=checkbox]:checked");
-    const checked_array = Array.from(checked_items);
-    const checked_values = checked_array.map(item => item.value);
-
-    return checked_values;
-  }
-
-  set value(objs)
-  {
-    this.Set_Checkboxes(objs);
+    this.replaceChildren(...elems);
   }
 
   // methods ==================================================================
-
-  Set_Checkboxes(objs)
-  {
-    const checkboxes = this.querySelectorAll("input[type=checkbox]");
-    if (objs)
-    {
-      const checkboxes_array = Array.from(checkboxes);
-      const to_check = checkboxes_array.filter(elem => objs.includes(elem.value));
-      to_check.forEach(elem => elem.checked = true);
-    }
-    else
-    {
-      checkboxes.forEach(elem => elem.checked = false);
-    }
-  }
-
-  Open(id)
-  {
-    // find checkbox where value = id
-    // find all parent details elements
-    // const detail_elems = Utils.Find_Parents(checkbox_elem, "DETAILS");
-    // set attribute open = true
-  }
 
   Get_Children(objs, parent_id)
   {
@@ -130,16 +91,16 @@ class DeInputTree extends HTMLElement
     }
   }
 
-  On_Click_Add_Btn(event)
+  On_Click_Child(event)
   {
-
+    const item_id = event.currentTarget.getAttribute("item-id");
+    this.dispatchEvent(new CustomEvent("itemclick", {detail: item_id}));
   }
 
   // rendering ================================================================
 
   Render_Item(objs, parent_id)
   {
-    const name = this.getAttribute("name");
     let elems = [];
     let child_objs = this.Get_Children(objs, parent_id);
     child_objs.sort(this.Sort_By_Order);
@@ -148,7 +109,7 @@ class DeInputTree extends HTMLElement
     {
       if (this.Has_Children(objs, child_obj.id))
       {
-        elems.push(this.Render_Parent(child_obj, objs, name));
+        elems.push(this.Render_Parent(child_obj, objs));
       }
       else
       {
@@ -159,10 +120,10 @@ class DeInputTree extends HTMLElement
     return elems;
   }
 
-  Render_Parent(parent_obj, objs, name)
+  Render_Parent(parent_obj, objs)
   {
     const html = `
-      <details x-name="${name}">
+      <details>
         <summary cid="title_elem">${parent_obj.title}</summary>
       </details>
     `;
@@ -177,40 +138,25 @@ class DeInputTree extends HTMLElement
 
   Render_Child(child_obj)
   {
-    const checkbox_id = "item_" + child_obj.id;
-    const html = 
-    `
-      <div class="item" item-id="${checkbox_id}">
-        <input id="${checkbox_id}" type="checkbox" value="${child_obj.id}" />
-        <label for="${checkbox_id}">${child_obj.title}</label>
-      </div>
-    `;
-    const elem = Utils.toElement(html);
-
-    return elem;
-  }
-
-  Render_List_Item(obj)
-  {
     const html = `
-      <li>${obj.title}</li>
+      <details class="item" item-id="${child_obj.id}">
+        <summary cid="title_elem">${child_obj.title}</summary>
+      </details>
     `;
+    /*const html = 
+    `
+      <div class="item" item-id="${child_obj.id}">
+        ${child_obj.title}
+      </div>
+    `;*/
     const elem = Utils.toElement(html);
+    elem.addEventListener("click", this.On_Click_Child);
 
     return elem;
   }
 
   Render()
   {
-    const html = `
-      <button cid="add_btn">+</button>
-      <ul cid="list_elem">
-      </ul>
-    `;
-    this.innerHTML = html;
-    Utils.Set_Id_Shortcuts(this, this, "cid");
-
-    this.add_btn.addEventListener("click", this.On_Click_Add_Btn);
   }
 }
 
