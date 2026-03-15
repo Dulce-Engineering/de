@@ -262,5 +262,11 @@
     "datetime": 1773357149499,
     "id": "2e1345f6-baf9-4a89-a774-0b95f92f05f8",
     "query_id": "-nextjs"
+  },
+  {
+    "count": 125,
+    "datetime": 1773612962758,
+    "id": "30986ea6-baf4-472d-863b-b731528c4d93",
+    "query_id": "-nextjs"
   }
 ]

@@ -262,5 +262,11 @@
     "datetime": 1773357123026,
     "id": "12048948-0a75-4f5a-bae7-33df9354af95",
     "query_id": "-kafka"
+  },
+  {
+    "count": 377,
+    "datetime": 1773612934599,
+    "id": "9cd4b5a3-9cb6-4e34-931a-e739f943320f",
+    "query_id": "-kafka"
   }
 ]
