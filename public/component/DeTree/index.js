@@ -22,7 +22,7 @@ class DeInputTree extends HTMLElement
   set items(objs)
   {
     const elems = this.Render_Item(objs, null);
-    this.replaceChildren(...elems);
+    this.main_elem.replaceChildren(...elems);
   }
 
   // methods ==================================================================
@@ -97,6 +97,11 @@ class DeInputTree extends HTMLElement
     this.dispatchEvent(new CustomEvent("itemclick", {detail: item_id}));
   }
 
+  On_Click_Close_Btn(event)
+  {
+    this.hidePopover();
+  }
+
   // rendering ================================================================
 
   Render_Item(objs, parent_id)
@@ -157,6 +162,17 @@ class DeInputTree extends HTMLElement
 
   Render()
   {
+    const html = `
+      <header cid="header_elem"></header>
+      <main cid="main_elem"></main>
+      <footer cid="footer_elem">
+        <button cid="close_btn" type="button">Close</button>
+      </footer>
+    `;
+    this.innerHTML = html;
+    Utils.Set_Id_Shortcuts(this, this, "cid");
+
+    this.close_btn.addEventListener("click", this.On_Click_Close_Btn);
   }
 }
 

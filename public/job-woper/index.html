@@ -149,6 +149,10 @@
         letter-spacing: 2px;
         cursor: pointer;
       }
+      footer
+      {
+        margin: 0 0 20px 0;
+      }
 
       de-input-list li
       {
@@ -382,13 +386,41 @@
         color: var(--input-text);
         padding: 40px;
 
-        details, .item
+        &::backdrop
         {
-          margin: 10px 0;
+          background-color: var(--shade);
+        }
+      
+        main
+        {
+          width: revert;
+          display: block;
+          flex-direction: revert;
+          gap: revert;
+          padding: revert;
+          box-sizing: revert;
+        }
+        details
+        {
+          margin: 10px 0 0 0;
         }
         details.item > summary
         {
           list-style: inside square;
+        }
+        footer
+        {
+          padding: 20px 0 0 0;
+
+          button
+          {
+            width: unset;
+            height: unset;
+            min-width: unset;
+            min-height: unset;
+            padding: 12px 16px;
+            margin: unset;
+          }
         }
       }
 
@@ -405,11 +437,78 @@
         display: none;
       }
       
+      /* large screen */
       @media screen and (min-width: 768px)
       {
       }
+      /* small screen */
       @media screen and (max-width: 768px)
       {
+        :root
+        {
+          font-size: 12px;
+        }
+
+        header
+        {
+          h1
+          {
+            display: inline-block;
+            font-size: 3rem;
+            margin: 0 0 10px 0;
+          }
+        }
+
+        de-dialog-form
+        {
+          dialog
+          {
+            padding: 0 5px;
+          }
+        }
+        de-input-list
+        {
+          padding: 0;
+          margin: 10px 0 0 0;
+          gap: 0;
+
+          li
+          {
+            border-top: 2px solid var(--border);
+            border-right: none;
+            border-left: none;
+            border-bottom: none;
+            padding: 15px 0 15px 0;
+
+            .title
+            {
+              margin: 0 5px 0 5px;
+              gap: 5px;
+              align-items: flex-start;
+            }
+
+            table
+            {
+              margin: 0;
+              padding: 0;
+              border-spacing: 5px 0;
+
+              .separator
+              {
+                display: none;
+              }
+              td[cid=range_time]
+              {
+                display: grid;
+              }
+            }
+          }
+        }
+
+        #ads_elem
+        {
+          margin: 0;
+        }
       }
     </style>
 
@@ -607,7 +706,6 @@
           const start_count = start_item.count;
           const end_count = end_item.count;
           const d_count = end_count - start_count;
-          const range = start_count + " - " + end_count;
           const percent_change = ((d_count / start_count) * 100).toFixed(2) + "%";
           const change_class = d_count > 0 ? "positive" : (d_count < 0 ? "negative" : "neutral");
           const trend_char = d_count > 0 ? "▲" : (d_count < 0 ? "▼" : "▬");
@@ -616,12 +714,20 @@
 
           const html = `
             <tr query-id="${query_id}">
-              <td>
-                ${query.title} 
+              <td class="xtitle">
+                <span>${query.title}</span>
                 <span style="color:var(--c${color});">&#9632;</span>
               </td>
-              <td cid="range">${range}</td>
-              <td cid="diff_usage" class="${change_class}">${d_count} (${percent_change}) ${trend_char}</td>
+              <td class="xrange">
+                ${start_count}
+                -
+                ${end_count}
+              </td>
+              <td class="xdiff" class="${change_class}">
+                ${d_count} 
+                (${percent_change}) 
+                ${trend_char}
+              </td>
               <td cid="selection_usage">n/a</td>
             </tr>
           `;
@@ -630,7 +736,11 @@
           color++;
         }
 
-        item_elem.range_time.innerText = `${start_date.toLocaleDateString()} - ${end_date.toLocaleDateString()}`;
+        item_elem.range_time.innerHTML = `
+          <span class="start">${start_date.toLocaleDateString()}</span>
+          <span class="separator">-</span>
+          <span class="end">${end_date.toLocaleDateString()}</span>
+        `;
         item_elem.diff_time.innerText = `${d_days} days`;
       }
 
@@ -687,9 +797,6 @@
       </table>
 
     </de-input-list>
-
-    <main id="docs">
-    </main>
 
     <footer>
       © Copyright Dulce Engineering 2025. All rights reserved. v1
