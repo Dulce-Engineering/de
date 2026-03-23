@@ -33,6 +33,8 @@ class DeLineChart extends HTMLElement
     this.Render();
   }
 
+  // properties ===============================================================
+
   set items(data)
   {
     this.data = data;
@@ -53,7 +55,8 @@ class DeLineChart extends HTMLElement
     this.Set_Highlight(h);
   }
 
-  static observedAttributes = ["title"];
+  // attributes ===============================================================
+
   attributeChangedCallback(name, old_value, new_value)
   {
     if (this.isConnected)
@@ -64,6 +67,8 @@ class DeLineChart extends HTMLElement
       }
     }
   }
+
+  // methods ==================================================================
 
   Set_Highlight(svg_range)
   {
@@ -132,67 +137,6 @@ class DeLineChart extends HTMLElement
     const x = (svg_pt.x / this.plot_width) * this.data_bounds.width + this.data_bounds.min_x;
     const y = (svg_pt.y / this.plot_height) * this.data_bounds.height + this.data_bounds.min_y;
     return { x, y };
-  }
-
-  Render_Data_Points(data)
-  {
-    const elements = [];
-    for (const data_point of data) 
-    {
-      const point = this.Map_Data_To_SVG_Point(data_point);
-      const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-      circle.setAttribute("cx", point.x);
-      circle.setAttribute("cy", point.y);
-      circle.setAttribute("r", "4");
-      circle.classList.add("data-point");
-      elements.push(circle);
-    }
-
-    return elements;
-  }
-
-  /*Render_Title()
-  {
-    const x = -this.padding_axis - this.padding_left + 40;
-    const y = this.plot_height + 40;
-    this.label_elem = document.createElementNS("http://www.w3.org/2000/svg", "text");
-    this.label_elem.setAttribute("x", x); 
-    this.label_elem.setAttribute("y", y);
-    this.label_elem.setAttribute("transform-origin", `${x} ${y}`);
-    this.label_elem.setAttribute("transform", "scale(1, -1)");
-    this.label_elem.classList.add("title");
-    this.label_elem.innerHTML = this.title;
-
-    return this.label_elem;
-  }*/
-
-  On_SVG_Click(event)
-  {
-    const rect = this.svg.getBoundingClientRect();
-
-    const elem_x = event.clientX - rect.left;
-    const elem_y = (rect.top + rect.height) - event.clientY;
-    const elem_pt = { x: elem_x, y: elem_y };
-
-    const svg_x = (elem_x / rect.width * this.Calc_SVG_Width()) + this.Calc_SVG_X_Offset();
-    const svg_y = (elem_y / rect.height * this.Calc_SVG_Height()) + this.Calc_SVG_Y_Offset();
-    const svg_pt = { x: svg_x, y: svg_y };
-
-    const data_pt = this.Map_SVG_Point_To_Data(svg_pt);
-
-    const nearest_data_pts = {};
-    for (const key in this.data)
-    {
-      const series = this.data[key];
-      const nearest = this.Nearest_Y_For_X(series, data_pt.x);
-      if (nearest)
-      {
-        nearest_data_pts[key] = { x: Math.trunc(data_pt.x), y: nearest.y };
-      }
-    }
-
-    this.dispatchEvent(new CustomEvent("point-selected", {detail: nearest_data_pts}));
-    
   }
 
   Nearest_Y_For_X(series, x)
@@ -274,7 +218,70 @@ class DeLineChart extends HTMLElement
     return h;
   }
 
+  // events ===================================================================
+
+  On_SVG_Click(event)
+  {
+    const rect = this.svg.getBoundingClientRect();
+
+    const elem_x = event.clientX - rect.left;
+    const elem_y = (rect.top + rect.height) - event.clientY;
+    const elem_pt = { x: elem_x, y: elem_y };
+
+    const svg_x = (elem_x / rect.width * this.Calc_SVG_Width()) + this.Calc_SVG_X_Offset();
+    const svg_y = (elem_y / rect.height * this.Calc_SVG_Height()) + this.Calc_SVG_Y_Offset();
+    const svg_pt = { x: svg_x, y: svg_y };
+
+    const data_pt = this.Map_SVG_Point_To_Data(svg_pt);
+
+    const nearest_data_pts = {};
+    for (const key in this.data)
+    {
+      const series = this.data[key];
+      const nearest = this.Nearest_Y_For_X(series, data_pt.x);
+      if (nearest)
+      {
+        nearest_data_pts[key] = { x: Math.trunc(data_pt.x), y: nearest.y };
+      }
+    }
+
+    this.dispatchEvent(new CustomEvent("point-selected", {detail: nearest_data_pts}));
+    
+  }
+
   // rendering ================================================================
+
+  Render_Data_Points(data)
+  {
+    const elements = [];
+    for (const data_point of data) 
+    {
+      const point = this.Map_Data_To_SVG_Point(data_point);
+      const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      circle.setAttribute("cx", point.x);
+      circle.setAttribute("cy", point.y);
+      circle.setAttribute("r", "4");
+      circle.classList.add("data-point");
+      elements.push(circle);
+    }
+
+    return elements;
+  }
+
+  /*Render_Title()
+  {
+    const x = -this.padding_axis - this.padding_left + 40;
+    const y = this.plot_height + 40;
+    this.label_elem = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    this.label_elem.setAttribute("x", x); 
+    this.label_elem.setAttribute("y", y);
+    this.label_elem.setAttribute("transform-origin", `${x} ${y}`);
+    this.label_elem.setAttribute("transform", "scale(1, -1)");
+    this.label_elem.classList.add("title");
+    this.label_elem.innerHTML = this.title;
+
+    return this.label_elem;
+  }*/
 
   Render()
   {

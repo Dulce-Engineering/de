@@ -27,6 +27,9 @@
     <meta property="og:type" content="website">
     <link rel="shortcut icon" href="./image/favicon.ico">
     
+    <script src="https://unpkg.com/@isomorphic-git/lightning-fs"></script>
+    <script src="https://unpkg.com/isomorphic-git"></script>
+
     <style>
       @import url('https://fonts.googleapis.com/css2?family=Covered+By+Your+Grace&family=Crafty+Girls&family=Fuzzy+Bubbles:wght@400;700&family=Handlee&display=swap');      
       @import url('https://fonts.googleapis.com/css2?family=Doto:wght@100..900&family=Major+Mono+Display&family=Turret+Road:wght@200;300;400;500;700;800&display=swap');
@@ -499,8 +502,10 @@
     <script type="module">
       import "../component/DeDialogForm/index.js";
       import "../component/DeDialogAlert/index.js";
-      import "../component/DeLineChart/index.js";
+      import "./component/DeLineChart/index.js";
       import Utils from "../lib/Utils.js";
+      //import { clone, log, readBlob } from 'https://unpkg.com/isomorphic-git@1.25.10/index.js';
+      import http from 'https://unpkg.com/isomorphic-git@beta/http/web/index.js'
 
       Main();
       async function Main()
@@ -539,84 +544,67 @@
       async function Get_File_Sizes_Per_Commit
         (repoOwner, repoName, filePath, githubToken = null) 
       {
-        let res = null, fetch_response = null;
-        const baseUrl = "https://api.github.com";
-        const headers = { Accept: "application/vnd.github.v3+json" };
+        let res = null;
+        const fs = new LightningFS('magnihube_fs');
+        const dir = `/${repoOwner}_${repoName}_${Date.now()}`;
+        const url = `https://github.com/${repoOwner}/${repoName}.git`;
+        const corsProxy = 'https://cors.isomorphic-git.org';
 
-        if (githubToken) 
-        {
-          headers.Authorization = `token ${githubToken}`;
-        }
+        try {
+          // 1. Clone the repository
+          await git.clone({
+            fs,
+            http,
+            dir,
+            url,
+            corsProxy,
+            singleBranch: true
+          });
 
-        // 1. Get the commit history for the file
-        const commitsUrl = `${baseUrl}/repos/${repoOwner}/${repoName}/commits?path=${filePath}`;
-        fetch_response = await fetch(commitsUrl, { headers });
-        if (fetch_response.ok) 
-        {
-          const commits = await fetch_response.json();
+          // 2. Get the commit history for the file
+          const commits = await git.log({
+            fs,
+            dir,
+            filepath: filePath
+          });
 
-          // 2. Iterate through commits and get file size for each
+          // 3. Iterate through commits and get file size for each
           const fileSizesPerCommit = [];
           for (const commit of commits) 
           {
-            const commitSha = commit.sha;
-            const commitDate = commit.commit.committer.date;
+            const commitSha = commit.oid;
+            const commitDate = new Date(commit.commit.committer.timestamp * 1000).toISOString();
 
-            const commitDetailsUrl = `${baseUrl}/repos/${repoOwner}/${repoName}/git/trees/${commitSha}?recursive=1`;
-            fetch_response = await fetch(commitDetailsUrl, { headers });
+            try {
+              const { blob } = await git.readBlob({
+                fs,
+                dir,
+                oid: commitSha,
+                filepath: filePath
+              });
 
-            if (fetch_response.ok) 
-            {
-              const commitDetails = await fetch_response.json();
-
-              // Find the file in the commit's tree
-              const fileEntry = commitDetails.tree.find((entry) => entry.path === filePath);
-
-              if (!fileEntry) 
-              {
-                fileSizesPerCommit.push({
-                  commitSha,
-                  commitDate,
-                  fileSize: null,
-                  error: { status: 404},
-                  message: "File not found in this commit"
-                });
-                continue;
-              }
-
-              // Get file size if it's a blob
-              if (fileEntry.type === "blob") 
-              {
-                fileSizesPerCommit.push({
-                  commitSha,
-                  commitDate,
-                  fileSize: fileEntry.size,
-                  error: null,
-                  message: null
-                });
-              } 
-              else 
-              {
-                fileSizesPerCommit.push({
-                  commitSha,
-                  commitDate,
-                  fileSize: null,
-                  error: { status: 400 },
-                  message: "File is not a blob in this commit."
-                });
-              }
+              fileSizesPerCommit.push({
+                commitSha,
+                commitDate,
+                fileSize: blob.length,
+                error: null,
+                message: null
+              });
             }
-            else
-            {
-              break;
+            catch (e) {
+              // File might not exist or be a blob in this commit
+              // (though log filtered it, renames or complex history might cause this)
             }
           }
 
-          res = {sizes: fileSizesPerCommit, status: fetch_response?.status};
+          res = {sizes: fileSizesPerCommit, status: 200};
         }
-        else
-        {
-          res = {sizes: null, status: fetch_response?.status};
+        catch (e) {
+          console.error(e);
+          res = {sizes: null, status: 500};
+        }
+        finally {
+          try { await fs.promises.rmdir(dir, { recursive: true }); } catch(e) {}
         }
 
         return res;
