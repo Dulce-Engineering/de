@@ -28,6 +28,7 @@
     <link rel="shortcut icon" href="./image/favicon.ico">
     
     <script src="https://unpkg.com/@isomorphic-git/lightning-fs"></script>
+    <script src="https://unpkg.com/isomorphic-git"></script>
 
     <style>
       @import url('https://fonts.googleapis.com/css2?family=Covered+By+Your+Grace&family=Crafty+Girls&family=Fuzzy+Bubbles:wght@400;700&family=Handlee&display=swap');      
@@ -503,8 +504,8 @@
       import "../component/DeDialogAlert/index.js";
       import "./component/DeLineChart/index.js";
       import Utils from "../lib/Utils.js";
-      import { clone, log, readBlob } from 'https://unpkg.com/isomorphic-git@1.25.10/index.js';
-      import http from 'https://unpkg.com/isomorphic-git@1.25.10/http/web/index.js';
+      //import { clone, log, readBlob } from 'https://unpkg.com/isomorphic-git@1.25.10/index.js';
+      import http from 'https://unpkg.com/isomorphic-git@beta/http/web/index.js'
 
       Main();
       async function Main()
@@ -551,7 +552,7 @@
 
         try {
           // 1. Clone the repository
-          await clone({
+          await git.clone({
             fs,
             http,
             dir,
@@ -561,7 +562,7 @@
           });
 
           // 2. Get the commit history for the file
-          const commits = await log({
+          const commits = await git.log({
             fs,
             dir,
             filepath: filePath
@@ -575,7 +576,7 @@
             const commitDate = new Date(commit.commit.committer.timestamp * 1000).toISOString();
 
             try {
-              const { blob } = await readBlob({
+              const { blob } = await git.readBlob({
                 fs,
                 dir,
                 oid: commitSha,
