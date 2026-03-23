@@ -513,8 +513,11 @@ class DeLineChart extends HTMLElement
           const path = this.Render_Line(line_data);
           this.svg.appendChild(path);
 
-          //const circles = this.Render_Data_Points(line_data);
-          //this.svg.append(...circles);
+          if (this.hasAttribute("data-points"))
+          {
+            const circles = this.Render_Data_Points(line_data);
+            this.svg.append(...circles);
+          }
         }
 
         const xAxis = this.Render_X_Axis();

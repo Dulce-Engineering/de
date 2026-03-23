@@ -32,17 +32,6 @@
       @import url('https://fonts.googleapis.com/css2?family=Doto:wght@100..900&family=Major+Mono+Display&family=Turret+Road:wght@200;300;400;500;700;800&display=swap');
       @import url('https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&family=Cutive+Mono&family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Special+Elite&display=swap');      
       
-      :root 
-      {
-        --c0: #00f;
-        --c1: #00f;
-        --c2: #0f0;
-        --c3: #0ff;
-        --c4: #f00;
-        --c5: #f0f;
-        --c6: #ff0;
-      }
-
       /*
         heading fonts
         font-family: "Major Mono Display";
@@ -330,91 +319,64 @@
         display: block;
         background-color: #ffe7;
         margin: 20px 0;
-
-        svg
-        {
-          width: 100%;
-        }
-        .data-point
-        {
-          stroke: none;
-          fill: #f00;
-        }
-        .axis-label
-        {
-          font-size: 1rem;
-        }
-        .axis-line
-        {
-          stroke-width: 2px;
-        }
-        .data-line
-        {
-          stroke-width: 2px;
-          fill: none;
-        }
-        .input-mask
-        {
-          stroke: none;
-          fill: #0000;
-        }
-        .input-mask:hover
-        {
-          cursor: crosshair;
-        }
-        .title
-        {
-          margin: 15px 35px 10px 35px;
-          padding: 0;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          gap: 20px;
-        }
-        .title > span
-        {
-          font-size: 1.2rem;
-          font-weight: 100;
-          overflow-wrap: anywhere;
-        }
-        .summary
-        {
-          display: grid;
-          grid-template-columns: 1fr 1fr 1fr 2fr;
-          gap: 10px;
-        }
-        .header
-        { 
-          justify-self: start;
-        }
-        .label
-        { 
-          justify-self: end;
-          text-decoration: underline;
-        }
-        .ranges
-        {
-          padding: 0 4.5% 0 10%;
-          height: 0;
-          overflow: hidden;
-          display: flex;
-          align-items: flex-start;
-          transition: height 0.3s ease-in-out;
-        }
-        .time-range
-        {
-          width: 100%;
-        }
-        .highlight
-        {
-          fill: #0f03;
-          visibility: hidden;
-          stroke: none;
-        }
-        .highlight.on
-        {
-          visibility: visible;
-        }
+      }
+      de-line-chart svg
+      {
+        width: 100%;
+        xheight: 400px;
+        xborder: 1px solid #f00;
+      }
+      de-line-chart .axis-label
+      {
+        font-size: 1rem;
+      }
+      de-line-chart .title
+      {
+        margin: 15px 35px 10px 35px;
+        padding: 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+      }
+      de-line-chart .title > span
+      {
+        font-size: 1.2rem;
+        font-weight: 100;
+        overflow-wrap: anywhere;
+      }
+      de-line-chart .summary
+      {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr 2fr;
+        gap: 10px;
+      }
+      de-line-chart .header
+      { 
+        justify-self: start;
+      }
+      de-line-chart .label
+      { 
+        justify-self: end;
+        text-decoration: underline;
+      }
+      de-line-chart .ranges
+      {
+        padding: 0 4.5% 0 10%;
+        height: 0;
+        overflow: hidden;
+        display: flex;
+        align-items: flex-start;
+        transition: height 0.3s ease-in-out;
+      }
+      de-line-chart .time-range
+      {
+        width: 100%;
+      }
+      de-line-chart .highlight
+      {
+        fill: #0f03;
+        visibility: hidden;
       }
 
       @media screen and (min-width: 768px)
@@ -537,7 +499,7 @@
     <script type="module">
       import "../component/DeDialogForm/index.js";
       import "../component/DeDialogAlert/index.js";
-      import "../component/DeLineChart/index.js";
+      import "./component/DeLineChart/index.js";
       import Utils from "../lib/Utils.js";
 
       Main();
@@ -776,7 +738,7 @@
               const title = github_info.repo + ": " + github_info.filePath;
               const file_elem = Render_Chart(title, data);
               file_list.appendChild(file_elem);
-              file_elem.items = {"Size": data};
+              file_elem.items = data;
 
               const summary_elem = Render_Summary(data, file_elem);
               file_elem.appendChild(summary_elem);
@@ -875,7 +837,7 @@
       function Render_Chart(title, data)
       {
         const html = `
-          <de-line-chart title="${title}" x-label="Time" y-label="Size" data-points>
+          <de-line-chart title="${title}" x-label="Time" y-label="Size">
             <button cid="del_btn" slot="title" class="header small">
               <span class="text">Delete</span>
             </button>
