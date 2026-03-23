@@ -11,6 +11,7 @@ const jsdoc2md = require("jsdoc-to-markdown");
 // Add component names here to include them in documentation generation
 const WHITELISTED_COMPONENTS = [
   "DeDialogAlert",
+  "DeLineChart",
 ];
 
 // ===== CONFIGURATION =====

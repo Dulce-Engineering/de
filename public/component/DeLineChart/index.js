@@ -1,6 +1,31 @@
 
 import Utils from "../../lib/Utils.js";
 
+/**
+ * DeLineChart is a custom HTML element that renders interactive line charts using SVG.
+ * It supports multiple data series, axis labels, highlighting ranges, and click interactions.
+ * The chart automatically scales data to fit the viewport and provides smooth curve interpolation.
+ *
+ * @class DeLineChart
+ * @extends HTMLElement
+ * @slot {HTMLElement} title - Custom title content (optional, overrides title attribute)
+ * @attr {string} title - Chart title text (default: "Title")
+ * @attr {string} x-label - X-axis label text (default: "X Axis")
+ * @attr {string} y-label - Y-axis label text (default: "Y Axis")
+ * @fires point-selected - Fired when user clicks on chart, provides nearest data points for all series
+ * @example
+ * <de-line-chart title="Sales Data" x-label="Time" y-label="Revenue">
+ *   <button slot="title">Custom Title Button</button>
+ * </de-line-chart>
+ *
+ * // Set data programmatically
+ * const chart = document.querySelector('de-line-chart');
+ * chart.items = [
+ *   { x: 1000, y: 50 },  // timestamp, value
+ *   { x: 2000, y: 75 },
+ *   { x: 3000, y: 60 }
+ * ];
+ */
 class DeLineChart extends HTMLElement
 {
   static tname = "de-line-chart";
@@ -21,6 +46,10 @@ class DeLineChart extends HTMLElement
   // attr: x-label = "X Axis";
   // attr: y-label = "Y Axis";
 
+  /**
+   * Creates a new DeLineChart instance.
+   * Initializes the component and binds event handlers.
+   */
   constructor()
   {
     super();
@@ -35,12 +64,25 @@ class DeLineChart extends HTMLElement
 
   // properties ===============================================================
 
+  /**
+   * Sets the data series to be displayed in the chart.
+   * Data should be an array of objects with x and y properties.
+   * Automatically re-renders the chart when set.
+   *
+   * @param {Array<{x: number, y: number}>} data - Array of data points with x,y coordinates
+   */
   set items(data)
   {
     this.data = data;
     this.Render_Chart();
   }
 
+  /**
+   * Sets the start position of the highlight range as a percentage (0-100).
+   * Updates the visual highlight overlay on the chart.
+   *
+   * @param {number} value - Start position as percentage (0-100)
+   */
   set highlight_start(value)
   {
     const h = this.Get_Highlight();
@@ -48,6 +90,12 @@ class DeLineChart extends HTMLElement
     this.Set_Highlight(h);
   }
 
+  /**
+   * Sets the end position of the highlight range as a percentage (0-100).
+   * Updates the visual highlight overlay on the chart.
+   *
+   * @param {number} value - End position as percentage (0-100)
+   */
   set highlight_end(value)
   {
     const h = this.Get_Highlight();
@@ -57,6 +105,14 @@ class DeLineChart extends HTMLElement
 
   // attributes ===============================================================
 
+  /**
+   * Handles changes to observed attributes.
+   * Currently responds to 'title' attribute changes by updating the title element.
+   *
+   * @param {string} name - Name of the attribute that changed
+   * @param {string} old_value - Previous value of the attribute
+   * @param {string} new_value - New value of the attribute
+   */
   attributeChangedCallback(name, old_value, new_value)
   {
     if (this.isConnected)
@@ -70,6 +126,14 @@ class DeLineChart extends HTMLElement
 
   // methods ==================================================================
 
+  /**
+   * Updates the visual highlight overlay on the chart.
+   * Validates the range and applies it to the highlight rectangle element.
+   *
+   * @param {Object} svg_range - Range object with x1 and x2 properties
+   * @param {number} svg_range.x1 - Start X coordinate in SVG space
+   * @param {number} svg_range.x2 - End X coordinate in SVG space
+   */
   Set_Highlight(svg_range)
   {
     const range_valid = 
@@ -86,6 +150,13 @@ class DeLineChart extends HTMLElement
     this.highlight.classList.toggle("on", has_range);
   }
 
+  /**
+   * Gets the current highlight range from the visual highlight element.
+   *
+   * @returns {Object|null} Range object with x1 and x2 properties, or null if no highlight is active
+   * @returns {number} .x1 - Start X coordinate in SVG space
+   * @returns {number} .x2 - End X coordinate in SVG space
+   */
   Get_Highlight()
   {
     let res = null;
@@ -101,6 +172,11 @@ class DeLineChart extends HTMLElement
     return res;
   }
 
+  /**
+   * Calculates and sets the data bounds for all series in the chart.
+   * Determines min/max values for X and Y axes across all data points.
+   * This information is used for scaling data to fit the chart viewport.
+   */
   Set_Bounds()
   {
     const all_points = Object.values(this.data).flat();
@@ -119,6 +195,17 @@ class DeLineChart extends HTMLElement
     //console.log("Set_Bounds(): data_bounds =", this.data_bounds);
   }
 
+  /**
+   * Maps a data point to SVG coordinates within the chart viewport.
+   * Scales the data point based on the calculated data bounds.
+   *
+   * @param {Object} data - Data point with x and y properties
+   * @param {number} data.x - X coordinate in data space
+   * @param {number} data.y - Y coordinate in data space
+   * @returns {Object} SVG point with x and y properties
+   * @returns {number} .x - X coordinate in SVG space
+   * @returns {number} .y - Y coordinate in SVG space
+   */
   Map_Data_To_SVG_Point(data)
   {
     const dx = data.x - this.data_bounds.min_x;
@@ -132,6 +219,17 @@ class DeLineChart extends HTMLElement
     return { x, y };
   }
 
+  /**
+   * Maps an SVG point back to data coordinates.
+   * Converts viewport coordinates back to original data scale.
+   *
+   * @param {Object} svg_pt - SVG point with x and y properties
+   * @param {number} svg_pt.x - X coordinate in SVG space
+   * @param {number} svg_pt.y - Y coordinate in SVG space
+   * @returns {Object} Data point with x and y properties
+   * @returns {number} .x - X coordinate in data space
+   * @returns {number} .y - Y coordinate in data space
+   */
   Map_SVG_Point_To_Data(svg_pt)
   {
     const x = (svg_pt.x / this.plot_width) * this.data_bounds.width + this.data_bounds.min_x;
@@ -139,6 +237,16 @@ class DeLineChart extends HTMLElement
     return { x, y };
   }
 
+  /**
+   * Finds the data point in a series with the X coordinate closest to the given value.
+   * Used for interpolating Y values when clicking on the chart.
+   *
+   * @param {Array<{x: number, y: number}>} series - Array of data points
+   * @param {number} x - Target X coordinate to find nearest point for
+   * @returns {Object|null} Nearest data point or null if series is empty
+   * @returns {number} .x - X coordinate of nearest point
+   * @returns {number} .y - Y coordinate of nearest point
+   */
   Nearest_Y_For_X(series, x)
   {
     if (!series || series.length === 0) return null;
@@ -160,6 +268,17 @@ class DeLineChart extends HTMLElement
     return { x: best.x, y: best.y };
   }
 
+  /**
+   * Finds the nearest data point across all series to the given coordinates.
+   * Used for click interactions to determine which data point was clicked.
+   *
+   * @param {number} clickX - X coordinate of click in data space
+   * @param {number} clickY - Y coordinate of click in data space
+   * @returns {Object|null} Nearest point information or null if no data
+   * @returns {number} .x - X coordinate of nearest point
+   * @returns {number} .y - Y coordinate of nearest point
+   * @returns {string} .series - Key/name of the series containing the point
+   */
   Find_Nearest_Point(clickX, clickY)
   {
     let nearestPoint = null;
@@ -186,18 +305,37 @@ class DeLineChart extends HTMLElement
     return nearestPoint;
   }
 
+  /**
+   * Calculates the X offset for the SVG viewBox to account for axis labels and padding.
+   *
+   * @returns {number} X offset value for SVG viewBox
+   * @private
+   */
   Calc_SVG_X_Offset()
   {
     const x = 0 - this.padding_axis - this.padding_left;
     return x;
   }
 
+  /**
+   * Calculates the Y offset for the SVG viewBox to account for axis labels and padding.
+   *
+   * @returns {number} Y offset value for SVG viewBox
+   * @private
+   */
   Calc_SVG_Y_Offset()
   {
     const y = 0 - this.padding_axis - this.padding_bottom;
     return y;
   }
 
+  /**
+   * Calculates the total width needed for the SVG viewBox.
+   * Includes plot area, padding, and axis space.
+   *
+   * @returns {number} Total width for SVG viewBox
+   * @private
+   */
   Calc_SVG_Width()
   {
     const w = 
@@ -208,6 +346,13 @@ class DeLineChart extends HTMLElement
     return w;
   }
 
+  /**
+   * Calculates the total height needed for the SVG viewBox.
+   * Includes plot area, padding, and axis space.
+   *
+   * @returns {number} Total height for SVG viewBox
+   * @private
+   */
   Calc_SVG_Height()
   {
     const h = 
@@ -220,6 +365,15 @@ class DeLineChart extends HTMLElement
 
   // events ===================================================================
 
+  /**
+   * Handles click events on the SVG chart area.
+   * Converts click coordinates to data coordinates and finds nearest points for all series.
+   * Dispatches a 'point-selected' custom event with the nearest points.
+   *
+   * @param {MouseEvent} event - The click event
+   * @fires point-selected - With detail containing nearest points for all series
+   * @private
+   */
   On_SVG_Click(event)
   {
     const rect = this.svg.getBoundingClientRect();
@@ -251,6 +405,14 @@ class DeLineChart extends HTMLElement
 
   // rendering ================================================================
 
+  /**
+   * Renders data points as SVG circles for a given data series.
+   * Creates circle elements positioned at each data point.
+   *
+   * @param {Array<{x: number, y: number}>} data - Array of data points to render
+   * @returns {Array<SVGCircleElement>} Array of SVG circle elements
+   * @private
+   */
   Render_Data_Points(data)
   {
     const elements = [];
@@ -283,6 +445,13 @@ class DeLineChart extends HTMLElement
     return this.label_elem;
   }*/
 
+  /**
+   * Renders the complete chart component structure.
+   * Creates the SVG element with proper viewBox, title, and event handlers.
+   * Only renders if the component is connected to the DOM.
+   *
+   * @private
+   */
   Render()
   {
     if (this.isConnected)
@@ -317,6 +486,13 @@ class DeLineChart extends HTMLElement
     }
   }
 
+  /**
+   * Renders the chart content within the SVG element.
+   * Clears existing content and renders all data series, axes, highlight, and input mask.
+   * Only renders if the component is connected and has data.
+   *
+   * @private
+   */
   Render_Chart() 
   {
     if (this.isConnected)
@@ -356,6 +532,15 @@ class DeLineChart extends HTMLElement
     }
   }
 
+  /**
+   * Renders a data series as a smooth curved line using monotone cubic interpolation.
+   * Creates an SVG path element with smooth curves that maintain monotonicity.
+   * Each series gets a different color automatically.
+   *
+   * @param {Array<{x: number, y: number}>} data - Array of data points for this series
+   * @returns {SVGPathElement} SVG path element representing the curved line
+   * @private
+   */
   Render_Line(data)
   {
     data = data.sort((a, b) => a.x - b.x);
@@ -431,6 +616,13 @@ class DeLineChart extends HTMLElement
     return path;
   }
 
+  /**
+   * Renders the X-axis line and label.
+   * Creates an SVG line element for the axis and a text element for the label.
+   *
+   * @returns {Array<SVGElement>} Array containing the axis line and label elements
+   * @private
+   */
   Render_X_Axis()
   {
     const x1 = -this.padding_axis - this.overhang_axis;
@@ -458,6 +650,13 @@ class DeLineChart extends HTMLElement
     return [xAxis, label_elem];
   }
 
+  /**
+   * Renders the Y-axis line and label.
+   * Creates an SVG line element for the axis and a rotated text element for the label.
+   *
+   * @returns {Array<SVGElement>} Array containing the axis line and label elements
+   * @private
+   */
   Render_Y_Axis()
   {
     const x1 = -this.padding_axis;
@@ -484,6 +683,13 @@ class DeLineChart extends HTMLElement
     return [yAxis, label_elem];
   }
 
+  /**
+   * Renders the highlight overlay rectangle.
+   * Creates a transparent rectangle that covers the entire plot area for highlighting ranges.
+   *
+   * @returns {SVGRectElement} SVG rectangle element for highlighting
+   * @private
+   */
   Render_Highlight()
   {
     const x = 0;
@@ -500,6 +706,13 @@ class DeLineChart extends HTMLElement
     return rect;
   }
 
+  /**
+   * Renders an invisible input mask rectangle over the plot area.
+   * This element captures click events on the chart area.
+   *
+   * @returns {SVGRectElement} SVG rectangle element for input capture
+   * @private
+   */
   Render_Input_Mask()
   {
     const x = 0;
