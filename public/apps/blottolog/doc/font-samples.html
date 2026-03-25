@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blottolog Local Font Pairings</title>
+    
+    <style>
+        @font-face { font-family: 'Mea Culpa'; src: url('../font/Mea_Culpa/MeaCulpa-Regular.ttf') format('truetype'); }
+        @font-face { font-family: 'Nanum Myeongjo'; src: url('../font/Nanum_Myeongjo/NanumMyeongjo-Regular.ttf') format('truetype'); }
+        @font-face { font-family: 'Tangerine'; src: url('../font/Tangerine/Tangerine-Bold.ttf') format('truetype'); }
+        @font-face { font-family: 'Quattrocento'; src: url('../font/Quattrocento/Quattrocento-Regular.ttf') format('truetype'); }
+        @font-face { font-family: 'Beau Rivage'; src: url('../font/Beau_Rivage/BeauRivage-Regular.ttf') format('truetype'); }
+        @font-face { font-family: 'Charm'; src: url('../font/Charm/Charm-Regular.ttf') format('truetype'); }
+
+        body {
+            background-color: #09527D; 
+            color: #EAC796; 
+            padding: 40px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1.main-title {
+            text-align: center;
+            color: #fff;
+            margin-bottom: 40px;
+            font-family: 'Quattrocento', serif;
+            letter-spacing: 2px;
+        }
+        .pairing {
+            background-color: #3A2318; 
+            border: 2px solid #D86938; 
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+        }
+        .pairing-title {
+            color: #6BA890; 
+            font-family: 'Nanum Myeongjo', serif;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 0;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(234, 199, 150, 0.2);
+            padding-bottom: 10px;
+        }
+        .sample-header {
+            font-size: 52px;
+            margin: 0 0 10px 0;
+            color: #fff;
+            font-weight: normal;
+        }
+        .sample-body {
+            font-size: 18px;
+            line-height: 1.6;
+            margin: 0 0 20px 0;
+        }
+        .sample-button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            background-color: #D86938;
+            color: #fff;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        /* Pairing 1: Mea Culpa + Nanum Myeongjo */
+        #p1 .sample-header { font-family: 'Mea Culpa', cursive; }
+        #p1 .sample-body, #p1 .sample-button { font-family: 'Nanum Myeongjo', serif; }
+
+        /* Pairing 2: Tangerine + Quattrocento */
+        #p2 .sample-header { font-family: 'Tangerine', cursive; font-size: 64px;}
+        #p2 .sample-body, #p2 .sample-button { font-family: 'Quattrocento', serif; }
+
+        /* Pairing 3: Beau Rivage + Charm */
+        #p3 .sample-header { font-family: 'Beau Rivage', cursive; font-size: 56px;}
+        #p3 .sample-body, #p3 .sample-button { font-family: 'Charm', cursive; font-size: 22px;}
+
+    </style>
+</head>
+<body>
+    <h1 class="main-title">Custom Local Font Options</h1>
+
+    <!-- Option 1 -->
+    <div class="pairing" id="p1">
+        <h3 class="pairing-title">Option 1: Mea Culpa + Nanum Myeongjo</h3>
+        <h2 class="sample-header">Captain's Log</h2>
+        <p class="sample-body">Mea Culpa offers an incredibly elegant looping script for headers, reminiscent of old handwritten ship logs. Nanum Myeongjo provides a highly legible, clean serif for all the data and body text readability.</p>
+        <button class="sample-button">Set Sail</button>
+    </div>
+
+    <!-- Option 2 -->
+    <div class="pairing" id="p2">
+        <h3 class="pairing-title">Option 2: Tangerine + Quattrocento</h3>
+        <h2 class="sample-header">The Storm Glass</h2>
+        <p class="sample-body">Tangerine is a tall, dramatic calligraphy font that screams "pirate treasure map." Quattrocento grounds it with a classic, wide, Roman-style serif that is extremely beautiful and easy to read.</p>
+        <button class="sample-button">Drop Anchor</button>
+    </div>
+
+    <!-- Option 3 -->
+    <div class="pairing" id="p3">
+        <h3 class="pairing-title">Option 3: Beau Rivage + Charm</h3>
+        <h2 class="sample-header">The Cargo Manifest</h2>
+        <p class="sample-body">Beau Rivage gives a slightly rougher, ink-and-quill aesthetic for the titles. Charm is a wonderfully unique font—it looks handwritten but retains nearly perfect legibility for paragraphs.</p>
+        <button class="sample-button">Plunder</button>
+    </div>
+</body>
+</html>
