@@ -31,6 +31,25 @@
 
 ## Images
 
+## Home Page
+
+**Top Navigation Bar (Quick Access):**
+Because we need to allow the user to change their settings quickly, these should live at the very top of the screen on the home page:
+- **Top Left:** `[Captain's Profile Button]` (An icon of a pirate hat or wheel to open the weight/sex settings modal).
+- **Top Right:** `[Storm Glass Button]` (An icon of a barometer to open the Buzz Target settings modal to adjust the target BAC limit).
+- **Center Title:** "Blottolog" written in `Beau Rivage`.
+
+**Primary View (The Hero Section):**
+- **Course Plot (The Timer):** This is the focal point. A large UI component taking up the top half of the screen. It features the treasure map animation of the ship navigating toward the target. 
+- **The Countdown:** Prominent countdown text below the map (e.g., "Next Port of Call in 34:12").
+
+**Secondary View (The Graphic Manifest):**
+- **Manifest (Active Drinks List):** Below the timer sits the manifest. Instead of a text list, drinks are highly graphic, represented by themed illustrations of bottles, tankards, and glasses (e.g., a rum bottle for liquor, a wooden mug for beer).
+- **Layout:** The icons are centered in the view and aggregate horizontally side-by-side. Once the row runs out of horizontal room, they wrap and flow underneath into a new row (a flex-wrap layout). They contain very little to no text, relying purely on visual representation to show the 'Cargo' filling up.
+
+**Primary Action:**
+- **Add Drink Button:** A persistent Floating Action Button (FAB) at the bottom right/center. Visually, this could be a large, shiny gold Doubloon that opens the "Quick Add" drink sheet when tapped.
+
 ## Captain's Profile
 
 ## Manifest (Active Drinks List)
