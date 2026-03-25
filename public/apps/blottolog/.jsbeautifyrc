@@ -1,0 +1,10 @@
+{
+  "css": {
+    "brace_style": "expand"
+  },
+  "html": {
+    "css": {
+      "brace_style": "expand"
+    }
+  }
+}

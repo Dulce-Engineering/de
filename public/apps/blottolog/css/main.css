@@ -87,3 +87,33 @@ a {
 a:hover {
   color: var(--parchment-tan-light);
 }
+
+.header {
+  display: flex;
+  align-items: center;
+
+  svg {
+    border: 1px solid #f00;
+    height: 15vh;
+    xwidth: 300px;
+
+    text {
+      font-family: var(--font-heading);
+      fill: var(--ink-brown-light);
+      filter: drop-shadow(0px 0px 12px rgba(0, 0, 0, 0.6));
+    }
+
+    .trace {
+      fill: none;
+      stroke: var(--terracotta-orange-light);
+      stroke-width: 20;
+      stroke-dasharray: 10, 5;
+      opacity: 0;
+    }
+
+    .viewbox {
+      fill: #f00;
+      opacity: 0;
+    }
+  }
+}
