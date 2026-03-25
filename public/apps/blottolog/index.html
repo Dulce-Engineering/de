@@ -12,7 +12,7 @@
 <body>
 
   <header class="header">
-    <button class="icon-button" aria-label="Profile">👤</button>
+    <button class="primary-button" aria-label="Profile">👤</button>
     <svg viewBox="300 350 400 250" width="100%" height="100%">
       <defs>
         <path id="logo-curve" d="M 0 1000 Q 0 500 1000 400" />
@@ -33,31 +33,96 @@
         </textPath>
       </text>
     </svg>
-    <button class="icon-button" aria-label="Target">🧭</button>
+    <button class="primary-button" aria-label="Target">🧭</button>
   </header>
 
-  <main>
-    <section id="timer-hero">
-      <!-- The map map and ship marker -->
-      <div class="course-plot-graphic">
-        <!-- Map placeholder -->
+  <section class="timer">
+    <div class="course-plot-graphic">
+    </div>
+    <div class="countdown-timer-display">
+      34:12
+    </div>
+  </section>
+
+  <section class="drinks">
+    <ul id="wip-drinks">
+
+    </ul>
+    <ul id="finished-drinks">
+
+    </ul>
+    <button id="add_btn" class="action-button" aria-label="Quick Add Drink" popovertarget="select-drink-dlg">
+      +
+    </button>
+    
+    <dialog id="select-drink-dlg" popover>
+      <h2>Log New Cargo</h2>
+      
+      <div class="drink-category">
+        <h3>Beer</h3>
+        <div class="drink-options">
+          <button class="drink-option" data-type="beer" data-size="small" aria-label="Small Beer">
+            <span class="icon">🍺</span><span class="label">Half Pint</span>
+          </button>
+          <button class="drink-option" data-type="beer" data-size="regular" aria-label="Regular Beer">
+            <span class="icon" style="font-size: 1.4em;">🍺</span><span class="label">Pint</span>
+          </button>
+          <button class="drink-option" data-type="beer" data-size="large" aria-label="Large Beer">
+            <span class="icon" style="font-size: 1.8em;">🍺</span><span class="label">Stein</span>
+          </button>
+        </div>
       </div>
 
-      <!-- Countdown formatted text -->
-      <div class="countdown-timer-display">
-        34:12
+      <div class="drink-category">
+        <h3>Wine</h3>
+        <div class="drink-options">
+          <button class="drink-option" data-type="wine" data-size="small" aria-label="Small Wine">
+            <span class="icon">🍷</span><span class="label">Small</span>
+          </button>
+          <button class="drink-option" data-type="wine" data-size="regular" aria-label="Regular Wine">
+            <span class="icon" style="font-size: 1.4em;">🍷</span><span class="label">Glass</span>
+          </button>
+          <button class="drink-option" data-type="wine" data-size="large" aria-label="Large Wine">
+            <span class="icon" style="font-size: 1.8em;">🍷</span><span class="label">Large</span>
+          </button>
+        </div>
       </div>
-    </section>
 
-    <!-- 3. THE GRAPHIC MANIFEST -->
-    <section id="manifest-container">
-      <!-- Flex-wrapped text-less graphical icons will populate here dynamically -->
-    </section>
-  </main>
+      <div class="drink-category">
+        <h3>Spirits</h3>
+        <div class="drink-options">
+          <button class="drink-option" data-type="shot" data-size="small" aria-label="Small Shot">
+            <span class="icon">🥃</span><span class="label">Half</span>
+          </button>
+          <button class="drink-option" data-type="shot" data-size="regular" aria-label="Regular Shot">
+            <span class="icon" style="font-size: 1.4em;">🥃</span><span class="label">Single</span>
+          </button>
+          <button class="drink-option" data-type="shot" data-size="large" aria-label="Large Shot">
+            <span class="icon" style="font-size: 1.8em;">🥃</span><span class="label">Double</span>
+          </button>
+        </div>
+      </div>
 
-  <button class="floating-action-button" aria-label="Quick Add Drink">
-    +
-  </button>
+      <div class="drink-category">
+        <h3>Cocktail</h3>
+        <div class="drink-options">
+          <button class="drink-option" data-type="cocktail" data-size="small" aria-label="Small Cocktail">
+            <span class="icon">🍸</span><span class="label">Short</span>
+          </button>
+          <button class="drink-option" data-type="cocktail" data-size="regular" aria-label="Regular Cocktail">
+            <span class="icon" style="font-size: 1.4em;">🍸</span><span class="label">Tall</span>
+          </button>
+          <button class="drink-option" data-type="cocktail" data-size="large" aria-label="Large Cocktail">
+            <span class="icon" style="font-size: 1.8em;">🍸</span><span class="label">Pitcher</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="dialog-actions">
+        <button class="secondary-button" id="close-dlg-btn" popovertarget="select-drink-dlg" popovertargetaction="hide">Cancel</button>
+      </div>
+    </dialog>
+  </section>
 
 </body>
 

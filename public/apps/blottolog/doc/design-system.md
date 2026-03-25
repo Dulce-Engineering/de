@@ -4,7 +4,7 @@
 - Light gradient background resembling a map parchment
 
 ## Primary Button
-- Large, pill-shaped or slightly rounded rectangular button, styled to look like brass or polished wood.
+- Large, pill-shaped, styled to look like brass or polished wood.
 - Bright gold/brass metallic gradient background (ties directly into the exact styling of the gold Doubloon Action Button).
 - Bold, high-contrast dark text (e.g., `Ink Brown`).
 - Heavy bottom shadow (`box-shadow`) to give it a physical, tactile weight, like pressing down on a coin or a wooden lever.
