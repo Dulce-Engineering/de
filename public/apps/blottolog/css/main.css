@@ -5,78 +5,85 @@
 
 /* --- FONTS --- */
 @font-face {
-    font-family: 'Beau Rivage';
-    src: url('../font/Beau_Rivage/BeauRivage-Regular.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
+  font-family: 'Beau Rivage';
+  src: url('../font/Beau_Rivage/BeauRivage-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
 }
 
 @font-face {
-    font-family: 'Quattrocento';
-    src: url('../font/Quattrocento/Quattrocento-Regular.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
+  font-family: 'Quattrocento';
+  src: url('../font/Quattrocento/Quattrocento-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
 }
 
 /* --- DESIGN TOKENS (Color Palette & Typography) --- */
 :root {
-    /* Nautical Blue - Primary Backgrounds */
-    --nautical-blue-dark: #053A5A;
-    --nautical-blue-base: #09527D;
-    --nautical-blue-light: #1F77A9;
+  /* Nautical Blue - Primary Backgrounds */
+  --nautical-blue-dark: #053A5A;
+  --nautical-blue-base: #09527D;
+  --nautical-blue-light: #1F77A9;
 
-    /* Parchment Tan - Text & Light Panels */
-    --parchment-tan-dark: #C49C65;
-    --parchment-tan-base: #EAC796;
-    --parchment-tan-light: #F4DFB8;
+  /* Parchment Tan - Text & Light Panels */
+  --parchment-tan-dark: #C49C65;
+  --parchment-tan-base: #EAC796;
+  --parchment-tan-light: #F4DFB8;
 
-    /* Terracotta Orange - Accents & Warnings */
-    --terracotta-orange-dark: #A1451E;
-    --terracotta-orange-base: #D86938;
-    --terracotta-orange-light: #E58A60;
+  /* Terracotta Orange - Accents & Warnings */
+  --terracotta-orange-dark: #A1451E;
+  --terracotta-orange-base: #D86938;
+  --terracotta-orange-light: #E58A60;
 
-    /* Seafoam Green - Success States & Safe Harbors */
-    --seafoam-green-dark: #457D65;
-    --seafoam-green-base: #6BA890;
-    --seafoam-green-light: #93C6B1;
+  /* Seafoam Green - Success States & Safe Harbors */
+  --seafoam-green-dark: #457D65;
+  --seafoam-green-base: #6BA890;
+  --seafoam-green-light: #93C6B1;
 
-    /* Ink Brown - Dark Panels & Contrast */
-    --ink-brown-dark: #1E100A;
-    --ink-brown-base: #3A2318;
-    --ink-brown-light: #5E3B29;
+  /* Ink Brown - Dark Panels & Contrast */
+  --ink-brown-dark: #1E100A;
+  --ink-brown-base: #3A2318;
+  --ink-brown-light: #5E3B29;
 
-    /* Typography */
-    --font-heading: 'Beau Rivage', cursive;
-    --font-body: 'Quattrocento', serif;
+  /* Typography */
+  --font-heading: 'Beau Rivage', cursive;
+  --font-body: 'Quattrocento', serif;
 }
 
 /* --- GLOBAL STYLES --- */
 * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 body {
-    /* Light gradient background resembling map parchment */
-    background: radial-gradient(circle at center, var(--parchment-tan-light) 0%, var(--parchment-tan-base) 100%);
-    color: var(--ink-brown-dark); /* Dark text for contrast against light parchment */
-    font-family: var(--font-body);
-    line-height: 1.6;
-    min-height: 100vh;
+  /* Light gradient background resembling map parchment */
+  background: radial-gradient(circle at center, var(--parchment-tan-base) 50%, var(--parchment-tan-dark) 100%);
+  color: var(--ink-brown-dark);
+  /* Dark text for contrast against light parchment */
+  font-family: var(--font-body);
+  line-height: 1.6;
+  min-height: 100vh;
 }
 
-h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-heading);
-    color: var(--parchment-tan-light);
-    font-weight: normal; /* Script fonts usually look best un-bolded */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading);
+  color: var(--parchment-tan-light);
+  font-weight: normal;
+  /* Script fonts usually look best un-bolded */
 }
 
 a {
-    color: var(--terracotta-orange-light);
-    text-decoration: none;
+  color: var(--terracotta-orange-light);
+  text-decoration: none;
 }
 
 a:hover {
-    color: var(--parchment-tan-light);
+  color: var(--parchment-tan-light);
 }

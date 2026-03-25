@@ -1,76 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <title>BlottoLog Logo - Pure SVG</title>
-    <link rel="stylesheet" href="../css/main.css">
-    <style>
-        body {
-            background-color: var(--nautical-blue-dark); 
-            background-image: radial-gradient(circle at center, var(--nautical-blue-base) 0%, var(--nautical-blue-dark) 100%);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            flex-direction: column;
-            overflow: hidden;
-        }
+  <meta charset="UTF-8">
+  <title>BlottoLog Logo - Pure SVG</title>
+  <link rel="stylesheet" href="../css/main.css">
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100vw;
+      height: 100vh;
+      margin: 0;
+      flex-direction: column;
+      overflow: hidden;
+    }
 
-        .svg-container {
-            width: 800px;
-            height: 300px;
-        }
+    svg {
+      border: 1px solid #f00;
 
-        /* SVG Text Styling */
-        .svg-text {
-            font-family: var(--font-heading);
-            fill: var(--parchment-tan-light);
-            /* Add drop shadow using CSS filter on the SVG text since standard text-shadow isn't standard SVG */
-            filter: drop-shadow(0px 10px 15px rgba(0,0,0,0.8));
-        }
-
-        .logo-subtitle {
-            font-family: var(--font-body);
-            color: var(--terracotta-orange-light);
-            font-size: 22px;
-            letter-spacing: 8px;
-            text-transform: uppercase;
-            margin-top: 10px;
-            opacity: 0.8;
-            margin-left: -50px;
-        }
-    </style>
+      text {
+        font-family: var(--font-heading);
+        fill: var(--ink-brown-light);
+        filter: drop-shadow(0px 10px 15px rgba(0, 0, 0, 0.8));
+      }
+    }
+  </style>
 </head>
+
 <body>
 
-    <div class="svg-container">
-        <!-- Pure SVG implementation -->
-        <svg viewBox="0 0 800 300" width="100%" height="100%">
-            <defs>
-                <!-- Define the invisible curved path (A smooth quadratic arch) -->
-                <path id="logo-curve" d="M 50 250 Q 400 20 750 100" />
-            </defs>
+  <svg viewBox="0 0 1000 200" width="100%" height="100%">
+    <defs>
+      <path id="logo-curve" d="M 0 1000 Q 0 0 1000 0" />
+    </defs>
 
-            <!-- Text element bound to the path -->
-            <text class="svg-text">
-                <textPath href="#logo-curve" startOffset="50%" text-anchor="middle">
-                    <!-- Shrinking the letters progressively using tspan inside the SVG -->
-                    <tspan font-size="180">B</tspan>
-                    <tspan font-size="160">l</tspan>
-                    <tspan font-size="140">o</tspan>
-                    <tspan font-size="120">t</tspan>
-                    <tspan font-size="100">t</tspan>
-                    <tspan font-size="80">o</tspan>
-                    <tspan font-size="70">L</tspan>
-                    <tspan font-size="60">o</tspan>
-                    <tspan font-size="50">g</tspan>
-                </textPath>
-            </text>
-        </svg>
-    </div>
+    <!-- This visualizes the invisible curve the text sits on -->
+    <use href="#logo-curve" fill="none" stroke="var(--terracotta-orange-light)" stroke-width="2" stroke-dasharray="10,5"
+      opacity="0.5" />
 
-    <div class="logo-subtitle">Captain's Log</div>
+    <text>
+      <textPath href="#logo-curve" startOffset="68%" text-anchor="middle">
+        <tspan font-size="180">B</tspan>
+        <tspan font-size="165">l</tspan>
+        <tspan font-size="150">o</tspan>
+        <tspan font-size="135">t</tspan>
+        <tspan font-size="120">t</tspan>
+        <tspan font-size="105">o</tspan>
+        <tspan font-size="90">l</tspan>
+        <tspan font-size="75">o</tspan>
+        <tspan font-size="60">g</tspan>
+      </textPath>
+    </text>
+  </svg>
 
 </body>
+
 </html>
