@@ -65,16 +65,11 @@ body {
   margin: 0;
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
+h1, h2, h3, h4, h5, h6 
+{
   font-family: var(--font-heading);
   color: var(--parchment-tan-light);
   font-weight: normal;
-  /* Script fonts usually look best un-bolded */
 }
 
 a {
@@ -86,62 +81,31 @@ a {
   }
 }
 
-
-.primary-button {
+.primary-button, .action-button, .secondary-button 
+{
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 12px 24px;
-
-  /* Bright gold/brass metallic gradient */
-  background: linear-gradient(180deg, var(--parchment-tan-light) 0%, var(--parchment-tan-base) 45%, var(--terracotta-orange-base) 100%);
-
-  /* Bold, high-contrast dark text */
-  color: var(--ink-brown-dark);
-  font-family: var(--font-body);
-  font-weight: bold;
-  font-size: 1.1rem;
-
-  /* Pill-shaped with a metallic rim */
-  border-radius: 50px;
-  border: 1px solid var(--parchment-tan-light);
-
-  /* Heavy bottom shadow for physical, tactile weight */
-  box-shadow: 0 6px 0 var(--ink-brown-base), 0 8px 15px rgba(0, 0, 0, 0.5);
-
+  background-color: var(--parchment-tan-light);
+  border: none;
+  border-radius: 50%;
+  box-shadow: 0 0 15px #0008;
   cursor: pointer;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  transition: all 0.1s ease-in-out;
-
-  &:active {
-    /* Physically presses the button down */
-    transform: translateY(4px);
-    box-shadow: 0 2px 0 var(--ink-brown-base), 0 4px 8px rgba(0, 0, 0, 0.5);
-  }
+  padding: 10px;
+  text-shadow: 0 0 6px #000f;
+  font-size: 2em;
 }
-
-.secondary-button {
-  padding: 8px 20px;
-  background: var(--ink-brown-base);
-  color: var(--parchment-tan-base);
-  border: 1px solid var(--parchment-tan-dark);
-  border-radius: 50px;
-  font-family: var(--font-body);
-  font-weight: bold;
-  cursor: pointer;
-  box-shadow: 0 4px 0 var(--ink-brown-dark);
-  transition: all 0.1s ease-in-out;
-
-  &:active {
-    transform: translateY(2px);
-    box-shadow: 0 2px 0 var(--ink-brown-dark);
-  }
+.primary-button, .action-button
+{
+  min-width: 64px;
+  min-height: 64px;
 }
 
 .header {
   display: flex;
   align-items: flex-start;
+  margin: 0 0 2vh 0;
+  gap: 10px;
 
   svg {
     xborder: 1px solid #f00;
@@ -202,7 +166,7 @@ dialog {
   }
 }
 
-#select-drink-dlg
+#select_drink_dlg
 {
 
   .dialog-actions {
@@ -258,5 +222,47 @@ dialog {
     font-size: 0.8rem;
     font-family: var(--font-body);
     opacity: 0.9;
+  }
+}
+
+#wip_drinks
+{
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2vh 0;
+
+  li
+  {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .icon
+  {
+    font-size: 10em;
+    line-height: 1.1em;
+    text-shadow: 0 0 30px #0008;
+  }
+}
+
+@media screen and (max-width: 768px)
+{
+  #wip_drinks
+  {
+    .icon
+    {
+      font-size: 4em;
+      line-height: 1.1em;
+    }
+    .label
+    {
+      width: min-content;
+      text-align: center;
+    }
   }
 }

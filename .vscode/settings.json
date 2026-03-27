@@ -9,5 +9,15 @@
     "logs/**", // Ignores a 'logs' folder
     "**/*.log", // Ignores all files with the .log extension
     "public/job-woper/db/**" // Ignores a specific folder named 'ignored_folder_name'
-  ]
+  ],
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "editor.detectIndentation": false,
+  "editor.formatOnSave": false,
+  "[html]": {
+    "editor.defaultFormatter": "vscode.html-language-features"
+  },
+  "[css]": {
+    "editor.defaultFormatter": "vscode.css-language-features"
+  }
 }
