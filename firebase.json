@@ -1,10 +1,11 @@
 {
   "hosting": {
-    "public": "public",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
+    "redirects": [
+      {
+        "source": "/job-woper/:path*",
+        "destination": "/app/job-woper/:path*",
+        "type": 301
+      }
     ]
   }
 }
