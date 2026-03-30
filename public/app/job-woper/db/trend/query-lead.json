@@ -1,0 +1,62 @@
+[
+  {
+    "count": 3167,
+    "datetime": 1772762747075,
+    "id": "f14ab570-f12a-41d4-ae14-a25e667b0a2c",
+    "query_id": "-lead"
+  },
+  {
+    "count": 3017,
+    "datetime": 1773037970261,
+    "id": "99770d01-2897-4705-b361-af00078f6539",
+    "query_id": "-lead"
+  },
+  {
+    "count": 3100,
+    "datetime": 1773183078632,
+    "id": "2f5abacf-d603-4f38-bb68-fe66d9574729",
+    "query_id": "-lead"
+  },
+  {
+    "count": 3092,
+    "datetime": 1773357250752,
+    "id": "bbc57481-56d6-47de-acce-110954af50d9",
+    "query_id": "-lead"
+  },
+  {
+    "count": 2885,
+    "datetime": 1773613063113,
+    "id": "6b379d78-45fd-47bd-a56d-15a9a38fab6f",
+    "query_id": "-lead"
+  },
+  {
+    "count": 3073,
+    "datetime": 1773790173162,
+    "id": "f916f95e-76ad-495c-ac9c-d352e722ee1b",
+    "query_id": "-lead"
+  },
+  {
+    "count": 2976,
+    "datetime": 1774218412160,
+    "id": "ad9f8be4-2135-40d9-91ec-49703e3a0b7b",
+    "query_id": "-lead"
+  },
+  {
+    "count": 3049,
+    "datetime": 1774418210835,
+    "id": "d2239c24-3602-40c7-96a9-1fccd8a3f229",
+    "query_id": "-lead"
+  },
+  {
+    "count": 3276,
+    "datetime": 1774564468517,
+    "id": "7d8b586c-4c2e-43b5-92c7-b27098c149ba",
+    "query_id": "-lead"
+  },
+  {
+    "count": 3114,
+    "datetime": 1774830196490,
+    "id": "4f4b19d0-07a4-4e2f-8749-24364988a19f",
+    "query_id": "-lead"
+  }
+]

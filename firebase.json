@@ -17,6 +17,21 @@
         "source": "/blottolog/:path*",
         "destination": "/app/blottolog/:path*",
         "type": 301
+      },
+      {
+        "source": "/tempustoi/:path*",
+        "destination": "/app/tempustoi/:path*",
+        "type": 301
+      },
+      {
+        "source": "/tempustrak/:path*",
+        "destination": "/app/tempustrak/:path*",
+        "type": 301
+      },
+      {
+        "source": "/porottoz/:path*",
+        "destination": "/app/porottoz/:path*",
+        "type": 301
       }
     ]
   }

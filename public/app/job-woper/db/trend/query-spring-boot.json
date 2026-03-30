@@ -1,0 +1,302 @@
+[
+  {
+    "count": 112,
+    "datetime": 1745973634674,
+    "id": "8fd8d4dc-4ae2-4f6a-a9bc-7a927fa488a6",
+    "query_id": "-spring-boot"
+  },
+  {
+    "count": 100,
+    "datetime": 1746346106132,
+    "id": "3462afa0-badc-4e45-b858-aa3ab77d6e5d",
+    "query_id": "-spring-boot"
+  },
+  {
+    "count": 100,
+    "datetime": 1746440398160,
+    "id": "d3493157-4fd7-4d0e-942d-a08e7f31ed3b",
+    "query_id": "-spring-boot"
+  },
+  {
+    "count": 111,
+    "datetime": 1746530189340,
+    "id": "505951c4-ea3b-44c1-9c0c-31d1ca21ed30",
+    "query_id": "-spring-boot"
+  },
+  {
+    "count": 113,
+    "datetime": 1746703428284,
+    "id": "a6738ee7-8424-4966-9074-6f61145a0808",
+    "query_id": "-spring-boot"
+  },
+  {
+    "count": 106,
+    "datetime": 1746934869865,
+    "id": "d306c661-4e32-4164-9bb6-9d3d6b4ec36f",
+    "query_id": "-spring-boot"
+  },
+  {
+    "count": 100,
+    "datetime": 1747229142817,
+    "id": "7b0d836c-12ad-450e-bb86-c5823d26a0ed",
+    "query_id": "-spring-boot"
+  },
+  {
+    "count": 104,
+    "datetime": 1747358553197,
+    "id": "e31a40a2-5041-46f6-90be-d8373397dd3b",
+    "query_id": "-spring-boot"
+  },
+  {
+    "count": 100,
+    "datetime": 1747611353230,
+    "id": "6759d2a2-9601-4b69-b198-17276392a0ac",
+    "query_id": "-spring-boot"
+  },
+  {
+    "count": 106,
+    "datetime": 1747923572558,
+    "id": "f44a262a-6736-4072-9aaa-5da189508a98",
+    "query_id": "-spring-boot"
+  },
+  {
+    "count": 105,
+    "datetime": 1748217803614,
+    "id": "78aca1a4-ba3c-4f74-9268-36da1793ce43",
+    "query_id": "-spring-boot"
+  },
+  {
+    "count": 119,
+    "datetime": 1748522558237,
+    "id": "895dee72-88fd-46e5-a4bc-2c701348f3e5",
+    "query_id": "-spring-boot"
+  },
+  {
+    "count": 123,
+    "datetime": 1748782891543,
+    "id": "f1d4a25c-d842-48d0-92f8-93066daf57ee",
+    "query_id": "-spring-boot"
+  },
+  {
+    "count": 115,
+    "datetime": 1748942802439,
+    "id": "273a1c88-6d83-442c-875a-98e18bdd3218",
+    "query_id": "-spring-boot"
+  },
+  {
+    "count": 108,
+    "datetime": 1749191471229,
+    "id": "daec851a-e77a-45fd-89a4-287905dfc285",
+    "query_id": "-spring-boot"
+  },
+  {
+    "count": 114,
+    "datetime": 1749357707305,
+    "id": "3a1307a8-61f3-425d-b926-53f3093df03e",
+    "query_id": "-spring-boot"
+  },
+  {
+    "count": 107,
+    "datetime": 1749601309522,
+    "id": "27dd6010-c5c8-437c-baec-f7d0f862595a",
+    "query_id": "-spring-boot"
+  },
+  {
+    "count": 116,
+    "datetime": 1750289719696,
+    "id": "13ffb296-be2f-4072-bacf-7854f6397fc4",
+    "query_id": "-spring-boot"
+  },
+  {
+    "count": 111,
+    "datetime": 1750732811715,
+    "id": "beb53d0d-ad29-414c-988c-05c5499806ca",
+    "query_id": "-spring-boot"
+  },
+  {
+    "count": 117,
+    "datetime": 1751248144189,
+    "id": "f6fabc00-701e-4f30-9835-03204aa87e17",
+    "query_id": "-spring-boot"
+  },
+  {
+    "count": 99,
+    "datetime": 1755842242371,
+    "id": "f28306cb-849d-4010-bd38-6581fb6193da",
+    "query_id": "-spring-boot"
+  },
+  {
+    "count": 87,
+    "datetime": 1756086132448,
+    "id": "935a860b-6b30-4b91-beb9-180e25316cdc",
+    "query_id": "-spring-boot"
+  },
+  {
+    "count": 100,
+    "datetime": 1756447363742,
+    "id": "b62275e6-864e-4cf8-97e8-ddfa01338d76",
+    "query_id": "-spring-boot"
+  },
+  {
+    "count": 88,
+    "datetime": 1757576988645,
+    "id": "c4a6bac1-a7ff-4960-8d7d-29a1b186d849",
+    "query_id": "-spring-boot"
+  },
+  {
+    "count": 82,
+    "datetime": 1757899949639,
+    "id": "4f8ce4c2-7286-466b-8254-32893984a6ea",
+    "query_id": "-spring-boot"
+  },
+  {
+    "count": 91,
+    "datetime": 1758586987123,
+    "id": "f0a2f4fb-7510-4d61-b383-f1a32fbf2841",
+    "query_id": "-spring-boot"
+  },
+  {
+    "count": 87,
+    "datetime": 1759466743866,
+    "id": "715cbe35-ae38-4a63-aa58-d2c1112290f2",
+    "query_id": "-spring-boot"
+  },
+  {
+    "count": 79,
+    "datetime": 1763508629598,
+    "id": "15ef54b2-51f9-4728-874b-5357bc2e1f97",
+    "query_id": "-spring-boot"
+  },
+  {
+    "count": 77,
+    "datetime": 1763694155208,
+    "id": "b8a1c62a-c812-439f-a63a-70bd7b6f4746",
+    "query_id": "-spring-boot"
+  },
+  {
+    "count": 80,
+    "datetime": 1764200169997,
+    "id": "f18d8acf-05b6-45b4-9927-618ab3302cb1",
+    "query_id": "-spring-boot"
+  },
+  {
+    "count": 84,
+    "datetime": 1765164339599,
+    "id": "85bf7b5a-0bb8-49d4-8249-97c63d9fd53d",
+    "query_id": "-spring-boot"
+  },
+  {
+    "count": 93,
+    "datetime": 1765779447779,
+    "id": "068543ea-b613-4a6e-a1a5-570bc3feefe6",
+    "query_id": "-spring-boot"
+  },
+  {
+    "count": 107,
+    "datetime": 1766102453642,
+    "id": "d85bef59-b7c9-4dee-a87b-5fbdef1beb62",
+    "query_id": "-spring-boot"
+  },
+  {
+    "count": 86,
+    "datetime": 1770725917396,
+    "id": "a3425a2b-98f7-4ee9-9cb0-f3bd5a16f360",
+    "query_id": "-spring-boot"
+  },
+  {
+    "count": 92,
+    "datetime": 1770849880365,
+    "id": "5d305edc-a5a5-4255-b9ac-51d57c2686d9",
+    "query_id": "-spring-boot"
+  },
+  {
+    "count": 93,
+    "datetime": 1771197781023,
+    "id": "dcf8c2a1-b42a-4984-a409-b2b149afe964",
+    "query_id": "-spring-boot"
+  },
+  {
+    "count": 90,
+    "datetime": 1771558729242,
+    "id": "f8404f7b-8c2f-438d-9c24-4222d19dbc2c",
+    "query_id": "-spring-boot"
+  },
+  {
+    "count": 81,
+    "datetime": 1771798646694,
+    "id": "8743949f-8171-44bd-a6f1-027d7071d62c",
+    "query_id": "-spring-boot"
+  },
+  {
+    "count": 94,
+    "datetime": 1771995248779,
+    "id": "b194e3e4-ab94-40bc-b031-31247c73bed4",
+    "query_id": "-spring-boot"
+  },
+  {
+    "count": 102,
+    "datetime": 1772171458503,
+    "id": "94210b0d-4eac-47b0-aa6f-1c8518a33921",
+    "query_id": "-spring-boot"
+  },
+  {
+    "count": 99,
+    "datetime": 1772755186085,
+    "id": "d350315a-b428-48b0-aa06-d2a48e3b0426",
+    "query_id": "-spring-boot"
+  },
+  {
+    "count": 92,
+    "datetime": 1773037838413,
+    "id": "7d314d82-781a-446b-8863-cd49d2ebbf89",
+    "query_id": "-spring-boot"
+  },
+  {
+    "count": 93,
+    "datetime": 1773182944703,
+    "id": "ff0d838a-9331-4b64-8bd9-dbf5ed1bb20e",
+    "query_id": "-spring-boot"
+  },
+  {
+    "count": 103,
+    "datetime": 1773357117115,
+    "id": "70e53c5b-3b9e-445e-b87b-9c51af67af5c",
+    "query_id": "-spring-boot"
+  },
+  {
+    "count": 95,
+    "datetime": 1773612927057,
+    "id": "38607176-5014-434d-92bc-2fca0387371f",
+    "query_id": "-spring-boot"
+  },
+  {
+    "count": 101,
+    "datetime": 1773790052785,
+    "id": "d21c8416-d262-4fd7-8a2b-db9858df9d7f",
+    "query_id": "-spring-boot"
+  },
+  {
+    "count": 92,
+    "datetime": 1774218279137,
+    "id": "388ea556-65b9-48cd-88f7-d9d8b30c0c7b",
+    "query_id": "-spring-boot"
+  },
+  {
+    "count": 93,
+    "datetime": 1774418084595,
+    "id": "4762fd74-8b43-4095-9190-e2be216879b3",
+    "query_id": "-spring-boot"
+  },
+  {
+    "count": 84,
+    "datetime": 1774564335686,
+    "id": "84c7e0cf-e7a8-46c1-ab93-b6a5c18a853d",
+    "query_id": "-spring-boot"
+  },
+  {
+    "count": 84,
+    "datetime": 1774830045107,
+    "id": "9f56c435-6d16-4750-b851-b2bfd9ad36af",
+    "query_id": "-spring-boot"
+  }
+]

@@ -1,0 +1,302 @@
+[
+  {
+    "count": 1100,
+    "datetime": 1745971198109,
+    "id": "b509087f-de20-40ed-9e4c-f99d21591127",
+    "query_id": "-javascript"
+  },
+  {
+    "count": 1012,
+    "datetime": 1746344533074,
+    "id": "caeccd16-377a-4d50-bf7c-d5b7a2c779cc",
+    "query_id": "-javascript"
+  },
+  {
+    "count": 1025,
+    "datetime": 1746438823581,
+    "id": "19ffadf2-4c4a-476b-a1d7-99185aa64755",
+    "query_id": "-javascript"
+  },
+  {
+    "count": 1072,
+    "datetime": 1746528616924,
+    "id": "edb9c52b-72cc-4355-ad77-9b962b31d510",
+    "query_id": "-javascript"
+  },
+  {
+    "count": 1086,
+    "datetime": 1746701857077,
+    "id": "5ff22e65-76cb-430f-8ce6-81e9f2078a29",
+    "query_id": "-javascript"
+  },
+  {
+    "count": 1001,
+    "datetime": 1746933298143,
+    "id": "70134196-077d-4c83-9a80-61c7a2a7b915",
+    "query_id": "-javascript"
+  },
+  {
+    "count": 1027,
+    "datetime": 1747227570924,
+    "id": "4ff55c5c-a29b-47ed-8559-294a4fa40d89",
+    "query_id": "-javascript"
+  },
+  {
+    "count": 1025,
+    "datetime": 1747356974282,
+    "id": "fa94fada-e4e5-42e4-bf49-d67894b069ee",
+    "query_id": "-javascript"
+  },
+  {
+    "count": 965,
+    "datetime": 1747609781511,
+    "id": "ea8b8802-8ef6-4226-9b4d-5fb9c656ba28",
+    "query_id": "-javascript"
+  },
+  {
+    "count": 1089,
+    "datetime": 1747922387663,
+    "id": "7da58b49-cba9-470f-b6a6-c517ec9fefa9",
+    "query_id": "-javascript"
+  },
+  {
+    "count": 1017,
+    "datetime": 1748216177956,
+    "id": "5296e32e-035b-43d8-be72-77cf3856e82a",
+    "query_id": "-javascript"
+  },
+  {
+    "count": 1093,
+    "datetime": 1748520936000,
+    "id": "be4a2a05-36a8-4e39-a198-4c0c93559751",
+    "query_id": "-javascript"
+  },
+  {
+    "count": 1088,
+    "datetime": 1748780841108,
+    "id": "52b1ba27-eca6-4528-8192-b5462c91642b",
+    "query_id": "-javascript"
+  },
+  {
+    "count": 1126,
+    "datetime": 1748941174614,
+    "id": "e5dc6bd9-4220-4db4-af6e-7b4ef5444ff9",
+    "query_id": "-javascript"
+  },
+  {
+    "count": 1173,
+    "datetime": 1749189788706,
+    "id": "00e68af7-6fc5-422d-a4a8-3f25c52226ff",
+    "query_id": "-javascript"
+  },
+  {
+    "count": 1109,
+    "datetime": 1749356064465,
+    "id": "254e475d-2f6d-4eac-9060-98502a394408",
+    "query_id": "-javascript"
+  },
+  {
+    "count": 1104,
+    "datetime": 1749599683871,
+    "id": "729ad9c7-1e9c-487c-9bcf-20ed413d5cc7",
+    "query_id": "-javascript"
+  },
+  {
+    "count": 1158,
+    "datetime": 1750254736389,
+    "id": "eed7986f-a177-4444-b1d4-6861751c0e0e",
+    "query_id": "-javascript"
+  },
+  {
+    "count": 1086,
+    "datetime": 1750689247661,
+    "id": "03141125-a773-4efe-8836-d98adcbd1dd4",
+    "query_id": "-javascript"
+  },
+  {
+    "count": 1109,
+    "datetime": 1751246475575,
+    "id": "c4d95aa7-5bfc-4e1f-90fa-07c0f5c71b11",
+    "query_id": "-javascript"
+  },
+  {
+    "count": 919,
+    "datetime": 1755840626331,
+    "id": "4c244d4a-8c51-49a2-96c4-0719d09fa5cc",
+    "query_id": "-javascript"
+  },
+  {
+    "count": 868,
+    "datetime": 1756084513100,
+    "id": "8490bde1-3893-4e3d-8e11-6b74ed44897d",
+    "query_id": "-javascript"
+  },
+  {
+    "count": 936,
+    "datetime": 1756445738131,
+    "id": "60033058-6614-4c86-80c6-e4380d094f53",
+    "query_id": "-javascript"
+  },
+  {
+    "count": 927,
+    "datetime": 1757575341447,
+    "id": "54799f3e-5a61-4a6a-a3c7-74e7f459dbec",
+    "query_id": "-javascript"
+  },
+  {
+    "count": 847,
+    "datetime": 1757896770573,
+    "id": "274c0e1e-f892-4226-b9d2-69fb3a2475be",
+    "query_id": "-javascript"
+  },
+  {
+    "count": 806,
+    "datetime": 1758585361603,
+    "id": "927549fc-ee56-4154-9da5-2bb2ccf291e0",
+    "query_id": "-javascript"
+  },
+  {
+    "count": 929,
+    "datetime": 1759465116851,
+    "id": "69742316-772e-42f8-a003-4af60d4eea22",
+    "query_id": "-javascript"
+  },
+  {
+    "count": 848,
+    "datetime": 1763507001141,
+    "id": "e8071577-b775-4fc1-ac96-e56c410131de",
+    "query_id": "-javascript"
+  },
+  {
+    "count": 890,
+    "datetime": 1763692528280,
+    "id": "b57cd815-069c-43c8-aa0e-3960d8d18b83",
+    "query_id": "-javascript"
+  },
+  {
+    "count": 909,
+    "datetime": 1764198560780,
+    "id": "8d055290-796a-46c5-943c-f419294938aa",
+    "query_id": "-javascript"
+  },
+  {
+    "count": 817,
+    "datetime": 1765162716805,
+    "id": "56bfb7a6-765b-4ec3-a934-886872088ae6",
+    "query_id": "-javascript"
+  },
+  {
+    "count": 726,
+    "datetime": 1765778762224,
+    "id": "1a2cb950-6ba7-4120-a405-d3d6dd2b1ae2",
+    "query_id": "-javascript"
+  },
+  {
+    "count": 748,
+    "datetime": 1766102004409,
+    "id": "e0e356b7-edf2-45ff-a913-0c51c9fb0caf",
+    "query_id": "-javascript"
+  },
+  {
+    "count": 874,
+    "datetime": 1770725436721,
+    "id": "3f16cf96-0c01-4954-baf1-8fa366a524d4",
+    "query_id": "-javascript"
+  },
+  {
+    "count": 858,
+    "datetime": 1770849426625,
+    "id": "4349e9ba-6c3d-41d8-bb10-7c0e44f7b8db",
+    "query_id": "-javascript"
+  },
+  {
+    "count": 778,
+    "datetime": 1771197581462,
+    "id": "be991b94-fb12-47a5-922f-b989182dfdaf",
+    "query_id": "-javascript"
+  },
+  {
+    "count": 796,
+    "datetime": 1771558517328,
+    "id": "24e4bce7-c9f9-4ea0-91b5-0b55360ff419",
+    "query_id": "-javascript"
+  },
+  {
+    "count": 715,
+    "datetime": 1771798489301,
+    "id": "ee074c09-5bfb-4619-9bcd-5d8c0d9572cb",
+    "query_id": "-javascript"
+  },
+  {
+    "count": 744,
+    "datetime": 1771995057618,
+    "id": "bc3a6504-9b01-445c-b91e-44f99d32ff6c",
+    "query_id": "-javascript"
+  },
+  {
+    "count": 832,
+    "datetime": 1772171290276,
+    "id": "089e5ea7-ddeb-418f-82ca-be12fa787538",
+    "query_id": "-javascript"
+  },
+  {
+    "count": 828,
+    "datetime": 1772755045939,
+    "id": "a3e79269-bee3-4a7e-913d-3862e8b8b99e",
+    "query_id": "-javascript"
+  },
+  {
+    "count": 764,
+    "datetime": 1773037694957,
+    "id": "166525d8-1a8f-43f6-aa89-1fe217576ba2",
+    "query_id": "-javascript"
+  },
+  {
+    "count": 801,
+    "datetime": 1773182794597,
+    "id": "4fdd7415-ae0c-4fa2-9f23-b629c7f76351",
+    "query_id": "-javascript"
+  },
+  {
+    "count": 823,
+    "datetime": 1773356970320,
+    "id": "775ae654-e4cc-4faf-8866-ab0e25528d6f",
+    "query_id": "-javascript"
+  },
+  {
+    "count": 765,
+    "datetime": 1773612772448,
+    "id": "cb3136e9-7e11-4271-89d0-84bd35580135",
+    "query_id": "-javascript"
+  },
+  {
+    "count": 811,
+    "datetime": 1773789920448,
+    "id": "cc85669f-d5cd-4386-95d2-62dadec89688",
+    "query_id": "-javascript"
+  },
+  {
+    "count": 812,
+    "datetime": 1774218131031,
+    "id": "5b303526-b861-4b67-a78a-09c4ad791bbc",
+    "query_id": "-javascript"
+  },
+  {
+    "count": 759,
+    "datetime": 1774417940585,
+    "id": "f0df6a9d-43bd-418b-ab18-a9472873ed8e",
+    "query_id": "-javascript"
+  },
+  {
+    "count": 789,
+    "datetime": 1774564188957,
+    "id": "184382d7-6e3a-47fc-a051-4a957efc1dc6",
+    "query_id": "-javascript"
+  },
+  {
+    "count": 734,
+    "datetime": 1774829888285,
+    "id": "00f11d73-75e6-475a-b4f9-a737efd2f1de",
+    "query_id": "-javascript"
+  }
+]

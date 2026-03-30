@@ -12,8 +12,8 @@
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "program": "${workspaceFolder}\\public\\job-woper\\index.js",
-            "cwd": "${workspaceFolder}\\public\\job-woper"
+            "program": "${workspaceFolder}\\public\\app\\job-woper\\index.js",
+            "cwd": "${workspaceFolder}\\public\\app\\job-woper"
         }
     ]
 }
