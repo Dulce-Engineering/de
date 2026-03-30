@@ -16,8 +16,8 @@ list.value = items;
 
 function On_Render_Item(event)
 {
-  const item_elem = event.currentTarget;
-  const item = event.detail;
+  const item_elem = event.target;
+  const item = item_elem.item_obj;
 
   item_elem.name_elem.innerHTML = item.name;
   item_elem.birthday_elem.innerHTML = item.birthday;
