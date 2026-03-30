@@ -1,9 +1,21 @@
 {
   "hosting": {
-    "redirects": [
+    "public": "public",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "redirects": 
+    [
       {
         "source": "/job-woper/:path*",
         "destination": "/app/job-woper/:path*",
+        "type": 301
+      },
+      {
+        "source": "/blottolog/:path*",
+        "destination": "/app/blottolog/:path*",
         "type": 301
       }
     ]
