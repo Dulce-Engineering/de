@@ -12,6 +12,8 @@
     import Utils from "../../lib/Utils.js";
     import DeInputList from "../../component/DeInputList/index.js";
 
+    const storage_key = "blottolog";
+
     const drink_types =
     [
       {id: 1, name: "Beer", icon: "🍺"},
@@ -43,10 +45,34 @@
     Main();
     function Main()
     {
+      const ctx = Get_Ctx();
+
+      wip_drinks_elem.addEventListener("change", On_Change_Drink_Items);
       wip_drinks_elem.addEventListener("render", On_Render_Drink_Item);
-      wip_drinks_elem.value = wip_drinks;
+      wip_drinks_elem.value = ctx?.wip_drinks;
 
       select_drink_form.addEventListener('submit', On_Submit_Drink);
+    }
+
+    function Get_Ctx()
+    {
+      const json_str = localStorage.getItem(storage_key);
+      const blottolog_ctx = JSON.parse(json_str);
+      return blottolog_ctx || {};
+    }
+
+    function Set_Ctx(blottolog_ctx)
+    {
+      const json_str = JSON.stringify(blottolog_ctx);
+      localStorage.setItem(storage_key, json_str);
+    }
+
+    function On_Change_Drink_Items()
+    {
+      const ctx = Get_Ctx();
+      ctx.wip_drinks = wip_drinks_elem.value;
+      Set_Ctx(ctx);
+      //Update_Nav();
     }
 
     function On_Render_Drink_Item(event)
@@ -61,6 +87,15 @@
 
       const drink_label = `${drink_type.name} ${drink_size.name}`;
       drink_elem.drink_label.innerHTML = drink_label;
+
+      drink_elem.addEventListener('click', On_Click_Drink_Item);
+    }
+
+    function On_Click_Drink_Item(event)
+    {
+      const drink_elem = event.currentTarget;
+      const drink = drink_elem.item_obj;
+      wip_drinks_elem.Remove(drink.id);
     }
 
     function On_Submit_Drink(e)
