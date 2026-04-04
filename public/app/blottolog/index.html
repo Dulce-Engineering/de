@@ -45,7 +45,7 @@
     Main();
     function Main()
     {
-      const ctx = Get_Ctx();
+      const ctx = Load_Ctx();
 
       wip_drinks_elem.addEventListener("change", On_Change_Drink_Items);
       wip_drinks_elem.addEventListener("render", On_Render_Drink_Item);
@@ -54,24 +54,24 @@
       select_drink_form.addEventListener('submit', On_Submit_Drink);
     }
 
-    function Get_Ctx()
+    function Load_Ctx()
     {
       const json_str = localStorage.getItem(storage_key);
-      const blottolog_ctx = JSON.parse(json_str);
-      return blottolog_ctx || {};
+      const ctx = JSON.parse(json_str);
+      return ctx || {};
     }
 
-    function Set_Ctx(blottolog_ctx)
+    function Save_Ctx(ctx)
     {
-      const json_str = JSON.stringify(blottolog_ctx);
+      const json_str = JSON.stringify(ctx);
       localStorage.setItem(storage_key, json_str);
     }
 
     function On_Change_Drink_Items()
     {
-      const ctx = Get_Ctx();
+      const ctx = Load_Ctx();
       ctx.wip_drinks = wip_drinks_elem.value;
-      Set_Ctx(ctx);
+      Save_Ctx(ctx);
       //Update_Nav();
     }
 

@@ -298,5 +298,11 @@
     "datetime": 1774829895026,
     "id": "df928677-046c-4dbf-bd39-a9f6aa108537",
     "query_id": "-rest"
+  },
+  {
+    "count": 404,
+    "datetime": 1775013869300,
+    "id": "c4f12cd0-f2f9-40f6-990e-c1b9934bc188",
+    "query_id": "-rest"
   }
 ]
