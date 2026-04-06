@@ -35,23 +35,29 @@
       {id: 10, name: "Short", ml: 300},
       {id: 11, name: "Tall", ml: 300},
     ];
-    const wip_drinks =
-    [
-      {id: 1, type_id: 1, size_id: 1},
-      {id: 2, type_id: 2, size_id: 2},
-      {id: 3, type_id: 3, size_id: 3},
-    ];
 
     Main();
     function Main()
     {
       const ctx = Load_Ctx();
 
-      wip_drinks_elem.addEventListener("change", On_Change_Drink_Items);
       wip_drinks_elem.addEventListener("render", On_Render_Drink_Item);
-      wip_drinks_elem.value = ctx?.wip_drinks;
+      wip_drinks_elem.value = Select_WIP_Drinks(ctx);
+      finished_drinks_elem.addEventListener("render", On_Render_Finished_Drink_Item);
+      finished_drinks_elem.value = Select_Finished_Drinks(ctx);
 
       select_drink_form.addEventListener('submit', On_Submit_Drink);
+      delete_drink_btn.addEventListener('click', On_Click_Delete_Btn);
+      finish_drink_btn.addEventListener('click', On_Click_Finish_Btn);
+
+      beer_drink.addEventListener('click', On_Click_Drink);
+      wine_drink.addEventListener('click', On_Click_Drink);
+      spirit_drink.addEventListener('click', On_Click_Drink);
+      cocktail_drink.addEventListener('click', On_Click_Drink);
+
+      small_drink.addEventListener('click', On_Click_Size);
+      regular_drink.addEventListener('click', On_Click_Size);
+      large_drink.addEventListener('click', On_Click_Size);
     }
 
     function Load_Ctx()
@@ -67,13 +73,90 @@
       localStorage.setItem(storage_key, json_str);
     }
 
-    function On_Change_Drink_Items()
+    function Update_Ctx(Update_Callback_Fn)
     {
       const ctx = Load_Ctx();
-      ctx.wip_drinks = wip_drinks_elem.value;
+      Update_Callback_Fn(ctx);
       Save_Ctx(ctx);
-      //Update_Nav();
     }
+
+    // drinks ======================================================================
+
+    function Select_Drinks(ctx)
+    {
+      if (!ctx.drinks)
+      {
+        ctx.drinks = [];
+      }
+      return ctx.drinks;
+    }
+
+    function Select_WIP_Drinks(ctx)
+    {
+      const drinks = Select_Drinks(ctx);
+      return drinks.filter(d => d.end_time == null);
+    }
+
+    function Select_Finished_Drinks(ctx)
+    {
+      const drinks = Select_Drinks(ctx);
+      return drinks.filter(d => d.end_time != null);
+    }
+
+    function Insert_Drink(ctx, drink)
+    {
+      const drinks = Select_Drinks(ctx);
+      drinks.push(drink);
+    }
+
+    function Update_Drink(ctx, drink)
+    {
+      const drinks = Select_Drinks(ctx);
+      const index = drinks.findIndex(d => d.id === drink.id);
+      drinks[index] = drink;
+    }
+
+    function Delete_Drink(ctx, drink_id)
+    {
+      const drinks = Select_Drinks(ctx);
+      const index = drinks.findIndex(d => d.id === drink_id);
+      if (index !== -1)
+      {
+        drinks.splice(index, 1);
+      }
+    }
+
+    function Start_Drink(drink_type_id, drink_size_id)
+    {
+      const drink =
+      {
+        id: Date.now(), 
+        type_id: drink_type_id, 
+        size_id: drink_size_id,
+        start_time: Date.now(),
+        end_time: null
+      };
+
+      wip_drinks_elem.Add(drink);
+      Update_Ctx(ctx => Insert_Drink(ctx, drink));
+    }
+
+    function Finish_Drink(drink)
+    {
+      drink.end_time = Date.now();
+
+      wip_drinks_elem.Remove(drink.id);
+      finished_drinks_elem.Add(drink);
+      Update_Ctx(ctx => Update_Drink(ctx, drink));
+    }
+
+    function Discard_Drink(drink_id)
+    {
+      wip_drinks_elem.Remove(drink_id);
+      Update_Ctx(ctx => Delete_Drink(ctx, drink_id));
+    }
+
+    // drinks list =================================================================
 
     function On_Render_Drink_Item(event)
     {
@@ -82,40 +165,124 @@
 
       const drink_type = drink_types.find(dt => dt.id === drink.type_id);
       const drink_size = drink_sizes.find(ds => ds.id === drink.size_id);
+      const drink_label = `${drink_type.name} ${drink_size.name}`;
 
       drink_elem.drink_icon.innerHTML = drink_type.icon;
-
-      const drink_label = `${drink_type.name} ${drink_size.name}`;
       drink_elem.drink_label.innerHTML = drink_label;
 
       drink_elem.addEventListener('click', On_Click_Drink_Item);
     }
 
+    function On_Render_Finished_Drink_Item(event)
+    {
+      const drink_elem = event.target;
+      const drink = drink_elem.item_obj;
+
+      const drink_type = drink_types.find(dt => dt.id === drink.type_id);
+      const drink_size = drink_sizes.find(ds => ds.id === drink.size_id);
+      const drink_label = `${drink_type.name} ${drink_size.name}`;
+
+      drink_elem.drink_label.innerHTML = drink_label;
+      drink_elem.drink_icon.innerHTML = drink_type.icon;
+    }
+
     function On_Click_Drink_Item(event)
     {
       const drink_elem = event.currentTarget;
-      const drink = drink_elem.item_obj;
-      wip_drinks_elem.Remove(drink.id);
+      drink_menu_dlg.item_obj = drink_elem.item_obj;
+      drink_menu_dlg.showPopover();
     }
 
-    function On_Submit_Drink(e)
+    // choose drink dlg ============================================================
+
+    function On_Submit_Drink(event)
     {
-      e.preventDefault();
-      const button = e.submitter;
-      if (button.classList.contains('drink-option'))
+      event.preventDefault?.();
+      const button = event.submitter;
+      if (button.tagName === "BL-DRINK")
       {
         const drink_type_id = parseInt(button.dataset.drinkType);
         const drink_size_id = parseInt(button.dataset.drinkSize);
-        const drink =
-        {
-          id: Date.now(), 
-          type_id: drink_type_id, 
-          size_id: drink_size_id
-        };
-        wip_drinks_elem.Add(drink);
+        Start_Drink(drink_type_id, drink_size_id);
       }
       select_drink_dlg.hidePopover();
     }
+
+    function On_Click_Size(event)
+    {
+      const drink_elem = event.currentTarget;
+      On_Submit_Drink({submitter: drink_elem});
+    }
+
+    function On_Click_Drink(event)
+    {
+      const drink_elem = event.currentTarget;
+      const icon = drink_elem.getAttribute("icon");
+      const drink_type_id = parseInt(drink_elem.dataset.drinkType);
+
+      small_drink.setAttribute("icon", icon);
+      small_drink.dataset.drinkType = drink_type_id;
+      regular_drink.setAttribute("icon", icon);
+      regular_drink.dataset.drinkType = drink_type_id;
+      large_drink.setAttribute("icon", icon);
+      large_drink.dataset.drinkType = drink_type_id;
+    }
+
+    // drink menu ==================================================================
+
+    function On_Click_Delete_Btn(event)
+    {
+      drink_menu_dlg.hidePopover();
+
+      const drink = drink_menu_dlg.item_obj;
+      Discard_Drink(drink.id);
+    }
+
+    function On_Click_Finish_Btn(event)
+    {
+      drink_menu_dlg.hidePopover();
+
+      const drink = drink_menu_dlg.item_obj;
+      Finish_Drink(drink);
+    }
+
+    // components ==================================================================
+
+    class BL_Drink extends HTMLElement
+    {
+      static tname = "bl-drink";
+
+      static observedAttributes = ['icon'];
+      attributeChangedCallback(name, oldValue, newValue)
+      {
+        if (name === 'icon')
+        {
+          this.Update_Icon();
+        }
+      }
+
+      Update_Icon()
+      {
+        if (this.drink_icon)
+        {
+          const icon = this.getAttribute("icon") || "🍹";
+          this.drink_icon.innerHTML = icon;
+        }
+      }
+
+      connectedCallback()
+      {
+        const label = this.getAttribute("label") || "";
+        this.innerHTML = `
+          <span cid="drink_icon" class="icon"></span> 
+          <span cid="drink_label" class="label">${label}</span> 
+        `;
+        Utils.Set_Id_Shortcuts(this, this, "cid");
+
+        this.Update_Icon();
+      }
+    }
+    Utils.Register_Element(BL_Drink);
   </script>
 </head>
 
@@ -155,98 +322,58 @@
   </section>
 
   <section class="drinks">
+
+    <h1>Drinks in Progress</h1>
     <de-input-list id="wip_drinks_elem">
-      <span cid="drink_icon" class="icon">${icon}</span> 
-      <span cid="drink_label" class="label">${label}</span> 
+      <span cid="drink_icon" class="icon"></span> 
+      <span cid="drink_label" class="label"></span> 
     </de-input-list>
 
-    <ul id="finished-drinks"></ul>
+    <h1>Finished Drinks</h1>🙊
+    <de-input-list id="finished_drinks_elem">
+      <span cid="drink_icon" class="icon"></span> 
+      <span cid="drink_label" class="label"></span> 
+    </de-input-list>
+
     <button id="add_btn" class="action-button" popovertarget="select_drink_dlg">🍻</button>
-    
-    <dialog id="select_drink_dlg" popover>
-      <form id="select_drink_form" method="dialog">
-        <h2>Log New Cargo</h2>
-        
-        <div class="drink-category">
-          <h3>Beer</h3>
-          <div class="drink-options">
-            <button type="submit" class="drink-option" data-drink-type="1" data-drink-size="4">
-              <span class="icon">🍺</span>
-              <span class="label">Middy 285ml</span>
-            </button>
-            <button type="submit" class="drink-option" data-drink-type="1" data-drink-size="5">
-              <span class="icon" style="font-size: 1.4em;">🍺</span>
-              <span class="label">Schooner 425ml</span>
-            </button>
-            <button type="submit" class="drink-option" data-drink-type="1" data-drink-size="6">
-              <span class="icon" style="font-size: 1.8em;">🍺</span>
-              <span class="label">Pint 570ml</span>
-            </button>
-          </div>
-        </div>
-
-        <div class="drink-category">
-          <h3>Wine</h3>
-          <div class="drink-options">
-            <button type="submit" class="drink-option" data-drink-type="2" data-drink-size="1">
-              <span class="icon">🍷</span>
-              <span class="label">Small</span>
-            </button>
-            <button type="submit" class="drink-option" data-drink-type="2" data-drink-size="2">
-              <span class="icon" style="font-size: 1.4em;">🍷</span>
-              <span class="label">Regular</span>
-            </button>
-            <button type="submit" class="drink-option" data-drink-type="2" data-drink-size="3">
-              <span class="icon" style="font-size: 1.8em;">🍷</span>
-              <span class="label">Large</span>
-            </button>
-          </div>
-        </div>
-
-        <div class="drink-category">
-          <h3>Spirits</h3>
-          <div class="drink-options">
-            <button type="submit" class="drink-option" data-drink-type="3" data-drink-size="7">
-              <span class="icon">🥃</span>
-              <span class="label">Half</span>
-            </button>
-            <button type="submit" class="drink-option" data-drink-type="3" data-drink-size="8">
-              <span class="icon" style="font-size: 1.4em;">🥃</span>
-              <span class="label">Single</span>
-            </button>
-            <button type="submit" class="drink-option" data-drink-type="3" data-drink-size="9">
-              <span class="icon" style="font-size: 1.8em;">🥃</span>
-              <span class="label">Double</span>
-            </button>
-          </div>
-        </div>
-
-        <div class="drink-category">
-          <h3>Cocktail</h3>
-          <div class="drink-options">
-            <button type="submit" class="drink-option" data-drink-type="4" data-drink-size="10">
-              <span class="icon">🍸</span>
-              <span class="label">Short</span>
-            </button>
-            <button type="submit" class="drink-option" data-drink-type="4" data-drink-size="2">
-              <span class="icon" style="font-size: 1.4em;">🍸</span>
-              <span class="label">Regular</span>
-            </button>
-            <button type="submit" class="drink-option" data-drink-type="4" data-drink-size="11">
-              <span class="icon" style="font-size: 1.8em;">🍸</span>
-              <span class="label">Tall</span>
-            </button>
-          </div>
-        </div>
-
-        <div class="dialog-actions">
-          <button type="button" class="secondary-button" popovertarget="select_drink_dlg" popovertargetaction="hide">
-            ❌
-          </button>
-        </div>
-      </form>
-    </dialog>
   </section>
+  
+  <dialog id="select_drink_dlg" popover>
+    <form id="select_drink_form" method="dialog">
+
+      <h1>Choose a Drink...</h1>
+      <div class="list">
+        <bl-drink id="beer_drink" data-drink-type="1" icon="🍺" label="Beer"></bl-drink>
+        <bl-drink id="wine_drink" data-drink-type="2" icon="🍷" label="Wine"></bl-drink>
+        <bl-drink id="spirit_drink" data-drink-type="3" icon="🥃" label="Spirit"></bl-drink>
+        <bl-drink id="cocktail_drink" data-drink-type="4" icon="🍸" label="Cocktail"></bl-drink>
+      </div>
+
+      <h1>and Size...</h1>
+      <div class="list">
+        <bl-drink id="small_drink" data-drink-size="1" icon="🍹" label="Small" class="small"></bl-drink>
+        <bl-drink id="regular_drink" data-drink-size="2" icon="🍹" label="Regular" class="regular"></bl-drink>
+        <bl-drink id="large_drink" data-drink-size="3" icon="🍹" label="Large" class="large"></bl-drink>
+      </div>
+
+      <div class="dialog-actions">
+        <button 
+          type="button" 
+          class="secondary-button" 
+          popovertarget="select_drink_dlg" 
+          popovertargetaction="hide">
+          ❌
+        </button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="drink_menu_dlg" popover>
+    <form id="drink_menu_form" method="dialog">
+      <button id="delete_drink_btn">Cast Away</button>
+      <button id="finish_drink_btn">Finished</button>
+    </form>
+  </dialog>
 
 </body>
 

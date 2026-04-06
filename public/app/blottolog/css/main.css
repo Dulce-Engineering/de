@@ -48,16 +48,16 @@
   --font-body: 'Quattrocento', serif;
 }
 
-* {
+* 
+{
   box-sizing: border-box;
   padding: 0;
 }
 
-body {
-  /* Light gradient background resembling map parchment */
+body 
+{
   background: radial-gradient(circle at center, var(--parchment-tan-base) 50%, var(--parchment-tan-dark) 100%);
   color: var(--ink-brown-dark);
-  /* Dark text for contrast against light parchment */
   font-family: var(--font-body);
   line-height: 1.6;
   min-height: 100vh;
@@ -65,11 +65,16 @@ body {
   margin: 0;
 }
 
+h1
+{
+  font-size: 4em;;
+}
 h1, h2, h3, h4, h5, h6 
 {
   font-family: var(--font-heading);
-  color: var(--parchment-tan-light);
   font-weight: normal;
+  margin: 0;
+  text-align: center;
 }
 
 a {
@@ -143,89 +148,71 @@ a {
 }
 
 /* --- DIALOG & DRINK SELECTION --- */
-dialog {
-  background: var(--nautical-blue-dark);
-  color: var(--parchment-tan-light);
-  border: 2px solid var(--terracotta-orange-dark);
-  border-radius: 12px;
+dialog 
+{
+  background: radial-gradient(circle at center, var(--parchment-tan-base) 50%, var(--parchment-tan-dark) 100%);
+  color: var(--ink-brown-dark);
+  border: none;
   padding: 24px;
-  width: 90%;
-  max-width: 400px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+  transform: skewX(-5deg);
 
-  /* Dim the background behind the modal */
-  &::backdrop {
+  &::backdrop 
+  {
     background: rgba(0, 0, 0, 0.8);
     backdrop-filter: blur(2px);
-  }
-
-  h2 {
-    text-align: center;
-    margin-bottom: 20px;
-    color: var(--terracotta-orange-light);
   }
 }
 
 #select_drink_dlg
 {
+  .icon
+  {
+    font-size: 10em;
+    line-height: 1.1em;
+    text-shadow: 0 0 30px #0008;
+  }
 
-  .dialog-actions {
+  bl-drink
+  {
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+
+    &.small .icon
+    {
+      font-size: 6em;
+    }
+    &.regular .icon
+    {
+      font-size: 8em;
+    }
+    &.large .icon
+    {
+      font-size: 10em;
+    }
+  }
+
+  .list
+  {
+    display: flex;
+    align-content: center;
+    align-items: center;
+    justify-content: center;  
+  }
+
+  .dialog-actions 
+  {
     display: flex;
     justify-content: flex-end;
     margin-top: 25px;
   }
-
-  .drink-category h3 {
-    font-family: var(--font-body);
-    font-size: 1.1rem;
-    margin: 10px 0 5px 0;
-    border-bottom: 1px dashed var(--ink-brown-light);
-    padding-bottom: 5px;
-  }
-
-  .drink-options {
-    display: flex;
-    justify-content: space-between;
-    gap: 10px;
-    margin-bottom: 15px;
-  }
-
-  .drink-option {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-end;
-    /* Keep labels aligned at the bottom */
-    background: var(--ink-brown-base);
-    border: 1px solid var(--ink-brown-light);
-    border-radius: 8px;
-    padding: 12px 10px;
-    color: var(--parchment-tan-base);
-    cursor: pointer;
-    transition: transform 0.1s, border-color 0.1s, background-color 0.1s;
-  }
-
-  .drink-option:hover {
-    background: var(--ink-brown-dark);
-    border-color: var(--terracotta-orange-light);
-    transform: translateY(-2px);
-  }
-
-  .drink-option .icon {
-    margin-bottom: 8px;
-    font-size: 1rem;
-    /* Small default, scaled inline for large sizes */
-  }
-
-  .drink-option .label {
-    font-size: 0.8rem;
-    font-family: var(--font-body);
-    opacity: 0.9;
-  }
 }
 
-#wip_drinks_elem
+#wip_drinks_elem, #finished_drinks_elem
 {
   list-style-type: none;
   margin: 0;
@@ -240,6 +227,16 @@ dialog {
     display: flex;
     flex-direction: column;
     align-items: center;
+    cursor: pointer;
+
+    &:hover
+    {
+      .icon
+      {
+        text-shadow: 0 0 30px #fff;
+        transform: scale(1.1);
+      }
+    }
   }
 
   .icon
