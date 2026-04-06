@@ -244,5 +244,11 @@
     "datetime": 1775275870525,
     "id": "abf3e8b6-c81c-4427-b7a7-a6e041a589b2",
     "query_id": "-frontend"
+  },
+  {
+    "count": 573,
+    "datetime": 1775443569818,
+    "id": "b20b570f-8994-4b83-9031-7b317202f287",
+    "query_id": "-frontend"
   }
 ]
