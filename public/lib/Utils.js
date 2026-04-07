@@ -1001,9 +1001,14 @@ class Utils
     }
   }
 
-  static toDocument(html, src_elems) 
+  static To_Document(html, src_elems) 
   {
     return Utils.To_Template(html, src_elems).content;
+  }
+
+  static toDocument(html, src_elems) 
+  {
+    return Utils.To_Document(html, src_elems);
   }
 
   static toElement(html) 

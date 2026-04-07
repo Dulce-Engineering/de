@@ -46,6 +46,8 @@
   /* Typography */
   --font-heading: 'Beau Rivage', cursive;
   --font-body: 'Quattrocento', serif;
+
+  font-size: 12px;
 }
 
 * 
@@ -59,7 +61,6 @@ body
   background: radial-gradient(circle at center, var(--parchment-tan-base) 50%, var(--parchment-tan-dark) 100%);
   color: var(--ink-brown-dark);
   font-family: var(--font-body);
-  line-height: 1.6;
   min-height: 100vh;
   padding: 4vw 2vh;
   margin: 0;
@@ -67,7 +68,7 @@ body
 
 h1
 {
-  font-size: 4em;;
+  font-size: 5rem;
 }
 h1, h2, h3, h4, h5, h6 
 {
@@ -98,7 +99,7 @@ a {
   cursor: pointer;
   padding: 10px;
   text-shadow: 0 0 6px #000f;
-  font-size: 2em;
+  font-size: 3rem;
 }
 .primary-button, .action-button
 {
@@ -162,14 +163,25 @@ dialog
     background: rgba(0, 0, 0, 0.8);
     backdrop-filter: blur(2px);
   }
+
+  form
+  {
+    border: 1px ridge var(--ink-brown-base);
+    padding: 20px;
+  }
+}
+
+section.drinks h1
+{
+  padding: 1vh 0 0 0;
+  border-top: 1px solid var(--ink-brown-base);
 }
 
 #select_drink_dlg
 {
   .icon
   {
-    font-size: 10em;
-    line-height: 1.1em;
+    font-size: 10rem;
     text-shadow: 0 0 30px #0008;
   }
 
@@ -184,15 +196,21 @@ dialog
 
     &.small .icon
     {
-      font-size: 6em;
+      font-size: 8rem;
     }
     &.regular .icon
     {
-      font-size: 8em;
+      font-size: 10rem;
     }
     &.large .icon
     {
-      font-size: 10em;
+      font-size: 12rem;
+      margin: 0 -1rem;
+    }
+
+    .label
+    {
+      font-size: 1.5rem;
     }
   }
 
@@ -241,9 +259,49 @@ dialog
 
   .icon
   {
-    font-size: 10em;
-    line-height: 1.1em;
+    font-size: 10rem;
     text-shadow: 0 0 30px #0008;
+  }
+  .label
+  {
+    font-size: 1.5rem;
+  }
+}
+#wip_drinks_elem
+{
+  margin: 0 0 2vh 0;
+}
+
+.menu-dlg
+{
+  form
+  {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 20px;
+  }
+
+  button
+  {
+    border: none;
+    background: none;
+    padding: 0;
+    margin: 0;
+    font-family: var(--font-heading);
+    font-weight: normal;
+    font-size: 4rem;
+    cursor: pointer;
+
+    &:focus-visible 
+    {
+      outline: none;
+    }
+  }
+
+  .primary-button
+  {
+    margin: 0 0 0 10px;
   }
 }
 
@@ -253,8 +311,7 @@ dialog
   {
     .icon
     {
-      font-size: 4em;
-      line-height: 1.1em;
+      font-size: 4rem;
     }
     .label
     {

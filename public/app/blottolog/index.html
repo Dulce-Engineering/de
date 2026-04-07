@@ -10,7 +10,7 @@
 
   <script type="module">
     import Utils from "../../lib/Utils.js";
-    import DeInputList from "../../component/DeInputList/index.js";
+    import DeInputList from "../../component/DeInputList/index2.js";
 
     const storage_key = "blottolog";
 
@@ -20,6 +20,7 @@
       {id: 2, name: "Wine", icon: "🍷"},
       {id: 3, name: "Spirits", icon: "🥃"},
       {id: 4, name: "Cocktail", icon: "🍸"},
+      {id: 5, name: "Mystery Drink", icon: "🍹"},
     ];
     const drink_sizes =
     [
@@ -160,36 +161,36 @@
 
     function On_Render_Drink_Item(event)
     {
-      const drink_elem = event.target;
-      const drink = drink_elem.item_obj;
+      const drink = event.detail.obj;
+      const shortcuts = event.detail.shortcuts;
 
-      const drink_type = drink_types.find(dt => dt.id === drink.type_id);
+      const def_drink_type = drink_types.find(dt => dt.id === 5);
+      const drink_type = drink_types.find(dt => dt.id === drink.type_id) || def_drink_type;
       const drink_size = drink_sizes.find(ds => ds.id === drink.size_id);
       const drink_label = `${drink_type.name} ${drink_size.name}`;
 
-      drink_elem.drink_icon.innerHTML = drink_type.icon;
-      drink_elem.drink_label.innerHTML = drink_label;
-
-      drink_elem.addEventListener('click', On_Click_Drink_Item);
+      shortcuts.drink_icon.innerHTML = drink_type.icon;
+      shortcuts.drink_label.innerHTML = drink_label;
+      shortcuts.drink_container.addEventListener('click', e => On_Click_Drink_Item(e, drink));
     }
 
     function On_Render_Finished_Drink_Item(event)
     {
-      const drink_elem = event.target;
-      const drink = drink_elem.item_obj;
+      const drink = event.detail.obj;
+      const shortcuts = event.detail.shortcuts;
 
-      const drink_type = drink_types.find(dt => dt.id === drink.type_id);
+      const def_drink_type = drink_types.find(dt => dt.id === 5);
+      const drink_type = drink_types.find(dt => dt.id === drink.type_id) || def_drink_type;
       const drink_size = drink_sizes.find(ds => ds.id === drink.size_id);
       const drink_label = `${drink_type.name} ${drink_size.name}`;
 
-      drink_elem.drink_label.innerHTML = drink_label;
-      drink_elem.drink_icon.innerHTML = drink_type.icon;
+      shortcuts.drink_icon.innerHTML = drink_type.icon;
+      shortcuts.drink_label.innerHTML = drink_label;
     }
 
-    function On_Click_Drink_Item(event)
+    function On_Click_Drink_Item(event, drink)
     {
-      const drink_elem = event.currentTarget;
-      drink_menu_dlg.item_obj = drink_elem.item_obj;
+      drink_menu_dlg.item_obj = drink;
       drink_menu_dlg.showPopover();
     }
 
@@ -325,14 +326,20 @@
 
     <h1>Drinks in Progress</h1>
     <de-input-list id="wip_drinks_elem">
-      <span cid="drink_icon" class="icon"></span> 
-      <span cid="drink_label" class="label"></span> 
+      <span slot="no_items" class="icon">🙊</span>
+      <li cid="drink_container" slot="item">
+        <span cid="drink_icon" class="icon"></span> 
+        <span cid="drink_label" class="label"></span> 
+      </li>
     </de-input-list>
 
-    <h1>Finished Drinks</h1>🙊
+    <h1>Finished Drinks</h1>
     <de-input-list id="finished_drinks_elem">
-      <span cid="drink_icon" class="icon"></span> 
-      <span cid="drink_label" class="label"></span> 
+      <span slot="no_items" class="icon">🙊</span>
+      <li cid="drink_container" slot="item">
+        <span cid="drink_icon" class="icon"></span> 
+        <span cid="drink_label" class="label"></span> 
+      </li>
     </de-input-list>
 
     <button id="add_btn" class="action-button" popovertarget="select_drink_dlg">🍻</button>
@@ -368,10 +375,10 @@
     </form>
   </dialog>
 
-  <dialog id="drink_menu_dlg" popover>
+  <dialog id="drink_menu_dlg" popover class="menu-dlg">
     <form id="drink_menu_form" method="dialog">
-      <button id="delete_drink_btn">Cast Away</button>
-      <button id="finish_drink_btn">Finished</button>
+      <button id="finish_drink_btn">Drink Finished! <span class="primary-button">💎</span></button>
+      <button id="delete_drink_btn">Cast Away <span class="primary-button">💎</span></button>
     </form>
   </dialog>
 
