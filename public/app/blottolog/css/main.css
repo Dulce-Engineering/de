@@ -43,6 +43,13 @@
   --ink-brown-base: #3A2318;
   --ink-brown-light: #5E3B29;
 
+  --hdr-grd-start: #000;
+  --hdr-grd-end: #66f;
+  --hdr-outline: #ff6;
+  --hdr-extrude-1: #e00;
+  --hdr-extrude-2: #c00;
+  --hdr-extrude-3: #a00;
+
   /* Typography */
   --font-heading: 'Beau Rivage', cursive;
   --font-body: 'Quattrocento', serif;
@@ -126,15 +133,16 @@ a {
     text 
     {
       font-family: var(--font-heading);
-
-      xfill: var(--parchment-tan-base);
-      xstroke: var(--ink-brown-dark);
-      xstroke-width: 2.5px;
-      xpaint-order: stroke fill;
-      xfilter:
-        drop-shadow(2px 2px 0px var(--terracotta-orange-base)) 
-        drop-shadow(4px 4px 0px var(--nautical-blue-dark)) 
-        drop-shadow(6px 6px 8px rgba(0, 0, 0, 0.7));
+      fill: url(#textGradient);
+      stroke: var(--hdr-outline);
+      stroke-width: 4;
+      stroke-linejoin: round;
+      stroke-linecap: round;
+      paint-order: stroke fill;
+      filter:
+        drop-shadow(-2px 2px 0px var(--hdr-extrude-1))
+        drop-shadow(-4px 4px 0px var(--hdr-extrude-2))
+        drop-shadow(-6px 6px 0px var(--hdr-extrude-3));
     }
 
     .trace 
