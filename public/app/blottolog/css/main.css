@@ -87,6 +87,11 @@ a {
   }
 }
 
+.icon
+{
+  font-size: 10rem;
+}
+
 .primary-button, .action-button, .secondary-button 
 {
   display: inline-flex;
@@ -107,29 +112,33 @@ a {
   min-height: 64px;
 }
 
-.header {
+.header 
+{
   display: flex;
   align-items: flex-start;
   margin: 0 0 2vh 0;
   gap: 10px;
 
-  svg {
-    xborder: 1px solid #f00;
+  svg 
+  {
     height: 15vh;
-    xwidth: 300px;
 
-    text {
+    text 
+    {
       font-family: var(--font-heading);
-      fill: var(--parchment-tan-base);
-      stroke: var(--ink-brown-dark);
-      stroke-width: 2.5px;
-      paint-order: stroke fill;
-      /* Fileteado style: bright colors, prominent strokes, and layered 3D shadows */
-      filter:
-        drop-shadow(2px 2px 0px var(--terracotta-orange-base)) drop-shadow(4px 4px 0px var(--nautical-blue-dark)) drop-shadow(6px 6px 8px rgba(0, 0, 0, 0.7));
+
+      xfill: var(--parchment-tan-base);
+      xstroke: var(--ink-brown-dark);
+      xstroke-width: 2.5px;
+      xpaint-order: stroke fill;
+      xfilter:
+        drop-shadow(2px 2px 0px var(--terracotta-orange-base)) 
+        drop-shadow(4px 4px 0px var(--nautical-blue-dark)) 
+        drop-shadow(6px 6px 8px rgba(0, 0, 0, 0.7));
     }
 
-    .trace {
+    .trace 
+    {
       fill: none;
       stroke: var(--terracotta-orange-light);
       stroke-width: 20;
@@ -137,7 +146,8 @@ a {
       opacity: 0;
     }
 
-    .viewbox {
+    .viewbox 
+    {
       fill: #f00;
       opacity: 0;
     }
@@ -181,7 +191,6 @@ section.drinks h1
 {
   .icon
   {
-    font-size: 10rem;
     text-shadow: 0 0 30px #0008;
   }
 
@@ -219,7 +228,8 @@ section.drinks h1
     display: flex;
     align-content: center;
     align-items: center;
-    justify-content: center;  
+    justify-content: center;
+    flex-wrap: wrap;
   }
 
   .dialog-actions 
@@ -259,7 +269,6 @@ section.drinks h1
 
   .icon
   {
-    font-size: 10rem;
     text-shadow: 0 0 30px #0008;
   }
   .label
@@ -307,12 +316,48 @@ section.drinks h1
 
 @media screen and (max-width: 768px)
 {
+  :root
+  {
+    font-size: 10px;
+  }
+
+  .icon
+  {
+    font-size: 7rem;
+  }
+
+  dialog
+  {
+    padding: 0;
+
+    form
+    {
+      padding: 20px;
+    }
+  }
+
+  #select_drink_dlg
+  {
+    bl-drink
+    {
+      &.small .icon
+      {
+        font-size: 6rem;
+      }
+      &.regular .icon
+      {
+        font-size: 7rem;
+      }
+      &.large .icon
+      {
+        font-size: 8rem;
+        margin: 0 -1rem;
+      }
+    }
+  }
+
   #wip_drinks
   {
-    .icon
-    {
-      font-size: 4rem;
-    }
     .label
     {
       width: min-content;
