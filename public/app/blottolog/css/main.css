@@ -125,6 +125,37 @@ a {
   align-items: flex-start;
   margin: 0 0 2vh 0;
   gap: 10px;
+  justify-content: space-between;
+
+  .logo
+  {
+    position: relative;
+
+    .skull, .drink, .money
+    {
+      position: absolute;
+      font-size: 7rem;
+      text-shadow: 0 0 10px #0008;
+    }
+    .drink
+    {
+      bottom: 10%;
+      right: 5%;
+      transform: rotateZ(15deg);
+    }
+    .skull
+    {
+      bottom: 10%;
+      right: 18%;
+      z-index: 1;
+    }
+    .money
+    {
+      bottom: 10%;
+      right: 33%;
+      transform: rotateZ(-15deg);
+    }
+  }
 
   svg 
   {
@@ -133,6 +164,7 @@ a {
     text 
     {
       font-family: var(--font-heading);
+      font-weight: bold;
       fill: url(#textGradient);
       stroke: var(--hdr-outline);
       stroke-width: 4;
@@ -144,7 +176,6 @@ a {
         drop-shadow(-4px 4px 0px var(--hdr-extrude-2))
         drop-shadow(-6px 6px 0px var(--hdr-extrude-3));
     }
-
     .trace 
     {
       fill: none;
@@ -153,7 +184,6 @@ a {
       stroke-dasharray: 10, 5;
       opacity: 0;
     }
-
     .viewbox 
     {
       fill: #f00;
@@ -327,6 +357,17 @@ section.drinks h1
   :root
   {
     font-size: 10px;
+  }
+
+  .header
+  {
+    .logo
+    {
+      .skull, .drink, .money
+      {
+        font-size: 4rem;
+      }
+    }
   }
 
   .icon
