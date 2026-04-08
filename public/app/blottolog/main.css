@@ -137,6 +137,44 @@ de-divider
   }
 }
 
+de-text-effect, .logo
+{
+  svg 
+  {
+    height: 15vh;
+    width: 100%;
+
+    text 
+    {
+      font-family: var(--font-heading);
+      font-weight: bold;
+      fill: url(#textGradient);
+      stroke: var(--hdr-outline);
+      stroke-width: 4;
+      stroke-linejoin: round;
+      stroke-linecap: round;
+      paint-order: stroke fill;
+      filter:
+        drop-shadow(-2px 2px 0px var(--hdr-extrude-1))
+        drop-shadow(-4px 4px 0px var(--hdr-extrude-2))
+        drop-shadow(-6px 6px 0px var(--hdr-extrude-3));
+    }
+    .trace 
+    {
+      fill: none;
+      stroke: var(--terracotta-orange-light);
+      stroke-width: 20;
+      stroke-dasharray: 10, 5;
+      opacity: 0;
+    }
+    .viewbox 
+    {
+      fill: #f00;
+      opacity: 0;
+    }
+  }
+}
+
 /* class scopes ================================================================= */
 
 .icon
@@ -199,40 +237,6 @@ de-divider
       bottom: 10%;
       right: 33%;
       transform: rotateZ(-15deg);
-    }
-  }
-
-  svg 
-  {
-    height: 15vh;
-
-    text 
-    {
-      font-family: var(--font-heading);
-      font-weight: bold;
-      fill: url(#textGradient);
-      stroke: var(--hdr-outline);
-      stroke-width: 4;
-      stroke-linejoin: round;
-      stroke-linecap: round;
-      paint-order: stroke fill;
-      filter:
-        drop-shadow(-2px 2px 0px var(--hdr-extrude-1))
-        drop-shadow(-4px 4px 0px var(--hdr-extrude-2))
-        drop-shadow(-6px 6px 0px var(--hdr-extrude-3));
-    }
-    .trace 
-    {
-      fill: none;
-      stroke: var(--terracotta-orange-light);
-      stroke-width: 20;
-      stroke-dasharray: 10, 5;
-      opacity: 0;
-    }
-    .viewbox 
-    {
-      fill: #f00;
-      opacity: 0;
     }
   }
 }
@@ -381,6 +385,8 @@ de-divider
 
   .header
   {
+    gap: 0;
+
     .logo
     {
       .skull, .drink, .money

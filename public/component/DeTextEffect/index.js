@@ -8,7 +8,7 @@ class DeTextEffect extends HTMLElement
   static effect1_html = `
     <svg cid="svg_elem" xviewBox="290 350 400 250">
       <defs>
-        <path id="logo-curve" d="M 0 1000 Q 0 500 1000 400" />
+        <path cid="path_def_elem" id="logo-curve" />
         <linearGradient id="textGradient" x1="0%" y1="0%" x2="0%" y2="100%">
           <stop offset="0%" style="stop-color:var(--hdr-grd-start);stop-opacity:1" />
           <stop offset="100%" style="stop-color:var(--hdr-grd-end);stop-opacity:1" />
@@ -17,7 +17,11 @@ class DeTextEffect extends HTMLElement
       <use href="#logo-curve" class="trace" />
       <rect x="300" y="350" width="400" height="250" class="viewbox" />
       <text cid="text_elem">
-        <textPath cid="path_elem" href="#logo-curve" startOffset="61%" text-anchor="middle">
+        <textPath 
+          cid="path_elem" 
+          href="#logo-curve" 
+          xlengthAdjust="spacingAndGlyphs"
+        >
         </textPath>
       </text>
     </svg>
@@ -41,6 +45,9 @@ class DeTextEffect extends HTMLElement
     this.innerHTML = DeTextEffect.effect1_html;
     Utils.Set_Id_Shortcuts(this, this, "cid");
 
+    //const path_str = "M 0 1000 Q 0 500 1000 400";
+    const path_str = "M 0 650 Q 0 500 1000 500";
+    this.path_def_elem.setAttribute("d", path_str);
     for (let i = 0; i < text.length; i++)
     {
       const font_size = Utils.Map_Index(i, 180, 60, text.length);
@@ -51,6 +58,9 @@ class DeTextEffect extends HTMLElement
 
       this.path_elem.appendChild(tspan);
     }
+    const path_length = this.path_def_elem.getTotalLength();
+    this.path_elem.setAttribute('textLength', path_length);
+
     const bbox = this.text_elem.getBBox();
     const view_attr_value = `${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}`;
     this.svg_elem.setAttribute("viewBox", view_attr_value);
