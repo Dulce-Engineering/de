@@ -5,14 +5,14 @@
 
 @font-face {
   font-family: 'Beau Rivage';
-  src: url('../font/Beau_Rivage/BeauRivage-Regular.ttf') format('truetype');
+  src: url('font/Beau_Rivage/BeauRivage-Regular.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
 }
 
 @font-face {
   font-family: 'Quattrocento';
-  src: url('../font/Quattrocento/Quattrocento-Regular.ttf') format('truetype');
+  src: url('font/Quattrocento/Quattrocento-Regular.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
 }
@@ -42,6 +42,7 @@
   --ink-brown-dark: #1E100A;
   --ink-brown-base: #3A2318;
   --ink-brown-light: #5E3B29;
+  --ink-brown-light2: #5E3B29aa;
 
   --hdr-grd-start: #000;
   --hdr-grd-end: #66f;
@@ -83,6 +84,7 @@ h1, h2, h3, h4, h5, h6
   font-weight: normal;
   margin: 0;
   text-align: center;
+  color: var(--ink-brown-light);
 }
 
 a {
@@ -219,12 +221,6 @@ dialog
   }
 }
 
-section.drinks h1
-{
-  padding: 1vh 0 0 0;
-  border-top: 1px solid var(--ink-brown-base);
-}
-
 #select_drink_dlg
 {
   .icon
@@ -349,6 +345,20 @@ section.drinks h1
   .primary-button
   {
     margin: 0 0 0 10px;
+  }
+}
+
+de-divider
+{
+  display: flex;
+  width: 100%;
+  justify-content: center;
+
+  svg
+  {
+    width: 80vw;
+    fill: var(--ink-brown-light2);
+    transform: scaleY(0.8);
   }
 }
 

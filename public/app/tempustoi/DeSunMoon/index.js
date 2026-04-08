@@ -1,5 +1,5 @@
 
-import Utils from "../../lib/Utils.js";
+import Utils from "/lib/Utils.js";
 
 class De_Sun_Moon extends HTMLElement
 {

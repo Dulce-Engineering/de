@@ -4,8 +4,8 @@
   "short_name": "TempusToi",
   "description": "TempusToi is a simple scheduling tool that helps you stay on top of deadlines. It displays a sorted list of countdown timers, visually representing the time remaining for each task at a glance. TempusToi requires no online account or subscription.",
   "version": "4",
-  "start_url": "/tempustoi/",
-  "scope": "/tempustoi/",
+  "start_url": "/app/tempustoi/",
+  "scope": "/app/tempustoi/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#000000",
@@ -20,12 +20,12 @@
   "screenshots": 
   [
     {
-      "src": "/tempustoi/screenshot-3.png",
+      "src": "/app/tempustoi/screenshot-3.png",
       "sizes": "1080x1751",
       "type": "image/png"
     },
     {
-      "src": "/tempustoi/screenshot-2.png",
+      "src": "/app/tempustoi/screenshot-2.png",
       "sizes": "2148x1288",
       "type": "image/png",
       "form_factor": "wide"
