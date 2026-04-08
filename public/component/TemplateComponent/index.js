@@ -13,15 +13,15 @@ class TemplateComponent extends HTMLElement
 
   connectedCallback()
   {
-    this.render();
+    this.Render();
   }
 
-  render()
+  Render()
   {
     const html = `
       <div cid="someId">html goes here</div>
     `;
-    const html_elements = Utils.toDocument(html, this);
+    const html_elements = Utils.To_Document(html, this);
     this.replaceChildren(html_elements);
     Utils.Set_Id_Shortcuts(this, this, "cid");
   }

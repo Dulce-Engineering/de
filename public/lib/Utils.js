@@ -1309,6 +1309,25 @@ class Utils
     }
   }
 
+  /**
+   * Calculates the ceiling value within bounded range divided into equal spans.
+   *
+   * This function divides the range between min and max into a specified number of
+   * equal spans, then finds the smallest value that is greater than or equal to the
+   * input value and falls on a span boundary.
+   *
+   * @param {number} val - The input value to find the ceiling for
+   * @param {number} max - The upper bound of the range
+   * @param {number} min - The lower bound of the range
+   * @param {number} span_count - The number of equal spans to divide the range into
+   * @returns {number|null} The ceiling value on a span boundary, or null if val is outside [min, max]
+   *
+   * @example
+   * // Range 0-100 divided into 4 spans: [0-25], [25-50], [50-75], [75-100]
+   * Utils.Ceiling_Bounded(17, 100, 0, 4); // Returns 25
+   * Utils.Ceiling_Bounded(42, 100, 0, 4); // Returns 50
+   * Utils.Ceiling_Bounded(150, 100, 0, 4); // Returns null (outside range)
+   */
   static Ceiling_Bounded(val, max, min, span_count)
   {
     let ceil = null;
@@ -1453,12 +1472,28 @@ class Utils
   }
 
   /**
-   * Scales a value from one range to another.
+   * Scales a value from one numeric range to another using linear interpolation.
    *
-   * @param {number} from_value - The initial value to be scaled.
-   * @param {Object} from_bounds - {x1, x2}
-   * @param {Object} to_bound - {x1, x2}
-   * @return {number} The scaled value within the new range.
+   * This function maps a value from a source range [from_bounds.x1, from_bounds.x2]
+   * to a corresponding value in the target range [to_bound.x1, to_bound.x2].
+   * The scaling maintains the relative position within the range.
+   *
+   * @param {number} from_value - The value to scale from the source range
+   * @param {Object} from_bounds - The source range bounds with x1 (min) and x2 (max) properties
+   * @param {Object} to_bound - The target range bounds with x1 (min) and x2 (max) properties
+   * @returns {number} The scaled value in the target range, or 0 if from_value is falsy
+   *
+   * @example
+   * // Scale temperature from Celsius (0-100) to Fahrenheit (32-212)
+   * const celsiusBounds = {x1: 0, x2: 100};
+   * const fahrenheitBounds = {x1: 32, x2: 212};
+   * Utils.Scale_Value(25, celsiusBounds, fahrenheitBounds); // Returns 77
+   *
+   * @example
+   * // Scale percentage (0-1) to pixel coordinates (0-800)
+   * const percentBounds = {x1: 0, x2: 1};
+   * const pixelBounds = {x1: 0, x2: 800};
+   * Utils.Scale_Value(0.5, percentBounds, pixelBounds); // Returns 400
    */
   static Scale_Value(from_value, from_bounds, to_bound)
   {
@@ -1545,6 +1580,36 @@ class Utils
     const m = w + min;
 
     return m;
+  }
+
+  /**
+   * Maps a step index to a value within a numeric range.
+   *
+   * This function divides the range between min and max into equal steps and returns
+   * the value at the specified index position. Index 0 returns min, and index (steps-1)
+   * returns max.
+   *
+   * @param {number} index - The step index (starting from 0)
+   * @param {number} min - The minimum value of the range
+   * @param {number} max - The maximum value of the range
+   * @param {number} steps - The total number of steps to divide the range into
+   * @returns {number} The value at the specified index position within the range
+   *
+   * @example
+   * // Range 0-100 with 5 steps: [0, 25, 50, 75, 100]
+   * Utils.Map_Index(0, 0, 100, 5); // Returns 0
+   * Utils.Map_Index(2, 0, 100, 5); // Returns 50
+   * Utils.Map_Index(4, 0, 100, 5); // Returns 100
+   *
+   * @example
+   * // Range 10-20 with 3 steps: [10, 15, 20]
+   * Utils.Map_Index(1, 10, 20, 3); // Returns 15
+   */
+  static Map_Index(index, min, max, steps)
+  {
+    const range = max - min;
+    const step_size = range / (steps - 1);
+    return min + (index * step_size);
   }
 
   // Date/Time ======================================================

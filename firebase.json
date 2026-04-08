@@ -42,6 +42,11 @@
         "source": "/porottoz/:path*",
         "destination": "/app/porottoz/:path*",
         "type": 301
+      },
+      {
+        "source": "/porottoz",
+        "destination": "/app/porottoz/index.html",
+        "type": 301
       }
     ]
   }

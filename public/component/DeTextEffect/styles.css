@@ -1,0 +1,56 @@
+@font-face 
+{
+  font-family: 'Beau Rivage';
+  src: url('./font/Beau_Rivage/BeauRivage-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+:root 
+{
+  --hdr-grd-start: #000;
+  --hdr-grd-end: #66f;
+  --hdr-outline: #ff6;
+  --hdr-extrude-1: #e00;
+  --hdr-extrude-2: #c00;
+  --hdr-extrude-3: #a00;
+  --hdr-font: 'Beau Rivage', cursive;
+}
+
+de-text-effect
+{
+  svg 
+  {
+    height: 15vh;
+    width: 100%;
+
+    text 
+    {
+      font-family: var(--hdr-font);
+      font-weight: bold;
+      fill: url(#textGradient);
+      stroke: var(--hdr-outline);
+      stroke-width: 4;
+      stroke-linejoin: round;
+      stroke-linecap: round;
+      paint-order: stroke fill;
+      filter:
+        drop-shadow(-2px 2px 0px var(--hdr-extrude-1))
+        drop-shadow(-4px 4px 0px var(--hdr-extrude-2))
+        drop-shadow(-6px 6px 0px var(--hdr-extrude-3));
+    }
+    .trace 
+    {
+      fill: none;
+      stroke: var(--terracotta-orange-light);
+      stroke-width: 20;
+      stroke-dasharray: 10, 5;
+      opacity: 0;
+    }
+    .viewbox 
+    {
+      fill: #f00;
+      opacity: 0;
+    }
+  }
+}
