@@ -8,8 +8,8 @@ async function Install_SW(event)
   await cache.addAll
   (
     [
-      "/porottoz/", 
-      "/porottoz/index.html", 
+      "/app/porottoz/", 
+      "/app/porottoz/index.html", 
     ]
   );
 }

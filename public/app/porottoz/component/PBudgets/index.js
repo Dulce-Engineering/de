@@ -1,4 +1,4 @@
-import Utils from "../../../lib/Utils.js";
+import Utils from "/lib/Utils.js";
 
 class PBudgets extends HTMLElement
 {
