@@ -1,0 +1,33 @@
+{
+  "id": "jose-ramirez",
+  "name": "Jose Ramirez",
+  "short_name": "Jose",
+  "description": "",
+  "start_url": "/app/jose-ramirez/index.html",
+  "scope": "/app/jose-ramirez/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#000000",
+  "icons": 
+  [
+    {
+      "src": "/app/jose-ramirez/image/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "screenshots": 
+  [
+    {
+      "src": "/app/jose-ramirez/image/screenshot-portrait.png",
+      "sizes": "455x1023",
+      "type": "image/png"
+    },
+    {
+      "src": "/app/jose-ramirez/image/screenshot-landscape.png",
+      "sizes": "1272x873",
+      "type": "image/png",
+      "form_factor": "wide"
+    }
+  ]
+}
