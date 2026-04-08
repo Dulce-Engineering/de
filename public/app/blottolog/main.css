@@ -433,4 +433,15 @@ de-divider
       text-align: center;
     }
   }
+
+  de-divider
+  {
+    margin: 4vh 0 1vh 0;
+
+    svg
+    {
+      width: 100vw;
+      transform: scaleY(1.5);
+    }
+  }
 }
