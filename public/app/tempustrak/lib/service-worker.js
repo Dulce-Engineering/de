@@ -5,8 +5,8 @@ console.log('Service worker installation started.');
 const CACHE_NAME = 'tempustrak-v1';
 const urlsToCache = 
 [
-  '/tempustrak',
-  'index.html',
+  '/app/tempustrak',
+  '/app/tempustrak/index.html',
 ];
 
 async function installServiceWorker(event) 
