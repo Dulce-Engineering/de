@@ -64,9 +64,14 @@
   padding: 0;
 }
 
+/* tag scopes =================================================================== */
+
 body 
 {
-  background: radial-gradient(circle at center, var(--parchment-tan-base) 50%, var(--parchment-tan-dark) 100%);
+  background: 
+    url(image/world-map.svg) no-repeat center / cover,
+    radial-gradient(circle at center, var(--parchment-tan-base) 50%, var(--parchment-tan-dark) 100%);
+  background-blend-mode: soft-light;
   color: var(--ink-brown-dark);
   font-family: var(--font-body);
   min-height: 100vh;
@@ -74,10 +79,28 @@ body
   margin: 0;
 }
 
-h1
+dialog 
 {
-  font-size: 5rem;
+  background: radial-gradient(circle at center, var(--parchment-tan-base) 50%, var(--parchment-tan-dark) 100%);
+  color: var(--ink-brown-dark);
+  border: none;
+  padding: 24px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+  transform: skewX(-5deg);
+
+  &::backdrop 
+  {
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(2px);
+  }
+
+  form
+  {
+    border: 1px ridge var(--ink-brown-base);
+    padding: 20px;
+  }
 }
+
 h1, h2, h3, h4, h5, h6 
 {
   font-family: var(--font-heading);
@@ -85,6 +108,10 @@ h1, h2, h3, h4, h5, h6
   margin: 0;
   text-align: center;
   color: var(--ink-brown-light);
+}
+h1
+{
+  font-size: 5rem;
 }
 
 a {
@@ -95,6 +122,22 @@ a {
     color: var(--parchment-tan-light);
   }
 }
+
+de-divider
+{
+  display: flex;
+  width: 100%;
+  justify-content: center;
+
+  svg
+  {
+    width: 80vw;
+    fill: var(--ink-brown-light2);
+    transform: scaleY(0.8);
+  }
+}
+
+/* class scopes ================================================================= */
 
 .icon
 {
@@ -198,28 +241,40 @@ a {
   display: none;
 }
 
-/* --- DIALOG & DRINK SELECTION --- */
-dialog 
+.menu-dlg
 {
-  background: radial-gradient(circle at center, var(--parchment-tan-base) 50%, var(--parchment-tan-dark) 100%);
-  color: var(--ink-brown-dark);
-  border: none;
-  padding: 24px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
-  transform: skewX(-5deg);
-
-  &::backdrop 
-  {
-    background: rgba(0, 0, 0, 0.8);
-    backdrop-filter: blur(2px);
-  }
-
   form
   {
-    border: 1px ridge var(--ink-brown-base);
-    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 20px;
+  }
+
+  button
+  {
+    border: none;
+    background: none;
+    padding: 0;
+    margin: 0;
+    font-family: var(--font-heading);
+    font-weight: normal;
+    font-size: 4rem;
+    cursor: pointer;
+
+    &:focus-visible 
+    {
+      outline: none;
+    }
+  }
+
+  .primary-button
+  {
+    margin: 0 0 0 10px;
   }
 }
+
+/* id scopes ==================================================================== */
 
 #select_drink_dlg
 {
@@ -315,52 +370,7 @@ dialog
   margin: 0 0 2vh 0;
 }
 
-.menu-dlg
-{
-  form
-  {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 20px;
-  }
-
-  button
-  {
-    border: none;
-    background: none;
-    padding: 0;
-    margin: 0;
-    font-family: var(--font-heading);
-    font-weight: normal;
-    font-size: 4rem;
-    cursor: pointer;
-
-    &:focus-visible 
-    {
-      outline: none;
-    }
-  }
-
-  .primary-button
-  {
-    margin: 0 0 0 10px;
-  }
-}
-
-de-divider
-{
-  display: flex;
-  width: 100%;
-  justify-content: center;
-
-  svg
-  {
-    width: 80vw;
-    fill: var(--ink-brown-light2);
-    transform: scaleY(0.8);
-  }
-}
+/* mobile ======================================================================= */
 
 @media screen and (max-width: 768px)
 {
