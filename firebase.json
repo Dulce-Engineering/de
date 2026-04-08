@@ -34,6 +34,11 @@
         "type": 301
       },
       {
+        "source": "/tempustrak",
+        "destination": "/app/tempustrak/index.html",
+        "type": 301
+      },
+      {
         "source": "/porottoz/:path*",
         "destination": "/app/porottoz/:path*",
         "type": 301
