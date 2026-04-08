@@ -24,6 +24,11 @@
         "type": 301
       },
       {
+        "source": "/tempustoi",
+        "destination": "/app/tempustoi/index.html",
+        "type": 301
+      },
+      {
         "source": "/tempustrak/:path*",
         "destination": "/app/tempustrak/:path*",
         "type": 301
