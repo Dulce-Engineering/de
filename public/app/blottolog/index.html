@@ -10,7 +10,7 @@
 
   <script type="module">
     import Utils from "../../lib/Utils.js";
-    import "../../component/DeInputList/index2.js";
+    import "../../component/DeInputList/index3.js";
     import "../../component/DeDivider/index.js";
     import "../../component/DeTextEffect/index.js";
 
@@ -173,7 +173,7 @@
 
       shortcuts.drink_icon.innerHTML = drink_type.icon;
       shortcuts.drink_label.innerHTML = drink_label;
-      shortcuts.drink_container.addEventListener('click', e => On_Click_Drink_Item(e, drink));
+      shortcuts.item_container.addEventListener('click', e => On_Click_Drink_Item(e, drink));
     }
 
     function On_Render_Finished_Drink_Item(event)
@@ -337,16 +337,20 @@
   <section class="drinks">
 
     <de-divider div-type="vintage-4"></de-divider>
-    <h1>Drinks in Progress</h1>
-    <de-input-list id="wip_drinks_elem">
+    <h1>
+      Drinks in Progress
       <button 
         id="add_btn" 
         class="action-button" 
         popovertarget="select_drink_dlg"
-        slot="list"
+        slot="body"
       >➕</button>
-      <span slot="xno_items" class="icon">🙊</span>
-      <li cid="drink_container" slot="item">
+    </h1>
+    <de-input-list id="wip_drinks_elem">
+      <li slot="no_items">
+        <span class="icon">🙊</span>
+      </li>
+      <li slot="item">
         <span cid="drink_icon" class="icon"></span> 
         <span cid="drink_label" class="label"></span> 
       </li>
@@ -354,13 +358,13 @@
 
     <de-divider div-type="vintage-4"></de-divider>
     <h1>Finished Drinks</h1>
-    <de-input-list id="finished_drinks_elem">
+    <xde-input-list id="finished_drinks_elem">
       <span slot="no_items" class="icon">🙊</span>
       <li cid="drink_container" slot="item">
         <span cid="drink_icon" class="icon"></span> 
         <span cid="drink_label" class="label"></span> 
       </li>
-    </de-input-list>
+    </xde-input-list>
 
   </section>
   

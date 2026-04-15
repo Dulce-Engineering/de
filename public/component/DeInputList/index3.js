@@ -16,19 +16,19 @@ class DeInputList extends HTMLElement
     this.no_items_template = null;
     this.envelopes = [];
     this.no_children = null;
-    console.log("DeInputList.constructor()");
+    //console.log("DeInputList.constructor()");
   }
 
   connectedCallback()
   {
-    console.log("DeInputList.connectedCallback()");
+    //console.log("DeInputList.connectedCallback()");
     this.Render();
   }
 
   set value(item_objs)
   {
-    console.log("DeInputList.set value()");
-    if (item_objs && item_objs.length > 0)
+    //console.log("DeInputList.set value()");
+    /*if (item_objs && item_objs.length > 0)
     {
       this.replaceChildren();
       for (const item of item_objs)
@@ -37,7 +37,7 @@ class DeInputList extends HTMLElement
       }
     }
 
-    this.Render_No_Items();
+    this.Render_No_Items();*/
   }
 
   get value()
@@ -96,11 +96,11 @@ class DeInputList extends HTMLElement
   Remove(obj_id)
   {
     //console.log("DeInputList.Remove()");
-    if (this.Remove_Envelope(obj_id))
+    /*if (this.Remove_Envelope(obj_id))
     {
       this.Render_No_Items();
       this.dispatchEvent(new Event("change"));
-    }
+    }*/
   }
 
   // helpers =====================================================================
@@ -197,28 +197,26 @@ class DeInputList extends HTMLElement
   // the template content holds the item markup used for rendering each item.
   Render()
   {
-    console.log("DeInputList.Render()");
+    //console.log("DeInputList.Render()");
     const html = `
       <ul cid="list_elem">
-        <slot name="list"></slot>
       </ul>
     `;
     
     // move all children with slot="item" into the item template
     this.item_template = document.createElement("template");
-    const elements = this.querySelectorAll("[slot='item']");
-    Array.from(elements).forEach(e => this.item_template.content.appendChild(e));
+    const item_elem = this.querySelector("[slot='item']");
+    this.item_template.content.append(item_elem);
 
     // move all children with slot="no_items" into the no_items template
     this.no_items_template = document.createElement("template");
-    const no_item_elems = this.querySelectorAll("[slot='no_items']");
-    Array.from(no_item_elems).forEach(e => this.no_items_template.content.appendChild(e));
+    const no_items_elem = this.querySelector("[slot='no_items']");
+    this.no_items_template.content.append(no_items_elem);
 
-    const fragment = Utils.toDocument(html, this);
-    this.replaceChildren(fragment);
+    this.innerHTML = html;
     Utils.Set_Id_Shortcuts(this, this, "cid");
 
-    this.Render_No_Items();
+    //this.Render_No_Items();
   }
 }
 
