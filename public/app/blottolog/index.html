@@ -289,7 +289,7 @@
   </script>
 </head>
 
-<!-- 🧭 🗺️ ⚓ 🏝️ 🏴‍☠️ ⚔️ 💀 ⛵ 🪙 💰 🍹 -->
+<!-- 🧭 🗺️ ⚓ 🏝️ 🍻 🏴‍☠️ ⚔️ 💀 ⛵ 🪙 💰 🍹 -->
 <body>
 
   <header class="header">
@@ -339,7 +339,13 @@
     <de-divider div-type="vintage-4"></de-divider>
     <h1>Drinks in Progress</h1>
     <de-input-list id="wip_drinks_elem">
-      <span slot="no_items" class="icon">🙊</span>
+      <button 
+        id="add_btn" 
+        class="action-button" 
+        popovertarget="select_drink_dlg"
+        slot="list"
+      >➕</button>
+      <span slot="xno_items" class="icon">🙊</span>
       <li cid="drink_container" slot="item">
         <span cid="drink_icon" class="icon"></span> 
         <span cid="drink_label" class="label"></span> 
@@ -356,7 +362,6 @@
       </li>
     </de-input-list>
 
-    <button id="add_btn" class="action-button" popovertarget="select_drink_dlg">🍻</button>
   </section>
   
   <dialog id="select_drink_dlg" popover>
