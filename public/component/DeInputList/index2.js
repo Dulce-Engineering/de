@@ -43,7 +43,7 @@ class DeInputList extends HTMLElement
       this.envelopes.length > 0 
       ? this.envelopes.map(e => e.obj)
       : null;
-      
+
     return res;
   }
 
@@ -66,6 +66,7 @@ class DeInputList extends HTMLElement
     else
     {
       this.envelopes.push(envelope);
+      //this.list_elem.append(envelope.fragment);
       this.append(envelope.fragment);
     }
     this.Render_No_Items();
@@ -129,14 +130,17 @@ class DeInputList extends HTMLElement
 
   Render_No_Items()
   {
-    if (this.envelopes.length == 0)
+    if (this.envelopes.length == 0 && !this.no_children)
     {
+      // if there are no items, render the no_items template
       const no_fragment = this.no_items_template.content.cloneNode(true);
       this.no_children = Array.from(no_fragment.children);
-      this.replaceChildren(no_fragment);
+      this.list_elem.append(no_fragment);
     }
-    else if (this.no_children)
+    else if (this.envelopes.length != 0 && this.no_children)
     {
+      // if there are items and no_children is rendered, 
+      // remove the no_items template children
       this.no_children.forEach(e => e.remove());
       this.no_children = null;
     }
@@ -146,16 +150,27 @@ class DeInputList extends HTMLElement
   // the template content holds the item markup used for rendering each item.
   Render()
   {
+    const html = `
+      <ul cid="list_elem">
+        <slot name="list"></slot>
+      </ul>
+    `;
+    
+    // move all children with slot="item" into the item template
     this.item_template = document.createElement("template");
     const elements = this.querySelectorAll("[slot='item']");
     Array.from(elements).forEach(e => this.item_template.content.appendChild(e));
 
+    // move all children with slot="no_items" into the no_items template
     this.no_items_template = document.createElement("template");
     const no_item_elems = this.querySelectorAll("[slot='no_items']");
     Array.from(no_item_elems).forEach(e => this.no_items_template.content.appendChild(e));
 
-    const no_items_fragment = this.Render_No_Items();
-    this.replaceChildren(no_items_fragment);
+    const fragment = Utils.toDocument(html, this);
+    this.replaceChildren(fragment);
+    Utils.Set_Id_Shortcuts(this, this, "cid");
+
+    this.Render_No_Items();
   }
 }
 
