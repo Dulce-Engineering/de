@@ -42,7 +42,7 @@
   --ink-brown-dark: #1E100A;
   --ink-brown-base: #3A2318;
   --ink-brown-light: #5E3B29;
-  --ink-brown-light2: #5E3B29aa;
+  --ink-brown-light2: #5E3B2955;
 
   --hdr-grd-start: #000;
   --hdr-grd-end: #66f;
@@ -56,12 +56,6 @@
   --font-body: 'Quattrocento', serif;
 
   font-size: 12px;
-}
-
-* 
-{
-  box-sizing: border-box;
-  padding: 0;
 }
 
 /* tag scopes =================================================================== */
@@ -80,6 +74,12 @@ body
   display: flex;
   flex-direction: column;
   align-items: center;
+  box-sizing: border-box;
+}
+
+section
+{
+  width: 100%;
 }
 
 dialog 
@@ -168,15 +168,11 @@ header
 
 de-divider
 {
-  display: flex;
-  width: 100%;
-  justify-content: center;
+  display: block;
 
   svg
   {
-    width: 80vw;
     fill: var(--ink-brown-light2);
-    transform: scaleY(0.8);
   }
 }
 
@@ -246,11 +242,25 @@ de-text-effect, header
   padding: 7px 10px 13px 10px;
   text-shadow: 0 0 6px #000f;
   font-size: 5rem;
+
+  /*
+  filter: 
+    grayscale(100%)
+    saturate(300%)
+    ;
+  */
 }
 .primary-button, .action-button
 {
-  min-width: 64px;
-  min-height: 64px;
+  /*  
+    brightness(1.2)
+    hue-rotate(0deg)
+  filter: 
+    grayscale(100%)
+    sepia(100%)
+    saturate(300%)
+    ;
+  */
 }
 
 .timer {
@@ -379,6 +389,7 @@ de-text-effect, header
   .label
   {
     font-size: 1.5rem;
+    text-align: center;
   }
 }
 #wip_drinks_elem
@@ -395,22 +406,36 @@ de-text-effect, header
     font-size: 10px;
   }
 
-  .header
+  .primary-button, .action-button, .secondary-button 
   {
-    gap: 0;
+    font-size: 3rem;
+    padding: 8px 10px 10px 10px;
+  }
 
-    header
+  .menu 
+  {
+    margin: 10px;
+  }
+
+  header
+  {
+    margin: 0 40px 0 0;
+
+    .skull, .drink, .money
     {
-      .skull, .drink, .money
-      {
-        font-size: 4rem;
-      }
+      font-size: 4rem;
     }
+  }
+
+  h1
+  {
+    font-size: 4rem;
+    gap: 10px;
   }
 
   .icon
   {
-    font-size: 7rem;
+    font-size: 5rem;
   }
 
   dialog
@@ -449,17 +474,6 @@ de-text-effect, header
     {
       width: min-content;
       text-align: center;
-    }
-  }
-
-  de-divider
-  {
-    margin: 4vh 0 1vh 0;
-
-    svg
-    {
-      width: 100vw;
-      transform: scaleY(1.5);
     }
   }
 }
