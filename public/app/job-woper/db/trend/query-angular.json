@@ -358,5 +358,11 @@
     "datetime": 1776035466588,
     "id": "98730e00-02f2-4356-a24d-11df272f7eac",
     "query_id": "-angular"
+  },
+  {
+    "count": 382,
+    "datetime": 1776216579174,
+    "id": "6cd9a83a-3bc7-42ca-a0fd-3e3a1e9e81bc",
+    "query_id": "-angular"
   }
 ]
