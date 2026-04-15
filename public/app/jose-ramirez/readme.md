@@ -4,7 +4,7 @@
 ## Woodcut & Linocut (Social Realism)
 
 Thick lines, sharp angles, and a hand-carved, tactile texture.  
-[Google Images](https://www.google.com/search?num=10&newwindow=1&sca_esv=ec43fa9020cedfa5&rlz=1C1ONGR_en-GBAU1158AU1159&sxsrf=ANbL-n6cxxl2gbMHgztvIryz4HvBfno6hw:1775782487693&udm=2&fbs=ADc_l-aN0CWEZBOHjofHoaMMDiKpaEWjvZ2Py1XXV8d8KvlI3o6iwGk6Iv1tRbZIBNIVs-7DjmheGwJ9kkYLzOq5Q2x5_vUa7NlVh74273t1qYj0GEEAK66knc-gpSWRl-btE2fJb3Ja2bm3nlTZI3g40FdRuumzM84sVZp6k_GzLBTebX_VA7bs9OrZRJoCJI1yziq3xk3qKhnuN35qhKZzfIp8AuHniA&q=Woodcut+%26+Linocut+(Social+Realism)&sa=X&ved=2ahUKEwiIhYKjieKTAxWITGwGHa39KOoQtKgLegQIGRAB&biw=1078&bih=1361&dpr=1)
+[Google Images](https://www.google.com/search?q=woodcut+%26+linocut+%28social+realism%29&num=10&newwindow=1&sca_esv=ec43fa9020cedfa5&rlz=1C1ONGR_en-GBAU1158AU1159&udm=2&biw=1080&bih=1751&sxsrf=ANbL-n42bkBerkzv_Auzom8b2l7INX2Uzw%3A1776037202026&ei=Ui3cabWmAfCaseMPt-Xj-AQ&oq=Woodcut&gs_lp=Egtnd3Mtd2l6LWltZyIHV29vZGN1dCoCCAEyBxAjGCcYyQIyBxAjGCcYyQIyBRAAGIAEMgYQABgHGB4yChAAGIAEGEMYigUyChAAGIAEGEMYigUyChAAGIAEGEMYigUyChAAGIAEGEMYigUyBRAAGIAEMgUQABiABEiGE1AAWABwAngAkAEAmAEAoAEAqgEAuAEByAEAmAICoAIKmAMAiAYBkgcBMqAHALIHALgHAMIHAzItMsgHCIAIAA&sclient=gws-wiz-img)
 
 ## Punk Zine & DIY Aesthetic
 

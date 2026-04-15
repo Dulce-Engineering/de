@@ -230,6 +230,7 @@
       function Main()
       {
         const bbox = title_text_elem.getBBox();
+        bbox.height += 5;
         const view_attr_value = `${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}`;
         title_elem.setAttribute("viewBox", view_attr_value);
       }
