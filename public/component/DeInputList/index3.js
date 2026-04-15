@@ -4,18 +4,13 @@ class DeInputList extends HTMLElement
 {
   static tname = "de-input-list";
 
-  //static observedAttributes = [ "attribute-name" ];
-  //attributeChangedCallback(name, old_value, new_value) { }
-
   constructor()
   {
     super();
     Utils.Bind(this, "On_");
 
     this.item_template = null;
-    this.no_items_template = null;
-    this.envelopes = [];
-    this.no_children = null;
+    //this.no_items_template = null;
     //console.log("DeInputList.constructor()");
   }
 
@@ -25,158 +20,76 @@ class DeInputList extends HTMLElement
     this.Render();
   }
 
-  set value(item_objs)
+  set value(objs)
   {
     //console.log("DeInputList.set value()");
-    /*if (item_objs && item_objs.length > 0)
+    if (objs && objs.length > 0)
     {
       this.replaceChildren();
-      for (const item of item_objs)
+      for (const obj of objs)
       {
-        this.Add(item, false);
+        this.Add(obj)
       }
     }
-
-    this.Render_No_Items();*/
   }
 
   get value()
   {
-    console.log("DeInputList.get value()");
-    const res = 
-      this.envelopes.length > 0 
-      ? this.envelopes.map(e => e.obj)
-      : null;
-
+    //console.log("DeInputList.get value()");
+    const res = Array.from(this.children).map(e => e.item_obj);
     return res;
   }
 
   get length()
   {
-    console.log("DeInputList.length()");
-    return this.envelopes.length;
+    //console.log("DeInputList.length()");
+    return this.children.length;
   }
 
   // public api ==================================================================
 
-  Add(obj, with_events = true)
+  Add(obj)
   {
     //console.log("DeInputList.Add()");
-    /*const envelope = this.Render_Item(obj);
-
-    const old_envelope_index = this.envelopes.findIndex(e => e.id == obj.id);
-    if (old_envelope_index !== -1)
-    {
-      const old_envelope = this.envelopes[old_envelope_index];
-      this.envelopes[old_envelope_index] = envelope;
-      this.Replace_Envelope(old_envelope, envelope);
-    }
-    else
-    {
-      this.envelopes.push(envelope);
-      //this.list_elem.append(envelope.fragment);
-      this.append(envelope.fragment);
-    }
-    this.Render_No_Items();
-
-    const detail = 
-    {
-      obj,
-      shortcuts: envelope.shortcuts
-    };
-    this.dispatchEvent(new CustomEvent("render", {bubbles:true, detail}));
-
-    if (with_events)
-    {
-      this.dispatchEvent(new Event("change"));
-    }*/
-   
+    const item_elem = this.Render_Item(obj);
+    this.append(item_elem);
+    item_elem.dispatchEvent(new Event("render", { bubbles: true }));
   }
 
   Remove(obj_id)
   {
     //console.log("DeInputList.Remove()");
-    /*if (this.Remove_Envelope(obj_id))
+    const item_elem = Array.from(this.children).find(e => e.item_obj.id == obj_id);
+    if (item_elem)
     {
-      this.Render_No_Items();
-      this.dispatchEvent(new Event("change"));
-    }*/
+      item_elem.remove();
+    }
+  }
+
+  Clear()
+  {
+    //console.log("DeInputList.Clear()");
+    this.replaceChildren();
   }
 
   // helpers =====================================================================
 
-  Has_Envelope(obj_id)
-  {
-    //console.log("DeInputList.Has_Envelope()");
-    return this.envelopes.some(e => e.id == obj_id);
-  }
-
-  Select_Envelope_By_Id(obj_id)
-  {
-    //console.log("DeInputList.Select_Envelope_By_Id()");
-    const envelope = this.envelopes.find(e => e.id == obj_id);
-    return envelope ? envelope : null;
-  }
-
-  Insert_Envelope(envelope)
-  {
-
-  }
-
-  Update_Envelope(obj_id, new_envelope)
-  {
-    //console.log("DeInputList.Replace_Envelope()");
-    const old_elem = old_envelope.children[0];
-    old_elem.before(new_envelope.fragment);
-    old_envelope.children.forEach(e => e.remove());
-  }
-
-  Remove_Envelope(obj_id)
-  {
-    //console.log("DeInputList.Remove_Envelope()");
-    let res = false;
-
-    const old_envelope_index = this.envelopes.findIndex(e => e.id == obj_id);
-    if (old_envelope_index !== -1)
-    {
-      const old_envelope = this.envelopes[old_envelope_index];
-      this.envelopes.splice(old_envelope_index, 1);
-      old_envelope.children.forEach(e => e.remove());
-      res = true;
-    }
-
-    return res;
-  }
 
   // rendering ===================================================================
 
-  // creates a copy of the template children with attached item object
-  // and shortcut links
   Render_Item(obj)
   {
     //console.log("DeInputList.Render_Item()");
     const fragment = this.item_template.content.cloneNode(true);
-    const children = Array.from(fragment.children);
-    //fragment_children.forEach((e, i) => e.setAttribute("fid", i));
-    //fragment_children.forEach(e => e.setAttribute("oid", obj.id));
-    
-    const shortcuts = {};
-    Utils.Set_Id_Shortcuts(fragment, shortcuts, "cid");
-
-    const envelope =
-    {
-      id: obj.id,
-      obj,
-      fragment,
-      children,
-      shortcuts
-    };
-    return envelope;
+    const item_elem = fragment.firstElementChild;
+    item_elem.item_obj = obj;
+    Utils.Set_Id_Shortcuts(item_elem, item_elem, "cid");
+    return item_elem;
   }
 
   Render_No_Items()
   {
-    console.log("DeInputList.Render_No_Items()");
+    /*console.log("DeInputList.Render_No_Items()");
     if (this.envelopes.length == 0 && !this.no_children)
     {
       // if there are no items, render the no_items template
@@ -190,33 +103,21 @@ class DeInputList extends HTMLElement
       // remove the no_items template children
       this.no_children.forEach(e => e.remove());
       this.no_children = null;
-    }
+    }*/
   }
 
-  // create a template element and move all child elements into it.
-  // the template content holds the item markup used for rendering each item.
   Render()
   {
     //console.log("DeInputList.Render()");
-    const html = `
-      <ul cid="list_elem">
-      </ul>
-    `;
-    
-    // move all children with slot="item" into the item template
+
+    // create a template element and move all child elements into it.
+    // the template content holds the item markup used for rendering each item.
     this.item_template = document.createElement("template");
     const item_elem = this.querySelector("[slot='item']");
     this.item_template.content.append(item_elem);
 
-    // move all children with slot="no_items" into the no_items template
-    this.no_items_template = document.createElement("template");
-    const no_items_elem = this.querySelector("[slot='no_items']");
-    this.no_items_template.content.append(no_items_elem);
-
-    this.innerHTML = html;
-    Utils.Set_Id_Shortcuts(this, this, "cid");
-
-    //this.Render_No_Items();
+    // clear  any remainig compoent content
+    this.replaceChildren();
   }
 }
 

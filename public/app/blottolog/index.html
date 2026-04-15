@@ -61,6 +61,8 @@
       small_drink.addEventListener('click', On_Click_Size);
       regular_drink.addEventListener('click', On_Click_Size);
       large_drink.addEventListener('click', On_Click_Size);
+
+      new_session_btn.addEventListener('click', On_Click_New_Session_Btn);
     }
 
     function Load_Ctx()
@@ -83,7 +85,7 @@
       Save_Ctx(ctx);
     }
 
-    // drinks ======================================================================
+    // drinks db ===================================================================
 
     function Select_Drinks(ctx)
     {
@@ -119,6 +121,11 @@
       drinks[index] = drink;
     }
 
+    function Delete_Drinks(ctx)
+    {
+      ctx.drinks = [];
+    }
+
     function Delete_Drink(ctx, drink_id)
     {
       const drinks = Select_Drinks(ctx);
@@ -127,6 +134,13 @@
       {
         drinks.splice(index, 1);
       }
+    }
+
+    // business logic ==============================================================
+
+    function Start_Session()
+    {
+      Update_Ctx(ctx => Delete_Drinks(ctx));
     }
 
     function Start_Drink(drink_type_id, drink_size_id)
@@ -163,31 +177,31 @@
 
     function On_Render_Drink_Item(event)
     {
-      const drink = event.detail.obj;
-      const shortcuts = event.detail.shortcuts;
+      const item_elem = event.target;
+      const drink = item_elem.item_obj;
 
       const def_drink_type = drink_types.find(dt => dt.id === 5);
       const drink_type = drink_types.find(dt => dt.id === drink.type_id) || def_drink_type;
       const drink_size = drink_sizes.find(ds => ds.id === drink.size_id);
       const drink_label = `${drink_type.name} ${drink_size.name}`;
 
-      shortcuts.drink_icon.innerHTML = drink_type.icon;
-      shortcuts.drink_label.innerHTML = drink_label;
-      shortcuts.item_container.addEventListener('click', e => On_Click_Drink_Item(e, drink));
+      item_elem.drink_icon.innerHTML = drink_type.icon;
+      item_elem.drink_label.innerHTML = drink_label;
+      item_elem.addEventListener('click', e => On_Click_Drink_Item(e, drink));
     }
 
     function On_Render_Finished_Drink_Item(event)
     {
-      const drink = event.detail.obj;
-      const shortcuts = event.detail.shortcuts;
+      const item_elem = event.target;
+      const drink = item_elem.item_obj;
 
       const def_drink_type = drink_types.find(dt => dt.id === 5);
       const drink_type = drink_types.find(dt => dt.id === drink.type_id) || def_drink_type;
       const drink_size = drink_sizes.find(ds => ds.id === drink.size_id);
       const drink_label = `${drink_type.name} ${drink_size.name}`;
 
-      shortcuts.drink_icon.innerHTML = drink_type.icon;
-      shortcuts.drink_label.innerHTML = drink_label;
+      item_elem.drink_icon.innerHTML = drink_type.icon;
+      item_elem.drink_label.innerHTML = drink_label;
     }
 
     function On_Click_Drink_Item(event, drink)
@@ -249,6 +263,20 @@
       Finish_Drink(drink);
     }
 
+    // main menu ===================================================================
+
+    function On_Click_New_Session_Btn(event)
+    {
+      main_menu_dlg.hidePopover();
+
+      if (confirm("Are you sure you want to start a new adventure? This will clear all your drinks.")) 
+      {
+        Start_Session();
+        wip_drinks_elem.Clear();
+        finished_drinks_elem.Clear();
+      }
+    }
+    
     // components ==================================================================
 
     class BL_Drink extends HTMLElement
@@ -289,42 +317,39 @@
   </script>
 </head>
 
-<!-- 🧭 🗺️ ⚓ 🏝️ 🍻 🏴‍☠️ ⚔️ 💀 ⛵ 🪙 💰 🍹 -->
+<!-- 🧭 🗺️ ⚓ 🏝️ 🍻 🏴‍☠️ ⚔️ 💀 ⛵ 🪙 💰 🍹 🤢 📜 -->
 <body>
 
-  <header class="header">
-    <button class="primary-button" aria-label="Profile">🫅</button>
-    <div class="logo">
-      <svg viewBox="290 350 400 250" width="100%" height="100%">
-        <defs>
-          <path id="logo-curve" d="M 0 1000 Q 0 500 1000 400" />
-          <linearGradient id="textGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" style="stop-color:var(--hdr-grd-start);stop-opacity:1" />
-            <stop offset="100%" style="stop-color:var(--hdr-grd-end);stop-opacity:1" />
-          </linearGradient>
-        </defs>
-        <use href="#logo-curve" class="trace" />
-        <rect x="300" y="350" width="400" height="250" class="viewbox" />
-        <text>
-          <textPath href="#logo-curve" startOffset="61%" text-anchor="middle">
-            <tspan font-size="180">B</tspan>
-            <tspan font-size="165">l</tspan>
-            <tspan font-size="150">o</tspan>
-            <tspan font-size="135">t</tspan>
-            <tspan font-size="120">t</tspan>
-            <tspan font-size="105">o</tspan>
-            <tspan font-size="90">l</tspan>
-            <tspan font-size="75">o</tspan>
-            <tspan font-size="60">g</tspan>
-          </textPath>
-        </text>
-      </svg>
-      <span class="skull">💀</span>
-      <span class="drink">🍹</span>
-      <span class="money">💰</span>
-    </div>
-    <button class="primary-button" aria-label="Target">🤢</button>
+  <header>
+    <svg viewBox="290 350 400 250" width="100%" height="100%">
+      <defs>
+        <path id="logo-curve" d="M 0 1000 Q 0 500 1000 400" />
+        <linearGradient id="textGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" style="stop-color:var(--hdr-grd-start);stop-opacity:1" />
+          <stop offset="100%" style="stop-color:var(--hdr-grd-end);stop-opacity:1" />
+        </linearGradient>
+      </defs>
+      <use href="#logo-curve" class="trace" />
+      <rect x="300" y="350" width="400" height="250" class="viewbox" />
+      <text>
+        <textPath href="#logo-curve" startOffset="61%" text-anchor="middle">
+          <tspan font-size="180">B</tspan>
+          <tspan font-size="165">l</tspan>
+          <tspan font-size="150">o</tspan>
+          <tspan font-size="135">t</tspan>
+          <tspan font-size="120">t</tspan>
+          <tspan font-size="105">o</tspan>
+          <tspan font-size="90">l</tspan>
+          <tspan font-size="75">o</tspan>
+          <tspan font-size="60">g</tspan>
+        </textPath>
+      </text>
+    </svg>
+    <span class="skull">💀</span>
+    <span class="drink">🍹</span>
+    <span class="money">💰</span>
   </header>
+  <button class="primary-button menu" aria-label="Menu" popovertarget="main_menu_dlg">📜</button>
 
   <section class="timer">
     <div class="course-plot-graphic">
@@ -358,13 +383,15 @@
 
     <de-divider div-type="vintage-4"></de-divider>
     <h1>Finished Drinks</h1>
-    <xde-input-list id="finished_drinks_elem">
-      <span slot="no_items" class="icon">🙊</span>
-      <li cid="drink_container" slot="item">
+    <de-input-list id="finished_drinks_elem">
+      <li slot="no_items">
+        <span class="icon">🙊</span>
+      </li>
+      <li slot="item">
         <span cid="drink_icon" class="icon"></span> 
         <span cid="drink_label" class="label"></span> 
       </li>
-    </xde-input-list>
+    </de-input-list>
 
   </section>
   
@@ -402,6 +429,13 @@
     <form id="drink_menu_form" method="dialog">
       <button id="finish_drink_btn">Drink Finished! <span class="primary-button">💎</span></button>
       <button id="delete_drink_btn">Cast Away <span class="primary-button">💎</span></button>
+    </form>
+  </dialog>
+
+  <dialog id="main_menu_dlg" popover class="menu-dlg">
+    <form id="main_menu_form" method="dialog">
+      <button id="new_session_btn">New Adventure <span class="primary-button">💎</span></button>
+      <button>TBA <span class="primary-button">💎</span></button>
     </form>
   </dialog>
 
