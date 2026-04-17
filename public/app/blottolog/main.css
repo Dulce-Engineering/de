@@ -229,7 +229,7 @@ de-text-effect, header
   font-size: 10rem;
 }
 
-.primary-button, .action-button, .secondary-button 
+.primary-button, .action-button, .secondary-button, de-dialog-form footer button
 {
   display: inline-flex;
   align-items: center;
@@ -264,7 +264,10 @@ de-text-effect, header
 }
 
 .timer {
-  display: none;
+  xdisplay: none;
+  font-size: 4rem;
+  text-align: center;
+  margin: 0 0 20px 0;
 }
 
 .menu-dlg
@@ -297,6 +300,71 @@ de-text-effect, header
   .primary-button
   {
     margin: 0 0 0 10px;
+  }
+}
+
+de-dialog-form
+{
+  header
+  {
+    margin: 0 0 10px 0;
+    display: block;
+
+    h1
+    {
+      margin: 0;
+    }
+  }
+
+  main
+  {
+    display: grid;
+    grid-template-columns: auto auto;
+    gap: 10px 20px;
+    font-size: 2rem;
+    margin: 0 0 20px 0;
+
+    label
+    {
+      text-align: right;
+    }
+
+    input
+    {
+      font-family: var(--font-body);
+      font-size: 2rem;
+      padding: 0;
+      margin: 0;
+      border: none;
+      border-bottom: 1px solid var(--ink-brown-light2);
+      background: none;
+      color: #000;
+    }
+    input[type="radio"] 
+    {
+      width: 20px;
+      height: 20px;
+    }
+    input[name="dob"] 
+    {
+      width: 200px;
+    }
+    input[name="weight"], input[name="height"]
+    {
+      width: 100px;
+    }
+  }
+
+  footer
+  {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+
+    button
+    {
+      font-size: 3rem;
+    }
   }
 }
 
@@ -474,6 +542,20 @@ de-text-effect, header
     {
       width: min-content;
       text-align: center;
+    }
+  }
+
+  de-dialog-form main
+  {
+    font-size: 1.7rem;
+
+    input
+    {
+      font-size: 1.7rem;
+    }
+    input[name="dob"] 
+    {
+      width: 130px;
     }
   }
 }

@@ -28,7 +28,23 @@ Journaling/Notes: A small text box to note why they drank or how they felt the n
 5. Fun / Quirky Features (Based on your humorous branding)
 If you are leaning into a fun, non-judgmental, or humorous vibe (like the app name concepts from your previous session):
 
-6. Drinking Games
+6. Drinking Games & gamification
+- badges
+- chalanges
+
+7. scan drinks menu for venue to feed into drinks db
+
+8. take photos and notes of drinks
+
+9. ai recognise drink from photo and feed into db
+
+9. post images to social media
+
+10. rate drinks and locales
+
+11. scan drink recipe
+
+12. drunkeness test
 
 "Drunk Texts" Prevention: An optional, highly-frictional lock screen for certain apps (like social media or ex-partners' contacts) when BAC passes a certain point.
 The "Morning After" Report: A cheeky push notification the next day summarizing the damage (calories, money, peak BAC) with humorous commentary.
