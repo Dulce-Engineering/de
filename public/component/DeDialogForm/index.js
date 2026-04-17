@@ -1,5 +1,33 @@
 import Utils from "../../lib/Utils.js";
 
+/**
+ * A custom dialog form component that extends HTMLElement.
+ * This component provides a modal dialog with form fields, allowing users to input data
+ * and submit or cancel the form. It supports asynchronous operations and custom event handling.
+ *
+ * @class DeDialogForm
+ * @extends HTMLElement
+ *
+ * @property {Object} value - Gets or sets the form data as an object. Setting this populates the form inputs,
+ *                            and getting it collects the current input values into an object.
+ *
+ * @attribute {string} label-ok - Custom label for the OK button. Defaults to "OK".
+ * @attribute {string} label-cancel - Custom label for the Cancel button. Defaults to "Cancel".
+ * @attribute {string} label-clr - Custom label for the Clear button. Defaults to "Clear".
+ * @attribute {boolean} hide-clr - If present, hides the Clear button.
+ *
+ * @fires ok - Emitted when the OK button is clicked and no promise resolver is set.
+ *             Event detail: none (standard Event).
+ *
+ * @example
+ * <de-dialog-form label-ok="Submit" label-cancel="Close">
+ *   <div slot="header">Form Title</div>
+ *   <div slot="fields">
+ *     <input name="name" type="text" placeholder="Name">
+ *     <input name="email" type="email" placeholder="Email">
+ *   </div>
+ * </de-dialog-form>
+ */
 class DeDialogForm extends HTMLElement
 {
   static tname = "de-dialog-form";
@@ -15,6 +43,8 @@ class DeDialogForm extends HTMLElement
     this.Render();
   }
 
+  // properties ====================================================================
+
   set value(obj)
   {
     this.obj = obj;
@@ -26,6 +56,8 @@ class DeDialogForm extends HTMLElement
     const obj = this.Set_Obj(this.obj);
     return obj;
   }
+
+  // internal methods ==============================================================
 
   Set_Obj(obj)
   {
@@ -108,6 +140,8 @@ class DeDialogForm extends HTMLElement
     }
   }
 
+  // events ========================================================================
+
   On_KeyDown(event)
   {
     if (event.keyCode == 13)
@@ -138,12 +172,22 @@ class DeDialogForm extends HTMLElement
     }
   }
 
+  // public methods ================================================================
+
+  /**
+   * Closes the modal dialog and removes the 'hydrated' class.
+   * @public
+   */
   Close()
   {
     this.dlg.close();
     this.classList.remove("hydrated");
   }
 
+  /**
+   * Shows the modal dialog without any initial value or promise handling.
+   * @public
+   */
   Show_Modal()
   {
     this.classList.add("hydrated");
@@ -152,6 +196,13 @@ class DeDialogForm extends HTMLElement
     this.dlg.showModal();
   }
 
+  /**
+   * Shows the modal dialog asynchronously, setting an initial value and returning a promise
+   * that resolves with the form data when OK is clicked or null when canceled.
+   * @public
+   * @param {Object} value - The initial form data object.
+   * @returns {Promise<Object|null>} A promise that resolves to the form data or null.
+   */
   Show_Async(value)
   {
     this.classList.add("hydrated");
@@ -166,6 +217,8 @@ class DeDialogForm extends HTMLElement
 
     return promise;
   }
+
+  // rendering =====================================================================
 
   HTML_Form()
   {
