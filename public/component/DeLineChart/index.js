@@ -172,6 +172,28 @@ class DeLineChart extends HTMLElement
   }
 
   /**
+   * Sets the visual highlight range using data coordinates.
+   * Converts the data-space X values to SVG-space coordinates before applying the highlight.
+   *
+   * @param {Object} data_range - Range object with x1 and x2 in data units
+   * @param {number} data_range.x1 - Start X coordinate in data space
+   * @param {number} data_range.x2 - End X coordinate in data space
+   */
+  Set_Data_Highlight(data_range)
+  {
+    if (!this.data_bounds || !data_range) 
+    {
+      this.Set_Highlight(null);
+      return;
+    }
+
+    const pt1 = this.Map_Data_To_SVG_Point({ x: data_range.x1, y: this.data_bounds.min_y });
+    const pt2 = this.Map_Data_To_SVG_Point({ x: data_range.x2, y: this.data_bounds.min_y });
+
+    this.Set_Highlight({ x1: pt1.x, x2: pt2.x });
+  }
+
+  /**
    * Gets the current highlight range from the visual highlight element.
    *
    * @returns {Object|null} Range object with x1 and x2 properties, or null if no highlight is active
