@@ -3,28 +3,39 @@ import Utils from "../../lib/Utils.js";
 
 /**
  * DeLineChart is a custom HTML element that renders interactive line charts using SVG.
- * It supports multiple data series, axis labels, highlighting ranges, and click interactions.
- * The chart automatically scales data to fit the viewport and provides smooth curve interpolation.
+ * It supports one or more data series, axis labels, highlight ranges, and click interaction events.
+ * The chart automatically scales data to fit the viewport, draws smooth interpolated lines,
+ * and optionally renders individual data points.
  *
  * @class DeLineChart
  * @extends HTMLElement
- * @slot {HTMLElement} title - Custom title content (optional, overrides title attribute)
+ * @slot title - Custom title content (optional, overrides title attribute text)
  * @attr {string} title - Chart title text (default: "Title")
  * @attr {string} x-label - X-axis label text (default: "X Axis")
  * @attr {string} y-label - Y-axis label text (default: "Y Axis")
- * @fires point-selected - Fired when user clicks on chart, provides nearest data points for all series
+ * @attr {boolean} data-points - When present, draws circle markers at each data point
+ * @property {Array|Object<string, Array<{x:number,y:number}>>} items - Data series to render; either an array of points or an object keyed by series name
+ * @property {number} highlight_start - Highlight range start as percentage of chart width (0-100)
+ * @property {number} highlight_end - Highlight range end as percentage of chart width (0-100)
+ * @fires point-selected - Fired when the user clicks the chart; event detail contains nearest data points per series
  * @example
- * <de-line-chart title="Sales Data" x-label="Time" y-label="Revenue">
- *   <button slot="title">Custom Title Button</button>
+ * <de-line-chart title="Sales Data" x-label="Time" y-label="Revenue" data-points>
+ *   <button slot="title">Custom Title</button>
  * </de-line-chart>
  *
- * // Set data programmatically
  * const chart = document.querySelector('de-line-chart');
- * chart.items = [
- *   { x: 1000, y: 50 },  // timestamp, value
- *   { x: 2000, y: 75 },
- *   { x: 3000, y: 60 }
- * ];
+ * chart.items = {
+ *   seriesA: [
+ *     { x: 1000, y: 50 },
+ *     { x: 2000, y: 75 }
+ *   ],
+ *   seriesB: [
+ *     { x: 1000, y: 40 },
+ *     { x: 2000, y: 60 }
+ *   ]
+ * };
+ * chart.highlight_start = 10;
+ * chart.highlight_end = 40;
  */
 class DeLineChart extends HTMLElement
 {
