@@ -1,0 +1,39 @@
+de-line-chart {
+  .input-mask {
+    stroke: none;
+    fill: #0000;
+  }
+
+  .highlight {
+    visibility: hidden;
+    stroke: none;
+    fill: #ff08;
+  }
+
+  .title {
+    display: none;
+  }
+
+  .data-line {
+    --c0: #000;
+
+    stroke-width: 2px;
+    fill: none;
+  }
+
+  .data-point {
+    stroke: none;
+    fill: none;
+  }
+
+  .axis-label {
+    stroke: none;
+    fill: #000;
+    font-size: 2rem;
+  }
+
+  .axis-line {
+    stroke: #000;
+    stroke-width: 2px;
+  }
+}

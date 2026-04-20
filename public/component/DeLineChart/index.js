@@ -14,6 +14,7 @@ import Utils from "../../lib/Utils.js";
  * @attr {string} x-label - X-axis label text (default: "X Axis")
  * @attr {string} y-label - Y-axis label text (default: "Y Axis")
  * @attr {boolean} data-points - When present, draws circle markers at each data point
+ * @attr {string} chart-type - Line rendering mode: "smooth" (default) for curves or "line" for straight segments
  * @property {Array|Object<string, Array<{x:number,y:number}>>} items - Data series to render; either an array of points or an object keyed by series name
  * @property {number} highlight_start - Highlight range start as percentage of chart width (0-100)
  * @property {number} highlight_end - Highlight range end as percentage of chart width (0-100)
@@ -40,6 +41,11 @@ import Utils from "../../lib/Utils.js";
 class DeLineChart extends HTMLElement
 {
   static tname = "de-line-chart";
+
+  static get observedAttributes()
+  {
+    return ["title", "chart-type"];
+  }
 
   plot_width = 800;
   plot_height = 200;
@@ -131,6 +137,10 @@ class DeLineChart extends HTMLElement
       if (name == "title" && this.title_elem)
       {
         this.title_elem.innerHTML = new_value;
+      }
+      else if (name == "chart-type")
+      {
+        this.Render_Chart();
       }
     }
   }
@@ -547,12 +557,12 @@ class DeLineChart extends HTMLElement
   }
 
   /**
-   * Renders a data series as a smooth curved line using monotone cubic interpolation.
-   * Creates an SVG path element with smooth curves that maintain monotonicity.
+   * Renders a data series as a line (smooth curves or straight segments).
+   * The rendering mode is controlled by the chart-type attribute.
    * Each series gets a different color automatically.
    *
    * @param {Array<{x: number, y: number}>} data - Array of data points for this series
-   * @returns {SVGPathElement} SVG path element representing the curved line
+   * @returns {SVGPathElement} SVG path element representing the line
    * @private
    */
   Render_Line(data)
@@ -563,58 +573,72 @@ class DeLineChart extends HTMLElement
     const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
     let pathData = "";
 
+    const chartType = this.getAttribute("chart-type") || "smooth";
+
     if (points.length > 1) 
     {
-      // Monotone Cubic Interpolation
-      // 1. Calculate slopes (secants)
-      const slopes = [];
-      for (let i = 0; i < points.length - 1; i++)
+      if (chartType === "line")
       {
-        const dx = points[i + 1].x - points[i].x;
-        const dy = points[i + 1].y - points[i].y;
-        slopes.push(dx === 0 ? Infinity : dy / dx);
-      }
-
-      // 2. Calculate tangents
-      const tangents = [];
-      tangents.push(slopes[0]);
-      for (let i = 0; i < slopes.length - 1; i++)
-      {
-        tangents.push((slopes[i] + slopes[i + 1]) / 2);
-      }
-      tangents.push(slopes[slopes.length - 1]);
-
-      // 3. Enforce monotonicity
-      for (let i = 0; i < slopes.length; i++)
-      {
-        const s = slopes[i];
-        if (s === 0)
+        // Render straight line segments
+        pathData = `M ${points[0].x},${points[0].y}`;
+        for (let i = 1; i < points.length; i++)
         {
-          tangents[i] = 0;
-          tangents[i + 1] = 0;
-        } 
-        else
-        {
-          const alpha = tangents[i] / s;
-          const beta = tangents[i + 1] / s;
-          const magSq = alpha * alpha + beta * beta;
-          if (magSq > 9)
-          {
-            const tau = 3 / Math.sqrt(magSq);
-            tangents[i] = tau * alpha * s;
-            tangents[i + 1] = tau * beta * s;
-          }
+          pathData += ` L ${points[i].x},${points[i].y}`;
         }
       }
-
-      // 4. Generate path
-      pathData = `M ${points[0].x},${points[0].y}`;
-      for (let i = 0; i < points.length - 1; i++)
+      else
       {
-        const p0 = points[i], p1 = points[i + 1];
-        const m0 = tangents[i], m1 = tangents[i + 1];
-        const dx = (p1.x - p0.x) / 3;
-        pathData += ` C ${p0.x + dx},${p0.y + dx * m0} ${p1.x - dx},${p1.y - dx * m1} ${p1.x},${p1.y}`;
+        // Monotone Cubic Interpolation
+        // 1. Calculate slopes (secants)
+        const slopes = [];
+        for (let i = 0; i < points.length - 1; i++)
+        {
+          const dx = points[i + 1].x - points[i].x;
+          const dy = points[i + 1].y - points[i].y;
+          slopes.push(dx === 0 ? Infinity : dy / dx);
+        }
+
+        // 2. Calculate tangents
+        const tangents = [];
+        tangents.push(slopes[0]);
+        for (let i = 0; i < slopes.length - 1; i++)
+        {
+          tangents.push((slopes[i] + slopes[i + 1]) / 2);
+        }
+        tangents.push(slopes[slopes.length - 1]);
+
+        // 3. Enforce monotonicity
+        for (let i = 0; i < slopes.length; i++)
+        {
+          const s = slopes[i];
+          if (s === 0)
+          {
+            tangents[i] = 0;
+            tangents[i + 1] = 0;
+          } 
+          else
+          {
+            const alpha = tangents[i] / s;
+            const beta = tangents[i + 1] / s;
+            const magSq = alpha * alpha + beta * beta;
+            if (magSq > 9)
+            {
+              const tau = 3 / Math.sqrt(magSq);
+              tangents[i] = tau * alpha * s;
+              tangents[i + 1] = tau * beta * s;
+            }
+          }
+        }
+
+        // 4. Generate path
+        pathData = `M ${points[0].x},${points[0].y}`;
+        for (let i = 0; i < points.length - 1; i++)
+        {
+          const p0 = points[i], p1 = points[i + 1];
+          const m0 = tangents[i], m1 = tangents[i + 1];
+          const dx = (p1.x - p0.x) / 3;
+          pathData += ` C ${p0.x + dx},${p0.y + dx * m0} ${p1.x - dx},${p1.y - dx * m1} ${p1.x},${p1.y}`;
+        }
       }
     }
     else if (points.length === 1) 

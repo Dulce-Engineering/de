@@ -48,6 +48,7 @@ It supports:
 | `x-label` | string | `X Axis` | Label text for the X axis |
 | `y-label` | string | `Y Axis` | Label text for the Y axis |
 | `data-points` | boolean | `false` | When present, renders circle markers for each data point |
+| `chart-type` | string | `smooth` | Line rendering mode: `smooth` for interpolated curves or `line` for straight segments |
 
 ## Properties
 

@@ -79,7 +79,7 @@ class Logic
    * @param {number} user.height - Height in centimeters.
    * @returns {number} The Widmark distribution factor.
    */
-  static Get_Widmark_Distribution_Factor(user)
+  static Get_Volume_Distribution_Factor(user)
   {
     return (user.sex === 'male')
       ? 0.31608 - (0.004821 * user.weight) + (0.004321 * user.height)
