@@ -334,5 +334,11 @@
     "datetime": 1776216904115,
     "id": "d53a4e22-1f72-4b58-91a7-42ed62b750d0",
     "query_id": "-nextjs"
+  },
+  {
+    "count": 84,
+    "datetime": 1776643391371,
+    "id": "ff1b737d-8301-466f-b965-e25431759cfa",
+    "query_id": "-nextjs"
   }
 ]
