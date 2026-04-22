@@ -505,6 +505,17 @@ de-dialog-form
     text-align: center;
   }
 }
+#finished_drinks_elem
+{
+  .icon
+  {
+    font-size: 6rem;
+  }
+  .label
+  {
+    font-size: 1.2rem;
+  }
+}
 #wip_drinks_elem
 {
   margin: 0 0 2vh 0;
