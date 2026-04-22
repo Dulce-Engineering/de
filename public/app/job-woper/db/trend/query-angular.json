@@ -370,5 +370,11 @@
     "datetime": 1776643058037,
     "id": "ec6599b9-6459-4761-8c70-08f92e1a19c9",
     "query_id": "-angular"
+  },
+  {
+    "count": 370,
+    "datetime": 1776815789412,
+    "id": "97a0f9ab-9f27-40c5-911f-d3734547c373",
+    "query_id": "-angular"
   }
 ]
