@@ -15,6 +15,7 @@
     import "../../component/DeTextEffect/index.js";
     import "../../component/DeDialogForm/index.js";
     import "../../component/DeLineChart/index.js";
+    import "./lib/BlDrink.js";
     import Logic from "./lib/logic.js";
 
     const storage_key = "blottolog";
@@ -47,23 +48,25 @@
     {
       const ctx = Load_Ctx();
 
-      wip_drinks_elem.addEventListener("render", On_Render_Drink_Item);
+      wip_drinks_elem.addEventListener("render", e => On_Render_Drink_Item(e, drink_menu_dlg));
       wip_drinks_elem.value = Select_WIP_Drinks(ctx);
-      finished_drinks_elem.addEventListener("render", On_Render_Finished_Drink_Item);
+      finished_drinks_elem.addEventListener("render", e => On_Render_Drink_Item(e, finished_drink_menu_dlg));
       finished_drinks_elem.value = Select_Finished_Drinks(ctx);
 
       select_drink_form.addEventListener('submit', On_Submit_Drink);
       delete_drink_btn.addEventListener('click', On_Click_Delete_Btn);
       finish_drink_btn.addEventListener('click', On_Click_Finish_Btn);
 
-      beer_drink.addEventListener('click', On_Click_Drink);
-      wine_drink.addEventListener('click', On_Click_Drink);
-      spirit_drink.addEventListener('click', On_Click_Drink);
-      cocktail_drink.addEventListener('click', On_Click_Drink);
+      beer_drink.addEventListener('click', On_Click_Drink_Type);
+      wine_drink.addEventListener('click', On_Click_Drink_Type);
+      spirit_drink.addEventListener('click', On_Click_Drink_Type);
+      cocktail_drink.addEventListener('click', On_Click_Drink_Type);
+      custom_drink.addEventListener('click', On_Click_Drink_Type);
 
-      small_drink.addEventListener('click', On_Click_Size);
-      regular_drink.addEventListener('click', On_Click_Size);
-      large_drink.addEventListener('click', On_Click_Size);
+      small_drink.addEventListener('click', On_Click_Drink_Size);
+      regular_drink.addEventListener('click', On_Click_Drink_Size);
+      large_drink.addEventListener('click', On_Click_Drink_Size);
+      custom_size_drink.addEventListener('click', On_Click_Drink_Size);
 
       new_session_btn.addEventListener('click', On_Click_New_Session_Btn);
       profile_btn.addEventListener('click', On_Click_Profile_Btn);
@@ -153,13 +156,15 @@
       //const interval_id = setInterval(Update_Calc, Utils.MILLIS_MINUTE);
     }
 
-    function Start_Drink(drink_type_id, drink_size_id)
+    function Start_Drink(drink_summary)
     {
       const drink =
       {
         id: Date.now(), 
-        type_id: drink_type_id, 
-        size_id: drink_size_id,
+        type_id: drink_summary.type_id, 
+        size_id: drink_summary.size_id,
+        size_ml: drink_summary.size_ml,
+        alc_vol: drink_summary.alc_vol,
         start_time: Date.now(),
         end_time: null
       };
@@ -201,40 +206,48 @@
 
     // drinks list =================================================================
 
-    function On_Render_Drink_Item(event)
+    function On_Render_Drink_Item(event, menu_dlg)
     {
       const item_elem = event.target;
       const drink = item_elem.item_obj;
 
-      const def_drink_type = drink_types.find(dt => dt.id === 5);
-      const drink_type = drink_types.find(dt => dt.id === drink.type_id) || def_drink_type;
-      const drink_size = drink_sizes.find(ds => ds.id === drink.size_id);
-      const drink_label = `${drink_type.name}<br>${drink_size.name}`;
+      let drink_name = "Special Drink";
+      let drink_icon = "🍹";
+      if (drink.alc_vol)
+      {
+        if (drink.alc_vol > 0) drink_name += `<br>Alc/Vol ${drink.alc_vol}%`;
+      }
+      else
+      {
+        const def_drink_type = drink_types.find(dt => dt.id === 5);
+        const drink_type = drink_types.find(dt => dt.id === drink.type_id) || def_drink_type;
+        drink_name = drink_type.name;
+        drink_icon = drink_type.icon;
+      }
 
-      item_elem.drink_icon.innerHTML = drink_type.icon;
+      let drink_size_str = "";
+      if (drink.size_ml)
+      {
+        drink_size_str = `${drink.size_ml} ml`;
+      }
+      else
+      {
+        const def_drink_size = drink_sizes.find(ds => ds.id === 2);
+        const drink_size = drink_sizes.find(ds => ds.id === drink.size_id) || def_drink_size;
+        drink_size_str = drink_size.name;
+      }
+
+      const drink_label = `${drink_name}<br>${drink_size_str}`;
+
+      item_elem.drink_icon.innerHTML = drink_icon;
       item_elem.drink_label.innerHTML = drink_label;
-      item_elem.addEventListener('click', e => On_Click_Drink_Item(e, drink));
+      item_elem.addEventListener('click', e => On_Click_Drink_Item(e, drink, menu_dlg));
     }
 
-    function On_Render_Finished_Drink_Item(event)
+    function On_Click_Drink_Item(event, drink, menu_dlg)
     {
-      const item_elem = event.target;
-      const drink = item_elem.item_obj;
-
-      const def_drink_type = drink_types.find(dt => dt.id === 5);
-      const drink_type = drink_types.find(dt => dt.id === drink.type_id) || def_drink_type;
-      const drink_size = drink_sizes.find(ds => ds.id === drink.size_id);
-      const drink_label = `${drink_type.name}<br>${drink_size.name}`;
-
-      item_elem.drink_icon.innerHTML = drink_type.icon;
-      item_elem.drink_label.innerHTML = drink_label;
-      item_elem.addEventListener('click', e => On_Click_Finished_Drink_Item(e, drink));
-    }
-
-    function On_Click_Finished_Drink_Item(event, drink)
-    {
-      finished_drink_menu_dlg.item_obj = drink;
-      finished_drink_menu_dlg.showPopover();
+      menu_dlg.item_obj = drink;
+      menu_dlg.showPopover();
     }
 
     function On_Click_Plot_Finished_Drink_Btn(event)
@@ -245,13 +258,34 @@
       Update_BAC_Chart([drink]);
     }
 
-    function On_Click_Drink_Item(event, drink)
+    // choose drink dlg ============================================================
+
+    function On_Click_Drink_Type(event)
     {
-      drink_menu_dlg.item_obj = drink;
-      drink_menu_dlg.showPopover();
+      const drink_elem = event.currentTarget;
+
+      const icon = drink_elem.getAttribute("icon");
+      const drink = drink_elem.value;
+
+      small_drink.setAttribute("icon", icon);
+      small_drink.value = drink;
+
+      regular_drink.setAttribute("icon", icon);
+      regular_drink.value = drink;
+
+      large_drink.setAttribute("icon", icon);
+      large_drink.value = drink;
+
+      custom_size_drink.setAttribute("icon", icon);
+      custom_size_drink.value = drink;
     }
 
-    // choose drink dlg ============================================================
+    function On_Click_Drink_Size(event)
+    {
+      const drink_elem = event.currentTarget;
+
+      On_Submit_Drink({submitter: drink_elem});
+    }
 
     function On_Submit_Drink(event)
     {
@@ -259,31 +293,10 @@
       const button = event.submitter;
       if (button.tagName === "BL-DRINK")
       {
-        const drink_type_id = parseInt(button.dataset.drinkType);
-        const drink_size_id = parseInt(button.dataset.drinkSize);
-        Start_Drink(drink_type_id, drink_size_id);
+        const drink = button.value;
+        Start_Drink(drink);
       }
       select_drink_dlg.hidePopover();
-    }
-
-    function On_Click_Size(event)
-    {
-      const drink_elem = event.currentTarget;
-      On_Submit_Drink({submitter: drink_elem});
-    }
-
-    function On_Click_Drink(event)
-    {
-      const drink_elem = event.currentTarget;
-      const icon = drink_elem.getAttribute("icon");
-      const drink_type_id = parseInt(drink_elem.dataset.drinkType);
-
-      small_drink.setAttribute("icon", icon);
-      small_drink.dataset.drinkType = drink_type_id;
-      regular_drink.setAttribute("icon", icon);
-      regular_drink.dataset.drinkType = drink_type_id;
-      large_drink.setAttribute("icon", icon);
-      large_drink.dataset.drinkType = drink_type_id;
     }
 
     // drink menu ==================================================================
@@ -312,15 +325,6 @@
       Update_BAC_Chart([drink]);
     }
 
-    function On_Click_Plot_All_Drinks_Btn(event)
-    {
-      main_menu_dlg.hidePopover();
-
-      const ctx = Load_Ctx();
-      const drinks = Select_Drinks(ctx);
-      Update_BAC_Chart(drinks);
-    }
-
     function Update_BAC_Chart(drinks)
     {
       const ctx = Load_Ctx();
@@ -341,12 +345,24 @@
       const end_time = Date.now() + (Utils.MILLIS_HOUR * 12);
       const step = Utils.MILLIS_MINUTE * 10;
 
-      const drink_data = drinks.map(d => {
+      const drink_data = [];
+      for (const d of drinks)
+      {
         const type = drink_types.find(dt => dt.id === d.type_id) || drink_types.find(dt => dt.id === 5);
         const size = drink_sizes.find(ds => ds.id === d.size_id);
-        const alcohol_ml = size.ml * (type.alc_vol / 100);
-        return { start: d.start_time, end: d.end_time, grams: alcohol_ml * 0.789 };
-      });
+
+        const size_ml = d.size_ml || size.ml || 0;
+        const alc_vol = d.alc_vol || type.alc_vol || 0;
+        const alcohol_ml = size_ml * (alc_vol / 100);
+
+        const drink_data_item = 
+        { 
+          start: d.start_time, 
+          end: d.end_time, 
+          grams: alcohol_ml * 0.789 
+        };
+        drink_data.push(drink_data_item);
+      }
 
       const points = [];
       for (let t = start_time; t <= end_time; t += step)
@@ -383,6 +399,15 @@
 
     // main menu ===================================================================
 
+    function On_Click_Plot_All_Drinks_Btn(event)
+    {
+      main_menu_dlg.hidePopover();
+
+      const ctx = Load_Ctx();
+      const drinks = Select_Drinks(ctx);
+      Update_BAC_Chart(drinks);
+    }
+
     function On_Click_New_Session_Btn(event)
     {
       main_menu_dlg.hidePopover();
@@ -407,44 +432,7 @@
         Save_Ctx(ctx);
       }
     }
-    
-    // components ==================================================================
 
-    class BL_Drink extends HTMLElement
-    {
-      static tname = "bl-drink";
-
-      static observedAttributes = ['icon'];
-      attributeChangedCallback(name, oldValue, newValue)
-      {
-        if (name === 'icon')
-        {
-          this.Update_Icon();
-        }
-      }
-
-      Update_Icon()
-      {
-        if (this.drink_icon)
-        {
-          const icon = this.getAttribute("icon") || "🍹";
-          this.drink_icon.innerHTML = icon;
-        }
-      }
-
-      connectedCallback()
-      {
-        const label = this.getAttribute("label") || "";
-        this.innerHTML = `
-          <span cid="drink_icon" class="icon"></span> 
-          <span cid="drink_label" class="label">${label}</span> 
-        `;
-        Utils.Set_Id_Shortcuts(this, this, "cid");
-
-        this.Update_Icon();
-      }
-    }
-    Utils.Register_Element(BL_Drink);
   </script>
 </head>
 
@@ -540,6 +528,7 @@
         <bl-drink id="wine_drink" data-drink-type="2" icon="🍷" label="Wine"></bl-drink>
         <bl-drink id="spirit_drink" data-drink-type="3" icon="🥃" label="Spirit"></bl-drink>
         <bl-drink id="cocktail_drink" data-drink-type="4" icon="🍸" label="Cocktail"></bl-drink>
+        <bl-drink id="custom_drink" label="Special" icon="🍹" get-alc></bl-drink>
       </div>
 
       <h1>and Size...</h1>
@@ -547,6 +536,7 @@
         <bl-drink id="small_drink" data-drink-size="1" icon="🍹" label="Small" class="small"></bl-drink>
         <bl-drink id="regular_drink" data-drink-size="2" icon="🍹" label="Regular" class="regular"></bl-drink>
         <bl-drink id="large_drink" data-drink-size="3" icon="🍹" label="Large" class="large"></bl-drink>
+        <bl-drink id="custom_size_drink" icon="🍹" label="Special" get-ml></bl-drink>
       </div>
 
       <div class="dialog-actions">
