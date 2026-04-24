@@ -280,5 +280,11 @@
     "datetime": 1776816166501,
     "id": "ffb7c7e9-a23f-42ef-bc39-18c4e48564c8",
     "query_id": "-frontend"
+  },
+  {
+    "count": 596,
+    "datetime": 1776931719881,
+    "id": "9cfaee1a-c005-4494-add0-63a825a81352",
+    "query_id": "-frontend"
   }
 ]
