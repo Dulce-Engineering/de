@@ -1,5 +1,17 @@
 import Utils from "../../lib/Utils.js";
 
+/**
+ * DeInputList component manages and renders a list of items based on a provided 
+ * template.
+ * It maintains a state of objects and maps them to DOM elements.
+ * 
+ * @customElement de-input-list
+ * 
+ * @slot item - The template element used to render each item in the list.
+ * 
+ * @fires render - Dispatched on an item's element after it has been created and 
+ * attached to the list.
+ */
 class DeInputList extends HTMLElement
 {
   static tname = "de-input-list";
@@ -10,7 +22,6 @@ class DeInputList extends HTMLElement
     Utils.Bind(this, "On_");
 
     this.item_template = null;
-    //this.no_items_template = null;
     //console.log("DeInputList.constructor()");
   }
 
@@ -20,6 +31,10 @@ class DeInputList extends HTMLElement
     this.Render();
   }
 
+  /**
+   * Sets the list of data objects and re-renders the component.
+   * @param {Array<Object>} objs - Array of objects to be rendered.
+   */
   set value(objs)
   {
     //console.log("DeInputList.set value()");
@@ -33,6 +48,10 @@ class DeInputList extends HTMLElement
     }
   }
 
+  /**
+   * Returns the current list of data objects associated with the rendered items.
+   * @returns {Array<Object>}
+   */
   get value()
   {
     //console.log("DeInputList.get value()");
@@ -40,6 +59,10 @@ class DeInputList extends HTMLElement
     return res;
   }
 
+  /**
+   * Returns the number of items currently in the list.
+   * @returns {number}
+   */
   get length()
   {
     //console.log("DeInputList.length()");
@@ -48,6 +71,10 @@ class DeInputList extends HTMLElement
 
   // public api ==================================================================
 
+  /**
+   * Adds a new item to the list and renders it.
+   * @param {Object} obj - The data object to associate with the new item.
+   */
   Add(obj)
   {
     //console.log("DeInputList.Add()");
@@ -56,6 +83,10 @@ class DeInputList extends HTMLElement
     item_elem.dispatchEvent(new Event("render", { bubbles: true }));
   }
 
+  /**
+   * Removes an item from the list by matching its object ID.
+   * @param {string|number} obj_id - The ID of the item to remove.
+   */
   Remove(obj_id)
   {
     //console.log("DeInputList.Remove()");
@@ -66,6 +97,9 @@ class DeInputList extends HTMLElement
     }
   }
 
+  /**
+   * Removes all items from the list.
+   */
   Clear()
   {
     //console.log("DeInputList.Clear()");
@@ -77,6 +111,12 @@ class DeInputList extends HTMLElement
 
   // rendering ===================================================================
 
+  /**
+   * Internal method to clone the template and bind data to the new element.
+   * @private
+   * @param {Object} obj - The data object.
+   * @returns {HTMLElement} The rendered item element.
+   */
   Render_Item(obj)
   {
     //console.log("DeInputList.Render_Item()");
@@ -106,17 +146,19 @@ class DeInputList extends HTMLElement
     }*/
   }
 
+  /**
+   * Initializes the component by extracting the item template from the children
+   * and clearing the light DOM.
+   * @private
+   */
   Render()
   {
     //console.log("DeInputList.Render()");
 
-    // create a template element and move all child elements into it.
-    // the template content holds the item markup used for rendering each item.
     this.item_template = document.createElement("template");
     const item_elem = this.querySelector("[slot='item']");
     this.item_template.content.append(item_elem);
 
-    // clear  any remainig compoent content
     this.replaceChildren();
   }
 }
