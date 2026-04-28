@@ -208,6 +208,7 @@
         padding: 10px 0 0 0;
         overflow: hidden;
         box-sizing: border-box;
+        display: none;
       }
 
       nav
@@ -806,9 +807,9 @@
           await navigator.serviceWorker.register("./lib/service-worker.js");
         }
 
-        const observer = new MutationObserver(On_Mutation);
-        On_Mutation.observer = observer;
-        observer.observe(document.documentElement, { childList: true, subtree: false });
+        //const observer = new MutationObserver(On_Mutation);
+        //On_Mutation.observer = observer;
+        //observer.observe(document.documentElement, { childList: true, subtree: false });
         
         function On_Mutation(mutations)
         {
@@ -929,7 +930,7 @@
       
       </script>
 
-    <script src="https://vemtoutcheeg.com/400/8903613" defer></script>
+    <!--script src="https://vemtoutcheeg.com/400/8903613" defer></script-->
 
   </head>
 

@@ -102,6 +102,7 @@
         overflow: hidden;
         width: 100%;
         margin-top: 15px;
+        display: none;
       }
       
       body
@@ -566,9 +567,9 @@
           //await navigator.serviceWorker.register("./lib/service-worker.js");
         }
 
-        const observer = new MutationObserver(On_Mutation);
-        On_Mutation.observer = observer;
-        observer.observe(document.documentElement, { childList: true, subtree: false });
+        //const observer = new MutationObserver(On_Mutation);
+        //On_Mutation.observer = observer;
+        //observer.observe(document.documentElement, { childList: true, subtree: false });
         
         function On_Mutation(mutations)
         {
@@ -750,7 +751,7 @@
       }
     </script>
 
-    <script src="https://vemtoutcheeg.com/400/8903613"></script>
+    <!--script src="https://vemtoutcheeg.com/400/8903613"></script-->
 
   </head>
 
