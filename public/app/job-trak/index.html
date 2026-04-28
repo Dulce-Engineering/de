@@ -45,6 +45,18 @@
       {
         width: fit-content;
       }
+      
+      .job-item {
+        border: 1px solid #ccc;
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 5px;
+        background-color: #f9f9f9;
+      }
+
+      .job-item h3 {
+        margin-top: 0;
+      }
 
       @media screen and (min-width: 768px)
       {
@@ -67,15 +79,63 @@
 
     <script type="module">
       import Utils from "../../lib/Utils.js";
-      import DeDialogForm from "../../component/DeDialogForm/index.js";
+      import "../../component/DeInputList/index3.js";
 
       Main();
-      function Main()
+      async function Main()
       {
         if ("serviceWorker" in navigator) 
         {
           //await navigator.serviceWorker.register("./lib/service-worker.js");
         }
+
+        const [jobs, agencies, contacts, actionLogs] = await Promise.all([
+          Load_Data("./db/job.json"),
+          Load_Data("./db/agency.json"),
+          Load_Data("./db/contact.json"),
+          Load_Data("./db/action-log.json")
+        ]);
+
+        // Map the IDs to names by looking up values in the related datasets
+        const enrichedJobs = (jobs || []).map(job => ({
+          ...job,
+          agency_name: agencies?.find(a => a.id === job.agency_id)?.name || "N/A",
+          contact_name: contacts?.find(c => c.id === job.contact_id)?.name || "N/A"
+        }));
+
+        // Enrich jobs with the latest action log note and its formatted time
+        enrichedJobs.forEach(Add_Latest_Note);
+        function Add_Latest_Note(job) 
+        {
+          const latestLog = (actionLogs || []).filter(log => log.job_id === job.id).sort((a, b) => b.timestamp - a.timestamp || b.id - a.id)[0];
+          job.latest_note = latestLog?.note || "No notes available.";
+          job.latest_note_time_formatted = latestLog ? new Date(latestLog.timestamp).toLocaleString() : "";
+        }
+
+        jobs_list.addEventListener("render", On_Render_Job_Item);
+        jobs_list.value = enrichedJobs;
+      }
+
+      async function Load_Data(url) 
+      {
+        const response = await fetch(url);
+        return response.ok ? await response.json() : [];
+      }
+
+      function On_Render_Job_Item(event) 
+      {
+        const itemElem = event.target;
+        const job = itemElem.item_obj;
+
+        itemElem.role_title_elem.textContent = job.role_title;
+        itemElem.role_type_elem.textContent = job.role_type;
+        itemElem.location_elem.textContent = job.location;
+        itemElem.remuneration_elem.textContent = job.remuneration;
+        itemElem.remuneration_unit_elem.textContent = job.remuneration_unit;
+        itemElem.agency_name_elem.textContent = job.agency_name;
+        itemElem.contact_name_elem.textContent = job.contact_name;
+        itemElem.latest_note_elem.textContent = job.latest_note;
+        itemElem.latest_note_time_elem.textContent = job.latest_note_time_formatted;
       }
 
       // events =========================================================================
@@ -98,6 +158,18 @@
     </header>
 
     <main id="items">
+      <de-input-list id="jobs_list">
+        <div slot="item" class="job-item">
+          <h3 cid="role_title_elem"></h3>
+          <p>
+            <span cid="role_type_elem"></span> - <span cid="location_elem"></span>
+          </p>
+          <p>Remuneration: <span cid="remuneration_elem"></span> <span cid="remuneration_unit_elem"></span></p>
+          <p>Agency: <span cid="agency_name_elem"></span></p>
+          <p>Contact: <span cid="contact_name_elem"></span></p>
+          <p>Latest Note: <i cid="latest_note_elem"></i> <span cid="latest_note_time_elem" style="font-size: 0.8em; color: #666;"></span></p>
+        </div>
+      </de-input-list>
     </main>
 
     <main id="docs">
