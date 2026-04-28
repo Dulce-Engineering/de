@@ -1,0 +1,24 @@
+[
+  {
+    "id": 1,
+    "agency_id": 1,
+    "contact_id": 1,
+    "role_title": "Senior Developer (React)",
+    "role_type": "Contract",
+    "remuneration": 900,
+    "remuneration_unit": "daily",
+    "location": "Sydney",
+    "jd_id": "jd-1.docx"
+  },
+  {
+    "id": 2,
+    "agency_id": 1,
+    "contact_id": 1,
+    "role_title": "Senior Developer (.Net)",
+    "role_type": "Contract",
+    "remuneration": 900,
+    "remuneration_unit": "daily",
+    "location": "Sydney",
+    "jd_id": "jd-2.docx"
+  }
+]
