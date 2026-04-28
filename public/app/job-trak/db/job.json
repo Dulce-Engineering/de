@@ -8,7 +8,8 @@
     "remuneration": 900,
     "remuneration_unit": "daily",
     "location": "Sydney",
-    "jd_id": "jd-1.docx"
+    "jd_id": "jd-1.docx",
+    "duration": "12 months"
   },
   {
     "id": 2,
@@ -19,6 +20,7 @@
     "remuneration": 900,
     "remuneration_unit": "daily",
     "location": "Sydney",
-    "jd_id": "jd-2.docx"
+    "jd_id": "jd-2.docx",
+    "duration": "12 months"
   }
 ]
