@@ -96,7 +96,19 @@
         const form_data = await note_dialog.Show_Async();
         if (form_data)
         {
-          await Action_Insert(db, form_data.note, job_id, form_data.status);
+          const now = new Date();
+          const action =
+          {
+            job_id,
+            time_str: now.toISOString().split('T')[0],
+            timestamp: now.getTime(),
+            note: form_data.note
+          };
+          await Insert(db, "action_logs", action);
+          
+          await Update(db, "jobs", { id: job_id, status: form_data.status });
+
+          await Render_Job_Items(db);
         }
       }
 
@@ -179,7 +191,7 @@
         return store;
       }
 
-      async function Next_Id(table)
+      async function Next_Id(db, table)
       {
         const data = await Get_Req_Res(table.getAll());
         const nextId = (data || []).reduce
@@ -187,37 +199,38 @@
         return nextId;
       }
 
-      async function Action_Insert(db, note, job_id, status)
+      function Select_By_Id(db, table_name, id)
       {
-        const now = new Date();
-        const tx = db.transaction(["action_logs"], "readwrite");
-        const action_table = tx.objectStore("action_logs");
-
-        const new_action = 
-        {
-          id: await Next_Id(action_table),
-          job_id,
-          time_str: now.toISOString().split('T')[0],
-          timestamp: now.getTime(),
-          note
-        };
-        await Get_Req_Res(action_table.put(new_action));
-
-        await Job_Status_Update(db, job_id, status);
-        
-        await Render_Job_Items(db);
+        const table = Get_Table(db, table_name);
+        const request = table.get(id);
+        return Get_Req_Res(request);
       }
 
-      async function Job_Status_Update(db, job_id, status)
+      async function Insert(db, table_name, item)
       {
-        const job_table = Get_Table(db, "jobs", false);
-        const job = await Get_Req_Res(job_table.get(job_id));
-        if (job)
+        const table = Get_Table(db, table_name, false);
+        item.id = await Next_Id(db, table);
+        const request = table.add(item);
+        return Get_Req_Res(request);
+      }
+
+      async function Update(db, table_name, new_item)
+      {
+        let res = null;
+
+        const table = Get_Table(db, table_name, false);
+        const existing_item = await Get_Req_Res(table.get(new_item.id));
+        if (existing_item)
         {
-          job.status = status;
-          await Get_Req_Res(job_table.put(job)); 
+          const combined_item = { ...existing_item, ...new_item };
+          const request = table.put(combined_item);
+          res = Get_Req_Res(request);
         }
+
+        return res;
       }
+
+      // business logic =================================================================
 
       // rendering ======================================================================
 
