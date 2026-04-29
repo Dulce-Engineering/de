@@ -1,0 +1,68 @@
+{
+  "jobs": [
+    {
+      "id": 1,
+      "agency_id": 1,
+      "contact_id": 1,
+      "role_title": "Senior Developer (React)",
+      "role_type": "Contract",
+      "remuneration": 900,
+      "remuneration_unit": "daily",
+      "location": "Sydney",
+      "jd_id": "jd-1.docx",
+      "duration": "12 months"
+    },
+    {
+      "id": 2,
+      "agency_id": 1,
+      "contact_id": 1,
+      "role_title": "Senior Developer (.Net)",
+      "role_type": "Contract",
+      "remuneration": 900,
+      "remuneration_unit": "daily",
+      "location": "Sydney",
+      "jd_id": "jd-2.docx",
+      "duration": "12 months"
+    }
+  ],
+  "agencies": [
+    {
+      "id": 1,
+      "name": "Swordfish Search",
+      "url": "https://swordfishsearch.com.au"
+    }
+  ],
+  "contacts": [
+    {
+      "id": 1,
+      "name": "Chris Gregory",
+      "position": "Director",
+      "phone": "0415808814",
+      "email": "chris@swordfishsearch.com.au",
+      "agency_id": 1
+    }
+  ],
+  "action_logs": [
+    {
+      "id": 1,
+      "job_id": 1,
+      "time_str": "2026-04-28",
+      "timestamp": 1777298400000,
+      "note": "received call and jd. yet to apply."
+    },
+    {
+      "id": 2,
+      "job_id": 2,
+      "time_str": "2026-04-28",
+      "timestamp": 1777298400000,
+      "note": "received call and jd. yet to apply."
+    },
+    {
+      "id": 3,
+      "job_id": 1,
+      "time_str": "2026-04-28",
+      "timestamp": 1777376983116,
+      "note": "sent email to agency contact to follow up on the application."
+    }
+  ]
+}

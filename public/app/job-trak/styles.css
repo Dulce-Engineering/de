@@ -273,7 +273,8 @@ de-dialog-form {
     margin: 10px 0 0 0;
   }
 
-  input {
+  input, textarea, select 
+  {
     font-family: octagonal-bold;
     font-size: 1.2rem;
     padding: 5px 10px;
@@ -286,11 +287,8 @@ de-dialog-form {
   main {
     gap: 10px;
     padding: 0 0 40px 0;
-  }
-
-  label[for=tech_select],
-  label[for=title] {
-    font-size: 1.5rem;
+    display: flex;
+    flex-direction: column
   }
 
   footer {

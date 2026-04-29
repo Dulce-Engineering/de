@@ -42,6 +42,7 @@
     <script type="module">
       import Utils from "../../lib/Utils.js";
       import "../../component/DeInputList/index3.js";
+      import "../../component/DeDialogForm/index.js";
 
       Main();
       async function Main()
@@ -51,12 +52,14 @@
           //await navigator.serviceWorker.register("./lib/service-worker.js");
         }
 
-        const [jobs, agencies, contacts, actionLogs] = await Promise.all([
-          Load_Data("./db/job.json"),
-          Load_Data("./db/agency.json"),
-          Load_Data("./db/contact.json"),
-          Load_Data("./db/action-log.json")
-        ]);
+        import_btn.onclick = On_Click_Import_Btn;
+
+        const db_data = await Load_From_IndexedDB();
+        
+        const jobs = db_data.jobs || [];
+        const agencies = db_data.agencies || [];
+        const contacts = db_data.contacts || [];
+        const actionLogs = db_data.action_logs || [];
 
         // Map the IDs to names by looking up values in the related datasets
         const enrichedJobs = (jobs || []).map(job => ({
@@ -78,11 +81,114 @@
         jobs_list.value = enrichedJobs;
       }
 
-      async function Load_Data(url) 
+      // events =========================================================================
+
+      async function On_Click_Import_Btn()
       {
-        const response = await fetch(url);
-        return response.ok ? await response.json() : [];
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.json';
+
+        input.onchange = async (e) => 
+        {
+          const file = e.target.files[0];
+          if (!file) return;
+
+          try 
+          {
+            const text = await file.text();
+            const db_data = JSON.parse(text);
+            await Clear_DB();
+            await Save_To_IndexedDB(db_data);
+            alert("Data imported from " + file.name + " to IndexedDB instance.");
+          }
+          catch (err)
+          {
+            alert("Failed to import: Please select a valid JSON database file.");
+          }
+        };
+
+        input.click();
       }
+
+      // db =============================================================================
+
+      async function Load_From_IndexedDB()
+      {
+        const db = await Open_DB();
+        const storeNames = ["jobs", "agencies", "contacts", "action_logs"];
+        const tx = db.transaction(storeNames, "readonly");
+        
+        const data = {};
+        const promises = storeNames.map(storeName => {
+          return new Promise((resolve) => {
+            const request = tx.objectStore(storeName).getAll();
+            request.onsuccess = () => {
+              data[storeName] = request.result;
+              resolve();
+            };
+          });
+        });
+
+        await Promise.all(promises);
+        return data;
+      }
+
+      async function Clear_DB()
+      {
+        const db = await Open_DB();
+        const storeNames = ["jobs", "agencies", "contacts", "action_logs"];
+        const tx = db.transaction(storeNames, "readwrite");
+        
+        for (const storeName of storeNames) 
+        {
+          tx.objectStore(storeName).clear();
+        }
+
+        return new Promise((resolve) => tx.oncomplete = resolve);
+      }
+
+      async function Open_DB()
+      {
+        return new Promise(
+        (resolve, reject) => 
+        {
+          const request = indexedDB.open("JobTrakDB", 1);
+          request.onupgradeneeded = (event) => 
+          {
+            const db = event.target.result;
+            if (!db.objectStoreNames.contains("jobs")) db.createObjectStore("jobs", { keyPath: "id" });
+            if (!db.objectStoreNames.contains("agencies")) db.createObjectStore("agencies", { keyPath: "id" });
+            if (!db.objectStoreNames.contains("contacts")) db.createObjectStore("contacts", { keyPath: "id" });
+            if (!db.objectStoreNames.contains("action_logs")) db.createObjectStore("action_logs", { keyPath: "id" });
+          };
+          request.onsuccess = () => resolve(request.result);
+          request.onerror = () => reject(request.error);
+        }
+        );
+      }
+
+      async function Save_To_IndexedDB(db_data)
+      {
+        const db = await Open_DB();
+        const storeNames = ["jobs", "agencies", "contacts", "action_logs"];
+        const tx = db.transaction(storeNames, "readwrite");
+        
+        function putItems(storeName, items) 
+        {
+          const store = tx.objectStore(storeName);
+          (items || []).forEach(item => store.put(item));
+        }
+
+        putItems("jobs", db_data.jobs);
+        putItems("agencies", db_data.agencies);
+        putItems("contacts", db_data.contacts);
+        putItems("action_logs", db_data.action_logs);
+
+        return new Promise((resolve) => tx.oncomplete = resolve);
+      }
+
+      // rendering ======================================================================
 
       function On_Render_Job_Item(event) 
       {
@@ -98,11 +204,13 @@
         itemElem.contact_name_elem.textContent = job.contact_name;
         itemElem.latest_note_elem.textContent = job.latest_note;
         itemElem.latest_note_time_elem.textContent = job.latest_note_time_formatted;
+
+        itemElem.add_note_btn.onclick = (e) => 
+        {
+          e.preventDefault(); // Prevents the details element from toggling
+          note_dialog.Show_Modal();
+        };
       }
-
-      // events =========================================================================
-
-      // rendering ======================================================================
 
     </script>
 
@@ -114,15 +222,22 @@
 
       <h1><span>Job Tracker</span></h1>
       <nav>
-        <button id="add_file_btn"><span class="text">Import</span></button>
-        <button id="del_all_btn"><span class="text">Export</span></button>
+        <button id="import_btn"><span class="text">Import</span></button>
+        <button id="export_btn"><span class="text">Export</span></button>
       </nav>
     </header>
 
     <main id="items">
       <de-input-list id="jobs_list">
-        <div slot="item" class="job-item">
-          <h3 cid="role_title_elem"></h3>
+        <details slot="item" class="job-item">
+          <summary>
+            <b cid="role_title_elem"></b>
+            <div>
+              <span cid="contact_name_elem"></span> @ 
+              <span cid="agency_name_elem"></span>
+            </div>
+            <button cid="add_note_btn"><img src="image/note-add.svg" alt="Add Note"></button>
+          </summary>
           <p>
             <span cid="role_type_elem"></span> - <span cid="location_elem"></span>
           </p>
@@ -130,12 +245,10 @@
             <span cid="remuneration_elem"></span> 
             <span cid="remuneration_unit_elem"></span>
           </p>
-          <p>Agency: <span cid="agency_name_elem"></span></p>
-          <p>Contact: <span cid="contact_name_elem"></span></p>
           <p>Latest Note (<span cid="latest_note_time_elem"></span>): <br>
             <i cid="latest_note_elem"></i> 
           </p>
-        </div>
+        </details>
       </de-input-list>
     </main>
 
@@ -145,6 +258,26 @@
     <footer>
       © Copyright Dulce Engineering 2025. All rights reserved. v1
     </footer>
+
+    <de-dialog-form id="note_dialog">
+      <h1 slot="header">Add Job Note</h1>
+      <label slot="fields">Note</label>
+      <textarea slot="fields" name="note" placeholder="Enter your note here..." rows="5"></textarea>
+      <label slot="fields">Status</label>
+      <select slot="fields" name="status">
+        <option value="bookmarked">Bookmarked</option>
+        <option value="applying">Applying</option>
+        <option value="applied">Applied</option>
+        <option value="screening">Screening</option>
+        <option value="interviewing">Interviewing</option>
+        <option value="negotiating">Negotiating</option>
+        <option value="offered">Offered</option>
+        <option value="accepted">Accepted</option>
+        <option value="rejected">Rejected</option>
+        <option value="withdrawn">Withdrawn</option>
+        <option value="ghosted">Ghosted</option>
+      </select>
+    </de-dialog-form>
 
   </body>
 
