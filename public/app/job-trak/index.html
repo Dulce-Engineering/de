@@ -52,38 +52,17 @@
           //await navigator.serviceWorker.register("./lib/service-worker.js");
         }
 
+        const db = await Open_DB();
+
         import_btn.onclick = On_Click_Import_Btn;
+        jobs_list.addEventListener("render", e => On_Render_Job_Item(e, db));
 
-        const db_data = await Load_From_IndexedDB();
-        
-        const jobs = db_data.jobs || [];
-        const agencies = db_data.agencies || [];
-        const contacts = db_data.contacts || [];
-        const actionLogs = db_data.action_logs || [];
-
-        // Map the IDs to names by looking up values in the related datasets
-        const enrichedJobs = (jobs || []).map(job => ({
-          ...job,
-          agency_name: agencies?.find(a => a.id === job.agency_id)?.name || "N/A",
-          contact_name: contacts?.find(c => c.id === job.contact_id)?.name || "N/A"
-        }));
-
-        // Enrich jobs with the latest action log note and its formatted time
-        enrichedJobs.forEach(Add_Latest_Note);
-        function Add_Latest_Note(job) 
-        {
-          const latestLog = (actionLogs || []).filter(log => log.job_id === job.id).sort((a, b) => b.timestamp - a.timestamp || b.id - a.id)[0];
-          job.latest_note = latestLog?.note || "No notes available.";
-          job.latest_note_time_formatted = latestLog ? new Date(latestLog.timestamp).toLocaleString() : "";
-        }
-
-        jobs_list.addEventListener("render", On_Render_Job_Item);
-        jobs_list.value = enrichedJobs;
+        Render_Job_Items(db);
       }
 
       // events =========================================================================
 
-      async function On_Click_Import_Btn()
+      async function On_Click_Import_Btn(db)
       {
         const input = document.createElement('input');
         input.type = 'file';
@@ -98,8 +77,9 @@
           {
             const text = await file.text();
             const db_data = JSON.parse(text);
-            await Clear_DB();
-            await Save_To_IndexedDB(db_data);
+            await Clear_DB(db);
+            await Save_To_IndexedDB(db, db_data);
+            Render_Job_Items(db);
             alert("Data imported from " + file.name + " to IndexedDB instance.");
           }
           catch (err)
@@ -111,46 +91,19 @@
         input.click();
       }
 
-      async function On_Click_Add_Note()
+      async function On_Click_Add_Note(e, job_id, db)
       {
-        /*const note =
+        const form_data = await note_dialog.Show_Async();
+        if (form_data)
         {
-          id: 1,
-          job_id: 1,
-          time_str: "2026-04-28",
-          timestamp: 1777298400000,
-          note: "received call and jd. yet to apply."
-        };*/
-
-        const note = await note_dialog.Show_Async();
+          await Action_Insert(db, form_data.note, job_id, form_data.status);
+        }
       }
 
       // db =============================================================================
 
-      async function Load_From_IndexedDB()
+      async function Clear_DB(db)
       {
-        const db = await Open_DB();
-        const storeNames = ["jobs", "agencies", "contacts", "action_logs"];
-        const tx = db.transaction(storeNames, "readonly");
-        
-        const data = {};
-        const promises = storeNames.map(storeName => {
-          return new Promise((resolve) => {
-            const request = tx.objectStore(storeName).getAll();
-            request.onsuccess = () => {
-              data[storeName] = request.result;
-              resolve();
-            };
-          });
-        });
-
-        await Promise.all(promises);
-        return data;
-      }
-
-      async function Clear_DB()
-      {
-        const db = await Open_DB();
         const storeNames = ["jobs", "agencies", "contacts", "action_logs"];
         const tx = db.transaction(storeNames, "readwrite");
         
@@ -164,8 +117,8 @@
 
       async function Open_DB()
       {
-        return new Promise(
-        (resolve, reject) => 
+        const promise = new Promise(On_Process);
+        function On_Process(resolve, reject)
         {
           const request = indexedDB.open("JobTrakDB", 1);
           request.onupgradeneeded = (event) => 
@@ -179,12 +132,12 @@
           request.onsuccess = () => resolve(request.result);
           request.onerror = () => reject(request.error);
         }
-        );
+
+        return promise;
       }
 
-      async function Save_To_IndexedDB(db_data)
+      async function Save_To_IndexedDB(db, db_data)
       {
-        const db = await Open_DB();
         const storeNames = ["jobs", "agencies", "contacts", "action_logs"];
         const tx = db.transaction(storeNames, "readwrite");
         
@@ -202,9 +155,99 @@
         return new Promise((resolve) => tx.oncomplete = resolve);
       }
 
+      function Get_Req_Res(request)
+      {
+        const res_promise = new Promise((resolve, reject) =>
+        {
+          request.onsuccess = () => resolve(request.result || null);
+          request.onerror = () => On_Db_Error(request, reject);
+        });
+
+        return res_promise;
+      }
+
+      function On_Db_Error(request, reject_fn)
+      {
+        console.error("IndexedDB error:", request.error);
+        reject_fn(request.error);
+      }
+
+      function Get_Table(db, table_name, is_readonly = true)
+      {
+        const tx = db.transaction([table_name], is_readonly ? "readonly" : "readwrite");
+        const store = tx.objectStore(table_name);
+        return store;
+      }
+
+      async function Next_Id(table)
+      {
+        const data = await Get_Req_Res(table.getAll());
+        const nextId = (data || []).reduce
+          ((max, action) => Math.max(max, action.id || 0), 0) + 1;
+        return nextId;
+      }
+
+      async function Action_Insert(db, note, job_id, status)
+      {
+        const now = new Date();
+        const tx = db.transaction(["action_logs"], "readwrite");
+        const action_table = tx.objectStore("action_logs");
+
+        const new_action = 
+        {
+          id: await Next_Id(action_table),
+          job_id,
+          time_str: now.toISOString().split('T')[0],
+          timestamp: now.getTime(),
+          note
+        };
+        await Get_Req_Res(action_table.put(new_action));
+
+        await Job_Status_Update(db, job_id, status);
+        
+        await Render_Job_Items(db);
+      }
+
+      async function Job_Status_Update(db, job_id, status)
+      {
+        const job_table = Get_Table(db, "jobs", false);
+        const job = await Get_Req_Res(job_table.get(job_id));
+        if (job)
+        {
+          job.status = status;
+          await Get_Req_Res(job_table.put(job)); 
+        }
+      }
+
       // rendering ======================================================================
 
-      function On_Render_Job_Item(event) 
+      async function Render_Job_Items(db)
+      {
+        const jobs = await Get_Req_Res(Get_Table(db, "jobs").getAll());
+        const agencies = await Get_Req_Res(Get_Table(db, "agencies").getAll());
+        const contacts = await Get_Req_Res(Get_Table(db, "contacts").getAll());
+        const actionLogs = await Get_Req_Res(Get_Table(db, "action_logs").getAll());
+
+        // Map the IDs to names by looking up values in the related datasets
+        const enrichedJobs = (jobs || []).map(job => ({
+          ...job,
+          agency_name: agencies?.find(a => a.id === job.agency_id)?.name || "N/A",
+          contact_name: contacts?.find(c => c.id === job.contact_id)?.name || "N/A"
+        }));
+
+        // Enrich jobs with the latest action log note and its formatted time
+        enrichedJobs.forEach(Add_Latest_Note);
+        function Add_Latest_Note(job) 
+        {
+          const latestLog = (actionLogs || []).filter(log => log.job_id === job.id).sort((a, b) => b.timestamp - a.timestamp || b.id - a.id)[0];
+          job.latest_note = latestLog?.note || "No notes available.";
+          job.latest_note_time_formatted = latestLog ? new Date(latestLog.timestamp).toLocaleString() : "";
+        }
+
+        jobs_list.value = enrichedJobs;
+      }
+
+      function On_Render_Job_Item(event, db)
       {
         const itemElem = event.target;
         const job = itemElem.item_obj;
@@ -218,7 +261,7 @@
         itemElem.contact_name_elem.textContent = job.contact_name;
         itemElem.latest_note_elem.textContent = job.latest_note;
         itemElem.latest_note_time_elem.textContent = job.latest_note_time_formatted;
-        itemElem.add_note_btn.onclick = On_Click_Add_Note;
+        itemElem.add_note_btn.onclick = e => On_Click_Add_Note(e, job.id, db);
       }
 
     </script>

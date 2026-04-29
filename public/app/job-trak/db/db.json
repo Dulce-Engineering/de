@@ -10,7 +10,8 @@
       "remuneration_unit": "daily",
       "location": "Sydney",
       "jd_id": "jd-1.docx",
-      "duration": "12 months"
+      "duration": "12 months",
+      "company": null
     },
     {
       "id": 2,
@@ -22,14 +23,34 @@
       "remuneration_unit": "daily",
       "location": "Sydney",
       "jd_id": "jd-2.docx",
-      "duration": "12 months"
+      "duration": "12 months",
+      "company": null
+    },
+    {
+      "id": 3,
+      "agency_id": 2,
+      "contact_id": 2,
+      "role_title": "Senior .Net Developer",
+      "role_type": "Contract",
+      "remuneration": 900,
+      "remuneration_unit": "daily",
+      "location": "Sydney",
+      "jd_id": "jd-3.pdf",
+      "duration": null,
+      "company": "CBA"
     }
   ],
-  "agencies": [
+  "agencies": 
+  [
     {
       "id": 1,
       "name": "Swordfish Search",
       "url": "https://swordfishsearch.com.au"
+    },
+    {
+      "id": 2,
+      "name": "Synechron Australia",
+      "url": "https://www.synechron.com"
     }
   ],
   "contacts": [
@@ -40,6 +61,14 @@
       "phone": "0415808814",
       "email": "chris@swordfishsearch.com.au",
       "agency_id": 1
+    },
+    {
+      "id": 2,
+      "name": "Kavita Vijay",
+      "position": "Talent Acquisition Specialist - Global Recruitment",
+      "phone": "+61 0488 857 442",
+      "email": "kavita.vijay@synechron.com",
+      "agency_id": 2
     }
   ],
   "action_logs": [
@@ -63,6 +92,13 @@
       "time_str": "2026-04-28",
       "timestamp": 1777376983116,
       "note": "sent email to agency contact to follow up on the application."
+    },
+    {
+      "id": 4,
+      "job_id": 3,
+      "time_str": "2026-04-29",
+      "timestamp": 1777438541917,
+      "note": "Sent email to agency contact to follow up on the application."
     }
   ]
 }
