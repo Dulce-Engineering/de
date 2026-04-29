@@ -26,45 +26,7 @@
     <meta property="og:url" content="https://dulceeng.com.au/app/xxx">
     <meta property="og:type" content="website">
     <link rel="shortcut icon" href="./image/favicon.ico">
-    
-    <style>
-      :root 
-      {
-        --pink: #FFB6C1; /* #FFB6C1, #FFC0CB, #FFD6E7 */
-      }
-      
-      body
-      {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        min-height: 100vh;
-        margin: 0;
-      }
-      body > *
-      {
-        width: fit-content;
-      }
-      
-      .job-item {
-        border: 1px solid #ccc;
-        padding: 10px;
-        margin-bottom: 10px;
-        border-radius: 5px;
-        background-color: #f9f9f9;
-      }
-
-      .job-item h3 {
-        margin-top: 0;
-      }
-
-      @media screen and (min-width: 768px)
-      {
-      }
-      @media screen and (max-width: 768px)
-      {
-      }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 
     <script type="application/ld+json">
     {
@@ -152,8 +114,8 @@
 
       <h1><span>Job Tracker</span></h1>
       <nav>
-        <button id="add_file_btn"><span class="text">Add File</span></button>
-        <button id="del_all_btn" hidden><span class="text">Delete All</span></button>
+        <button id="add_file_btn"><span class="text">Import</span></button>
+        <button id="del_all_btn"><span class="text">Export</span></button>
       </nav>
     </header>
 
@@ -164,10 +126,15 @@
           <p>
             <span cid="role_type_elem"></span> - <span cid="location_elem"></span>
           </p>
-          <p>Remuneration: <span cid="remuneration_elem"></span> <span cid="remuneration_unit_elem"></span></p>
+          <p>Remuneration: 
+            <span cid="remuneration_elem"></span> 
+            <span cid="remuneration_unit_elem"></span>
+          </p>
           <p>Agency: <span cid="agency_name_elem"></span></p>
           <p>Contact: <span cid="contact_name_elem"></span></p>
-          <p>Latest Note: <i cid="latest_note_elem"></i> <span cid="latest_note_time_elem" style="font-size: 0.8em; color: #666;"></span></p>
+          <p>Latest Note (<span cid="latest_note_time_elem"></span>): <br>
+            <i cid="latest_note_elem"></i> 
+          </p>
         </div>
       </de-input-list>
     </main>
