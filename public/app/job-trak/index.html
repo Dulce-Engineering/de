@@ -55,6 +55,7 @@
         const db = await Open_DB();
 
         import_btn.onclick = On_Click_Import_Btn;
+        export_btn.onclick = () => On_Click_Export_Btn(db);
         jobs_list.addEventListener("render", e => On_Render_Job_Item(e, db));
 
         Render_Job_Items(db);
@@ -89,6 +90,35 @@
         };
 
         input.click();
+      }
+
+      async function On_Click_Export_Btn(db)
+      {
+        const jobs = await Get_Req_Res(Get_Table(db, "jobs").getAll());
+        const agencies = await Get_Req_Res(Get_Table(db, "agencies").getAll());
+        const contacts = await Get_Req_Res(Get_Table(db, "contacts").getAll());
+        const action_logs = await Get_Req_Res(Get_Table(db, "action_logs").getAll());
+
+        const db_data = {
+          jobs: jobs || [],
+          agencies: agencies || [],
+          contacts: contacts || [],
+          action_logs: action_logs || []
+        };
+
+        const json_string = JSON.stringify(db_data, null, 2);
+        const blob = new Blob([json_string], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `job-trak-data-${new Date().toISOString().split('T')[0]}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        alert("Data exported successfully!");
       }
 
       async function On_Click_Add_Note(e, job_id, db)
@@ -150,21 +180,10 @@
 
       async function Save_To_IndexedDB(db, db_data)
       {
-        const storeNames = ["jobs", "agencies", "contacts", "action_logs"];
-        const tx = db.transaction(storeNames, "readwrite");
-        
-        function putItems(storeName, items) 
-        {
-          const store = tx.objectStore(storeName);
-          (items || []).forEach(item => store.put(item));
-        }
-
-        putItems("jobs", db_data.jobs);
-        putItems("agencies", db_data.agencies);
-        putItems("contacts", db_data.contacts);
-        putItems("action_logs", db_data.action_logs);
-
-        return new Promise((resolve) => tx.oncomplete = resolve);
+        await Insert_Items(db, "jobs", db_data.jobs);
+        await Insert_Items(db, "agencies", db_data.agencies);
+        await Insert_Items(db, "contacts", db_data.contacts);
+        await Insert_Items(db, "action_logs", db_data.action_logs);
       }
 
       function Get_Req_Res(request)
@@ -206,12 +225,27 @@
         return Get_Req_Res(request);
       }
 
-      async function Insert(db, table_name, item)
+      function Insert(db, table_name, item)
       {
-        const table = Get_Table(db, table_name, false);
-        item.id = await Next_Id(db, table);
-        const request = table.add(item);
-        return Get_Req_Res(request);
+        return Insert_Items(db, table_name, [item]);
+      }
+
+      async function Insert_Items(db, table_name, items)
+      {
+        if (items && items.length > 0)
+        {
+          const table = Get_Table(db, table_name, false);
+          for (const item of items)
+          {
+            if (item)
+            {
+              if (item.id == null || item.id == undefined)
+                item.id = await Next_Id(db, table);
+              const request = table.add(item);
+              await Get_Req_Res(request);
+            }
+          }
+        }
       }
 
       async function Update(db, table_name, new_item)
@@ -284,11 +318,23 @@
   <body>
 
     <header>
-
       <h1><span>Job Tracker</span></h1>
       <nav>
-        <button id="import_btn"><span class="text">Import</span></button>
-        <button id="export_btn"><span class="text">Export</span></button>
+        <button id="import_btn" class="img">
+          <img src="image/upload.svg" alt="Upload">          
+        </button>
+        <button id="export_btn" class="img">
+          <img src="image/download.svg" alt="Download">
+        </button>
+        <button id="jobs_btn" class="img">
+          <img src="image/paid.svg" alt="Jobs">
+        </button>
+        <button id="companies_btn" class="img">
+          <img src="image/factory.svg" alt="Companies">
+        </button>
+        <button id="contacts_btn" class="img">
+          <img src="image/contacts.svg" alt="Contacts">
+        </button>
       </nav>
     </header>
 
@@ -301,7 +347,9 @@
               <span cid="contact_name_elem"></span> @ 
               <span cid="agency_name_elem"></span>
             </div>
-            <button cid="add_note_btn"><img src="image/note-add.svg" alt="Add Note"></button>
+            <button cid="add_note_btn" class="img">
+              <img src="image/note-add.svg" alt="Add Note">
+            </button>
           </summary>
           <p>
             <span cid="role_type_elem"></span> - <span cid="location_elem"></span>

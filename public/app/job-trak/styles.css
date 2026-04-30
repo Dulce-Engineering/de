@@ -106,7 +106,8 @@ de-input-list {
   box-sizing: border-box;
 }
 
-button {
+button 
+{
   background-color: #440;
   color: #ff0;
   font-family: hyperspace-bold;
@@ -115,6 +116,12 @@ button {
   border: none;
   letter-spacing: 2px;
   cursor: pointer;
+
+  &.img
+  {
+    font-size: 0;  
+    padding: 8px 8px;  
+  }
 }
 
 footer {
