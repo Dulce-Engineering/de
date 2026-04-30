@@ -40,7 +40,7 @@ class DeInputList extends HTMLElement
     //console.log("DeInputList.set value()");
     if (objs && objs.length > 0)
     {
-      this.replaceChildren();
+      this.Clear();
       for (const obj of objs)
       {
         this.Add(obj)
@@ -55,7 +55,7 @@ class DeInputList extends HTMLElement
   get value()
   {
     //console.log("DeInputList.get value()");
-    const res = Array.from(this.children).map(e => e.item_obj);
+    const res = Array.from(this.items_elem.children).map(e => e.item_obj);
     return res;
   }
 
@@ -66,7 +66,7 @@ class DeInputList extends HTMLElement
   get length()
   {
     //console.log("DeInputList.length()");
-    return this.children.length;
+    return this.items_elem.children.length;
   }
 
   // public api ==================================================================
@@ -79,7 +79,7 @@ class DeInputList extends HTMLElement
   {
     //console.log("DeInputList.Add()");
     const item_elem = this.Render_Item(obj);
-    this.append(item_elem);
+    this.items_elem.append(item_elem);
     item_elem.dispatchEvent(new Event("render", { bubbles: true }));
   }
 
@@ -90,7 +90,8 @@ class DeInputList extends HTMLElement
   Remove(obj_id)
   {
     //console.log("DeInputList.Remove()");
-    const item_elem = Array.from(this.children).find(e => e.item_obj.id == obj_id);
+    const item_elem = 
+      Array.from(this.items_elem.children).find(e => e.item_obj?.id == obj_id);
     if (item_elem)
     {
       item_elem.remove();
@@ -103,7 +104,7 @@ class DeInputList extends HTMLElement
   Clear()
   {
     //console.log("DeInputList.Clear()");
-    this.replaceChildren();
+    this.items_elem.replaceChildren();
   }
 
   // helpers =====================================================================
@@ -159,7 +160,14 @@ class DeInputList extends HTMLElement
     const item_elem = this.querySelector("[slot='item']");
     this.item_template.content.append(item_elem);
 
-    this.replaceChildren();
+    const html = `
+      <slot name="header"></slot>
+      <main cid="items_elem"></main>
+      <slot name="footer"></slot>
+    `;
+    const elems = Utils.To_Document(html, this);
+    this.replaceChildren(elems);
+    Utils.Set_Id_Shortcuts(this, this, "cid");
   }
 }
 

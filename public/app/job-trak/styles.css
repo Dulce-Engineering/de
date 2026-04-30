@@ -96,8 +96,8 @@ header {
   }
 }
 
-main,
-de-input-list {
+main
+{
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -130,6 +130,25 @@ footer {
 
 de-input-list
 {
+  width: 100%;
+  padding: 40px;
+  box-sizing: border-box;
+
+  &.hidden 
+  {
+    display: none;
+  }
+
+  main
+  {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+  }
+
   details
   {
     border: 1px solid #fff;
@@ -215,7 +234,7 @@ de-dialog-form {
     margin: 10px 0 0 0;
   }
 
-  input, textarea, select 
+  input, textarea, select, option
   {
     font-family: octagonal-bold;
     font-size: 1.2rem;
@@ -224,6 +243,10 @@ de-dialog-form {
     background: none;
     color: var(--input-text);
     border: 1px solid var(--border);
+  }
+  option
+  {
+    background: #000;
   }
 
   main {
@@ -319,19 +342,6 @@ de-tree {
       margin: unset;
     }
   }
-}
-
-.negative {
-  color: #f66;
-}
-
-.positive {
-  color: #0c0;
-}
-
-.hidden,
-.item.hidden {
-  display: none;
 }
 
 /* large screen */

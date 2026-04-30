@@ -1039,6 +1039,10 @@ class Utils
           {
             slot_elem.replaceWith(...content_elems);
           }
+          else
+          {
+            slot_elem.remove();
+          }
         }
       }
     }

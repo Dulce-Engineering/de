@@ -56,12 +56,24 @@
 
         import_btn.onclick = On_Click_Import_Btn;
         export_btn.onclick = () => On_Click_Export_Btn(db);
+        jobs_btn.onclick = () => Toggle_View(jobs_list);
+        contacts_btn.onclick = () => Toggle_View(contacts_list);
+        add_contact_btn.onclick = () => On_Click_Add_Contact(db);
         jobs_list.addEventListener("render", e => On_Render_Job_Item(e, db));
+        contacts_list.addEventListener("render", e => On_Render_Contact_Item(e, db));
 
         Render_Job_Items(db);
+        Render_Contacts(db);
       }
 
       // events =========================================================================
+
+      function Toggle_View(view_elem)
+      {
+        jobs_list.classList.add("hidden");
+        contacts_list.classList.add("hidden");
+        view_elem.classList.remove("hidden");
+      }
 
       async function On_Click_Import_Btn(db)
       {
@@ -139,6 +151,28 @@
           await Update(db, "jobs", { id: job_id, status: form_data.status });
 
           await Render_Job_Items(db);
+        }
+      }
+
+      async function On_Click_Add_Contact(db)
+      {
+        const agencies = await Get_Req_Res(Get_Table(db, "agencies").getAll());
+        Set_Options(contact_agency_select, agencies, "id", "name");
+
+        const form_data = await contact_dialog.Show_Async();
+        if (form_data)
+        {
+          const contact = 
+          {
+            name: form_data.name?.trim() || null,
+            email: form_data.email?.trim() || null,
+            phone: form_data.phone?.trim() || null,
+            position: form_data.position?.trim() || null,
+            agency_id: parseInt(form_data.agency_id) || null,
+          };
+
+          await Insert(db, "contacts", contact);
+          await Render_Contacts(db);
         }
       }
 
@@ -268,6 +302,18 @@
 
       // rendering ======================================================================
 
+      function Set_Options(select_elem, items, value_field, text_field)
+      {
+        select_elem.innerHTML = '<option value="">None</option>';
+        (items || []).forEach(item =>
+        {
+          const option = document.createElement("option");
+          option.value = item[value_field];
+          option.textContent = item[text_field];
+          select_elem.appendChild(option);
+        });
+      }
+
       async function Render_Job_Items(db)
       {
         const jobs = await Get_Req_Res(Get_Table(db, "jobs").getAll());
@@ -311,6 +357,31 @@
         itemElem.add_note_btn.onclick = e => On_Click_Add_Note(e, job.id, db);
       }
 
+      async function Render_Contacts(db)
+      {
+        const contacts = await Get_Req_Res(Get_Table(db, "contacts").getAll());
+        const agencies = await Get_Req_Res(Get_Table(db, "agencies").getAll());
+
+        const enrichedContacts = (contacts || []).map(contact => ({
+          ...contact,
+          agency_name: agencies?.find(a => a.id === contact.agency_id)?.name || "N/A"
+        }));
+
+        contacts_list.value = enrichedContacts;
+      }
+
+      function On_Render_Contact_Item(event, db)
+      {
+        const itemElem = event.target;
+        const contact = itemElem.item_obj;
+
+        itemElem.contact_name_elem.textContent = contact.name || "";
+        itemElem.contact_phone_elem.textContent = contact.phone || "N/A";
+        itemElem.contact_email_elem.textContent = contact.email || "N/A";
+        itemElem.contact_agency_elem.textContent = contact.agency_name || "N/A";
+        itemElem.contact_position_elem.textContent = contact.position || "N/A";
+      }
+
     </script>
 
   </head>
@@ -339,6 +410,7 @@
     </header>
 
     <main id="items">
+
       <de-input-list id="jobs_list">
         <details slot="item" class="job-item">
           <summary>
@@ -363,6 +435,26 @@
           </p>
         </details>
       </de-input-list>
+
+      <de-input-list id="contacts_list" class="hidden">
+        <header slot="header">
+          <button id="add_contact_btn" class="img">
+            <img src="image/add.svg" alt="Add Contact">
+          </button>
+        </header>
+        <details slot="item" class="contact-item">
+          <summary>
+            <b cid="contact_name_elem"></b>
+            <div>
+              <span cid="contact_agency_elem"></span>
+            </div>
+          </summary>
+          <p>Email: <span cid="contact_email_elem"></span></p>
+          <p>Phone: <span cid="contact_phone_elem"></span></p>
+          <p>Position: <span cid="contact_position_elem"></span></p>
+        </details>
+      </de-input-list>
+
     </main>
 
     <main id="docs">
@@ -390,6 +482,20 @@
         <option value="withdrawn">Withdrawn</option>
         <option value="ghosted">Ghosted</option>
       </select>
+    </de-dialog-form>
+
+    <de-dialog-form id="contact_dialog">
+      <h1 slot="header">Add Contact</h1>
+      <label slot="fields">Name</label>
+      <input slot="fields" type="text" name="name" placeholder="Contact name">
+      <label slot="fields">Email</label>
+      <input slot="fields" type="email" name="email" placeholder="Contact email">
+      <label slot="fields">Phone</label>
+      <input slot="fields" type="tel" name="phone" placeholder="Contact phone">
+      <label slot="fields">Position</label>
+      <input slot="fields" type="text" name="position" placeholder="Contact position">
+      <label slot="fields">Agency</label>
+      <select id="contact_agency_select" slot="fields" name="agency_id"></select>
     </de-dialog-form>
 
   </body>
