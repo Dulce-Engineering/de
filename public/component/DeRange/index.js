@@ -1,5 +1,28 @@
 import Utils from "../../lib/Utils.js";
 
+/**
+ * A custom range slider element with built-in value display.
+ *
+ * @class DeRange
+ * @extends HTMLElement
+ *
+ * @example
+ * <de-range name="volume" min="0" max="100" step="5" value="50" show-percent="1"></de-range>
+ *
+ * @attr {string} min - Minimum slider value. Defaults to "10".
+ * @attr {string} max - Maximum slider value. Defaults to "100".
+ * @attr {string} step - Slider step increment. Defaults to "10".
+ * @attr {string} value - Initial slider value. Defaults to "0".
+ * @attr {string} name - Name attribute for the underlying input element.
+ * @attr {string} show-percent - When truthy, appends a percent sign to the displayed value and labels.
+ *
+ * @property {number} value - Current numeric value of the slider.
+ * @property {boolean} disabled - Disable state of the slider input.
+ *
+ * @method Render - Builds the internal markup and wires events.
+ *
+ * @emits None
+ */
 class DeRange extends HTMLElement
 {
   static tname = "de-range";
@@ -15,17 +38,29 @@ class DeRange extends HTMLElement
     this.Render();
   }
 
+  /**
+   * Set the current slider value.
+   * @param {string|number} text
+   */
   set value(text)
   {
     this.input_elem.value = text;
     this.On_Input();
   }
 
+  /**
+   * Get the current numeric slider value.
+   * @returns {number}
+   */
   get value()
   {
     return parseFloat(this.input_elem.value);
   }
 
+  /**
+   * Enable or disable the slider.
+   * @param {boolean} value
+   */
   set disabled(value)
   {
     this.input_elem.disabled = value;

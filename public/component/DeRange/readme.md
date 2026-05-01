@@ -1,58 +1,38 @@
 # DeRange
 
-This component will automatically assign object fields to specified input fields based on the input field "name" attribute.
+A custom range slider component that renders a value display alongside a native `<input type="range">`.
 
 ## Usage
-```JavaScript
-const field_data = 
-{ 
-  name: "Roger Ramjet", 
-  birthday = new Date(1971, 10, 13), 
-  height: 180 
-};
-const result = await dlg.Show_Async(field_data);
-if (data)
-{
-  console.log(data);
-}
-```
-
-```HTML
-<de-dialog-form id="dlg">
-
-  <h1 slot="header">Person Details</h1>
-
-  <label slot="fields">
-    Fullname
-    <input name="name" type="number">
-  </label>
-
-  <label slot="fields">
-    Birthday
-    <input name="birthday" type="date">
-  </label>
-
-  <label slot="fields">
-    Height (m)
-    <input name="height" type="number">
-  </label>
-
-</de-dialog-form>
+```html
+<de-range name="volume" min="0" max="100" step="5" value="50" show-percent="1"></de-range>
 ```
 
 ## Slots
-### header
-### fields
+This component does not expose any custom slots. It renders its own internal markup.
 
 ## Attributes
+- `min` — Minimum slider value. Defaults to `10`.
+- `max` — Maximum slider value. Defaults to `100`.
+- `step` — Slider step increment. Defaults to `10`.
+- `value` — Initial slider value. Defaults to `0`.
+- `name` — Name attribute for the internal `<input>` element.
+- `show-percent` — When present and truthy, displays a `%` suffix on the value and labels.
 
 ## Fields
-### value
+- `value` — Current numeric slider value.
+- `disabled` — Whether the slider input is disabled.
 
 ## Events
-### save
+- None. The component does not emit custom events.
 
 ## Methods
-### Show_Async()
-### Show_Modal()
-### Close()
+- `Render()` — Builds the internal component markup and attaches event handlers.
+
+## Example
+```html
+<de-range id="volumeRange" min="0" max="100" step="1" value="25" show-percent="1"></de-range>
+<script>
+  const range = document.getElementById('volumeRange');
+  console.log(range.value); // 25
+</script>
+```
