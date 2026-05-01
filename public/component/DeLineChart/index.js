@@ -94,6 +94,11 @@ class DeLineChart extends HTMLElement
     this.Render_Chart();
   }
 
+  get items()
+  {
+    return this.data;
+  }
+
   /**
    * Sets the start position of the highlight range as a percentage (0-100).
    * Updates the visual highlight overlay on the chart.
@@ -456,7 +461,7 @@ class DeLineChart extends HTMLElement
    * @returns {Array<SVGCircleElement>} Array of SVG circle elements
    * @private
    */
-  Render_Data_Points(data)
+  Render_Data_Points(key, data)
   {
     const elements = [];
     for (const data_point of data) 
@@ -466,6 +471,7 @@ class DeLineChart extends HTMLElement
       circle.setAttribute("cx", point.x);
       circle.setAttribute("cy", point.y);
       circle.setAttribute("r", "4");
+      circle.setAttribute("data-series", key);
       circle.classList.add("data-point");
       elements.push(circle);
     }
@@ -548,20 +554,8 @@ class DeLineChart extends HTMLElement
         //const title_elem = this.Render_Title();
         //this.svg.appendChild(title_elem);
 
-        this.color = 0;
-        for (const key in this.data)
-        {
-          const line_data = this.data[key];
-
-          const path = this.Render_Line(line_data);
-          this.svg.appendChild(path);
-
-          if (this.hasAttribute("data-points"))
-          {
-            const circles = this.Render_Data_Points(line_data);
-            this.svg.append(...circles);
-          }
-        }
+        //this.color = 0;
+        this.Render_Data();
 
         const xAxis = this.Render_X_Axis();
         this.svg.append(...xAxis);
@@ -574,6 +568,28 @@ class DeLineChart extends HTMLElement
 
         this.mask = this.Render_Input_Mask();
         this.svg.appendChild(this.mask);
+      }
+    }
+  }
+
+  Render_Data()
+  {
+    this.color = 0;
+    for (const key in this.data)
+    {
+      const series_elems = this.svg.querySelectorAll("[data-series='" + key + "']");
+      series_elems.forEach(elem => elem.remove());
+
+      const line_data = this.data[key];
+
+      const path = this.Render_Line(line_data);
+      path.setAttribute("data-series", key);
+      this.svg.appendChild(path);
+
+      if (this.hasAttribute("data-points"))
+      {
+        const circles = this.Render_Data_Points(key, line_data);
+        this.svg.append(...circles);
       }
     }
   }

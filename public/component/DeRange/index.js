@@ -96,7 +96,7 @@ class DeRange extends HTMLElement
     this.input_elem.max = Utils.Get_Attr_Def(this, "max", "100");
     this.input_elem.min = Utils.Get_Attr_Def(this, "min", "10");
     this.input_elem.step = Utils.Get_Attr_Def(this, "step", "10");
-    this.input_elem.name = Utils.Get_Attr_Def(this, "name");
+    //this.input_elem.name = Utils.Get_Attr_Def(this, "name");
     this.value = Utils.Get_Attr_Def(this, "value", "0");
   }
 }
