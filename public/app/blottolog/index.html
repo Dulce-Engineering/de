@@ -23,25 +23,38 @@
 
     const drink_types =
     [
-      {id: 1, name: "Beer", icon: "🍺", alc_vol: 4.8},
-      {id: 2, name: "Wine", icon: "🍷", alc_vol: 13.5},
-      {id: 3, name: "Spirits", icon: "🥃", alc_vol: 40},
-      {id: 4, name: "Cocktail", icon: "🍸", alc_vol: 20},
-      {id: 5, name: "Mystery Drink", icon: "🍹", alc_vol: 5},
+      { id: 1, name: "Beer", icon: "🍺", alc_vol: 4.8 },
+      { id: 2, name: "Wine", icon: "🍷", alc_vol: 13 },
+      { id: 3, name: "Spirits", icon: "🥃", alc_vol: 40 },
+      { id: 4, name: "Cocktail", icon: "🍸", alc_vol: 30 },
+      { id: 5, name: "Mystery Drink", icon: "🍹", alc_vol: 5 },
+      { id: 6, name: "Sparkling", icon: "🥂", alc_vol: 5 },
     ];
     const drink_sizes =
     [
-      {id: 1, name: "Small", ml: 100},
-      {id: 2, name: "Regular", ml: 200},
-      {id: 3, name: "Large", ml: 300},
-      {id: 4, name: "Middy", ml: 285},
-      {id: 5, name: "Schooner", ml: 425},
-      {id: 6, name: "Pint", ml: 568},
-      {id: 7, name: "Half", ml: 100},
-      {id: 8, name: "Single", ml: 200},
-      {id: 9, name: "Double", ml: 300},
-      {id: 10, name: "Short", ml: 300},
-      {id: 11, name: "Tall", ml: 300},
+      { id: 4, name: "Middy", ml: 285, drink_type_id: 1},
+      { id: 5, name: "Schooner", ml: 425, drink_type_id: 1 },
+      { id: 6, name: "Pint", ml: 570, drink_type_id: 1 },
+
+      { id: 1, name: "Small", ml: 100, drink_type_id: 2},
+      { id: 2, name: "Standard", ml: 150, drink_type_id: 2 },
+      { id: 3, name: "Large", ml: 250, drink_type_id: 2 },
+
+      { id: 7, name: "Half", ml: 15, drink_type_id: 3 },
+      { id: 8, name: "Single", ml: 30, drink_type_id: 3 },
+      { id: 9, name: "Double", ml: 60, drink_type_id: 3 },
+
+      { id: 10, name: "Short", ml: 105, drink_type_id: 4 },
+      { id: 12, name: "Standard", ml: 200, drink_type_id: 4 },
+      { id: 11, name: "Tall", ml: 375, drink_type_id: 4 },
+
+      { id: 13, name: "Small", ml: 100, drink_type_id: 5 },
+      { id: 14, name: "Regular", ml: 150, drink_type_id: 5 },
+      { id: 15, name: "Large", ml: 250, drink_type_id: 5 },
+
+      { id: 16, name: "Small", ml: 67.5, drink_type_id: 6 },
+      { id: 17, name: "Regular", ml: 135, drink_type_id: 6 },
+      { id: 18, name: "Large", ml: 192.5, drink_type_id: 6 },
     ];
 
     Main();
@@ -202,6 +215,9 @@
 
       const icon = drink_elem.getAttribute("icon");
       const drink = drink_elem.value;
+
+      const drink_sizes = 
+        drink_sizes.filter(ds => ds.drink_type_id === drink.type_id);
 
       small_drink.setAttribute("icon", icon);
       small_drink.value = drink;
@@ -452,7 +468,7 @@
   </script>
 </head>
 
-<!-- 🧭 🗺️ ⚓ 🏝️ 🍻 🏴‍☠️ ⚔️ 💀 ⛵ 🪙 💰 🍹 🤢 📜 🧜‍♂️ -->
+<!-- 🧭 🗺️ ⚓ 🏝️ 🍻 🏴‍☠️ ⚔️ 💀 ⛵ 🪙 💰 🍹 🤢 📜 🧜‍♂️ 🥂 -->
 <body>
 
   <header>
