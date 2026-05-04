@@ -388,5 +388,11 @@
     "datetime": 1777335186637,
     "id": "c4da8a9f-eab6-4ad9-a617-346882d0848c",
     "query_id": "-entity-framework"
+  },
+  {
+    "count": 39,
+    "datetime": 1777863526966,
+    "id": "030006d4-a35e-4a75-aa99-01dd270ea070",
+    "query_id": "-entity-framework"
   }
 ]

@@ -358,5 +358,11 @@
     "datetime": 1777335317760,
     "id": "661fd2a6-8ed9-4217-b2d3-c96abb64ed56",
     "query_id": "-javascript"
+  },
+  {
+    "count": 721,
+    "datetime": 1777863685651,
+    "id": "7150b264-874c-412f-8f60-76f62f7f918f",
+    "query_id": "-javascript"
   }
 ]

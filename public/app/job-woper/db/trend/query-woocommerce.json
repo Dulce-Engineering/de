@@ -358,5 +358,11 @@
     "datetime": 1777335513217,
     "id": "1be06442-ba5a-4aae-ba32-59bb644df580",
     "query_id": "-woocommerce"
+  },
+  {
+    "count": 28,
+    "datetime": 1777863903685,
+    "id": "41d939c3-a615-4b00-8447-462e1bdb04cc",
+    "query_id": "-woocommerce"
   }
 ]
