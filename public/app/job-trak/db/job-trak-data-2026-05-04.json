@@ -1,0 +1,135 @@
+{
+  "jobs": [
+    {
+      "id": 1,
+      "agency_id": 1,
+      "contact_id": 1,
+      "role_title": "Senior Developer (React)",
+      "role_type": "Contract",
+      "remuneration": 900,
+      "remuneration_unit": "daily",
+      "location": "Sydney",
+      "jd_id": "jd-1.docx",
+      "duration": "12 months",
+      "company": null,
+      "status": "ghosted"
+    },
+    {
+      "id": 2,
+      "agency_id": 1,
+      "contact_id": 1,
+      "role_title": "Senior Developer (.Net)",
+      "role_type": "Contract",
+      "remuneration": 900,
+      "remuneration_unit": "daily",
+      "location": "Sydney",
+      "jd_id": "jd-2.docx",
+      "duration": "12 months",
+      "company": null,
+      "status": "dismissed"
+    },
+    {
+      "id": 3,
+      "agency_id": 2,
+      "contact_id": 2,
+      "role_title": "Senior .Net Developer",
+      "role_type": "Contract",
+      "remuneration": 900,
+      "remuneration_unit": "daily",
+      "location": "Sydney",
+      "jd_id": "jd-3.pdf",
+      "duration": null,
+      "company": "CBA",
+      "status": "rejected"
+    }
+  ],
+  "agencies": [
+    {
+      "id": 1,
+      "name": "Swordfish Search",
+      "url": "https://swordfishsearch.com.au"
+    },
+    {
+      "id": 2,
+      "name": "Synechron Australia",
+      "url": "https://www.synechron.com"
+    }
+  ],
+  "contacts": [
+    {
+      "id": 1,
+      "name": "Chris Gregory",
+      "position": "Director",
+      "phone": "0415808814",
+      "email": "chris@swordfishsearch.com.au",
+      "agency_id": 1
+    },
+    {
+      "id": 2,
+      "name": "Kavita Vijay",
+      "position": "Talent Acquisition Specialist - Global Recruitment",
+      "phone": "+61 0488 857 442",
+      "email": "kavita.vijay@synechron.com",
+      "agency_id": 2
+    },
+    {
+      "name": "Dilip Biswal,",
+      "email": "dilip.biswal@synechron.com",
+      "phone": "",
+      "position": "",
+      "agency_id": 2,
+      "id": 3
+    }
+  ],
+  "action_logs": [
+    {
+      "id": 1,
+      "job_id": 1,
+      "time_str": "2026-04-28",
+      "timestamp": 1777298400000,
+      "note": "received call and jd. yet to apply."
+    },
+    {
+      "id": 2,
+      "job_id": 2,
+      "time_str": "2026-04-28",
+      "timestamp": 1777298400000,
+      "note": "received call and jd. yet to apply."
+    },
+    {
+      "id": 3,
+      "job_id": 1,
+      "time_str": "2026-04-28",
+      "timestamp": 1777376983116,
+      "note": "sent email to agency contact to follow up on the application."
+    },
+    {
+      "id": 4,
+      "job_id": 3,
+      "time_str": "2026-04-29",
+      "timestamp": 1777438541917,
+      "note": "Sent email to agency contact to follow up on the application."
+    },
+    {
+      "id": 5,
+      "job_id": 3,
+      "time_str": "2026-04-29",
+      "timestamp": 1777470482435,
+      "note": "received meeting invite for technical interview @ 4:30pm 30-April-2026"
+    },
+    {
+      "job_id": 3,
+      "time_str": "2026-04-30",
+      "timestamp": 1777549992261,
+      "note": "finished online interview with Dilip Biswal. he asked random vague technical questions. was able to answer many of my questions and he was difficult to understand with no interest in conversation.",
+      "id": 6
+    },
+    {
+      "job_id": 3,
+      "time_str": "2026-05-04",
+      "timestamp": 1777865579632,
+      "note": "ghosted by the agency but syed says the application was rejected.",
+      "id": 7
+    }
+  ]
+}

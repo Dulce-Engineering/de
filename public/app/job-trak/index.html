@@ -1,34 +1,34 @@
 <!doctype html>
 <html lang="en">
 
-  <head>
+<head>
 
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-KMFPTFXKGX"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-KMFPTFXKGX');
-    </script>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-KMFPTFXKGX"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-KMFPTFXKGX');
+  </script>
 
-    <link rel="manifest" href="/app/job-trak/manifest.json">
-    <title>Job Tracker</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="keywords" content="">
-    <meta name="author" content="Dulce Engineering Pty. Ltd.">
-    <meta name="robots" content="index, follow"> 
-    <meta property="og:title" content="Job Tracker">
-    <meta property="og:description" content="">
-    <meta property="og:image" content="https://dulceeng.com.au/app/job-trak/image/screenshot-landscape.png">
-    <meta property="og:url" content="https://dulceeng.com.au/app/job-trak">
-    <meta property="og:type" content="website">
-    <link rel="shortcut icon" href="./image/favicon.ico">
-    <link rel="stylesheet" href="styles.css">
+  <link rel="manifest" href="/app/job-trak/manifest.json">
+  <title>Job Tracker</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+  <meta name="author" content="Dulce Engineering Pty. Ltd.">
+  <meta name="robots" content="index, follow">
+  <meta property="og:title" content="Job Tracker">
+  <meta property="og:description" content="">
+  <meta property="og:image" content="https://dulceeng.com.au/app/job-trak/image/screenshot-landscape.png">
+  <meta property="og:url" content="https://dulceeng.com.au/app/job-trak">
+  <meta property="og:type" content="website">
+  <link rel="shortcut icon" href="./image/favicon.ico">
+  <link rel="stylesheet" href="styles.css">
 
-    <script type="application/ld+json">
+  <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "Website",
@@ -39,465 +39,721 @@
     }
     </script>
 
-    <script type="module">
-      import Utils from "../../lib/Utils.js";
-      import "../../component/DeInputList/index3.js";
-      import "../../component/DeDialogForm/index.js";
+  <script type="module">
+    import { pipeline } from 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@4.2.0';    import Utils from "../../lib/Utils.js";
+    import "../../component/DeInputList/index3.js";
+    import "../../component/DeDialogForm/index.js";
 
-      Main();
-      async function Main()
+    /*
+      agencies
+        id: int
+        name: string
+        url: string
+
+      contacts
+        id: int
+        agency_id: int
+        email: string
+        name: string
+        phone: string
+        position: string
+
+      jobs
+        agency_id: int
+        company
+        contact_id: int
+        duration: string
+        jd_id: string
+        location: string
+        remuneration: float
+        remuniration_unit: string
+        role_title: string
+        role_type: string
+        status: string
+        source: string
+    */
+    const job_status =
+      [
+        { id: "bookmarked", label: "Bookmarked", type: 0 },
+        { id: "applying", label: "Applying", type: 0 },
+        { id: "applied", label: "Applied", type: 0 },
+        { id: "screening", label: "Screening", type: 0 },
+        { id: "interviewing", label: "Interviewing", type: 0 },
+        { id: "negotiating", label: "Negotiating", type: 0 },
+        { id: "offered", label: "Offered", type: 0 },
+        { id: "accepted", label: "Accepted", type: 0 },
+        { id: "rejected", label: "Rejected", type: 1 },
+        { id: "withdrawn", label: "Withdrawn", type: 1 },
+        { id: "ghosted", label: "Ghosted", type: 1 },
+        { id: "dismissed", label: "Not interested", type: 1 },
+      ];
+
+    Main();
+    async function Main()
+    {
+      if ("serviceWorker" in navigator) 
       {
-        if ("serviceWorker" in navigator) 
+        //await navigator.serviceWorker.register("./lib/service-worker.js");
+      }
+
+      const db = await Open_DB();
+
+      Set_Options(note_status_select, job_status, "id", "label");
+      Set_Options(job_status_select, job_status, "id", "label");
+
+      import_btn.onclick = On_Click_Import_Btn;
+      export_btn.onclick = () => On_Click_Export_Btn(db);
+      jobs_btn.onclick = () => Toggle_View(jobs_list);
+      contacts_btn.onclick = () => Toggle_View(contacts_list);
+      add_job_btn.onclick = () => On_Click_Add_Job(db);
+      ai_add_job_btn.onclick = () => On_Click_AI_Add_Job(db);
+      add_contact_btn.onclick = () => On_Click_Add_Contact(db);
+      jobs_list.addEventListener("render", e => On_Render_Job_Item(e, db));
+      contacts_list.addEventListener("render", e => On_Render_Contact_Item(e, db));
+
+      Render_Job_Items(db);
+      Render_Contacts(db);
+    }
+
+    // events =========================================================================
+
+    function Toggle_View(view_elem)
+    {
+      jobs_list.classList.add("hidden");
+      contacts_list.classList.add("hidden");
+      view_elem.classList.remove("hidden");
+    }
+
+    async function On_Click_Import_Btn(db)
+    {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.json';
+
+      input.onchange = async (e) => 
+      {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        try 
         {
-          //await navigator.serviceWorker.register("./lib/service-worker.js");
+          const text = await file.text();
+          const db_data = JSON.parse(text);
+          await Clear_DB(db);
+          await Save_To_IndexedDB(db, db_data);
+          Render_Job_Items(db);
+          alert("Data imported from " + file.name + " to IndexedDB instance.");
         }
-
-        const db = await Open_DB();
-
-        import_btn.onclick = On_Click_Import_Btn;
-        export_btn.onclick = () => On_Click_Export_Btn(db);
-        jobs_btn.onclick = () => Toggle_View(jobs_list);
-        contacts_btn.onclick = () => Toggle_View(contacts_list);
-        add_contact_btn.onclick = () => On_Click_Add_Contact(db);
-        jobs_list.addEventListener("render", e => On_Render_Job_Item(e, db));
-        contacts_list.addEventListener("render", e => On_Render_Contact_Item(e, db));
-
-        Render_Job_Items(db);
-        Render_Contacts(db);
-      }
-
-      // events =========================================================================
-
-      function Toggle_View(view_elem)
-      {
-        jobs_list.classList.add("hidden");
-        contacts_list.classList.add("hidden");
-        view_elem.classList.remove("hidden");
-      }
-
-      async function On_Click_Import_Btn(db)
-      {
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = '.json';
-
-        input.onchange = async (e) => 
+        catch (err)
         {
-          const file = e.target.files[0];
-          if (!file) return;
+          alert("Failed to import: Please select a valid JSON database file.");
+        }
+      };
 
-          try 
-          {
-            const text = await file.text();
-            const db_data = JSON.parse(text);
-            await Clear_DB(db);
-            await Save_To_IndexedDB(db, db_data);
-            Render_Job_Items(db);
-            alert("Data imported from " + file.name + " to IndexedDB instance.");
-          }
-          catch (err)
-          {
-            alert("Failed to import: Please select a valid JSON database file.");
-          }
+      input.click();
+    }
+
+    async function On_Click_Export_Btn(db)
+    {
+      const jobs = await Get_Req_Res(Get_Table(db, "jobs").getAll());
+      const agencies = await Get_Req_Res(Get_Table(db, "agencies").getAll());
+      const contacts = await Get_Req_Res(Get_Table(db, "contacts").getAll());
+      const action_logs = await Get_Req_Res(Get_Table(db, "action_logs").getAll());
+
+      const db_data = {
+        jobs: jobs || [],
+        agencies: agencies || [],
+        contacts: contacts || [],
+        action_logs: action_logs || []
+      };
+
+      const json_string = JSON.stringify(db_data, null, 2);
+      const blob = new Blob([json_string], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `job-trak-data-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      alert("Data exported successfully!");
+    }
+
+    async function On_Click_Add_Note(e, job_id, db)
+    {
+      const form_data = await note_dialog.Show_Async();
+      if (!Utils.Is_Empty(form_data?.note))
+      {
+        const now = new Date();
+        const action =
+        {
+          job_id,
+          time_str: now.toISOString().split('T')[0],
+          timestamp: now.getTime(),
+          note: form_data.note
+        };
+        await Insert(db, "action_logs", action);
+      }
+
+      if (!Utils.Is_Empty(form_data?.status))
+      {
+        await Update(db, "jobs", { id: job_id, status: form_data.status });
+      }
+
+      await Render_Job_Items(db);
+    }
+
+    async function On_Click_Add_Job(db)
+    {
+      const agencies = await Get_Req_Res(Get_Table(db, "agencies").getAll());
+      const contacts = await Get_Req_Res(Get_Table(db, "contacts").getAll());
+      Set_Options(job_agency_select, agencies, "id", "name");
+      Set_Options(job_contact_select, contacts, "id", "name");
+
+      const form_data = await job_dialog.Show_Async();
+      if (form_data)
+      {
+        const job =
+        {
+          role_title: form_data.role_title?.trim() || null,
+          role_type: form_data.role_type?.trim() || null,
+          location: form_data.location?.trim() || null,
+          remuneration: parseFloat(form_data.remuneration) || null,
+          remuneration_unit: form_data.remuneration_unit?.trim() || null,
+          agency_id: parseInt(form_data.agency_id) || null,
+          contact_id: parseInt(form_data.contact_id) || null,
+          status: form_data.status || "bookmarked"
         };
 
-        input.click();
+        await Insert(db, "jobs", job);
+        await Render_Job_Items(db);
       }
+    }
 
-      async function On_Click_Export_Btn(db)
+    async function On_Click_AI_Add_Job(db)
+    {
+      const form_data = await email_dialog.Show_Async();
+      if (form_data?.email_text)
       {
-        const jobs = await Get_Req_Res(Get_Table(db, "jobs").getAll());
-        const agencies = await Get_Req_Res(Get_Table(db, "agencies").getAll());
-        const contacts = await Get_Req_Res(Get_Table(db, "contacts").getAll());
-        const action_logs = await Get_Req_Res(Get_Table(db, "action_logs").getAll());
+        const agency_data = await Extract_Agency_From_Email(form_data.email_text);
+        console.info(agency_data);
 
-        const db_data = {
-          jobs: jobs || [],
-          agencies: agencies || [],
-          contacts: contacts || [],
-          action_logs: action_logs || []
-        };
-
-        const json_string = JSON.stringify(db_data, null, 2);
-        const blob = new Blob([json_string], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `job-trak-data-${new Date().toISOString().split('T')[0]}.json`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-
-        alert("Data exported successfully!");
-      }
-
-      async function On_Click_Add_Note(e, job_id, db)
-      {
-        const form_data = await note_dialog.Show_Async();
-        if (form_data)
+        // Create agency if extracted
+        /*let agency_id = null;
+        if (agency_data.name)
         {
-          const now = new Date();
-          const action =
+          const agencies = await Get_Req_Res(Get_Table(db, "agencies").getAll());
+          let agency = agencies.find(a => a.name.toLowerCase() === agency_data.name.toLowerCase());
+          if (!agency)
           {
-            job_id,
-            time_str: now.toISOString().split('T')[0],
-            timestamp: now.getTime(),
-            note: form_data.note
-          };
-          await Insert(db, "action_logs", action);
-          
-          await Update(db, "jobs", { id: job_id, status: form_data.status });
-
-          await Render_Job_Items(db);
-        }
-      }
-
-      async function On_Click_Add_Contact(db)
-      {
-        const agencies = await Get_Req_Res(Get_Table(db, "agencies").getAll());
-        Set_Options(contact_agency_select, agencies, "id", "name");
-
-        const form_data = await contact_dialog.Show_Async();
-        if (form_data)
-        {
-          const contact = 
+            agency = { name: agency_data.name };
+            await Insert(db, "agencies", agency);
+            agency_id = agency.id;
+          }
+          else
           {
-            name: form_data.name?.trim() || null,
-            email: form_data.email?.trim() || null,
-            phone: form_data.phone?.trim() || null,
-            position: form_data.position?.trim() || null,
-            agency_id: parseInt(form_data.agency_id) || null,
-          };
+            agency_id = agency.id;
+          }
+        }*/
 
-          await Insert(db, "contacts", contact);
-          await Render_Contacts(db);
-        }
-      }
-
-      // db =============================================================================
-
-      async function Clear_DB(db)
-      {
-        const storeNames = ["jobs", "agencies", "contacts", "action_logs"];
-        const tx = db.transaction(storeNames, "readwrite");
-        
-        for (const storeName of storeNames) 
+        // Create contact if extracted
+        /*let contact_id = null;
+        if (extracted_data.contact_name || extracted_data.contact_email)
         {
-          tx.objectStore(storeName).clear();
-        }
-
-        return new Promise((resolve) => tx.oncomplete = resolve);
-      }
-
-      async function Open_DB()
-      {
-        const promise = new Promise(On_Process);
-        function On_Process(resolve, reject)
-        {
-          const request = indexedDB.open("JobTrakDB", 1);
-          request.onupgradeneeded = (event) => 
+          const contacts = await Get_Req_Res(Get_Table(db, "contacts").getAll());
+          let contact = contacts.find(c =>
+            (extracted_data.contact_email && c.email === extracted_data.contact_email) ||
+            (extracted_data.contact_name && c.name === extracted_data.contact_name)
+          );
+          if (!contact)
           {
-            const db = event.target.result;
-            if (!db.objectStoreNames.contains("jobs")) db.createObjectStore("jobs", { keyPath: "id" });
-            if (!db.objectStoreNames.contains("agencies")) db.createObjectStore("agencies", { keyPath: "id" });
-            if (!db.objectStoreNames.contains("contacts")) db.createObjectStore("contacts", { keyPath: "id" });
-            if (!db.objectStoreNames.contains("action_logs")) db.createObjectStore("action_logs", { keyPath: "id" });
-          };
-          request.onsuccess = () => resolve(request.result);
-          request.onerror = () => reject(request.error);
-        }
-
-        return promise;
-      }
-
-      async function Save_To_IndexedDB(db, db_data)
-      {
-        await Insert_Items(db, "jobs", db_data.jobs);
-        await Insert_Items(db, "agencies", db_data.agencies);
-        await Insert_Items(db, "contacts", db_data.contacts);
-        await Insert_Items(db, "action_logs", db_data.action_logs);
-      }
-
-      function Get_Req_Res(request)
-      {
-        const res_promise = new Promise((resolve, reject) =>
-        {
-          request.onsuccess = () => resolve(request.result || null);
-          request.onerror = () => On_Db_Error(request, reject);
-        });
-
-        return res_promise;
-      }
-
-      function On_Db_Error(request, reject_fn)
-      {
-        console.error("IndexedDB error:", request.error);
-        reject_fn(request.error);
-      }
-
-      function Get_Table(db, table_name, is_readonly = true)
-      {
-        const tx = db.transaction([table_name], is_readonly ? "readonly" : "readwrite");
-        const store = tx.objectStore(table_name);
-        return store;
-      }
-
-      async function Next_Id(db, table)
-      {
-        const data = await Get_Req_Res(table.getAll());
-        const nextId = (data || []).reduce
-          ((max, action) => Math.max(max, action.id || 0), 0) + 1;
-        return nextId;
-      }
-
-      function Select_By_Id(db, table_name, id)
-      {
-        const table = Get_Table(db, table_name);
-        const request = table.get(id);
-        return Get_Req_Res(request);
-      }
-
-      function Insert(db, table_name, item)
-      {
-        return Insert_Items(db, table_name, [item]);
-      }
-
-      async function Insert_Items(db, table_name, items)
-      {
-        if (items && items.length > 0)
-        {
-          const table = Get_Table(db, table_name, false);
-          for (const item of items)
+            contact = {
+              name: extracted_data.contact_name || null,
+              email: extracted_data.contact_email || null,
+              phone: extracted_data.contact_phone || null,
+              position: extracted_data.contact_position || null,
+              agency_id: agency_id
+            };
+            await Insert(db, "contacts", contact);
+            contact_id = contact.id;
+          }
+          else
           {
-            if (item)
-            {
-              if (item.id == null || item.id == undefined)
-                item.id = await Next_Id(db, table);
-              const request = table.add(item);
-              await Get_Req_Res(request);
-            }
+            contact_id = contact.id;
           }
         }
+
+        // Create job
+        const job = {
+          role_title: extracted_data.role_title || null,
+          role_type: extracted_data.role_type || null,
+          location: extracted_data.location || null,
+          remuneration: extracted_data.remuneration ? parseFloat(extracted_data.remuneration) : null,
+          remuneration_unit: extracted_data.remuneration_unit || null,
+          agency_id: agency_id,
+          contact_id: contact_id,
+          status: "bookmarked"
+        };
+
+        await Insert(db, "jobs", job);
+        await Render_Job_Items(db);*/
+        alert("Job extracted and added successfully!");
+      }
+    }
+
+    async function On_Click_Edit_Job(event, job_id, db)
+    {
+      const agencies = await Get_Req_Res(Get_Table(db, "agencies").getAll());
+      const contacts = await Get_Req_Res(Get_Table(db, "contacts").getAll());
+      Set_Options(job_agency_select, agencies, "id", "name");
+      Set_Options(job_contact_select, contacts, "id", "name");
+      const curr_job = await Select_By_Id(db, "jobs", job_id);
+
+      const form_data = await job_dialog.Show_Async(curr_job);
+      if (form_data)
+      {
+        const job =
+        {
+          id: job_id,
+          role_title: form_data.role_title?.trim() || null,
+          role_type: form_data.role_type?.trim() || null,
+          location: form_data.location?.trim() || null,
+          remuneration: parseFloat(form_data.remuneration) || null,
+          remuneration_unit: form_data.remuneration_unit?.trim() || null,
+          agency_id: parseInt(form_data.agency_id) || null,
+          contact_id: parseInt(form_data.contact_id) || null,
+          status: form_data.status || null
+        };
+
+        await Update(db, "jobs", job);
+        await Render_Job_Items(db);
+      }
+    }
+
+    async function On_Click_Add_Contact(db)
+    {
+      const agencies = await Get_Req_Res(Get_Table(db, "agencies").getAll());
+      Set_Options(contact_agency_select, agencies, "id", "name");
+
+      const form_data = await contact_dialog.Show_Async();
+      if (form_data)
+      {
+        const contact =
+        {
+          name: form_data.name?.trim() || null,
+          email: form_data.email?.trim() || null,
+          phone: form_data.phone?.trim() || null,
+          position: form_data.position?.trim() || null,
+          agency_id: parseInt(form_data.agency_id) || null,
+        };
+
+        await Insert(db, "contacts", contact);
+        await Render_Contacts(db);
+      }
+    }
+
+    // db =============================================================================
+
+    async function Clear_DB(db)
+    {
+      const storeNames = ["jobs", "agencies", "contacts", "action_logs"];
+      const tx = db.transaction(storeNames, "readwrite");
+
+      for (const storeName of storeNames) 
+      {
+        tx.objectStore(storeName).clear();
       }
 
-      async function Update(db, table_name, new_item)
-      {
-        let res = null;
+      return new Promise((resolve) => tx.oncomplete = resolve);
+    }
 
+    async function Open_DB()
+    {
+      const promise = new Promise(On_Process);
+      function On_Process(resolve, reject)
+      {
+        const request = indexedDB.open("JobTrakDB", 1);
+        request.onupgradeneeded = (event) => 
+        {
+          const db = event.target.result;
+          if (!db.objectStoreNames.contains("jobs")) db.createObjectStore("jobs", { keyPath: "id" });
+          if (!db.objectStoreNames.contains("agencies")) db.createObjectStore("agencies", { keyPath: "id" });
+          if (!db.objectStoreNames.contains("contacts")) db.createObjectStore("contacts", { keyPath: "id" });
+          if (!db.objectStoreNames.contains("action_logs")) db.createObjectStore("action_logs", { keyPath: "id" });
+        };
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      }
+
+      return promise;
+    }
+
+    async function Save_To_IndexedDB(db, db_data)
+    {
+      await Insert_Items(db, "jobs", db_data.jobs);
+      await Insert_Items(db, "agencies", db_data.agencies);
+      await Insert_Items(db, "contacts", db_data.contacts);
+      await Insert_Items(db, "action_logs", db_data.action_logs);
+    }
+
+    function Get_Req_Res(request)
+    {
+      const res_promise = new Promise((resolve, reject) =>
+      {
+        request.onsuccess = () => resolve(request.result || null);
+        request.onerror = () => On_Db_Error(request, reject);
+      });
+
+      return res_promise;
+    }
+
+    function On_Db_Error(request, reject_fn)
+    {
+      console.error("IndexedDB error:", request.error);
+      reject_fn(request.error);
+    }
+
+    function Get_Table(db, table_name, is_readonly = true)
+    {
+      const tx = db.transaction([table_name], is_readonly ? "readonly" : "readwrite");
+      const store = tx.objectStore(table_name);
+      return store;
+    }
+
+    async function Next_Id(db, table)
+    {
+      const data = await Get_Req_Res(table.getAll());
+      const nextId = (data || []).reduce
+        ((max, action) => Math.max(max, action.id || 0), 0) + 1;
+      return nextId;
+    }
+
+    function Select_By_Id(db, table_name, id)
+    {
+      const table = Get_Table(db, table_name);
+      const request = table.get(id);
+      return Get_Req_Res(request);
+    }
+
+    function Insert(db, table_name, item)
+    {
+      return Insert_Items(db, table_name, [item]);
+    }
+
+    async function Insert_Items(db, table_name, items)
+    {
+      if (items && items.length > 0)
+      {
         const table = Get_Table(db, table_name, false);
-        const existing_item = await Get_Req_Res(table.get(new_item.id));
-        if (existing_item)
+        for (const item of items)
         {
-          const combined_item = { ...existing_item, ...new_item };
-          const request = table.put(combined_item);
-          res = Get_Req_Res(request);
+          if (item)
+          {
+            if (item.id == null || item.id == undefined)
+              item.id = await Next_Id(db, table);
+            const request = table.add(item);
+            await Get_Req_Res(request);
+          }
         }
+      }
+    }
 
-        return res;
+    async function Update(db, table_name, new_item)
+    {
+      let res = null;
+
+      const table = Get_Table(db, table_name, false);
+      const existing_item = await Get_Req_Res(table.get(new_item.id));
+      if (existing_item)
+      {
+        const combined_item = { ...existing_item, ...new_item };
+        const request = table.put(combined_item);
+        res = Get_Req_Res(request);
       }
 
-      // business logic =================================================================
+      return res;
+    }
 
-      // rendering ======================================================================
+    // business logic =================================================================
 
-      function Set_Options(select_elem, items, value_field, text_field)
+    let pipe = null;
+
+    async function Extract_Agency_From_Email(email_text)
+    {
+      if (!pipe)
       {
-        select_elem.innerHTML = '<option value="">None</option>';
-        (items || []).forEach(item =>
-        {
-          const option = document.createElement("option");
-          option.value = item[value_field];
-          option.textContent = item[text_field];
-          select_elem.appendChild(option);
+        // We use a small, instruction-tuned model (e.g., Gemma 2B)
+        pipe = await pipeline('text2text-generation', 'google/gemma-2b-it', {
+          device: 'webgpu', // Use WebGPU for 2026-era performance
         });
       }
 
-      async function Render_Job_Items(db)
-      {
-        const jobs = await Get_Req_Res(Get_Table(db, "jobs").getAll());
-        const agencies = await Get_Req_Res(Get_Table(db, "agencies").getAll());
-        const contacts = await Get_Req_Res(Get_Table(db, "contacts").getAll());
-        const actionLogs = await Get_Req_Res(Get_Table(db, "action_logs").getAll());
+      const prompt = `
+        The following text comes from an email from a sender that is most likely
+        a recruiter working for a recruitment agency.
+        Extract agency company details from the text and 
+        return ONLY a JSON object with the following fields:
+        agency fields: name, url.
+        Text: "${email_text}"
+      `;
 
-        // Map the IDs to names by looking up values in the related datasets
-        const enrichedJobs = (jobs || []).map(job => ({
+      const output = await pipe(prompt, {
+        max_new_tokens: 128,
+        temperature: 0, // Keep it deterministic for JSON
+      });
+
+      const jsonString = output[0].generated_text.match(/\{.*\}/s)[0];
+      return JSON.parse(jsonString);
+    }
+
+    // rendering ======================================================================
+
+    function Set_Options(select_elem, items, value_field, text_field)
+    {
+      select_elem.innerHTML = '<option value="">None</option>';
+      (items || []).forEach(item =>
+      {
+        const option = document.createElement("option");
+        option.value = item[value_field];
+        option.textContent = item[text_field];
+        select_elem.appendChild(option);
+      });
+    }
+
+    async function Render_Job_Items(db)
+    {
+      const jobs = await Get_Req_Res(Get_Table(db, "jobs").getAll()) || [];
+      const agencies = await Get_Req_Res(Get_Table(db, "agencies").getAll());
+      const contacts = await Get_Req_Res(Get_Table(db, "contacts").getAll());
+      const actionLogs = await Get_Req_Res(Get_Table(db, "action_logs").getAll());
+
+      const enrichedJobs = jobs.map(Add_Details);
+      enrichedJobs.sort((a, b) => a.status_type - b.status_type);
+
+      function Add_Details(job) 
+      {
+        const status_type = job_status.find(s => s.id === job.status)?.type;
+        const latestLog = actionLogs
+          .filter(log => log.job_id === job.id)
+          .sort((a, b) => b.timestamp - a.timestamp || b.id - a.id)[0];
+        const agency_name = agencies?.find(a => a.id === job.agency_id)?.name || "N/A";
+        const contact_name = contacts?.find(c => c.id === job.contact_id)?.name || "N/A";
+        const latest_note = latestLog?.note || "No notes available.";
+        const latest_note_time_formatted = latestLog ? new Date(latestLog.timestamp).toLocaleString() : "";
+
+        return {
           ...job,
-          agency_name: agencies?.find(a => a.id === job.agency_id)?.name || "N/A",
-          contact_name: contacts?.find(c => c.id === job.contact_id)?.name || "N/A"
-        }));
-
-        // Enrich jobs with the latest action log note and its formatted time
-        enrichedJobs.forEach(Add_Latest_Note);
-        function Add_Latest_Note(job) 
-        {
-          const latestLog = (actionLogs || []).filter(log => log.job_id === job.id).sort((a, b) => b.timestamp - a.timestamp || b.id - a.id)[0];
-          job.latest_note = latestLog?.note || "No notes available.";
-          job.latest_note_time_formatted = latestLog ? new Date(latestLog.timestamp).toLocaleString() : "";
-        }
-
-        jobs_list.value = enrichedJobs;
+          status_type,
+          agency_name,
+          contact_name,
+          latest_note,
+          latest_note_time_formatted
+        };
       }
 
-      function On_Render_Job_Item(event, db)
-      {
-        const itemElem = event.target;
-        const job = itemElem.item_obj;
+      jobs_list.value = enrichedJobs;
+    }
 
-        itemElem.role_title_elem.textContent = job.role_title;
-        itemElem.role_type_elem.textContent = job.role_type;
-        itemElem.location_elem.textContent = job.location;
-        itemElem.remuneration_elem.textContent = job.remuneration;
-        itemElem.remuneration_unit_elem.textContent = job.remuneration_unit;
-        itemElem.agency_name_elem.textContent = job.agency_name;
-        itemElem.contact_name_elem.textContent = job.contact_name;
-        itemElem.latest_note_elem.textContent = job.latest_note;
-        itemElem.latest_note_time_elem.textContent = job.latest_note_time_formatted;
-        itemElem.add_note_btn.onclick = e => On_Click_Add_Note(e, job.id, db);
-      }
+    function On_Render_Job_Item(event, db)
+    {
+      const item_elem = event.target;
+      const job = item_elem.item_obj;
 
-      async function Render_Contacts(db)
-      {
-        const contacts = await Get_Req_Res(Get_Table(db, "contacts").getAll());
-        const agencies = await Get_Req_Res(Get_Table(db, "agencies").getAll());
+      item_elem.role_title_elem.textContent = job.role_title;
+      item_elem.role_type_elem.textContent = job.role_type;
+      item_elem.location_elem.textContent = job.location;
+      item_elem.remuneration_elem.textContent = job.remuneration;
+      item_elem.remuneration_unit_elem.textContent = job.remuneration_unit;
+      item_elem.agency_name_elem.textContent = job.agency_name;
+      item_elem.contact_name_elem.textContent = job.contact_name;
+      item_elem.latest_note_elem.textContent = job.latest_note;
+      item_elem.latest_note_time_elem.textContent = job.latest_note_time_formatted;
+      item_elem.add_note_btn.onclick = e => On_Click_Add_Note(e, job.id, db);
+      item_elem.edit_job_btn.onclick = e => On_Click_Edit_Job(e, job.id, db);
+      //item_elem.del_job_btn.onclick = e => On_Click_Delete_Job(e, job.id, db);
 
-        const enrichedContacts = (contacts || []).map(contact => ({
-          ...contact,
-          agency_name: agencies?.find(a => a.id === contact.agency_id)?.name || "N/A"
-        }));
+      if (job.status_type == 0 || job.status_type == undefined)
+        item_elem.classList.remove("failed");
+      else
+        item_elem.classList.add("failed");
+    }
 
-        contacts_list.value = enrichedContacts;
-      }
+    async function Render_Contacts(db)
+    {
+      const contacts = await Get_Req_Res(Get_Table(db, "contacts").getAll());
+      const agencies = await Get_Req_Res(Get_Table(db, "agencies").getAll());
 
-      function On_Render_Contact_Item(event, db)
-      {
-        const itemElem = event.target;
-        const contact = itemElem.item_obj;
+      const enrichedContacts = (contacts || []).map(contact => ({
+        ...contact,
+        agency_name: agencies?.find(a => a.id === contact.agency_id)?.name || "N/A"
+      }));
 
-        itemElem.contact_name_elem.textContent = contact.name || "";
-        itemElem.contact_phone_elem.textContent = contact.phone || "N/A";
-        itemElem.contact_email_elem.textContent = contact.email || "N/A";
-        itemElem.contact_agency_elem.textContent = contact.agency_name || "N/A";
-        itemElem.contact_position_elem.textContent = contact.position || "N/A";
-      }
+      contacts_list.value = enrichedContacts;
+    }
 
-    </script>
+    function On_Render_Contact_Item(event, db)
+    {
+      const itemElem = event.target;
+      const contact = itemElem.item_obj;
 
-  </head>
+      itemElem.contact_name_elem.textContent = contact.name || "";
+      itemElem.contact_phone_elem.textContent = contact.phone || "N/A";
+      itemElem.contact_email_elem.textContent = contact.email || "N/A";
+      itemElem.contact_agency_elem.textContent = contact.agency_name || "N/A";
+      itemElem.contact_position_elem.textContent = contact.position || "N/A";
+    }
 
-  <body>
+  </script>
 
-    <header>
-      <h1><span>Job Tracker</span></h1>
-      <nav>
-        <button id="import_btn" class="img">
-          <img src="image/upload.svg" alt="Upload">          
+</head>
+
+<body>
+
+  <header>
+    <h1><span>Job Tracker</span></h1>
+    <nav>
+      <button id="import_btn" class="img">
+        <img src="image/upload.svg" alt="Upload">
+      </button>
+      <button id="export_btn" class="img">
+        <img src="image/download.svg" alt="Download">
+      </button>
+      <button id="jobs_btn" class="img">
+        <img src="image/paid.svg" alt="Jobs">
+      </button>
+      <button id="companies_btn" class="img">
+        <img src="image/factory.svg" alt="Companies">
+      </button>
+      <button id="contacts_btn" class="img">
+        <img src="image/contacts.svg" alt="Contacts">
+      </button>
+    </nav>
+  </header>
+
+  <main id="items">
+
+    <de-input-list id="jobs_list">
+      <header slot="header">
+        <button id="add_job_btn" class="img">
+          <img src="image/add.svg" title="Add Job">
         </button>
-        <button id="export_btn" class="img">
-          <img src="image/download.svg" alt="Download">
+        <button id="ai_add_job_btn" class="img">
+          <img src="image/robot.svg" title="AI Add Job">
         </button>
-        <button id="jobs_btn" class="img">
-          <img src="image/paid.svg" alt="Jobs">
-        </button>
-        <button id="companies_btn" class="img">
-          <img src="image/factory.svg" alt="Companies">
-        </button>
-        <button id="contacts_btn" class="img">
-          <img src="image/contacts.svg" alt="Contacts">
-        </button>
-      </nav>
-    </header>
-
-    <main id="items">
-
-      <de-input-list id="jobs_list">
-        <details slot="item" class="job-item">
-          <summary>
-            <b cid="role_title_elem"></b>
-            <div>
-              <span cid="contact_name_elem"></span> @ 
-              <span cid="agency_name_elem"></span>
-            </div>
+      </header>
+      <details slot="item" class="job-item">
+        <summary>
+          <b cid="role_title_elem"></b>
+          <div>
+            <span cid="contact_name_elem"></span> @
+            <span cid="agency_name_elem"></span>
+          </div>
+          <div class="float">
             <button cid="add_note_btn" class="img">
               <img src="image/note-add.svg" alt="Add Note">
             </button>
-          </summary>
-          <p>
-            <span cid="role_type_elem"></span> - <span cid="location_elem"></span>
-          </p>
-          <p>Remuneration: 
-            <span cid="remuneration_elem"></span> 
-            <span cid="remuneration_unit_elem"></span>
-          </p>
-          <p>Latest Note (<span cid="latest_note_time_elem"></span>): <br>
-            <i cid="latest_note_elem"></i> 
-          </p>
-        </details>
-      </de-input-list>
+            <button cid="edit_job_btn" class="img">
+              <img src="image/edit.svg" alt="" title="Edit Job">
+            </button>
+            <button cid="del_job_btn" class="img">
+              <img src="image/delete.svg" alt="" title="Delete Job">
+            </button>
+          </div>
+        </summary>
+        <p>
+          <span cid="role_type_elem"></span> - <span cid="location_elem"></span>
+        </p>
+        <p>Remuneration:
+          <span cid="remuneration_elem"></span>
+          <span cid="remuneration_unit_elem"></span>
+        </p>
+        <p>Latest Note (<span cid="latest_note_time_elem"></span>): <br>
+          <i cid="latest_note_elem"></i>
+        </p>
+      </details>
+    </de-input-list>
 
-      <de-input-list id="contacts_list" class="hidden">
-        <header slot="header">
-          <button id="add_contact_btn" class="img">
-            <img src="image/add.svg" alt="Add Contact">
-          </button>
-        </header>
-        <details slot="item" class="contact-item">
-          <summary>
-            <b cid="contact_name_elem"></b>
-            <div>
-              <span cid="contact_agency_elem"></span>
-            </div>
-          </summary>
-          <p>Email: <span cid="contact_email_elem"></span></p>
-          <p>Phone: <span cid="contact_phone_elem"></span></p>
-          <p>Position: <span cid="contact_position_elem"></span></p>
-        </details>
-      </de-input-list>
+    <de-input-list id="contacts_list" class="hidden">
+      <header slot="header">
+        <button id="add_contact_btn" class="img">
+          <img src="image/add.svg" alt="Add Contact">
+        </button>
+      </header>
+      <details slot="item" class="contact-item">
+        <summary>
+          <b cid="contact_name_elem"></b>
+          <div>
+            <span cid="contact_agency_elem"></span>
+          </div>
+        </summary>
+        <p>Email: <span cid="contact_email_elem"></span></p>
+        <p>Phone: <span cid="contact_phone_elem"></span></p>
+        <p>Position: <span cid="contact_position_elem"></span></p>
+      </details>
+    </de-input-list>
 
-    </main>
+  </main>
 
-    <main id="docs">
-    </main>
+  <main id="docs">
+  </main>
 
-    <footer>
-      © Copyright Dulce Engineering 2025. All rights reserved. v1
-    </footer>
+  <footer>
+    © Copyright Dulce Engineering 2025. All rights reserved. v1
+  </footer>
 
-    <de-dialog-form id="note_dialog">
-      <h1 slot="header">Add Job Note</h1>
-      <label slot="fields">Note</label>
-      <textarea slot="fields" name="note" placeholder="Enter your note here..." rows="5"></textarea>
-      <label slot="fields">Status</label>
-      <select slot="fields" name="status">
-        <option value="bookmarked">Bookmarked</option>
-        <option value="applying">Applying</option>
-        <option value="applied">Applied</option>
-        <option value="screening">Screening</option>
-        <option value="interviewing">Interviewing</option>
-        <option value="negotiating">Negotiating</option>
-        <option value="offered">Offered</option>
-        <option value="accepted">Accepted</option>
-        <option value="rejected">Rejected</option>
-        <option value="withdrawn">Withdrawn</option>
-        <option value="ghosted">Ghosted</option>
-      </select>
-    </de-dialog-form>
+  <de-dialog-form id="job_dialog">
+    <h1 slot="header">Add Job</h1>
+    <label slot="fields">Role Title</label>
+    <input slot="fields" type="text" name="role_title" placeholder="Job title">
+    <label slot="fields">Role Type</label>
+    <input slot="fields" type="text" name="role_type" placeholder="e.g., Full-time, Contract">
+    <label slot="fields">Location</label>
+    <input slot="fields" type="text" name="location" placeholder="Job location">
+    <label slot="fields">Remuneration</label>
+    <input slot="fields" type="number" name="remuneration" placeholder="Salary/rate" step="0.01">
+    <label slot="fields">Remuneration Unit</label>
+    <input slot="fields" type="text" name="remuneration_unit" placeholder="e.g., AUD/year, $/hour">
+    <label slot="fields">Agency</label>
+    <select id="job_agency_select" slot="fields" name="agency_id"></select>
+    <label slot="fields">Contact</label>
+    <select id="job_contact_select" slot="fields" name="contact_id"></select>
+    <label slot="fields">Status</label>
+    <select id="job_status_select" slot="fields" name="status"></select>
+  </de-dialog-form>
 
-    <de-dialog-form id="contact_dialog">
-      <h1 slot="header">Add Contact</h1>
-      <label slot="fields">Name</label>
-      <input slot="fields" type="text" name="name" placeholder="Contact name">
-      <label slot="fields">Email</label>
-      <input slot="fields" type="email" name="email" placeholder="Contact email">
-      <label slot="fields">Phone</label>
-      <input slot="fields" type="tel" name="phone" placeholder="Contact phone">
-      <label slot="fields">Position</label>
-      <input slot="fields" type="text" name="position" placeholder="Contact position">
-      <label slot="fields">Agency</label>
-      <select id="contact_agency_select" slot="fields" name="agency_id"></select>
-    </de-dialog-form>
+  <de-dialog-form id="note_dialog">
+    <h1 slot="header">Add Job Note</h1>
+    <label slot="fields">Note</label>
+    <textarea slot="fields" name="note" placeholder="Enter your note here..." rows="5"></textarea>
+    <label slot="fields">Status</label>
+    <select id="note_status_select" slot="fields" name="status"></select>
+  </de-dialog-form>
 
-  </body>
+  <de-dialog-form id="contact_dialog">
+    <h1 slot="header">Add Contact</h1>
+    <label slot="fields">Name</label>
+    <input slot="fields" type="text" name="name" placeholder="Contact name">
+    <label slot="fields">Email</label>
+    <input slot="fields" type="email" name="email" placeholder="Contact email">
+    <label slot="fields">Phone</label>
+    <input slot="fields" type="tel" name="phone" placeholder="Contact phone">
+    <label slot="fields">Position</label>
+    <input slot="fields" type="text" name="position" placeholder="Contact position">
+    <label slot="fields">Agency</label>
+    <select id="contact_agency_select" slot="fields" name="agency_id"></select>
+  </de-dialog-form>
+
+  <de-dialog-form id="email_dialog">
+    <h1 slot="header">Extract Job from Email</h1>
+    <label slot="fields">Paste Email Text</label>
+    <textarea slot="fields" name="email_text" placeholder="Paste the job email content here..." rows="10"></textarea>
+    <p slot="fields" style="font-size: 0.9em; color: #666;">AI will attempt to extract job details, contact info, and
+      agency details from the email text.</p>
+  </de-dialog-form>
+
+</body>
 
 </html>
