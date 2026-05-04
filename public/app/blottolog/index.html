@@ -216,20 +216,22 @@
       const icon = drink_elem.getAttribute("icon");
       const drink = drink_elem.value;
 
-      const drink_sizes = 
-        drink_sizes.filter(ds => ds.drink_type_id === drink.type_id);
+      const drink_type_sizes = 
+        drink_sizes
+          .filter(ds => ds.drink_type_id === drink.type_id)
+          .sort((a, b) => a.ml - b.ml);
 
       small_drink.setAttribute("icon", icon);
-      small_drink.value = drink;
+      small_drink.value = { ...drink, size_id: drink_type_sizes[0].id };
 
       regular_drink.setAttribute("icon", icon);
-      regular_drink.value = drink;
+      regular_drink.value = { ...drink, size_id: drink_type_sizes[1].id };
 
       large_drink.setAttribute("icon", icon);
-      large_drink.value = drink;
+      large_drink.value = { ...drink, size_id: drink_type_sizes[2].id };
 
       custom_size_drink.setAttribute("icon", icon);
-      custom_size_drink.value = drink;
+      custom_size_drink.value = { ...drink };
     }
 
     function On_Click_Drink_Size(event)
