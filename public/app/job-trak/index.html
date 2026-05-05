@@ -29,34 +29,36 @@
   <link rel="stylesheet" href="styles.css">
 
   <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Website",
+    "name": "Job Tracker",
+    "url": "https://dulceeng.com.au/app/xxx",
+    "description": "",
+    "image": "https://dulceeng.com.au/app/xxx/image/screenshot-landscape.png"
+  }
+  </script>
+
+  <script type="importmap">
+  {
+    "imports": 
     {
-      "@context": "https://schema.org",
-      "@type": "Website",
-      "name": "Job Tracker",
-      "url": "https://dulceeng.com.au/app/xxx",
-      "description": "",
-      "image": "https://dulceeng.com.au/app/xxx/image/screenshot-landscape.png"
+      "firebase/app":       "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js",
+      "firebase/functions": "https://www.gstatic.com/firebasejs/12.12.1/firebase-functions.js",
+      "firebase/firestore": "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js",
+      "firebase/auth":      "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js",
+      "firebase-analytics": "https://www.gstatic.com/firebasejs/12.12.1/firebase-analytics.js",
+      "firebase/ai":        "https://www.gstatic.com/firebasejs/12.12.1/firebase-ai.js"
     }
-    </script>
+  }
+  </script>
 
   <script type="module">
     import Utils from "../../lib/Utils.js";
     import "../../component/DeInputList/index3.js";
     import "../../component/DeDialogForm/index.js";
-    import * as hf from 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@4.2.0';    
-
-    hf.env.localModelPath = '/ai-models/';
-    hf.env.allowLocalModels = true;
-    hf.env.allowRemoteModels = false;
-
-    let agent = null;
-    const model_id = "onnx-community/Qwen2.5-1.5B-Instruct";
-    const pipe_config =
-    {
-      device: 'webgpu',
-      dtype: "q4",
-      quantized: true
-    };
+    import * as fb_app from "firebase/app";
+    import * as fb_ai from "firebase/ai";
 
     /*
       agencies
@@ -105,6 +107,41 @@
     Main();
     async function Main()
     {
+      const response = await fetch("/__/firebase/init.json");
+      const fb_config = await response.json();
+      const app = fb_app.initializeApp(fb_config);
+
+      const ai = fb_ai.getAI(app, { backend: new fb_ai.GoogleAIBackend() });
+      const email_schema = 
+      {
+        type: "object",
+        properties: 
+        {
+          agencyName: 
+          {
+            type: "string",
+            description: "The official name of the recruitment agency or consulting firm."
+          },
+          websiteUrl: 
+          {
+            type: "string",
+            description: "The main website URL of the agency (e.g., https://example.com). If not explicitly found, infer it from the sender's email domain."
+          }
+        },
+        required: ["agencyName", "websiteUrl"]
+      };
+      const model_config = 
+      {
+        model: "gemini-2.5-flash-lite",
+        generationConfig: 
+        {
+          responseMimeType: "application/json",
+          responseSchema: email_schema,
+          temperature: 0.1
+        }
+      };
+      const model = fb_ai.getGenerativeModel(ai, model_config);
+
       if ("serviceWorker" in navigator) 
       {
         //await navigator.serviceWorker.register("./lib/service-worker.js");
@@ -120,7 +157,7 @@
       jobs_btn.onclick = () => Toggle_View(jobs_list);
       contacts_btn.onclick = () => Toggle_View(contacts_list);
       add_job_btn.onclick = () => On_Click_Add_Job(db);
-      ai_add_job_btn.onclick = () => On_Click_AI_Add_Job(db);
+      ai_add_job_btn.onclick = () => On_Click_AI_Add_Job(db, model);
       add_contact_btn.onclick = () => On_Click_Add_Contact(db);
       jobs_list.addEventListener("render", e => On_Render_Job_Item(e, db));
       contacts_list.addEventListener("render", e => On_Render_Contact_Item(e, db));
@@ -247,73 +284,22 @@
       }
     }
 
-    async function On_Click_AI_Add_Job(db)
+    async function On_Click_AI_Add_Job(db, model)
     {
       const form_data = await email_dialog.Show_Async();
       if (form_data?.email_text)
       {
-        const agency_data = await Extract_Agency_From_Email(form_data.email_text);
+        const prompt = `
+          Analyze the following email and extract the recruitment agency details. 
+          Email content:
+          
+          ${form_data.email_text}
+        `;
+
+        const result = await model.generateContent(prompt);
+        const agency_data = JSON.parse(result.response.text());
+
         console.info(agency_data);
-
-        // Create agency if extracted
-        /*let agency_id = null;
-        if (agency_data.name)
-        {
-          const agencies = await Get_Req_Res(Get_Table(db, "agencies").getAll());
-          let agency = agencies.find(a => a.name.toLowerCase() === agency_data.name.toLowerCase());
-          if (!agency)
-          {
-            agency = { name: agency_data.name };
-            await Insert(db, "agencies", agency);
-            agency_id = agency.id;
-          }
-          else
-          {
-            agency_id = agency.id;
-          }
-        }*/
-
-        // Create contact if extracted
-        /*let contact_id = null;
-        if (extracted_data.contact_name || extracted_data.contact_email)
-        {
-          const contacts = await Get_Req_Res(Get_Table(db, "contacts").getAll());
-          let contact = contacts.find(c =>
-            (extracted_data.contact_email && c.email === extracted_data.contact_email) ||
-            (extracted_data.contact_name && c.name === extracted_data.contact_name)
-          );
-          if (!contact)
-          {
-            contact = {
-              name: extracted_data.contact_name || null,
-              email: extracted_data.contact_email || null,
-              phone: extracted_data.contact_phone || null,
-              position: extracted_data.contact_position || null,
-              agency_id: agency_id
-            };
-            await Insert(db, "contacts", contact);
-            contact_id = contact.id;
-          }
-          else
-          {
-            contact_id = contact.id;
-          }
-        }
-
-        // Create job
-        const job = {
-          role_title: extracted_data.role_title || null,
-          role_type: extracted_data.role_type || null,
-          location: extracted_data.location || null,
-          remuneration: extracted_data.remuneration ? parseFloat(extracted_data.remuneration) : null,
-          remuneration_unit: extracted_data.remuneration_unit || null,
-          agency_id: agency_id,
-          contact_id: contact_id,
-          status: "bookmarked"
-        };
-
-        await Insert(db, "jobs", job);
-        await Render_Job_Items(db);*/
         alert("Job extracted and added successfully!");
       }
     }
@@ -492,31 +478,6 @@
     }
 
     // business logic =================================================================
-
-    async function Extract_Agency_From_Email(email_text)
-    {
-      if (!agent)
-      {
-        agent = await hf.pipeline
-          ('text-generation', model_id, pipe_config);
-      }
-
-      const messages = 
-      [
-        { role: "system", content: "You are a helpful assistant that extracts employment agency data into valid JSON. Return ONLY JSON." },
-        { role: "user", content: `Extract 'agency company name', 'agency website' from this email text: \n\n ${email_text}` }
-      ];
-
-      const output = await agent(messages, 
-      {
-        max_new_tokens: 256,
-        temperature: 0,
-        return_full_text: false,
-      });
-      const result_text = output[0].generated_text;
-
-      console.log(result_text);
-    }
 
     // rendering ======================================================================
 

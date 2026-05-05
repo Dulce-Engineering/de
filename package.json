@@ -2,10 +2,13 @@
   "name": "dulce-engineering-components",
   "version": "1.0.0",
   "description": "Dulce Engineering custom web components",
-  "scripts": {
+  "scripts": 
+  {
+    "startem": "firebase emulators:start --only hosting",
     "docs": "node script/generate-docs.js"
   },
-  "devDependencies": {
+  "devDependencies": 
+  {
     "jsdoc-to-markdown": "^8.0.0"
   }
 }

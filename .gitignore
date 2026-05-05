@@ -75,3 +75,6 @@ __
 /playwright/.cache/
 /playwright/.auth/
 /public/ai-models
+/.agents
+/skills-lock.json
+/public/app/job-trak/lib/config.js

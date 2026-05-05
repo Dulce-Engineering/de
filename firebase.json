@@ -1,7 +1,9 @@
 {
-  "hosting": {
+  "hosting": 
+  {
     "public": "public",
-    "ignore": [
+    "ignore": 
+    [
       "firebase.json",
       "**/.*",
       "**/node_modules/**"
@@ -49,5 +51,28 @@
         "type": 301
       }
     ]
+  },
+  "functions": 
+  [
+    {
+      "source": "functions",
+      "codebase": "default",
+      "disallowLegacyRuntimeConfig": true,
+      "ignore": 
+      [
+        "node_modules",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log",
+        "*.local"
+      ]
+    }
+  ],
+  "emulators": 
+  {
+    "hosting": 
+    {
+      "port": 80
+    }
   }
 }

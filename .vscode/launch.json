@@ -1,19 +1,40 @@
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
-    "version": "0.2.0",
-    "configurations": 
-    [
-        {
-            "type": "node",
-            "request": "launch",
-            "name": "Scrape",
-            "skipFiles": [
-                "<node_internals>/**"
-            ],
-            "program": "${workspaceFolder}\\public\\app\\job-woper\\index.js",
-            "cwd": "${workspaceFolder}\\public\\app\\job-woper"
-        }
-    ]
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": 
+  [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Scrape",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "program": "${workspaceFolder}\\public\\app\\job-woper\\index.js",
+      "cwd": "${workspaceFolder}\\public\\app\\job-woper"
+    },
+    {
+      "name": "Website",
+      "request": "launch",
+      "type": "chrome",
+      "url": "http://localhost/app/job-trak",
+      "webRoot": "${workspaceFolder}"
+    },
+    {
+      "name": "JobTrak",
+      "request": "launch",
+      "type": "chrome",
+      "url": "http://127.0.0.1/app/job-trak/index.html",
+      "webRoot": "${workspaceFolder}"
+    },
+    {
+      "name": "Server",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm run startem",
+      "cwd": "${workspaceFolder}"
+    },
+  ]
 }
