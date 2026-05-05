@@ -40,9 +40,23 @@
     </script>
 
   <script type="module">
-    import { pipeline } from 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@4.2.0';    import Utils from "../../lib/Utils.js";
+    import Utils from "../../lib/Utils.js";
     import "../../component/DeInputList/index3.js";
     import "../../component/DeDialogForm/index.js";
+    import * as hf from 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@4.2.0';    
+
+    hf.env.localModelPath = '/ai-models/';
+    hf.env.allowLocalModels = true;
+    hf.env.allowRemoteModels = false;
+
+    let agent = null;
+    const model_id = "onnx-community/Qwen2.5-1.5B-Instruct";
+    const pipe_config =
+    {
+      device: 'webgpu',
+      dtype: "q4",
+      quantized: true
+    };
 
     /*
       agencies
@@ -479,34 +493,29 @@
 
     // business logic =================================================================
 
-    let pipe = null;
-
     async function Extract_Agency_From_Email(email_text)
     {
-      if (!pipe)
+      if (!agent)
       {
-        // We use a small, instruction-tuned model (e.g., Gemma 2B)
-        pipe = await pipeline('text2text-generation', 'google/gemma-2b-it', {
-          device: 'webgpu', // Use WebGPU for 2026-era performance
-        });
+        agent = await hf.pipeline
+          ('text-generation', model_id, pipe_config);
       }
 
-      const prompt = `
-        The following text comes from an email from a sender that is most likely
-        a recruiter working for a recruitment agency.
-        Extract agency company details from the text and 
-        return ONLY a JSON object with the following fields:
-        agency fields: name, url.
-        Text: "${email_text}"
-      `;
+      const messages = 
+      [
+        { role: "system", content: "You are a helpful assistant that extracts employment agency data into valid JSON. Return ONLY JSON." },
+        { role: "user", content: `Extract 'agency company name', 'agency website' from this email text: \n\n ${email_text}` }
+      ];
 
-      const output = await pipe(prompt, {
-        max_new_tokens: 128,
-        temperature: 0, // Keep it deterministic for JSON
+      const output = await agent(messages, 
+      {
+        max_new_tokens: 256,
+        temperature: 0,
+        return_full_text: false,
       });
+      const result_text = output[0].generated_text;
 
-      const jsonString = output[0].generated_text.match(/\{.*\}/s)[0];
-      return JSON.parse(jsonString);
+      console.log(result_text);
     }
 
     // rendering ======================================================================

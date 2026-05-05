@@ -74,3 +74,4 @@ __
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+/public/ai-models
