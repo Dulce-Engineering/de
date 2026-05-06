@@ -135,7 +135,7 @@ class DeDialogForm extends HTMLElement
       }
       else
       {
-        input_elem.value = field_val;
+        input_elem.value = field_val || null;
       }
     }
   }

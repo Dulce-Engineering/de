@@ -88,8 +88,7 @@ de-dialog-form dialog
   animation: shift-colors 0.5s linear forwards;
 }
 button:hover,
-de-input-list details:hover,
-de-dialog-form dialog:hover
+de-input-list details:hover
 {
   border: 1px solid;
   border-image:
@@ -305,7 +304,7 @@ de-dialog-form
     border-width: 3px;
     background-color: #000;
     color: var(--main);
-    width: 400px;
+    xwidth: 400px;
     padding: 40px;
   }
 

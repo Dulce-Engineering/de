@@ -300,6 +300,16 @@
       }
     }
 
+    async function On_Click_Delete_Job(event, job_id, db)
+    {
+      const confirmed = confirm("Are you sure you want to delete this job?");
+      if (confirmed)
+      {
+        await Delete_By_Id(db, "jobs", job_id);
+        await Render_Job_Items(db);
+      }
+    }
+
     async function On_Click_Add_Contact(db)
     {
       const agencies = await Get_Req_Res(Get_Table(db, "agencies").getAll());
@@ -432,6 +442,13 @@
         }
       }
 
+      return res;
+    }
+
+    async function Delete_By_Id(db, table_name, id)
+    {
+      const table = Get_Table(db, table_name, false);
+      const res = Get_Req_Res(table.delete(id));
       return res;
     }
 
@@ -751,7 +768,7 @@
       item_elem.latest_note_time_elem.textContent = job.latest_note_time_formatted;
       item_elem.add_note_btn.onclick = e => On_Click_Add_Note(e, job.id, db);
       item_elem.edit_job_btn.onclick = e => On_Click_Edit_Job(e, job.id, db);
-      //item_elem.del_job_btn.onclick = e => On_Click_Delete_Job(e, job.id, db);
+      item_elem.del_job_btn.onclick = e => On_Click_Delete_Job(e, job.id, db);
 
       if (job.status_type == 0 || job.status_type == undefined)
         item_elem.classList.remove("failed");
@@ -809,6 +826,7 @@
         <img src="image/contacts.svg" alt="Contacts">
       </button>
     </nav>
+    <output role="status"></output>
   </header>
 
   <main id="items">
@@ -925,8 +943,8 @@
   </de-dialog-form>
 
   <de-dialog-form id="email_dialog">
-    <h1 slot="header">Extract Job from Email</h1>
-    <label slot="fields">Paste Email Text</label>
+    <h1 slot="header">Extract Job from Text</h1>
+    <label slot="fields">Paste Text</label>
     <textarea slot="fields" name="email_text" placeholder="Paste the job email content here..." rows="10"></textarea>
     <p slot="fields" style="font-size: 0.9em; color: #666;">AI will attempt to extract job details, contact info, and
       agency details from the email text.</p>
