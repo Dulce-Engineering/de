@@ -154,15 +154,26 @@ body>* {
   width: fit-content;
 }
 
-header {
+header 
+{
   display: flex;
   flex-direction: column;
   align-items: center;
 
-  h1 {
+  h1 
+  {
     font-size: 5rem;
     font-family: hyperspace;
     margin: 0 0 20px 0;
+  }
+
+  output
+  {
+    height: 80px;
+    display: flex;
+    font-size: 2rem;
+    color: var(--highlight);
+    align-items: center;
   }
 }
 
@@ -172,7 +183,7 @@ main
   display: flex;
   flex-direction: column;
   gap: 20px;
-  padding: 40px;
+  padding: 0 40px 40px 40px;
   box-sizing: border-box;
 }
 
@@ -201,7 +212,7 @@ footer {
 de-input-list
 {
   width: 100%;
-  padding: 40px;
+  padding: 0 40px 40px 40px;
   box-sizing: border-box;
 
   &.hidden 
@@ -241,6 +252,7 @@ de-input-list
   summary
   {
     position: relative;
+    cursor: pointer;
 
     .float
     {
@@ -296,7 +308,7 @@ de-input-tree {
   }
 }
 
-de-dialog-form 
+de-dialog-form, de-dialog-alert 
 {
   dialog 
   {

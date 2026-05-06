@@ -53,42 +53,46 @@
   }
   </script>
 
+  <!--
+    agencies
+      id: int
+      name: string
+      url: string
+
+    contacts
+      id: int
+      agency_id: int
+      email: string
+      name: string
+      phone: string
+      position: string
+
+    jobs
+      id: string
+      role_title: string
+
+      agency_id: int
+      company
+      contact_id: int
+      duration: string
+      jd_id: string
+      location: string
+      remuneration: float
+      remuniration_unit: string
+      role_type: string
+      status: string
+      source: string
+      description: string
+  -->
+
   <script type="module">
     import Utils from "../../lib/Utils.js";
     import "../../component/DeInputList/index3.js";
     import "../../component/DeDialogForm/index.js";
+    import "../../component/DeDialogAlert/index.js";
     import * as fb_app from "firebase/app";
     import * as fb_ai from "firebase/ai";
 
-    /*
-      agencies
-        id: int
-        name: string
-        url: string
-
-      contacts
-        id: int
-        agency_id: int
-        email: string
-        name: string
-        phone: string
-        position: string
-
-      jobs
-        agency_id: int
-        company
-        contact_id: int
-        duration: string
-        jd_id: string
-        location: string
-        remuneration: float
-        remuniration_unit: string
-        role_title: string
-        role_type: string
-        status: string
-        source: string
-        description: string
-    */
     const job_status =
       [
         { id: "bookmarked", label: "Bookmarked", type: 0 },
@@ -127,7 +131,7 @@
       add_job_btn.onclick = () => On_Click_Add_Job(db);
       ai_add_job_btn.onclick = () => On_Click_AI_Add_Job(ctx);
       add_contact_btn.onclick = () => On_Click_Add_Contact(db);
-      jobs_list.addEventListener("render", e => On_Render_Job_Item(e, db));
+      jobs_list.addEventListener("render", e => Render_Job_Item(e, db));
       contacts_list.addEventListener("render", e => On_Render_Contact_Item(e, db));
 
       Render_Job_Items(db);
@@ -161,11 +165,11 @@
           await Clear_DB(db);
           await Save_To_IndexedDB(db, db_data);
           Render_Job_Items(db);
-          alert("Data imported from " + file.name + " to IndexedDB instance.");
+          Alert("Data imported from " + file.name + " to IndexedDB instance.");
         }
         catch (err)
         {
-          alert("Failed to import: Please select a valid JSON database file.");
+          Alert("Failed to import: Please select a valid JSON database file.");
         }
       };
 
@@ -198,7 +202,7 @@
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
 
-      alert("Data exported successfully!");
+      Alert("Data exported successfully!");
     }
 
     async function On_Click_Add_Note(e, job_id, db)
@@ -266,7 +270,7 @@
         const contact_id = await Contact_Insert_If_New(ctx.db, data?.contact, agency_id);
         await Job_Insert_If_New(ctx.db, data?.job, agency_id, contact_id);
 
-        alert("Job extracted and added successfully!");
+        Alert("Job extracted and added successfully!");
         await Render_Job_Items(ctx.db);
       }
     }
@@ -330,6 +334,15 @@
         await Insert(db, "contacts", contact);
         await Render_Contacts(db);
       }
+    }
+
+    async function On_Click_View_Job(event, job_id, db)
+    {
+      const curr_job = await Select_By_Id(db, "jobs", job_id);
+
+      job_det_dialog.role_elem.innerText = curr_job.role_title;
+      job_det_dialog.des_elem.innerText = curr_job.description || null;
+      job_det_dialog.Show();
     }
 
     // db =============================================================================
@@ -752,7 +765,7 @@
       jobs_list.value = enrichedJobs;
     }
 
-    function On_Render_Job_Item(event, db)
+    function Render_Job_Item(event, db)
     {
       const item_elem = event.target;
       const job = item_elem.item_obj;
@@ -769,6 +782,7 @@
       item_elem.add_note_btn.onclick = e => On_Click_Add_Note(e, job.id, db);
       item_elem.edit_job_btn.onclick = e => On_Click_Edit_Job(e, job.id, db);
       item_elem.del_job_btn.onclick = e => On_Click_Delete_Job(e, job.id, db);
+      item_elem.view_job_btn.onclick = e => On_Click_View_Job(e, job.id, db);
 
       if (job.status_type == 0 || job.status_type == undefined)
         item_elem.classList.remove("failed");
@@ -801,13 +815,41 @@
       itemElem.contact_position_elem.textContent = contact.position || "N/A";
     }
 
+    function Alert(msg)
+    {
+      const char_millis = 35;
+      const wait_millis = 5000;
+
+      Render(0, 1, On_Completed_Reverse);
+      function On_Completed_Reverse()
+      {
+        setTimeout(() => Render(msg.length, -1, On_Completed_Clr), wait_millis);
+      }
+      function On_Completed_Clr()
+      {
+        alert_elem.textContent = "";
+      }
+
+      function Render(length, step, on_complete_fn)
+      {
+        alert_elem.textContent = "[ " + msg.substring(0, length) + " ]";
+        if ((step > 0 && length <= msg.length) || (step < 0 && length >= 0))
+        {
+          setTimeout(() => Render(length + step, step, on_complete_fn), char_millis);
+        }
+        else if (on_complete_fn)
+        {
+          on_complete_fn();
+        }
+      }
+    }
   </script>
 
 </head>
 
 <body>
 
-  <header>
+  <header id="hdr_elem">
     <h1><span>Job Tracker</span></h1>
     <nav>
       <button id="import_btn" class="img">
@@ -826,7 +868,7 @@
         <img src="image/contacts.svg" alt="Contacts">
       </button>
     </nav>
-    <output role="status"></output>
+    <output id="alert_elem" role="status"></output>
   </header>
 
   <main id="items">
@@ -849,10 +891,13 @@
           </div>
           <div class="float">
             <button cid="add_note_btn" class="img">
-              <img src="image/note-add.svg" alt="Add Note">
+              <img src="image/note-add.svg" title="Add Note">
+            </button>
+            <button cid="view_job_btn" class="img">
+              <img src="image/expand.svg" title="View Job">
             </button>
             <button cid="edit_job_btn" class="img">
-              <img src="image/edit.svg" alt="" title="Edit Job">
+              <img src="image/edit.svg" title="Edit Job">
             </button>
             <button cid="del_job_btn" class="img">
               <img src="image/delete.svg" alt="" title="Delete Job">
@@ -949,6 +994,12 @@
     <p slot="fields" style="font-size: 0.9em; color: #666;">AI will attempt to extract job details, contact info, and
       agency details from the email text.</p>
   </de-dialog-form>
+
+  <de-dialog-alert id="job_det_dialog">
+    <h1 cid="role_elem" slot="header">Job Details</h1>
+    <span cid="des_elem" slot="body"></span>
+    <label slot="body"></label><span cid="xrole_elem" slot="body"></span>
+  </de-dialog-alert>
 
 </body>
 
