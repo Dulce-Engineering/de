@@ -1,0 +1,22 @@
+
+de-action-btn
+{
+  display: inline-flex;
+  border-top: 2px solid #ccc;
+  border-left: 2px solid #ccc;
+  border-bottom: 2px solid #444;
+  border-right: 2px solid #444;
+  color: #444;
+  background-color: #bbb;
+  border-radius: 5px;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+de-action-btn:active
+{
+  border-top: 2px solid #444;
+  border-left: 2px solid #444;
+  border-bottom: 2px solid #ccc;
+  border-right: 2px solid #ccc;
+  background-color: #999;
+}

@@ -1,0 +1,105 @@
+
+de-timer
+{
+  display:flex;
+  justify-content:center;
+  font-size: 0;
+  border: 1px solid #f00;
+  xheight: 200px;
+}
+de-timer de-dial
+{
+  position: initial;
+  display: initial;
+  width: initial;
+  height: initial;
+  color: initial;
+  stroke: initial;
+  fill: initial;
+  stroke-width: initial;
+}
+de-timer .label
+{
+  font-size:1rem;
+  position:absolute;
+  left:0;
+  top:0;
+  right:0;
+  bottom:0;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+  display: none;
+}
+de-timer .counter
+{
+  position:relative;
+  width:25%;
+  border: 1px solid #0f0;
+}
+de-timer .dial
+{
+  fill:none;
+  rotate:-91deg;
+}
+de-timer .anim-border
+{
+  xposition:absolute;
+  xleft:0;
+  xright:0;
+  xtop:0;
+  stroke-width:3px;
+  stroke:#f00;
+}
+de-timer .ticks
+{
+  stroke-width:15px;
+  stroke:#000;
+  display:inline-block;
+  width:86%;
+  padding:7%;
+  position:relative;
+  font-size:0;
+  display: none;
+}
+de-timer .seconds
+{
+  animation:dedial-spin 10s infinite linear;
+}
+de-timer .minutes
+{
+  animation:dedial-spin 30s infinite linear;
+}
+de-timer .hours
+{
+  animation:dedial-spin 70s infinite linear;
+}
+de-timer .days
+{
+  animation:dedial-spin 100s infinite linear;
+}
+
+@keyframes dedial-spin
+{
+  from
+  {
+    transform: rotate(0deg);
+  }
+  to
+  {
+    transform: rotate(-360deg);
+  }
+}
+
+@keyframes dedial-spin-y
+{
+  from
+  {
+    transform: rotateY(0deg);
+  }
+  to
+  {
+    transform: rotateY(360deg);
+  }
+}

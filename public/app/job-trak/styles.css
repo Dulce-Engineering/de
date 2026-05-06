@@ -28,6 +28,75 @@
   src: url("font/octab-017.ttf");
 }
 
+@property --s1 
+{
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 0%;
+}
+@property --s2 
+{
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 1%;
+}
+@property --s3
+{
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 2%;
+}
+@keyframes shift-colors 
+{
+  0% 
+  {
+    --s1: 0%;
+    --s2: 1%;
+    --s3: 2%;
+  }
+
+  100% 
+  {
+    --s1: 100%;
+    --s2: 101%;
+    --s3: 102%;  
+  }
+}
+@keyframes shift-colors-2
+{
+  0% 
+  {
+    --s1: 0%;
+    --s2: 1%;
+    --s3: 2%;
+  }
+
+  100% 
+  {
+    --s1: 100%;
+    --s2: 101%;
+    --s3: 102%;
+  }
+}
+button, 
+de-input-list details,
+de-dialog-form dialog
+{
+  border: 1px solid;
+  border-image:
+    linear-gradient(to bottom right, var(--border-color) var(--s1), #fff var(--s2), #000 var(--s3)) 1;
+  animation: shift-colors 0.5s linear forwards;
+}
+button:hover,
+de-input-list details:hover,
+de-dialog-form dialog:hover
+{
+  border: 1px solid;
+  border-image:
+    linear-gradient(to bottom right, #fff var(--s1), var(--border-color) var(--s2)) 1;
+  animation: shift-colors-2 0.25s linear forwards;
+}
+
 :root {
   --main: #4af;
   --border: #fff5;
@@ -110,8 +179,8 @@ main
 
 button 
 {
+  --border-color: #ff0;
   background-color: #0004;
-  border: 1px solid #ff0;
   color: #ff0;
   font-family: hyperspace-bold;
   padding: 12px 16px;
@@ -160,13 +229,13 @@ de-input-list
 
   details
   {
-    border: 1px solid #0f0;
+    --border-color: #0f0;
     padding: 20px 20px;
     background: #0008;
-
+    
     &.failed
     {
-      border: 1px solid #f00;
+      --border-color: #f00;
     }
   }
 
@@ -228,10 +297,13 @@ de-input-tree {
   }
 }
 
-de-dialog-form {
-  dialog {
+de-dialog-form 
+{
+  dialog 
+  {
+    --border-color: #fff;
+    border-width: 3px;
     background-color: #000;
-    border: 4px solid var(--border);
     color: var(--main);
     width: 400px;
     padding: 40px;
@@ -273,6 +345,11 @@ de-dialog-form {
 
   footer {
     text-align: center;
+  }
+
+  &.wait dialog
+  {
+    background-color: #f00;
   }
 }
 

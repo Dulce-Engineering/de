@@ -1,0 +1,201 @@
+CLASSES
+anim-border (de-dial)
+completed ()
+counter (div)
+dial (svg)
+hand-hr (path)
+hand-min (path)
+hands (svg)
+hand-sec (path)
+hours (de-dialmarks)
+hrs (de-dial)
+label (span, div)
+mins (de-dial)
+minutes (de-dialmarks)
+secs (de-dial)
+shadow (circle)
+sublabel (span)
+text-label (span)
+ticks (de-dial)
+
+ATTRIBUTES
+auto-start
+auto-stop
+base-type (small/medium/large)
+circle-radius
+count-reverse
+date-day
+date-month
+date-hour
+date-minute
+date-second
+date-year
+gap-width
+label-min
+label-hr
+label-day
+label-postfix
+label-prefix
+label-sec
+max-value
+show-label
+show-shadow
+stop-href
+style-host
+style-label
+style-svg
+sublabel-text
+tick-width
+time-str
+time-zone
+value
+viewbox-radius
+wait-millis
+
+PROPERTIES
+value
+labelText
+
+METHODS
+start
+stop
+toggle
+reset
+restart
+
+EVENTS
+tick
+completed
+
+background-image
+clock
+clock dial
+full dial
+hours dial
+large dial
+minutes/seconds dial
+target
+text
+timer
+
+tests
+1. test embedded app page
+
+24hr Time (hh:mm:ss)
+Auto-Start
+Counter Size
+Date (yyyy-mm-dd)
+HTML Id
+Label - Days
+Label - Hours
+Label - Minutes
+Label - Seconds
+Colour - Dial Border
+Colour - Dial Inactive Marks
+Colour - Dial Marks
+CSS
+CSS - Label
+CSS - Value
+
+- sales channels / themes click "Customize" to edit the default theme
+
+- on the home page "template" area add a section, at the top before the "image banner"
+and select dedial background image
+- select the new "background image" and choose or upload an image
+
+- add a dedial target block
+top:calc(50% - 75px);
+left:calc(50% - 75px);
+position:absolute;
+display:inline-block;
+border-radius:100%;
+animation:dedial-zoom-spin infinite ease-in-out alternate;
+animation-duration:5s;
+
+- add a dedial large dial
+top:calc(50% - 75px);
+left:calc(50% - 75px);
+position:absolute;
+display:inline-block;
+border-radius:100%;
+animation:dedial-zoom-spin infinite ease-in-out alternate;
+animation-duration:3s;
+
+- add a dedial minutes/seconds dial
+tick colour: #0f0
+top:calc(50% - 75px);
+left:calc(50% - 75px);
+position:absolute;
+display:inline-block;
+border-radius:100%;
+animation:dedial-zoom-spin infinite ease-in-out alternate;
+animation-duration:2s;
+
+- add timer
+date: 2025-01-01
+colour dial border: #000
+colour dial inactive marks: #fff
+top:70%;
+left:50%;
+width:200%;
+transform:translate(-50%,-50%) rotate(-5deg);
+position:absolute;
+background-color:#ff08;
+justify-content:center;
+padding:20px;
+border:4px dashed #000;
+
+- to the same "apps" section add a dedial text block and
+text: countdown to our new season styles!
+style: heading 1
+top:50%;
+left:50%;
+transform:translate(-50%,-50%) rotate(10deg);
+position:absolute;
+line-height:30px;
+font-weight:800;
+text-align:center;
+background-color:#ff08;
+width:200%;
+padding:0 20px;
+text-transform:uppercase;
+border:4px dashed #000;
+
+- if frameworks get faster and batter as they become lightweight, isn't the best framework none at all?
+- if its great to have zero dependencies, doesn't that apply to the client app as well? 
+- if the author's best solution was to write his own framework, couldn't we all aspire to do the same?
+- if cold start are the problem then why not eliminate them altogether by having no framework to start?
+- if routing is so complex, you need to ask yourself why. maybe passing params thru the URL and mapping to http actions isnt such a good idea.
+
+Hi Laila,
+SEO
+CMS
+Products and Checkout
+Custom Design
+Third-Party Integrations
+
+https://demo.templatemonster.com/demo/379300.html
+$58
+
+https://demo.templatemonster.com/demo/58200.html
+#39
+
+https://demo.templatemonster.com/demo/287151.html
+$44
+
+https://demo.templatemonster.com/demo/398794.html
+$18
+
+https://demo.templatemonster.com/demo/322179.html
+$29
+
+https://demo.templatemonster.com/demo/270802.html
+$29
+
+https://demo.templatemonster.com/demo/237664.html
+$21
+
+https://demo.templatemonster.com/demo/428191.html
+$20
+
+https://www.flightradar24.com/CES562/37e7b025

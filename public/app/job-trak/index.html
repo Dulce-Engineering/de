@@ -87,6 +87,7 @@
         role_type: string
         status: string
         source: string
+        description: string
     */
     const job_status =
       [
@@ -107,47 +108,14 @@
     Main();
     async function Main()
     {
-      const response = await fetch("/__/firebase/init.json");
-      const fb_config = await response.json();
-      const app = fb_app.initializeApp(fb_config);
-
-      const ai = fb_ai.getAI(app, { backend: new fb_ai.GoogleAIBackend() });
-      const email_schema = 
-      {
-        type: "object",
-        properties: 
-        {
-          agencyName: 
-          {
-            type: "string",
-            description: "The official name of the recruitment agency or consulting firm."
-          },
-          websiteUrl: 
-          {
-            type: "string",
-            description: "The main website URL of the agency (e.g., https://example.com). If not explicitly found, infer it from the sender's email domain."
-          }
-        },
-        required: ["agencyName", "websiteUrl"]
-      };
-      const model_config = 
-      {
-        model: "gemini-2.5-flash-lite",
-        generationConfig: 
-        {
-          responseMimeType: "application/json",
-          responseSchema: email_schema,
-          temperature: 0.1
-        }
-      };
-      const model = fb_ai.getGenerativeModel(ai, model_config);
-
       if ("serviceWorker" in navigator) 
       {
         //await navigator.serviceWorker.register("./lib/service-worker.js");
       }
 
-      const db = await Open_DB();
+      const ctx = { };
+      Init_AI(ctx);
+      const db = await Open_DB(ctx);
 
       Set_Options(note_status_select, job_status, "id", "label");
       Set_Options(job_status_select, job_status, "id", "label");
@@ -157,7 +125,7 @@
       jobs_btn.onclick = () => Toggle_View(jobs_list);
       contacts_btn.onclick = () => Toggle_View(contacts_list);
       add_job_btn.onclick = () => On_Click_Add_Job(db);
-      ai_add_job_btn.onclick = () => On_Click_AI_Add_Job(db, model);
+      ai_add_job_btn.onclick = () => On_Click_AI_Add_Job(ctx);
       add_contact_btn.onclick = () => On_Click_Add_Contact(db);
       jobs_list.addEventListener("render", e => On_Render_Job_Item(e, db));
       contacts_list.addEventListener("render", e => On_Render_Contact_Item(e, db));
@@ -284,23 +252,22 @@
       }
     }
 
-    async function On_Click_AI_Add_Job(db, model)
+    async function On_Click_AI_Add_Job(ctx)
     {
       const form_data = await email_dialog.Show_Async();
       if (form_data?.email_text)
       {
-        const prompt = `
-          Analyze the following email and extract the recruitment agency details. 
-          Email content:
-          
-          ${form_data.email_text}
-        `;
+        console.info("Processing...");
+        const data = await Extract_Job(ctx.ai, form_data.email_text);
+        console.log("On_Click_AI_Add_Job(): data =", data);
+        console.info("...Finished.");
 
-        const result = await model.generateContent(prompt);
-        const agency_data = JSON.parse(result.response.text());
+        const agency_id = await Agency_Insert_If_New(ctx.db, data?.agency);
+        const contact_id = await Contact_Insert_If_New(ctx.db, data?.contact, agency_id);
+        await Job_Insert_If_New(ctx.db, data?.job, agency_id, contact_id);
 
-        console.info(agency_data);
         alert("Job extracted and added successfully!");
+        await Render_Job_Items(ctx.db);
       }
     }
 
@@ -370,7 +337,7 @@
       return new Promise((resolve) => tx.oncomplete = resolve);
     }
 
-    async function Open_DB()
+    async function Open_DB(ctx)
     {
       const promise = new Promise(On_Process);
       function On_Process(resolve, reject)
@@ -387,8 +354,9 @@
         request.onsuccess = () => resolve(request.result);
         request.onerror = () => reject(request.error);
       }
+      ctx.db = await promise;
 
-      return promise;
+      return ctx.db;
     }
 
     async function Save_To_IndexedDB(db, db_data)
@@ -438,15 +406,19 @@
       return Get_Req_Res(request);
     }
 
-    function Insert(db, table_name, item)
+    async function Insert(db, table_name, item)
     {
-      return Insert_Items(db, table_name, [item]);
+      const ids = await Insert_Items(db, table_name, [item]);
+      return ids[0];
     }
 
     async function Insert_Items(db, table_name, items)
     {
+      let res = null;
+
       if (items && items.length > 0)
       {
+        res = [];
         const table = Get_Table(db, table_name, false);
         for (const item of items)
         {
@@ -454,11 +426,13 @@
           {
             if (item.id == null || item.id == undefined)
               item.id = await Next_Id(db, table);
-            const request = table.add(item);
-            await Get_Req_Res(request);
+            await Get_Req_Res(table.add(item));
+            res.push(item.id);
           }
         }
       }
+
+      return res;
     }
 
     async function Update(db, table_name, new_item)
@@ -477,7 +451,241 @@
       return res;
     }
 
+    async function Exists_By_Id(db, table_name, id)
+    {
+      const table = Get_Table(db, table_name);
+      const result = await Get_Req_Res(table.getKey(id));
+
+      return result != null;
+    }
+
+    async function Find_Id(db, table_name, fn)
+    {
+      const items = await Get_Req_Res(Get_Table(db, table_name).getAll());
+      const item = items.find(fn);
+
+      return item == null || item == undefined ? null: item.id;
+    }
+
+    async function Exists(db, table_name, fn)
+    {
+      const items = await Get_Req_Res(Get_Table(db, table_name).getAll());
+      const exists = items.some(fn);
+
+      return exists;
+    }
+
+    async function Insert_If_New(db, table_name, data, fn)
+    {
+      let res = null;
+
+      const item_id = await Find_Id(db, table_name, fn);
+      if (item_id == null)
+      {
+        res = await Insert(db, table_name, data);
+      }
+      else
+      {
+        res = item_id;
+      }
+
+      return res;
+    }
+
+    // ai =============================================================================
+
+    async function Init_AI(ctx)
+    {
+      const response = await fetch("/__/firebase/init.json");
+      const fb_config = await response.json();
+      console.info("Init_AI(): fb_config =", fb_config);
+      const app = fb_app.initializeApp(fb_config);
+
+      ctx.ai = fb_ai.getAI(app, { backend: new fb_ai.GoogleAIBackend() });
+
+      return ctx.ai;
+    }
+
+    async function Extract_Job(ai, text)
+    {
+      const email_schema =
+      {
+        type: "object",
+        properties:
+        {
+          agency_name:
+          {
+            type: "string",
+            description: "The official name of the recruitment agency or consulting firm."
+          },
+          agency_url:
+          {
+            type: "string",
+            description: "The main website URL of the agency (e.g., https://example.com). If not explicitly found, infer it from the sender's email domain."
+          },
+          contact_email:
+          {
+            type: "string",
+            description: "The sender's email address."
+          },
+          contact_name:
+          {
+            type: "string",
+            description: "The sender's fullname as a single string."
+          },
+          contact_phone:
+          {
+            type: "string",
+            description: "The sender's phone number."
+          },
+          contact_position:
+          {
+            type: "string",
+            description: "The sender's role or position within the agency."
+          },
+          job_company_name:
+          {
+            type: "string",
+            description: "The name of the company the job is for."
+          },
+          job_duration:
+          {
+            type: "string",
+            description: "The length of time the job is for, if it is a contract role."
+          },
+          job_location:
+          {
+            type: "string",
+            description: "The location nof the job"
+          },
+          job_remuneration:
+          {
+            type: "number",
+            description: "The numerical amount being paid for the job not including units of any kind."
+          },
+          job_remuneration_unit:
+          {
+            type: "string",
+            description: "The units of the amount being paid for the job. usually yearly or daily."
+          },
+          job_role_title:
+          {
+            type: "string",
+            description: "The job role title."
+          },
+          job_role_type:
+          {
+            type: "string",
+            enum: ["Contract", "Fulltime", "Other"],
+            description: "Whether the job is a contract, fulltime, or something else."
+          },
+          job_description:
+          {
+            type: "string",
+            description: "Any details regarding the job's technical requirements and responsibilities."
+          }
+        },
+        //required: ["agencyName", "websiteUrl"]
+      };
+      const model_config =
+      {
+        model: "gemini-2.5-flash-lite",
+        generationConfig:
+        {
+          responseMimeType: "application/json",
+          responseSchema: email_schema,
+          temperature: 0.1
+        }
+      };
+      const model = fb_ai.getGenerativeModel(ai, model_config);
+
+      const prompt = 
+      `
+        Analyze the following email and extract the recruitment agency, contact, and job details. 
+        Email content:
+        
+        ${text}
+      `;
+
+      const result = await model.generateContent(prompt);
+      const data = JSON.parse(result.response.text());
+
+      const job_details =
+      {
+        agency:
+        {
+          name: data.agency_name,
+          url: data.agency_url
+        },
+        contact:
+        {
+          email: data.contact_email,
+          name: data.contact_name,
+          phone: data.contact_phone,
+          position: data.contact_position
+        },
+        job:
+        {
+          company: data.job_company_name,
+          duration: data.job_duration,
+          location: data.job_location,
+          remuneration: data.job_remuneration,
+          remuneration_unit: data.job_remuneration_unit,
+          role_title: data.job_role_title,
+          role_type: data.job_role_type,
+          description: data.job_description
+        }
+      };
+
+      return job_details;
+    }
+
     // business logic =================================================================
+
+    async function Agency_Insert_If_New(db, agency)
+    {
+      let res = null;
+
+      if (agency && agency.name)
+      {
+        res = await Insert_If_New
+          (db, "agencies", agency, a => a.name === agency.name);
+      }
+
+      return res;
+    }
+
+    async function Contact_Insert_If_New(db, contact, agency_id)
+    {
+      let res = null;
+
+      if (contact && contact.email)
+      {
+        contact.agency_id = agency_id;
+        res = await Insert_If_New
+          (db, "contacts", contact, c => c.email === contact.email);
+      }
+
+      return res;
+    }
+
+    async function Job_Insert_If_New(db, job, agency_id, contact_id)
+    {
+      let res = null;
+
+      if (job && job.role_title && contact_id)
+      {
+        job.agency_id = agency_id;
+        job.contact_id = contact_id;
+        res = await Insert_If_New(db, "jobs", job, Fail_If);
+        function Fail_If(j)
+        {
+          return (agency_id && j.agency_id == agency_id && j.role_title == job.role_title);
+        }
+      }
+
+      return res;
+    }
 
     // rendering ======================================================================
 
