@@ -310,5 +310,11 @@
     "datetime": 1777863698731,
     "id": "1f71760c-9eed-43ea-becd-75e82b403ee1",
     "query_id": "-rpc"
+  },
+  {
+    "count": 2,
+    "datetime": 1778158673302,
+    "id": "2b104489-7d90-4d79-9abd-c9f3be426119",
+    "query_id": "-rpc"
   }
 ]
