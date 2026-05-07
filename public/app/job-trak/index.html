@@ -205,13 +205,8 @@
       const blob = new Blob([json_string], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
 
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `job-trak-data-${new Date().toISOString().split('T')[0]}.json`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      const filename = `job-trak-data-${new Date().toISOString().split('T')[0]}.json`;
+      Download_File(blob, filename);
 
       Alert("Data exported successfully!");
     }
@@ -342,15 +337,15 @@
         {
           const attachments = files.map(file => ({
             job_id,
-            file
-            //filename: file.name,
-            //mime_type: file.type || 'application/octet-stream',
-            //size: file.size,
-            //blob: file,
-            //timestamp: Date.now()
+            filename: file.name,
+            mime_type: file.type || 'application/octet-stream',
+            size: file.size,
+            file,
+            timestamp: Date.now()
           }));
 
           await Insert_Items(db, 'attachments', attachments);
+          await Render_Job_Items(db);
           Alert(`${files.length} file${files.length === 1 ? '' : 's'} attached to the job.`);
         }
       }
@@ -387,6 +382,12 @@
       job_det_dialog.role_elem.innerText = curr_job.role_title;
       job_det_dialog.des_elem.innerText = curr_job.description || null;
       job_det_dialog.Show();
+    }
+
+    function On_Click_Attachment(attachment)
+    {
+      const filename = attachment.filename || attachment.file?.name || 'Unnamed file';
+      Download_File(attachment.file, filename);
     }
 
     // db =============================================================================
@@ -767,6 +768,24 @@
       return res;
     }
 
+    function Download_File(blob, filename)
+    {
+      const url = URL.createObjectURL(blob);
+
+      window.open(url, '_blank');
+      setTimeout(() => URL.revokeObjectURL(url), 5000);
+      
+      /*const a = document.createElement('a');
+      a.href = url;
+      a.target = "_blank";
+      a.rel = 'noopener noreferrer';
+      document.body.appendChild(a);
+      a.click();
+
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);*/
+    }
+
     // rendering ======================================================================
 
     function Set_Options(select_elem, items, value_field, text_field)
@@ -787,6 +806,7 @@
       const agencies = await Get_Req_Res(Get_Table(db, "agencies").getAll());
       const contacts = await Get_Req_Res(Get_Table(db, "contacts").getAll());
       const actionLogs = await Get_Req_Res(Get_Table(db, "action_logs").getAll());
+      const attachments = await Get_Req_Res(Get_Table(db, "attachments").getAll()) || [];
 
       const enrichedJobs = jobs.map(Add_Details);
       enrichedJobs.sort((a, b) => a.status_type - b.status_type);
@@ -801,6 +821,7 @@
         const contact_name = contacts?.find(c => c.id === job.contact_id)?.name || "N/A";
         const latest_note = latestLog?.note || "No notes available.";
         const latest_note_time_formatted = latestLog ? new Date(latestLog.timestamp).toLocaleString() : "";
+        const job_attachments = attachments.filter(a => a.job_id === job.id);
 
         return {
           ...job,
@@ -808,7 +829,8 @@
           agency_name,
           contact_name,
           latest_note,
-          latest_note_time_formatted
+          latest_note_time_formatted,
+          attachments: job_attachments
         };
       }
 
@@ -834,6 +856,7 @@
       item_elem.edit_job_btn.onclick = e => On_Click_Edit_Job(e, job.id, db);
       item_elem.del_job_btn.onclick = e => On_Click_Delete_Job(e, job.id, db);
       item_elem.view_job_btn.onclick = e => On_Click_View_Job(e, job.id, db);
+      Render_Attachment_List(item_elem.attachment_list_elem, job.attachments);
 
       if (job.status_type == 0 || job.status_type == undefined)
         item_elem.classList.remove("failed");
@@ -864,6 +887,29 @@
       itemElem.contact_email_elem.textContent = contact.email || "N/A";
       itemElem.contact_agency_elem.textContent = contact.agency_name || "N/A";
       itemElem.contact_position_elem.textContent = contact.position || "N/A";
+    }
+
+    function Render_Attachment_List(list_elem, attachments)
+    {
+      if (attachments && attachments.length > 0)
+      {
+        for (const attachment of attachments)
+        {
+          const name = attachment.filename || attachment.file?.name || 'Unnamed file';
+          const size = attachment.size || attachment.file?.size || 0;
+          const size_text = size ? ` (${Math.round(size / 1024)} KB)` : '';
+
+          const item_elem = document.createElement("li");
+          item_elem.classList.add("link");
+          item_elem.innerText = name + size_text;
+          item_elem.addEventListener("click", () => On_Click_Attachment(attachment));
+          list_elem.appendChild(item_elem);
+        }
+      }
+      else
+      {
+        list_elem.innerHTML = '<li>No attachments</li>';
+      }
     }
 
     function Alert(msg)
@@ -901,7 +947,7 @@
 <body>
 
   <header id="hdr_elem">
-    <h1><span>JOPR</span></h1>
+    <h1><span>JOPR&nbsp;&nbsp;</span></h1>
     <nav>
       <button id="import_btn" class="img">
         <img src="image/upload.svg" alt="Upload">
@@ -974,6 +1020,10 @@
         <p>Latest Note (<span cid="latest_note_time_elem"></span>): <br>
           <i cid="latest_note_elem"></i>
         </p>
+        <div class="attachment-list">
+          <strong>Attachments:</strong>
+          <ul cid="attachment_list_elem"></ul>
+        </div>
       </details>
     </de-input-list>
 
