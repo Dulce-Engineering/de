@@ -92,8 +92,9 @@ de-input-list details:hover
 {
   border: 1px solid;
   border-image:
-    linear-gradient(to bottom right, #fff var(--s1), var(--border-color) var(--s2)) 1;
-  animation: shift-colors-2 0.25s linear forwards;
+    /* linear-gradient(to bottom right, #fff var(--s1), var(--border-color) var(--s2)) 1; */
+    linear-gradient(to bottom right, #fff var(--s1), #000 var(--s2)) 1;
+  animation: shift-colors-2 0.5s linear forwards;
 }
 
 :root {

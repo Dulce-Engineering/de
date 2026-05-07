@@ -13,14 +13,14 @@
   </script>
 
   <link rel="manifest" href="/app/job-trak/manifest.json">
-  <title>Job Tracker</title>
+  <title>JOPR</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <meta name="description" content="">
   <meta name="keywords" content="">
   <meta name="author" content="Dulce Engineering Pty. Ltd.">
   <meta name="robots" content="index, follow">
-  <meta property="og:title" content="Job Tracker">
+  <meta property="og:title" content="JOPR">
   <meta property="og:description" content="">
   <meta property="og:image" content="https://dulceeng.com.au/app/job-trak/image/screenshot-landscape.png">
   <meta property="og:url" content="https://dulceeng.com.au/app/job-trak">
@@ -32,10 +32,10 @@
   {
     "@context": "https://schema.org",
     "@type": "Website",
-    "name": "Job Tracker",
-    "url": "https://dulceeng.com.au/app/xxx",
+    "name": "JOPR",
+    "url": "https://dulceeng.com.au/app/job-trak",
     "description": "",
-    "image": "https://dulceeng.com.au/app/xxx/image/screenshot-landscape.png"
+    "image": "https://dulceeng.com.au/app/job-trak/image/screenshot-landscape.png"
   }
   </script>
 
@@ -90,6 +90,7 @@
     import "../../component/DeInputList/index3.js";
     import "../../component/DeDialogForm/index.js";
     import "../../component/DeDialogAlert/index.js";
+    import "../../component/DeDialogConfirm/index.js";
     import * as fb_app from "firebase/app";
     import * as fb_ai from "firebase/ai";
 
@@ -362,22 +363,34 @@
 
     async function Open_DB(ctx)
     {
-      const promise = new Promise(On_Process);
-      function On_Process(resolve, reject)
+      const version = 2;
+      try { ctx.db = await (new Promise(IndexedDB_Open)); }
+      catch(error)
       {
-        const request = indexedDB.open("JobTrakDB", 1);
-        request.onupgradeneeded = (event) => 
-        {
-          const db = event.target.result;
-          if (!db.objectStoreNames.contains("jobs")) db.createObjectStore("jobs", { keyPath: "id" });
-          if (!db.objectStoreNames.contains("agencies")) db.createObjectStore("agencies", { keyPath: "id" });
-          if (!db.objectStoreNames.contains("contacts")) db.createObjectStore("contacts", { keyPath: "id" });
-          if (!db.objectStoreNames.contains("action_logs")) db.createObjectStore("action_logs", { keyPath: "id" });
-        };
+        console.error("Open_DB():", error);
+        ctx.db = null;
+      }
+
+      function IndexedDB_Open(resolve, reject)
+      {
+        const request = indexedDB.open("JobTrakDB", version);
+        request.onupgradeneeded = Upgrade_Needed;
         request.onsuccess = () => resolve(request.result);
         request.onerror = () => reject(request.error);
       }
-      ctx.db = await promise;
+
+      function Upgrade_Needed(event)
+      {
+        const db = event.target.result;
+        if (!db.objectStoreNames.contains("jobs"))
+          db.createObjectStore("jobs", { keyPath: "id" });
+        if (!db.objectStoreNames.contains("agencies"))
+          db.createObjectStore("agencies", { keyPath: "id" });
+        if (!db.objectStoreNames.contains("contacts"))
+          db.createObjectStore("contacts", { keyPath: "id" });
+        if (!db.objectStoreNames.contains("action_logs"))
+          db.createObjectStore("action_logs", { keyPath: "id" });
+      };
 
       return ctx.db;
     }
@@ -409,8 +422,14 @@
 
     function Get_Table(db, table_name, is_readonly = true)
     {
-      const tx = db.transaction([table_name], is_readonly ? "readonly" : "readwrite");
-      const store = tx.objectStore(table_name);
+      let store = null;
+
+      if (db)
+      {
+        const tx = db.transaction([table_name], is_readonly ? "readonly" : "readwrite");
+        store = tx.objectStore(table_name);
+      }
+
       return store;
     }
 
@@ -522,18 +541,31 @@
       return res;
     }
 
+    function Select_All(db, table_name)
+    {
+      const table = Get_Table(db, table_name);
+      const res = table ? Get_Req_Res(table.getAll()): null;
+
+      return res;
+    }
+
     // ai =============================================================================
 
     async function Init_AI(ctx)
     {
+      let res = null;
       const response = await fetch("/__/firebase/init.json");
-      const fb_config = await response.json();
-      console.info("Init_AI(): fb_config =", fb_config);
-      const app = fb_app.initializeApp(fb_config);
+      if (response.ok)
+      {
+        const fb_config = await response.json();
+        console.info("Init_AI(): fb_config =", fb_config);
+        const app = fb_app.initializeApp(fb_config);
 
-      ctx.ai = fb_ai.getAI(app, { backend: new fb_ai.GoogleAIBackend() });
+        ctx.ai = fb_ai.getAI(app, { backend: new fb_ai.GoogleAIBackend() });
+        res = ctx.ai;
+      }
 
-      return ctx.ai;
+      return res;
     }
 
     async function Extract_Job(ai, text)
@@ -733,10 +765,10 @@
 
     async function Render_Job_Items(db)
     {
-      const jobs = await Get_Req_Res(Get_Table(db, "jobs").getAll()) || [];
-      const agencies = await Get_Req_Res(Get_Table(db, "agencies").getAll());
-      const contacts = await Get_Req_Res(Get_Table(db, "contacts").getAll());
-      const actionLogs = await Get_Req_Res(Get_Table(db, "action_logs").getAll());
+      const jobs = await Select_All(db, "jobs") || [];
+      const agencies = await Select_All(db, "agencies") || [];
+      const contacts = await Select_All(db, "contacts") || [];
+      const action_logs = await Select_All(db, "action_logs") || [];
 
       const enrichedJobs = jobs.map(Add_Details);
       enrichedJobs.sort((a, b) => a.status_type - b.status_type);
@@ -744,13 +776,13 @@
       function Add_Details(job) 
       {
         const status_type = job_status.find(s => s.id === job.status)?.type;
-        const latestLog = actionLogs
+        const latest_log = action_logs
           .filter(log => log.job_id === job.id)
           .sort((a, b) => b.timestamp - a.timestamp || b.id - a.id)[0];
         const agency_name = agencies?.find(a => a.id === job.agency_id)?.name || "N/A";
         const contact_name = contacts?.find(c => c.id === job.contact_id)?.name || "N/A";
-        const latest_note = latestLog?.note || "No notes available.";
-        const latest_note_time_formatted = latestLog ? new Date(latestLog.timestamp).toLocaleString() : "";
+        const latest_note = latest_log?.note || "No notes available.";
+        const latest_note_time_formatted = latest_log ? new Date(latest_log.timestamp).toLocaleString() : "";
 
         return {
           ...job,
@@ -792,8 +824,8 @@
 
     async function Render_Contacts(db)
     {
-      const contacts = await Get_Req_Res(Get_Table(db, "contacts").getAll());
-      const agencies = await Get_Req_Res(Get_Table(db, "agencies").getAll());
+      const contacts = await Select_All(db, "contacts") || [];
+      const agencies = await Select_All(db, "agencies") || [];
 
       const enrichedContacts = (contacts || []).map(contact => ({
         ...contact,
@@ -850,7 +882,7 @@
 <body>
 
   <header id="hdr_elem">
-    <h1><span>Job Tracker</span></h1>
+    <h1><span>JOPR</span></h1>
     <nav>
       <button id="import_btn" class="img">
         <img src="image/upload.svg" alt="Upload">
@@ -881,6 +913,12 @@
         <button id="ai_add_job_btn" class="img">
           <img src="image/robot.svg" title="AI Add Job">
         </button>
+        <button id="filter_btn" class="img">
+          <img src="image/filter-1.svg" title="Filter Jobs">
+        </button>
+        <button id="sort_btn" class="img">
+          <img src="image/sort.svg" title="Sort Jobs">
+        </button>
       </header>
       <details slot="item" class="job-item">
         <summary>
@@ -890,11 +928,14 @@
             <span cid="agency_name_elem"></span>
           </div>
           <div class="float">
+            <button cid="attach_btn" class="img">
+              <img src="image/attach.svg" title="Attach Files">
+            </button>
             <button cid="add_note_btn" class="img">
               <img src="image/note-add.svg" title="Add Note">
             </button>
             <button cid="view_job_btn" class="img">
-              <img src="image/expand.svg" title="View Job">
+              <img src="image/zoom.svg" title="View Job">
             </button>
             <button cid="edit_job_btn" class="img">
               <img src="image/edit.svg" title="Edit Job">
@@ -1000,6 +1041,8 @@
     <span cid="des_elem" slot="body"></span>
     <label slot="body"></label><span cid="xrole_elem" slot="body"></span>
   </de-dialog-alert>
+
+  <de-dialog-confirm></de-dialog-confirm>
 
 </body>
 
