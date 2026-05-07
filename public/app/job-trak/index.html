@@ -94,21 +94,29 @@
     import * as fb_app from "firebase/app";
     import * as fb_ai from "firebase/ai";
 
+    const table_names = 
+    [
+      "jobs", 
+      "agencies", 
+      "contacts", 
+      "action_logs", 
+      "attachments"
+    ];
     const job_status =
-      [
-        { id: "bookmarked", label: "Bookmarked", type: 0 },
-        { id: "applying", label: "Applying", type: 0 },
-        { id: "applied", label: "Applied", type: 0 },
-        { id: "screening", label: "Screening", type: 0 },
-        { id: "interviewing", label: "Interviewing", type: 0 },
-        { id: "negotiating", label: "Negotiating", type: 0 },
-        { id: "offered", label: "Offered", type: 0 },
-        { id: "accepted", label: "Accepted", type: 0 },
-        { id: "rejected", label: "Rejected", type: 1 },
-        { id: "withdrawn", label: "Withdrawn", type: 1 },
-        { id: "ghosted", label: "Ghosted", type: 1 },
-        { id: "dismissed", label: "Not interested", type: 1 },
-      ];
+    [
+      { id: "bookmarked", label: "Bookmarked", type: 0 },
+      { id: "applying", label: "Applying", type: 0 },
+      { id: "applied", label: "Applied", type: 0 },
+      { id: "screening", label: "Screening", type: 0 },
+      { id: "interviewing", label: "Interviewing", type: 0 },
+      { id: "negotiating", label: "Negotiating", type: 0 },
+      { id: "offered", label: "Offered", type: 0 },
+      { id: "accepted", label: "Accepted", type: 0 },
+      { id: "rejected", label: "Rejected", type: 1 },
+      { id: "withdrawn", label: "Withdrawn", type: 1 },
+      { id: "ghosted", label: "Ghosted", type: 1 },
+      { id: "dismissed", label: "Not interested", type: 1 },
+    ];
 
     Main();
     async function Main()
@@ -183,12 +191,14 @@
       const agencies = await Get_Req_Res(Get_Table(db, "agencies").getAll());
       const contacts = await Get_Req_Res(Get_Table(db, "contacts").getAll());
       const action_logs = await Get_Req_Res(Get_Table(db, "action_logs").getAll());
+      const attachments = await Get_Req_Res(Get_Table(db, "attachments").getAll());
 
       const db_data = {
         jobs: jobs || [],
         agencies: agencies || [],
         contacts: contacts || [],
-        action_logs: action_logs || []
+        action_logs: action_logs || [],
+        attachments: attachments || []
       };
 
       const json_string = JSON.stringify(db_data, null, 2);
@@ -315,6 +325,39 @@
       }
     }
 
+    async function On_Click_Attach_Files(event, job_id, db)
+    {
+      //event?.stopPropagation?.();
+      //event?.preventDefault?.();
+
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.multiple = true;
+
+      input.onchange = Files_Change;
+      async function Files_Change(e)
+      {
+        const files = Array.from(e.target.files);
+        if (files && files.length > 0)
+        {
+          const attachments = files.map(file => ({
+            job_id,
+            file
+            //filename: file.name,
+            //mime_type: file.type || 'application/octet-stream',
+            //size: file.size,
+            //blob: file,
+            //timestamp: Date.now()
+          }));
+
+          await Insert_Items(db, 'attachments', attachments);
+          Alert(`${files.length} file${files.length === 1 ? '' : 's'} attached to the job.`);
+        }
+      }
+
+      input.click();
+    }
+
     async function On_Click_Add_Contact(db)
     {
       const agencies = await Get_Req_Res(Get_Table(db, "agencies").getAll());
@@ -350,10 +393,9 @@
 
     async function Clear_DB(db)
     {
-      const storeNames = ["jobs", "agencies", "contacts", "action_logs"];
-      const tx = db.transaction(storeNames, "readwrite");
+      const tx = db.transaction(table_names, "readwrite");
 
-      for (const storeName of storeNames) 
+      for (const storeName of table_names) 
       {
         tx.objectStore(storeName).clear();
       }
@@ -363,34 +405,23 @@
 
     async function Open_DB(ctx)
     {
-      const version = 2;
-      try { ctx.db = await (new Promise(IndexedDB_Open)); }
-      catch(error)
+      const promise = new Promise(On_Process);
+      function On_Process(resolve, reject)
       {
-        console.error("Open_DB():", error);
-        ctx.db = null;
-      }
-
-      function IndexedDB_Open(resolve, reject)
-      {
-        const request = indexedDB.open("JobTrakDB", version);
-        request.onupgradeneeded = Upgrade_Needed;
+        const request = indexedDB.open("JobTrakDB", 2);
+        request.onupgradeneeded = (event) => 
+        {
+          const db = event.target.result;
+          if (!db.objectStoreNames.contains("jobs")) db.createObjectStore("jobs", { keyPath: "id" });
+          if (!db.objectStoreNames.contains("agencies")) db.createObjectStore("agencies", { keyPath: "id" });
+          if (!db.objectStoreNames.contains("contacts")) db.createObjectStore("contacts", { keyPath: "id" });
+          if (!db.objectStoreNames.contains("action_logs")) db.createObjectStore("action_logs", { keyPath: "id" });
+          if (!db.objectStoreNames.contains("attachments")) db.createObjectStore("attachments", { keyPath: "id" });
+        };
         request.onsuccess = () => resolve(request.result);
         request.onerror = () => reject(request.error);
       }
-
-      function Upgrade_Needed(event)
-      {
-        const db = event.target.result;
-        if (!db.objectStoreNames.contains("jobs"))
-          db.createObjectStore("jobs", { keyPath: "id" });
-        if (!db.objectStoreNames.contains("agencies"))
-          db.createObjectStore("agencies", { keyPath: "id" });
-        if (!db.objectStoreNames.contains("contacts"))
-          db.createObjectStore("contacts", { keyPath: "id" });
-        if (!db.objectStoreNames.contains("action_logs"))
-          db.createObjectStore("action_logs", { keyPath: "id" });
-      };
+      ctx.db = await promise;
 
       return ctx.db;
     }
@@ -401,6 +432,7 @@
       await Insert_Items(db, "agencies", db_data.agencies);
       await Insert_Items(db, "contacts", db_data.contacts);
       await Insert_Items(db, "action_logs", db_data.action_logs);
+      await Insert_Items(db, "attachments", db_data.attachments);
     }
 
     function Get_Req_Res(request)
@@ -422,14 +454,8 @@
 
     function Get_Table(db, table_name, is_readonly = true)
     {
-      let store = null;
-
-      if (db)
-      {
-        const tx = db.transaction([table_name], is_readonly ? "readonly" : "readwrite");
-        store = tx.objectStore(table_name);
-      }
-
+      const tx = db.transaction([table_name], is_readonly ? "readonly" : "readwrite");
+      const store = tx.objectStore(table_name);
       return store;
     }
 
@@ -537,14 +563,6 @@
       {
         res = item_id;
       }
-
-      return res;
-    }
-
-    function Select_All(db, table_name)
-    {
-      const table = Get_Table(db, table_name);
-      const res = table ? Get_Req_Res(table.getAll()): null;
 
       return res;
     }
@@ -765,10 +783,10 @@
 
     async function Render_Job_Items(db)
     {
-      const jobs = await Select_All(db, "jobs") || [];
-      const agencies = await Select_All(db, "agencies") || [];
-      const contacts = await Select_All(db, "contacts") || [];
-      const action_logs = await Select_All(db, "action_logs") || [];
+      const jobs = await Get_Req_Res(Get_Table(db, "jobs").getAll()) || [];
+      const agencies = await Get_Req_Res(Get_Table(db, "agencies").getAll());
+      const contacts = await Get_Req_Res(Get_Table(db, "contacts").getAll());
+      const actionLogs = await Get_Req_Res(Get_Table(db, "action_logs").getAll());
 
       const enrichedJobs = jobs.map(Add_Details);
       enrichedJobs.sort((a, b) => a.status_type - b.status_type);
@@ -776,13 +794,13 @@
       function Add_Details(job) 
       {
         const status_type = job_status.find(s => s.id === job.status)?.type;
-        const latest_log = action_logs
+        const latestLog = actionLogs
           .filter(log => log.job_id === job.id)
           .sort((a, b) => b.timestamp - a.timestamp || b.id - a.id)[0];
         const agency_name = agencies?.find(a => a.id === job.agency_id)?.name || "N/A";
         const contact_name = contacts?.find(c => c.id === job.contact_id)?.name || "N/A";
-        const latest_note = latest_log?.note || "No notes available.";
-        const latest_note_time_formatted = latest_log ? new Date(latest_log.timestamp).toLocaleString() : "";
+        const latest_note = latestLog?.note || "No notes available.";
+        const latest_note_time_formatted = latestLog ? new Date(latestLog.timestamp).toLocaleString() : "";
 
         return {
           ...job,
@@ -811,6 +829,7 @@
       item_elem.contact_name_elem.textContent = job.contact_name;
       item_elem.latest_note_elem.textContent = job.latest_note;
       item_elem.latest_note_time_elem.textContent = job.latest_note_time_formatted;
+      item_elem.attach_btn.onclick = e => On_Click_Attach_Files(e, job.id, db);
       item_elem.add_note_btn.onclick = e => On_Click_Add_Note(e, job.id, db);
       item_elem.edit_job_btn.onclick = e => On_Click_Edit_Job(e, job.id, db);
       item_elem.del_job_btn.onclick = e => On_Click_Delete_Job(e, job.id, db);
@@ -824,8 +843,8 @@
 
     async function Render_Contacts(db)
     {
-      const contacts = await Select_All(db, "contacts") || [];
-      const agencies = await Select_All(db, "agencies") || [];
+      const contacts = await Get_Req_Res(Get_Table(db, "contacts").getAll());
+      const agencies = await Get_Req_Res(Get_Table(db, "agencies").getAll());
 
       const enrichedContacts = (contacts || []).map(contact => ({
         ...contact,

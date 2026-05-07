@@ -85,7 +85,7 @@ de-dialog-form dialog
   border: 1px solid;
   border-image:
     linear-gradient(to bottom right, var(--border-color) var(--s1), #fff var(--s2), #000 var(--s3)) 1;
-  animation: shift-colors 0.5s linear forwards;
+  animation: shift-colors 0.25s linear forwards;
 }
 button:hover,
 de-input-list details:hover
@@ -94,7 +94,7 @@ de-input-list details:hover
   border-image:
     /* linear-gradient(to bottom right, #fff var(--s1), var(--border-color) var(--s2)) 1; */
     linear-gradient(to bottom right, #fff var(--s1), #000 var(--s2)) 1;
-  animation: shift-colors-2 0.5s linear forwards;
+  animation: shift-colors-2 0.25s linear forwards;
 }
 
 :root {
