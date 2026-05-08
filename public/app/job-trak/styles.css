@@ -80,7 +80,8 @@
 }
 button, 
 de-input-list details,
-de-dialog-form dialog
+de-dialog-form dialog,
+.btn
 {
   border: 1px solid;
   border-image:
@@ -88,7 +89,8 @@ de-dialog-form dialog
   animation: shift-colors 0.25s linear forwards;
 }
 button:hover,
-de-input-list details:hover
+de-input-list details:hover,
+.btn:hover
 {
   border: 1px solid;
   border-image:
@@ -121,7 +123,7 @@ de-input-list details:hover
 
   background-color: #000;
   font-family: octagonal-bold;
-  font-size: 20px;
+  font-size: 22px;
   letter-spacing: 1px;
 
   stroke: var(--main);
@@ -197,7 +199,7 @@ main
   box-sizing: border-box;
 }
 
-button 
+button, .btn 
 {
   --border-color: #ff0;
   background-color: #0004;
@@ -207,6 +209,7 @@ button
   font-size: 1rem;
   letter-spacing: 2px;
   cursor: pointer;
+  display: inline-block;
 
   &.img
   {
@@ -252,17 +255,39 @@ de-input-list
     --border-color: #0f0;
     padding: 20px 20px;
     background: #0008;
-    
+
+    [cid="status_elem"] 
+    {
+      color: #000;
+      background-color: #0f0;
+      padding: 5px 10px;
+      text-shadow: none;
+    }
+
     &.failed
     {
       --border-color: #f00;
+
+      [cid="status_elem"]
+      {
+        color: #000;
+        background-color: #f33;
+      }
     }
   }
 
   summary
   {
-    position: relative;
     cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    align-items: center;
+
+    h2
+    {
+      margin: 0;
+    }
 
     .float
     {
@@ -270,6 +295,10 @@ de-input-list
       right: 0;
       top: 0;
     }
+  }
+  summary > :first-child 
+  {
+    flex-grow: 1;
   }
 }
 

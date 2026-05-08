@@ -61,6 +61,11 @@ class Utils
     return params;
   }
 
+  static Append_Str(a, b, sep)
+  {
+    return Utils.appendStr(a, b, sep);
+  }
+
   static appendStr(a, b, sep)
   {
     let res = null;

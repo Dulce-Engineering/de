@@ -70,17 +70,17 @@
     jobs
       id: string
       role_title: string
-
-      agency_id: int
-      company
-      contact_id: int
-      duration: string
-      jd_id: string
+      role_type: string
       location: string
       remuneration: float
       remuniration_unit: string
-      role_type: string
+      agency_id: int
+      contact_id: int
       status: string
+      jd_id: string
+
+      company: string
+      duration: string
       source: string
       description: string
   -->
@@ -250,6 +250,10 @@
           role_title: form_data.role_title?.trim() || null,
           role_type: form_data.role_type?.trim() || null,
           location: form_data.location?.trim() || null,
+          company: form_data.company?.trim() || null,
+          duration: form_data.duration?.trim() || null,
+          source: form_data.source?.trim() || null,
+          description: form_data.description?.trim() || null,
           remuneration: parseFloat(form_data.remuneration) || null,
           remuneration_unit: form_data.remuneration_unit?.trim() || null,
           agency_id: parseInt(form_data.agency_id) || null,
@@ -294,6 +298,10 @@
       {
         const job =
         {
+          company: form_data.company?.trim() || null,
+          duration: form_data.duration?.trim() || null,
+          source: form_data.source?.trim() || null,
+          description: form_data.description?.trim() || null,
           id: job_id,
           role_title: form_data.role_title?.trim() || null,
           role_type: form_data.role_type?.trim() || null,
@@ -754,7 +762,7 @@
     {
       let res = null;
 
-      if (job && job.role_title && contact_id)
+      if (job && job.role_title)
       {
         job.agency_id = agency_id;
         job.contact_id = contact_id;
@@ -774,7 +782,7 @@
 
       window.open(url, '_blank');
       setTimeout(() => URL.revokeObjectURL(url), 5000);
-      
+
       /*const a = document.createElement('a');
       a.href = url;
       a.target = "_blank";
@@ -817,9 +825,9 @@
         const latestLog = actionLogs
           .filter(log => log.job_id === job.id)
           .sort((a, b) => b.timestamp - a.timestamp || b.id - a.id)[0];
-        const agency_name = agencies?.find(a => a.id === job.agency_id)?.name || "N/A";
-        const contact_name = contacts?.find(c => c.id === job.contact_id)?.name || "N/A";
-        const latest_note = latestLog?.note || "No notes available.";
+        const agency_name = agencies?.find(a => a.id === job.agency_id)?.name;
+        const contact_name = contacts?.find(c => c.id === job.contact_id)?.name;
+        const latest_note = latestLog?.note;
         const latest_note_time_formatted = latestLog ? new Date(latestLog.timestamp).toLocaleString() : "";
         const job_attachments = attachments.filter(a => a.job_id === job.id);
 
@@ -842,21 +850,38 @@
       const item_elem = event.target;
       const job = item_elem.item_obj;
 
-      item_elem.role_title_elem.textContent = job.role_title;
-      item_elem.role_type_elem.textContent = job.role_type;
-      item_elem.location_elem.textContent = job.location;
-      item_elem.remuneration_elem.textContent = job.remuneration;
-      item_elem.remuneration_unit_elem.textContent = job.remuneration_unit;
-      item_elem.agency_name_elem.textContent = job.agency_name;
-      item_elem.contact_name_elem.textContent = job.contact_name;
-      item_elem.latest_note_elem.textContent = job.latest_note;
-      item_elem.latest_note_time_elem.textContent = job.latest_note_time_formatted;
+      const title_text = Utils.Append_Str(job.role_title, job.company, " - ");
+      item_elem.role_title_elem.textContent = title_text;
+
+      const contact_text = Utils.Append_Str(job.contact_name, job.agency_name, " @ ");
+      item_elem.contact_elem.textContent = contact_text;
+
+      const salary_text = Utils.Append_Str(job.remuneration, job.remuneration_unit, " ");
+      const type_text = Utils.Append_Str(job.role_type, job.duration, " - ");
+      const des_text = Utils.Append_Str(type_text, salary_text, " - ");
+      item_elem.role_type_elem.textContent = des_text;
+
+      Render_Attachment_List(item_elem.attachment_list_elem, job.attachments);
+
+      if (job.latest_note)
+      {
+        const note_html = 
+          "Latest Note (" + job.latest_note_time_formatted + "):<br> " + 
+          job.latest_note;
+        item_elem.note_elem.innerHTML = note_html;
+      }
+      else
+      {
+        item_elem.note_elem.remove();
+      }
+      
+      item_elem.status_elem.textContent = job.status;
+
       item_elem.attach_btn.onclick = e => On_Click_Attach_Files(e, job.id, db);
       item_elem.add_note_btn.onclick = e => On_Click_Add_Note(e, job.id, db);
       item_elem.edit_job_btn.onclick = e => On_Click_Edit_Job(e, job.id, db);
       item_elem.del_job_btn.onclick = e => On_Click_Delete_Job(e, job.id, db);
       item_elem.view_job_btn.onclick = e => On_Click_View_Job(e, job.id, db);
-      Render_Attachment_List(item_elem.attachment_list_elem, job.attachments);
 
       if (job.status_type == 0 || job.status_type == undefined)
         item_elem.classList.remove("failed");
@@ -908,7 +933,7 @@
       }
       else
       {
-        list_elem.innerHTML = '<li>No attachments</li>';
+        list_elem.remove();
       }
     }
 
@@ -949,21 +974,24 @@
   <header id="hdr_elem">
     <h1><span>JOPR&nbsp;&nbsp;</span></h1>
     <nav>
-      <button id="import_btn" class="img">
-        <img src="image/upload.svg" alt="Upload">
+      <button id="import_btn" class="img" title="Upload">
+        <img src="image/upload.svg">
       </button>
-      <button id="export_btn" class="img">
-        <img src="image/download.svg" alt="Download">
+      <button id="export_btn" class="img" title="Download">
+        <img src="image/download.svg">
       </button>
-      <button id="jobs_btn" class="img">
-        <img src="image/paid.svg" alt="Jobs">
+      <button id="jobs_btn" class="img" title="Jobs">
+        <img src="image/paid.svg">
       </button>
-      <button id="companies_btn" class="img">
-        <img src="image/factory.svg" alt="Companies">
+      <button id="companies_btn" class="img" title="Companies">
+        <img src="image/factory.svg">
       </button>
-      <button id="contacts_btn" class="img">
-        <img src="image/contacts.svg" alt="Contacts">
+      <button id="contacts_btn" class="img" title="Contacts">
+        <img src="image/contacts.svg">
       </button>
+      <a id="analysis_btn" class="btn img" href="../job-woper" title="Market Analysis">
+        <img src="image/chart-4.svg">
+      </a>
     </nav>
     <output id="alert_elem" role="status"></output>
   </header>
@@ -987,12 +1015,12 @@
       </header>
       <details slot="item" class="job-item">
         <summary>
-          <b cid="role_title_elem"></b>
           <div>
-            <span cid="contact_name_elem"></span> @
-            <span cid="agency_name_elem"></span>
+            <h2 cid="role_title_elem"></h2>
+            <span cid="contact_elem"></span>
           </div>
-          <div class="float">
+          <div cid="status_elem">blah</div>
+          <div class="">
             <button cid="attach_btn" class="img">
               <img src="image/attach.svg" title="Attach Files">
             </button>
@@ -1010,16 +1038,8 @@
             </button>
           </div>
         </summary>
-        <p>
-          <span cid="role_type_elem"></span> - <span cid="location_elem"></span>
-        </p>
-        <p>Remuneration:
-          <span cid="remuneration_elem"></span>
-          <span cid="remuneration_unit_elem"></span>
-        </p>
-        <p>Latest Note (<span cid="latest_note_time_elem"></span>): <br>
-          <i cid="latest_note_elem"></i>
-        </p>
+        <p cid="role_type_elem"></p>
+        <p cid="note_elem"></p>
         <div class="attachment-list">
           <strong>Attachments:</strong>
           <ul cid="attachment_list_elem"></ul>
@@ -1063,6 +1083,14 @@
     <input slot="fields" type="text" name="role_type" placeholder="e.g., Full-time, Contract">
     <label slot="fields">Location</label>
     <input slot="fields" type="text" name="location" placeholder="Job location">
+    <label slot="fields">Company</label>
+    <input slot="fields" type="text" name="company" placeholder="Company name">
+    <label slot="fields">Duration</label>
+    <input slot="fields" type="text" name="duration" placeholder="Job duration">
+    <label slot="fields">Source</label>
+    <input slot="fields" type="text" name="source" placeholder="Job source">
+    <label slot="fields">Description</label>
+    <textarea slot="fields" name="description" placeholder="Job description" rows="4"></textarea>
     <label slot="fields">Remuneration</label>
     <input slot="fields" type="number" name="remuneration" placeholder="Salary/rate" step="0.01">
     <label slot="fields">Remuneration Unit</label>
