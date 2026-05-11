@@ -382,8 +382,13 @@ de-dialog-form, de-dialog-alert
     background-color: var(--shade);
   }
 
-  h1 {
+  h1 
+  {
     font-size: 2rem;
+  }
+  h2
+  {
+    margin: 0;
   }
 
   label {

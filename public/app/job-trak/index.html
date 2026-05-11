@@ -147,6 +147,7 @@
       add_job_btn.onclick = () => On_Click_Add_Job(db);
       ai_add_job_btn.onclick = () => On_Click_AI_Add_Job(ctx);
       add_contact_btn.onclick = () => On_Click_Add_Contact(db);
+      add_company_btn.onclick = () => On_Click_Add_Company(db);
 
       jobs_list.addEventListener("render", e => Render_Job_Item(e, db));
       contacts_list.addEventListener("render", e => Render_Contact_Item(e, db));
@@ -159,12 +160,25 @@
 
     // events =========================================================================
 
-    function Toggle_View(view_elem)
+    async function On_Click_Add_Company(db)
     {
-      jobs_list.classList.add("hidden");
-      contacts_list.classList.add("hidden");
-      companies_list.classList.add("hidden");
-      view_elem.classList.remove("hidden");
+      const form_data = await company_dialog.Show_Async();
+      if (form_data)
+      {
+        const company =
+        {
+          name: form_data.name?.trim() || null,
+          url: form_data.url?.trim() || null,
+          address: form_data.address?.trim() || null,
+          phone: form_data.phone?.trim() || null,
+          email: form_data.email?.trim() || null,
+          industry: form_data.industry?.trim() || null
+        };
+
+        await Insert(db, "agencies", company);
+        await Render_Companies(db);
+        Alert("Company added successfully.");
+      }
     }
 
     async function On_Click_Import_Btn(db)
@@ -807,6 +821,14 @@
 
     // rendering ======================================================================
 
+    function Toggle_View(view_elem)
+    {
+      jobs_list.classList.add("hidden");
+      contacts_list.classList.add("hidden");
+      companies_list.classList.add("hidden");
+      view_elem.classList.remove("hidden");
+    }
+
     async function Render_Companies(db)
     {
       const companies = await Get_Req_Res(Get_Table(db, "agencies").getAll()) || [];
@@ -1136,7 +1158,7 @@
   </footer>
 
   <de-dialog-form id="job_dialog">
-    <h1 slot="header">Add Job</h1>
+    <h2 slot="header">Add Job</h2>
     <label slot="fields">Role Title</label>
     <input slot="fields" type="text" name="role_title" placeholder="Job title">
     <label slot="fields">Role Type</label>
@@ -1164,7 +1186,7 @@
   </de-dialog-form>
 
   <de-dialog-form id="note_dialog">
-    <h1 slot="header">Add Job Note</h1>
+    <h2 slot="header">Add Job Note</h2>
     <label slot="fields">Note</label>
     <textarea slot="fields" name="note" placeholder="Enter your note here..." rows="5"></textarea>
     <label slot="fields">Status</label>
@@ -1172,7 +1194,7 @@
   </de-dialog-form>
 
   <de-dialog-form id="contact_dialog">
-    <h1 slot="header">Add Contact</h1>
+    <h2 slot="header">Add Contact</h2>
     <label slot="fields">Name</label>
     <input slot="fields" type="text" name="name" placeholder="Contact name">
     <label slot="fields">Email</label>
@@ -1185,8 +1207,8 @@
     <select id="contact_agency_select" slot="fields" name="agency_id"></select>
   </de-dialog-form>
 
-  <de-dialog-form id="agency_dialog">
-    <h1 slot="header">Add Agency / Company</h1>
+  <de-dialog-form id="company_dialog">
+    <h2 slot="header">Add Agency / Company</h2>
     <label slot="fields">Name</label>
     <input slot="fields" type="text" name="name" placeholder="Company name">
     <label slot="fields">URL</label>
@@ -1202,7 +1224,7 @@
   </de-dialog-form>
 
   <de-dialog-form id="email_dialog">
-    <h1 slot="header">Extract Job from Text</h1>
+    <h2 slot="header">Extract Job from Text</h2>
     <label slot="fields">Paste Text</label>
     <textarea slot="fields" name="email_text" placeholder="Paste the job email content here..." rows="10"></textarea>
     <p slot="fields" style="font-size: 0.9em; color: #666;">AI will attempt to extract job details, contact info, and
