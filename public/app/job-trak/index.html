@@ -58,6 +58,10 @@
       id: int
       name: string
       url: string
+      address: string
+      phone: string
+      email: string
+      industry: string
 
     contacts
       id: int
@@ -135,16 +139,22 @@
 
       import_btn.onclick = On_Click_Import_Btn;
       export_btn.onclick = () => On_Click_Export_Btn(db);
+
       jobs_btn.onclick = () => Toggle_View(jobs_list);
+      companies_btn.onclick = () => Toggle_View(companies_list);
       contacts_btn.onclick = () => Toggle_View(contacts_list);
+
       add_job_btn.onclick = () => On_Click_Add_Job(db);
       ai_add_job_btn.onclick = () => On_Click_AI_Add_Job(ctx);
       add_contact_btn.onclick = () => On_Click_Add_Contact(db);
+
       jobs_list.addEventListener("render", e => Render_Job_Item(e, db));
-      contacts_list.addEventListener("render", e => On_Render_Contact_Item(e, db));
+      contacts_list.addEventListener("render", e => Render_Contact_Item(e, db));
+      companies_list.addEventListener("render", e => Render_Company_Item(e));
 
       Render_Job_Items(db);
       Render_Contacts(db);
+      Render_Companies(db);
     }
 
     // events =========================================================================
@@ -153,6 +163,7 @@
     {
       jobs_list.classList.add("hidden");
       contacts_list.classList.add("hidden");
+      companies_list.classList.add("hidden");
       view_elem.classList.remove("hidden");
     }
 
@@ -796,6 +807,26 @@
 
     // rendering ======================================================================
 
+    async function Render_Companies(db)
+    {
+      const companies = await Get_Req_Res(Get_Table(db, "agencies").getAll()) || [];
+      companies_list.value = companies;
+    }
+
+    function Render_Company_Item(event)
+    {
+      const item_elem = event.target;
+      const agency = item_elem.item_obj;
+
+      item_elem.agency_name_elem.textContent = agency.name || "Unnamed Company";
+      item_elem.agency_industry_elem.textContent = agency.industry ? `Industry: ${agency.industry}` : "";
+      item_elem.agency_url_elem.textContent = agency.url || "No website";
+      item_elem.agency_url_elem.href = agency.url || "#";
+      item_elem.agency_phone_elem.textContent = agency.phone || "N/A";
+      item_elem.agency_email_elem.textContent = agency.email || "N/A";
+      item_elem.agency_address_elem.textContent = agency.address || "N/A";
+    }
+
     function Set_Options(select_elem, items, value_field, text_field)
     {
       select_elem.innerHTML = '<option value="">None</option>';
@@ -902,7 +933,7 @@
       contacts_list.value = enrichedContacts;
     }
 
-    function On_Render_Contact_Item(event, db)
+    function Render_Contact_Item(event, db)
     {
       const itemElem = event.target;
       const contact = itemElem.item_obj;
@@ -1000,6 +1031,7 @@
 
     <de-input-list id="jobs_list">
       <header slot="header">
+        <h2>Jobs</h2>
         <button id="add_job_btn" class="img">
           <img src="image/add.svg" title="Add Job">
         </button>
@@ -1020,7 +1052,7 @@
             <span cid="contact_elem"></span>
           </div>
           <div cid="status_elem">blah</div>
-          <div class="">
+          <div class="menu">
             <button cid="attach_btn" class="img">
               <img src="image/attach.svg" title="Attach Files">
             </button>
@@ -1049,6 +1081,7 @@
 
     <de-input-list id="contacts_list" class="hidden">
       <header slot="header">
+        <h2>Contacts</h2>
         <button id="add_contact_btn" class="img">
           <img src="image/add.svg" alt="Add Contact">
         </button>
@@ -1063,6 +1096,33 @@
         <p>Email: <span cid="contact_email_elem"></span></p>
         <p>Phone: <span cid="contact_phone_elem"></span></p>
         <p>Position: <span cid="contact_position_elem"></span></p>
+      </details>
+    </de-input-list>
+
+    <de-input-list id="companies_list" class="hidden">
+      <header slot="header">
+        <h2>Agencies & Companies</h2>
+        <button id="add_company_btn" class="img">
+          <img src="image/add.svg" alt="Add Company">
+        </button>
+      </header>
+      <details slot="item" class="company-item">
+        <summary>
+          <b cid="agency_name_elem"></b>
+          <div><span cid="agency_industry_elem"></span></div>
+          <div class="menu">
+            <button cid="edit_company_btn" class="img">
+              <img src="image/edit.svg" title="Edit Company">
+            </button>
+            <button cid="del_company_btn" class="img">
+              <img src="image/delete.svg" alt="" title="Delete Company">
+            </button>
+          </div>
+        </summary>
+        <p>Website: <a cid="agency_url_elem" href="#" target="_blank" rel="noopener"></a></p>
+        <p>Email: <span cid="agency_email_elem"></span></p>
+        <p>Phone: <span cid="agency_phone_elem"></span></p>
+        <p>Address: <span cid="agency_address_elem"></span></p>
       </details>
     </de-input-list>
 
@@ -1123,6 +1183,22 @@
     <input slot="fields" type="text" name="position" placeholder="Contact position">
     <label slot="fields">Agency</label>
     <select id="contact_agency_select" slot="fields" name="agency_id"></select>
+  </de-dialog-form>
+
+  <de-dialog-form id="agency_dialog">
+    <h1 slot="header">Add Agency / Company</h1>
+    <label slot="fields">Name</label>
+    <input slot="fields" type="text" name="name" placeholder="Company name">
+    <label slot="fields">URL</label>
+    <input slot="fields" type="url" name="url" placeholder="https://example.com">
+    <label slot="fields">Address</label>
+    <input slot="fields" type="text" name="address" placeholder="Address">
+    <label slot="fields">Phone</label>
+    <input slot="fields" type="tel" name="phone" placeholder="Phone">
+    <label slot="fields">Email</label>
+    <input slot="fields" type="email" name="email" placeholder="Email">
+    <label slot="fields">Industry</label>
+    <input slot="fields" type="text" name="industry" placeholder="Industry sector">
   </de-dialog-form>
 
   <de-dialog-form id="email_dialog">

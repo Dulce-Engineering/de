@@ -204,6 +204,8 @@ button, .btn
   --border-color: #ff0;
   background-color: #0004;
   color: #ff0;
+  xbackground-color: #ff0;
+  xcolor: #000;
   font-family: hyperspace-bold;
   padding: 12px 16px;
   font-size: 1rem;
@@ -236,8 +238,19 @@ de-input-list
   header
   {
     margin: 0 0 20px 0;
+    display: flex;
     flex-direction: row;
+    justify-content: space-between;
     gap: 10px;
+
+    h2
+    {
+      margin: 0;
+    }
+  }
+  header > :first-child 
+  {
+    flex-grow: 1;
   }
 
   main
@@ -294,6 +307,12 @@ de-input-list
       position: absolute;
       right: 0;
       top: 0;
+    }
+    .menu
+    {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
     }
   }
   summary > :first-child 
@@ -491,6 +510,7 @@ de-tree {
   cursor: pointer;
   text-decoration: underline solid var(--link);
   text-underline-offset: 8px;
+  margin: 0 0 10px 0;
 
   &:hover
   {
