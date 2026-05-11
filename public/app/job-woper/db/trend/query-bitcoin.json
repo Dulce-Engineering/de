@@ -370,5 +370,11 @@
     "datetime": 1778158624636,
     "id": "1bf938d2-e1c6-4fdc-82db-cb6752b1dc44",
     "query_id": "-bitcoin"
+  },
+  {
+    "count": 34,
+    "datetime": 1778476933608,
+    "id": "cce8e9a7-9d2b-4b10-8e0a-a6529f688f6c",
+    "query_id": "-bitcoin"
   }
 ]

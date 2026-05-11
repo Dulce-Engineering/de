@@ -400,5 +400,11 @@
     "datetime": 1778158500799,
     "id": "6e6a9736-321a-4367-bd4c-de611debe7a9",
     "query_id": "-angular"
+  },
+  {
+    "count": 589,
+    "datetime": 1778476804143,
+    "id": "6d5f5a11-7b7a-4cae-ac3b-1eecc19bb188",
+    "query_id": "-angular"
   }
 ]

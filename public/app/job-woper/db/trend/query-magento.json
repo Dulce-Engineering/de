@@ -370,5 +370,11 @@
     "datetime": 1778158939092,
     "id": "5cc7e9f9-30cf-4f01-9c64-3b7c904d7489",
     "query_id": "-magento"
+  },
+  {
+    "count": 9,
+    "datetime": 1778477256238,
+    "id": "5b2ffaa7-380f-4827-b144-1ac73c472da3",
+    "query_id": "-magento"
   }
 ]
