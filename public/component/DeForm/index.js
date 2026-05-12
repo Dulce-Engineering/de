@@ -10,6 +10,9 @@ class DeForm extends HTMLElement
   {
     super();
     Utils.Bind(this, "On_");
+
+    this.submit_resolve = null;
+    this.submit_reject = null;
   }
 
   connectedCallback()
@@ -200,6 +203,35 @@ class DeForm extends HTMLElement
     }
   }
 
+  Submit(value)
+  {
+    //this.classList.add("hydrated");
+    this.value = value;
+
+    const promise = new Promise((resolve, reject) =>
+    {
+      this.submit_resolve = resolve;
+      this.submit_reject = reject;
+    });
+
+    return promise;
+  }
+
+  Resolve(value, event_name)
+  {
+    if (this.submit_resolve)
+    {
+      this.submit_resolve(value);
+
+      this.submit_resolve = null;
+      this.submit_reject = null;
+    }
+    else
+    {
+      this.dispatchEvent(new Event(event_name));
+    }
+  }
+
   // events ===================================================================
 
   On_KeyDown(event)
@@ -213,7 +245,7 @@ class DeForm extends HTMLElement
 
   On_Click_Cancel_Btn()
   {
-    this.dispatchEvent(new CustomEvent("cancel"));
+    this.Resolve(null, "cancel");
   }
 
   On_Click_OK_Btn(event)
@@ -222,7 +254,7 @@ class DeForm extends HTMLElement
     //event.preventDefault();
     if (this.form_elem.reportValidity())
     {
-      this.dispatchEvent(new CustomEvent("ok"));
+      this.Resolve(this.value, "ok");
     }
   }
 
@@ -254,7 +286,7 @@ class DeForm extends HTMLElement
 
           <button cid="ok_btn" type="button">
             <span cid="ok_btn_label" class="text">OK</span>
-            <img cid="prog_img" src="image/progress.svg" hidden>
+            <!--img cid="prog_img" src="image/progress.svg" hidden-->
           </button>
 
           <button cid="clr_btn" type="reset">

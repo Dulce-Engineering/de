@@ -53,50 +53,16 @@
   }
   </script>
 
-  <!--
-    agencies
-      id: int
-      name: string
-      url: string
-      address: string
-      phone: string
-      email: string
-      industry: string
-
-    contacts
-      id: int
-      agency_id: int
-      email: string
-      name: string
-      phone: string
-      position: string
-
-    jobs
-      id: string
-      role_title: string
-      role_type: string
-      location: string
-      remuneration: float
-      remuniration_unit: string
-      agency_id: int
-      contact_id: int
-      status: string
-      jd_id: string
-
-      company: string
-      duration: string
-      source: string
-      description: string
-  -->
-
   <script type="module">
+    import * as fb_app from "firebase/app";
+    import * as fb_ai from "firebase/ai";
     import Utils from "../../lib/Utils.js";
+    import Db from "./lib/Db.js";
     import "../../component/DeInputList/index3.js";
+    import "../../component/DeForm/index.js";
     import "../../component/DeDialogForm/index.js";
     import "../../component/DeDialogAlert/index.js";
     import "../../component/DeDialogConfirm/index.js";
-    import * as fb_app from "firebase/app";
-    import * as fb_ai from "firebase/ai";
 
     const table_names = 
     [
@@ -104,7 +70,8 @@
       "agencies", 
       "contacts", 
       "action_logs", 
-      "attachments"
+      "attachments",
+      "profiles"
     ];
     const job_status =
     [
@@ -132,17 +99,22 @@
 
       const ctx = { };
       Init_AI(ctx);
-      const db = await Open_DB(ctx);
+      const db = await Db.Open_DB(ctx);
 
       Set_Options(note_status_select, job_status, "id", "label");
       Set_Options(job_status_select, job_status, "id", "label");
 
-      import_btn.onclick = On_Click_Import_Btn;
+      import_btn.onclick = () => On_Click_Import_Btn(db);
       export_btn.onclick = () => On_Click_Export_Btn(db);
 
-      jobs_btn.onclick = () => Toggle_View(jobs_list);
-      companies_btn.onclick = () => Toggle_View(companies_list);
-      contacts_btn.onclick = () => Toggle_View(contacts_list);
+      jobs_btn.onclick = () => Show_View(jobs_list);
+      companies_btn.onclick = () => Show_View(companies_list);
+      contacts_btn.onclick = () => Show_View(contacts_list);
+      profile_btn.onclick = () => Show_View(profile_elem);
+      
+      edit_profile_btn.onclick = () => On_Click_Edit_Profile(db);
+      profile_form.addEventListener("ok", () => On_Click_Save_Profile(db));
+      profile_form.addEventListener("cancel", () => Toggle_Profile_View(false));
 
       add_job_btn.onclick = () => On_Click_Add_Job(db);
       ai_add_job_btn.onclick = () => On_Click_AI_Add_Job(ctx);
@@ -156,6 +128,7 @@
       Render_Job_Items(db);
       Render_Contacts(db);
       Render_Companies(db);
+      Render_Profile(db);
     }
 
     // events =========================================================================
@@ -181,6 +154,25 @@
       }
     }
 
+    async function On_Click_Edit_Profile(db)
+    {
+      profile_details.classList.add("hidden");
+      profile_form.classList.remove("hidden");
+
+      const profiles = await Db.Get_All(db, "profiles");
+      const profile = profiles && profiles.length > 0 ? profiles[0] : null;
+      const form_data = await profile_form.Submit(profile);
+      if (form_data)
+      {
+        await Save(db, "profiles", { ...form_data, id: profile?.id });
+        Alert("Profile saved successfully.");
+        Render_Profile(db);
+      }
+
+      profile_details.classList.remove("hidden");
+      profile_form.classList.add("hidden");
+    }
+
     async function On_Click_Import_Btn(db)
     {
       const input = document.createElement('input');
@@ -192,19 +184,25 @@
         const file = e.target.files[0];
         if (!file) return;
 
-        try 
+        const text = await file.text();
+        const db_data = JSON.parse(text);
+
+        const attachments = db_data.attachments;
+        if (attachments)
         {
-          const text = await file.text();
-          const db_data = JSON.parse(text);
-          await Clear_DB(db);
-          await Save_To_IndexedDB(db, db_data);
-          Render_Job_Items(db);
-          Alert("Data imported from " + file.name + " to IndexedDB instance.");
+          for (const attachment of attachments)
+          {
+            if (attachment.file)
+            {
+              attachment.file = await Deserialize_File(attachment.file);
+            }
+          }
         }
-        catch (err)
-        {
-          Alert("Failed to import: Please select a valid JSON database file.");
-        }
+
+        await Clear_DB(db);
+        await Save_To_IndexedDB(db, db_data);
+        Render_Job_Items(db);
+        Alert("Data imported from " + file.name + " to IndexedDB instance.");
       };
 
       input.click();
@@ -212,18 +210,32 @@
 
     async function On_Click_Export_Btn(db)
     {
-      const jobs = await Get_Req_Res(Get_Table(db, "jobs").getAll());
-      const agencies = await Get_Req_Res(Get_Table(db, "agencies").getAll());
-      const contacts = await Get_Req_Res(Get_Table(db, "contacts").getAll());
-      const action_logs = await Get_Req_Res(Get_Table(db, "action_logs").getAll());
-      const attachments = await Get_Req_Res(Get_Table(db, "attachments").getAll());
+      const action_logs = await Get_All(db, "action_logs");
+      const agencies = await Get_All(db, "agencies");
+      const contacts = await Get_All(db, "contacts");
+      const jobs = await Get_All(db, "jobs");
+      const profiles = await Get_All(db, "profiles");
 
-      const db_data = {
-        jobs: jobs || [],
-        agencies: agencies || [],
-        contacts: contacts || [],
-        action_logs: action_logs || [],
-        attachments: attachments || []
+      const attachments = await Get_All(db, "attachments");
+      if (attachments)
+      {
+        for (const attachment of attachments)
+        {
+          if (attachment.file)
+          {
+            attachment.file = await Serialize_File(attachment.file);
+          }
+        }
+      }
+
+      const db_data = 
+      {
+        jobs,
+        agencies,
+        contacts,
+        action_logs,
+        attachments,
+        profiles,
       };
 
       const json_string = JSON.stringify(db_data, null, 2);
@@ -262,8 +274,8 @@
 
     async function On_Click_Add_Job(db)
     {
-      const agencies = await Get_Req_Res(Get_Table(db, "agencies").getAll());
-      const contacts = await Get_Req_Res(Get_Table(db, "contacts").getAll());
+      const agencies = await Get_All(db, "agencies");
+      const contacts = await Get_All(db, "contacts");
       Set_Options(job_agency_select, agencies, "id", "name");
       Set_Options(job_contact_select, contacts, "id", "name");
 
@@ -312,8 +324,8 @@
 
     async function On_Click_Edit_Job(event, job_id, db)
     {
-      const agencies = await Get_Req_Res(Get_Table(db, "agencies").getAll());
-      const contacts = await Get_Req_Res(Get_Table(db, "contacts").getAll());
+      const agencies = await Get_All(db, "agencies");
+      const contacts = await Get_All(db, "contacts");
       Set_Options(job_agency_select, agencies, "id", "name");
       Set_Options(job_contact_select, contacts, "id", "name");
       const curr_job = await Select_By_Id(db, "jobs", job_id);
@@ -370,9 +382,9 @@
         {
           const attachments = files.map(file => ({
             job_id,
-            filename: file.name,
-            mime_type: file.type || 'application/octet-stream',
-            size: file.size,
+            //filename: file.name,
+            //mime_type: file.type || 'application/octet-stream',
+            //size: file.size,
             file,
             timestamp: Date.now()
           }));
@@ -388,7 +400,7 @@
 
     async function On_Click_Add_Contact(db)
     {
-      const agencies = await Get_Req_Res(Get_Table(db, "agencies").getAll());
+      const agencies = await Get_All(db, "agencies");
       Set_Options(contact_agency_select, agencies, "id", "name");
 
       const form_data = await contact_dialog.Show_Async();
@@ -420,185 +432,7 @@
     function On_Click_Attachment(attachment)
     {
       const filename = attachment.filename || attachment.file?.name || 'Unnamed file';
-      Download_File(attachment.file, filename);
-    }
-
-    // db =============================================================================
-
-    async function Clear_DB(db)
-    {
-      const tx = db.transaction(table_names, "readwrite");
-
-      for (const storeName of table_names) 
-      {
-        tx.objectStore(storeName).clear();
-      }
-
-      return new Promise((resolve) => tx.oncomplete = resolve);
-    }
-
-    async function Open_DB(ctx)
-    {
-      const promise = new Promise(On_Process);
-      function On_Process(resolve, reject)
-      {
-        const request = indexedDB.open("JobTrakDB", 2);
-        request.onupgradeneeded = (event) => 
-        {
-          const db = event.target.result;
-          if (!db.objectStoreNames.contains("jobs")) db.createObjectStore("jobs", { keyPath: "id" });
-          if (!db.objectStoreNames.contains("agencies")) db.createObjectStore("agencies", { keyPath: "id" });
-          if (!db.objectStoreNames.contains("contacts")) db.createObjectStore("contacts", { keyPath: "id" });
-          if (!db.objectStoreNames.contains("action_logs")) db.createObjectStore("action_logs", { keyPath: "id" });
-          if (!db.objectStoreNames.contains("attachments")) db.createObjectStore("attachments", { keyPath: "id" });
-        };
-        request.onsuccess = () => resolve(request.result);
-        request.onerror = () => reject(request.error);
-      }
-      ctx.db = await promise;
-
-      return ctx.db;
-    }
-
-    async function Save_To_IndexedDB(db, db_data)
-    {
-      await Insert_Items(db, "jobs", db_data.jobs);
-      await Insert_Items(db, "agencies", db_data.agencies);
-      await Insert_Items(db, "contacts", db_data.contacts);
-      await Insert_Items(db, "action_logs", db_data.action_logs);
-      await Insert_Items(db, "attachments", db_data.attachments);
-    }
-
-    function Get_Req_Res(request)
-    {
-      const res_promise = new Promise((resolve, reject) =>
-      {
-        request.onsuccess = () => resolve(request.result || null);
-        request.onerror = () => On_Db_Error(request, reject);
-      });
-
-      return res_promise;
-    }
-
-    function On_Db_Error(request, reject_fn)
-    {
-      console.error("IndexedDB error:", request.error);
-      reject_fn(request.error);
-    }
-
-    function Get_Table(db, table_name, is_readonly = true)
-    {
-      const tx = db.transaction([table_name], is_readonly ? "readonly" : "readwrite");
-      const store = tx.objectStore(table_name);
-      return store;
-    }
-
-    async function Next_Id(db, table)
-    {
-      const data = await Get_Req_Res(table.getAll());
-      const nextId = (data || []).reduce
-        ((max, action) => Math.max(max, action.id || 0), 0) + 1;
-      return nextId;
-    }
-
-    function Select_By_Id(db, table_name, id)
-    {
-      const table = Get_Table(db, table_name);
-      const request = table.get(id);
-      return Get_Req_Res(request);
-    }
-
-    async function Insert(db, table_name, item)
-    {
-      const ids = await Insert_Items(db, table_name, [item]);
-      return ids[0];
-    }
-
-    async function Insert_Items(db, table_name, items)
-    {
-      let res = null;
-
-      if (items && items.length > 0)
-      {
-        res = [];
-        const table = Get_Table(db, table_name, false);
-        for (const item of items)
-        {
-          if (item)
-          {
-            if (item.id == null || item.id == undefined)
-              item.id = await Next_Id(db, table);
-            await Get_Req_Res(table.add(item));
-            res.push(item.id);
-          }
-        }
-      }
-
-      return res;
-    }
-
-    async function Delete_By_Id(db, table_name, id)
-    {
-      const table = Get_Table(db, table_name, false);
-      const res = Get_Req_Res(table.delete(id));
-      return res;
-    }
-
-    async function Update(db, table_name, new_item)
-    {
-      let res = null;
-
-      const table = Get_Table(db, table_name, false);
-      const existing_item = await Get_Req_Res(table.get(new_item.id));
-      if (existing_item)
-      {
-        const combined_item = { ...existing_item, ...new_item };
-        const request = table.put(combined_item);
-        res = Get_Req_Res(request);
-      }
-
-      return res;
-    }
-
-    async function Exists_By_Id(db, table_name, id)
-    {
-      const table = Get_Table(db, table_name);
-      const result = await Get_Req_Res(table.getKey(id));
-
-      return result != null;
-    }
-
-    async function Find_Id(db, table_name, fn)
-    {
-      const items = await Get_Req_Res(Get_Table(db, table_name).getAll());
-      const item = items.find(fn);
-
-      return item == null || item == undefined ? null: item.id;
-    }
-
-    async function Exists(db, table_name, fn)
-    {
-      const items = await Get_Req_Res(Get_Table(db, table_name).getAll());
-      const exists = items.some(fn);
-
-      return exists;
-    }
-
-    async function Insert_If_New(db, table_name, data, fn)
-    {
-      let res = null;
-
-      const item_id = await Find_Id(db, table_name, fn);
-      if (item_id == null)
-      {
-        res = await Insert(db, table_name, data);
-      }
-      else
-      {
-        res = item_id;
-      }
-
-      return res;
+      Show_File(attachment.file, filename);
     }
 
     // ai =============================================================================
@@ -801,37 +635,69 @@
       return res;
     }
 
-    function Download_File(blob, filename)
+    function Show_File(blob, filename)
     {
       const url = URL.createObjectURL(blob);
 
       window.open(url, '_blank');
       setTimeout(() => URL.revokeObjectURL(url), 5000);
+    }
 
-      /*const a = document.createElement('a');
+    function Download_File(blob, filename)
+    {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
       a.href = url;
-      a.target = "_blank";
-      a.rel = 'noopener noreferrer';
+      a.download = filename;
       document.body.appendChild(a);
       a.click();
 
       document.body.removeChild(a);
-      URL.revokeObjectURL(url);*/
+      URL.revokeObjectURL(url);
     }
 
     // rendering ======================================================================
 
-    function Toggle_View(view_elem)
+    async function Render_Profile(db)
+    {
+      const profiles = await Db.Get_All(db, "profiles");
+      if (profiles)
+      {
+        const profile = profiles[0] || {}; // Assume first profile
+
+        profile_address.textContent = profile.address || "N/A";
+        profile_seek_url.textContent = profile.seek_url || "N/A";
+        profile_linkedin_url.textContent = profile.linkedin_url || "N/A";
+        profile_residency_status.textContent = profile.residency_status || "N/A";
+        profile_personal_summary.textContent = profile.personal_summary || "N/A";
+        profile_skills.textContent = profile.skills || "N/A";
+        profile_interests.textContent = profile.interests || "N/A";
+
+        // Set form value for editing
+        profile_form.value = {
+          address: profile.address || "",
+          seek_url: profile.seek_url || "",
+          linkedin_url: profile.linkedin_url || "",
+          residency_status: profile.residency_status || "",
+          personal_summary: profile.personal_summary || "",
+          skills: profile.skills || "",
+          interests: profile.interests || ""
+        };
+      }
+    }
+
+    function Show_View(view_elem)
     {
       jobs_list.classList.add("hidden");
       contacts_list.classList.add("hidden");
       companies_list.classList.add("hidden");
+      profile_elem.classList.add("hidden");
       view_elem.classList.remove("hidden");
     }
 
     async function Render_Companies(db)
     {
-      const companies = await Get_Req_Res(Get_Table(db, "agencies").getAll()) || [];
+      const companies = await Db.Get_All(db, "agencies");
       companies_list.value = companies;
     }
 
@@ -863,11 +729,11 @@
 
     async function Render_Job_Items(db)
     {
-      const jobs = await Get_Req_Res(Get_Table(db, "jobs").getAll()) || [];
-      const agencies = await Get_Req_Res(Get_Table(db, "agencies").getAll());
-      const contacts = await Get_Req_Res(Get_Table(db, "contacts").getAll());
-      const actionLogs = await Get_Req_Res(Get_Table(db, "action_logs").getAll());
-      const attachments = await Get_Req_Res(Get_Table(db, "attachments").getAll()) || [];
+      const jobs = await Db.Get_All(db, "jobs");
+      const agencies = await Db.Get_All(db, "agencies");
+      const contacts = await Db.Get_All(db, "contacts");
+      const actionLogs = await Db.Get_All(db, "action_logs");
+      const attachments = await Db.Get_All(db, "attachments");
 
       const enrichedJobs = jobs.map(Add_Details);
       enrichedJobs.sort((a, b) => a.status_type - b.status_type);
@@ -944,8 +810,8 @@
 
     async function Render_Contacts(db)
     {
-      const contacts = await Get_Req_Res(Get_Table(db, "contacts").getAll());
-      const agencies = await Get_Req_Res(Get_Table(db, "agencies").getAll());
+      const contacts = await Db.Get_All(db, "contacts");
+      const agencies = await Db.Get_All(db, "agencies");
 
       const enrichedContacts = (contacts || []).map(contact => ({
         ...contact,
@@ -1041,6 +907,9 @@
       </button>
       <button id="contacts_btn" class="img" title="Contacts">
         <img src="image/contacts.svg">
+      </button>
+      <button id="profile_btn" class="img" title="Profile">
+        <img src="image/person.svg">
       </button>
       <a id="analysis_btn" class="btn img" href="../job-woper" title="Market Analysis">
         <img src="image/chart-4.svg">
@@ -1147,6 +1016,62 @@
         <p>Address: <span cid="agency_address_elem"></span></p>
       </details>
     </de-input-list>
+
+    <div id="profile_elem" class="panel hidden">
+      <header slot="header">
+        <h2>Profile</h2>
+        <button id="edit_profile_btn" class="img">
+          <img src="image/edit.svg" alt="Edit Profile">
+        </button>
+      </header>
+      <div id="profile_details" class="details">
+        <p>Address: <span id="profile_address"></span></p>
+        <p>Seek URL: <span id="profile_seek_url"></span></p>
+        <p>LinkedIn URL: <span id="profile_linkedin_url"></span></p>
+        <p>Residency Status: <span id="profile_residency_status"></span></p>
+        <p>Personal Summary: <span id="profile_personal_summary"></span></p>
+        <p>Skills: <span id="profile_skills"></span></p>
+        <p>Interests: <span id="profile_interests"></span></p>
+      </div>
+      <de-form id="profile_form" class="hidden" hide-clr>
+        <h2 slot="header">Edit Profile</h2>
+        
+        <label slot="fields">
+          Address
+        </label>
+          <input name="address" type="text" placeholder="Street address">
+        
+        <label slot="fields">
+          Seek URL
+          <input name="seek_url" type="url" placeholder="https://seek.com.au/profile/...">
+        </label>
+        
+        <label slot="fields">
+          LinkedIn URL
+          <input name="linkedin_url" type="url" placeholder="https://linkedin.com/in/...">
+        </label>
+        
+        <label slot="fields">
+          Residency Status
+          <input name="residency_status" type="text" placeholder="e.g., Permanent Resident">
+        </label>
+        
+        <label slot="fields">
+          Personal Summary
+          <textarea name="personal_summary" placeholder="Tell us about yourself..." rows="4"></textarea>
+        </label>
+        
+        <label slot="fields">
+          Skills
+          <textarea name="skills" placeholder="List your skills..." rows="4"></textarea>
+        </label>
+        
+        <label slot="fields">
+          Interests
+          <textarea name="interests" placeholder="What are you interested in?" rows="4"></textarea>
+        </label>
+      </de-form>
+    </div>
 
   </main>
 
