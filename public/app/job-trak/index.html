@@ -63,6 +63,7 @@
     import "../../component/DeDialogForm/index.js";
     import "../../component/DeDialogAlert/index.js";
     import "../../component/DeDialogConfirm/index.js";
+    import DB_SCHEMA from "./db/schema.js";
 
     const table_names = 
     [
@@ -99,7 +100,7 @@
 
       const ctx = { };
       Init_AI(ctx);
-      const db = await Db.Open_DB(ctx);
+      const db = await Db.Open_DB(ctx, DB_SCHEMA);
 
       Set_Options(note_status_select, job_status, "id", "label");
       Set_Options(job_status_select, job_status, "id", "label");
@@ -125,6 +126,8 @@
       contacts_list.addEventListener("render", e => Render_Contact_Item(e, db));
       companies_list.addEventListener("render", e => Render_Company_Item(e));
 
+      ai_add_profile_btn.onclick = () => On_Click_AI_Add_Profile(ctx);
+
       Render_Job_Items(db);
       Render_Contacts(db);
       Render_Companies(db);
@@ -148,7 +151,7 @@
           industry: form_data.industry?.trim() || null
         };
 
-        await Insert(db, "agencies", company);
+        await Db.Insert(db, "agencies", company);
         await Render_Companies(db);
         Alert("Company added successfully.");
       }
@@ -164,7 +167,7 @@
       const form_data = await profile_form.Submit(profile);
       if (form_data)
       {
-        await Save(db, "profiles", { ...form_data, id: profile?.id });
+        await Db.Save(db, "profiles", { ...form_data, id: profile?.id });
         Alert("Profile saved successfully.");
         Render_Profile(db);
       }
@@ -200,7 +203,7 @@
         }
 
         await Clear_DB(db);
-        await Save_To_IndexedDB(db, db_data);
+        await Save_To_IndexedDB(db, db_data, DB_SCHEMA);
         Render_Job_Items(db);
         Alert("Data imported from " + file.name + " to IndexedDB instance.");
       };
@@ -210,13 +213,13 @@
 
     async function On_Click_Export_Btn(db)
     {
-      const action_logs = await Get_All(db, "action_logs");
-      const agencies = await Get_All(db, "agencies");
-      const contacts = await Get_All(db, "contacts");
-      const jobs = await Get_All(db, "jobs");
-      const profiles = await Get_All(db, "profiles");
+      const action_logs = await Db.Get_All(db, "action_logs");
+      const agencies = await Db.Get_All(db, "agencies");
+      const contacts = await Db.Get_All(db, "contacts");
+      const jobs = await Db.Get_All(db, "jobs");
+      const profiles = await Db.Get_All(db, "profiles");
 
-      const attachments = await Get_All(db, "attachments");
+      const attachments = await Db.Get_All(db, "attachments");
       if (attachments)
       {
         for (const attachment of attachments)
@@ -261,7 +264,7 @@
           timestamp: now.getTime(),
           note: form_data.note
         };
-        await Insert(db, "action_logs", action);
+        await Db.Insert(db, "action_logs", action);
       }
 
       if (!Utils.Is_Empty(form_data?.status))
@@ -274,8 +277,8 @@
 
     async function On_Click_Add_Job(db)
     {
-      const agencies = await Get_All(db, "agencies");
-      const contacts = await Get_All(db, "contacts");
+      const agencies = await Db.Get_All(db, "agencies");
+      const contacts = await Db.Get_All(db, "contacts");
       Set_Options(job_agency_select, agencies, "id", "name");
       Set_Options(job_contact_select, contacts, "id", "name");
 
@@ -298,7 +301,7 @@
           status: form_data.status || "bookmarked"
         };
 
-        await Insert(db, "jobs", job);
+        await Db.Insert(db, "jobs", job);
         await Render_Job_Items(db);
       }
     }
@@ -322,13 +325,31 @@
       }
     }
 
+    async function On_Click_AI_Add_Profile(ctx)
+    {
+      const files = await Select_Files();
+      if (files && files.length > 0) 
+      {
+        console.info("Processing CV...");
+        const cv_blob = files[0];
+        const cv_data = await Extract_CV(ctx.ai, cv_blob);
+
+        Db.Delete_All(ctx.db, "education");
+        Db.Insert_Items(ctx.db, "education", cv_data.educations);
+        Db.Delete_All(ctx.db, "career");
+        Db.Insert_Items(ctx.db, "career", cv_data.career);
+
+        Alert("CV extracted successfully!");
+      }
+    }
+
     async function On_Click_Edit_Job(event, job_id, db)
     {
-      const agencies = await Get_All(db, "agencies");
-      const contacts = await Get_All(db, "contacts");
+      const agencies = await Db.Get_All(db, "agencies");
+      const contacts = await Db.Get_All(db, "contacts");
       Set_Options(job_agency_select, agencies, "id", "name");
       Set_Options(job_contact_select, contacts, "id", "name");
-      const curr_job = await Select_By_Id(db, "jobs", job_id);
+      const curr_job = await Db.Select_By_Id(db, "jobs", job_id);
 
       const form_data = await job_dialog.Show_Async(curr_job);
       if (form_data)
@@ -360,7 +381,7 @@
       const confirmed = confirm("Are you sure you want to delete this job?");
       if (confirmed)
       {
-        await Delete_By_Id(db, "jobs", job_id);
+        await Db.Delete(db, "jobs", job_id);
         await Render_Job_Items(db);
       }
     }
@@ -369,38 +390,27 @@
     {
       //event?.stopPropagation?.();
       //event?.preventDefault?.();
-
-      const input = document.createElement('input');
-      input.type = 'file';
-      input.multiple = true;
-
-      input.onchange = Files_Change;
-      async function Files_Change(e)
+      const files = await Select_Files();
+      if (files && files.length > 0)
       {
-        const files = Array.from(e.target.files);
-        if (files && files.length > 0)
-        {
-          const attachments = files.map(file => ({
-            job_id,
-            //filename: file.name,
-            //mime_type: file.type || 'application/octet-stream',
-            //size: file.size,
-            file,
-            timestamp: Date.now()
-          }));
+        const attachments = files.map(file => ({
+          job_id,
+          //filename: file.name,
+          //mime_type: file.type || 'application/octet-stream',
+          //size: file.size,
+          file,
+          timestamp: Date.now()
+        }));
 
-          await Insert_Items(db, 'attachments', attachments);
-          await Render_Job_Items(db);
-          Alert(`${files.length} file${files.length === 1 ? '' : 's'} attached to the job.`);
-        }
+        await Db.Insert_Items(db, 'attachments', attachments);
+        await Render_Job_Items(db);
+        Alert(`${files.length} file${files.length === 1 ? '' : 's'} attached to the job.`);
       }
-
-      input.click();
     }
 
     async function On_Click_Add_Contact(db)
     {
-      const agencies = await Get_All(db, "agencies");
+      const agencies = await Db.Get_All(db, "agencies");
       Set_Options(contact_agency_select, agencies, "id", "name");
 
       const form_data = await contact_dialog.Show_Async();
@@ -415,7 +425,7 @@
           agency_id: parseInt(form_data.agency_id) || null,
         };
 
-        await Insert(db, "contacts", contact);
+        await Db.Insert(db, "contacts", contact);
         await Render_Contacts(db);
       }
     }
@@ -588,6 +598,185 @@
       return job_details;
     }
 
+    async function Extract_Career_Job(ai, job, mime_type, base64)
+    {
+      console.info("Processing job " + job.role_titles + "...");
+      const career_schema =
+      {
+        type: "array",
+        items:
+        {
+          type: "object",
+          properties:
+          {
+            start_date:
+            { 
+              type: "string",
+              description: "The starting date of the role in ISO format (YYYY-MM-DD) if available, or just the year (YYYY) if the full date cannot be determined."
+            },
+            end_date:
+            { 
+              type: "string",
+              description: "The ending date of the role in ISO format (YYYY-MM-DD) if available, or just the year (YYYY) if the full date cannot be determined."
+            },
+            work_type:
+            { 
+              type: "string",
+              description: "The type of work performed (e.g., full-time, part-time, contract).",
+              enum: ["full-time", "part-time", "contract", "temp", "casual", "internship", "volunteer", "vacation", "other"],
+            },
+            location:
+            { 
+              type: "string",
+              description: "The location of the role. This could be a city, state, or country depending on the level of detail available in the CV."
+            },
+            tech:
+            { 
+              type: "string",
+              description: "The technologies or tools used in the role. This could include programming languages, software, methodologies, or any other relevant technical skills mentioned in the CV."
+            },
+            responsibilities:
+            { 
+              type: "string",
+              description: "The responsibilities and achievements in the role."
+            },
+            projects:
+            { 
+              type: "string",
+              description: "The projects worked on in the role."
+            },
+          },
+        }
+        //required: ["role_titles", "company_name"]
+      };
+      const prompt =
+        "From the given CV document extract the deatils of the job titled " + job.role_titles + " at company " + job.company + ". " +
+        "Return a job object with start_date, end_date, work_type, location, tech, responsibilities, and projects.";
+      const job_details = await Prompt(ai, prompt, career_schema, mime_type, base64)
+      console.log("Extract_Career_Job(): Extracted job_details:", job_details);
+      console.info("...Finished.");
+
+      return job_details && job_details.length > 0 ? job_details[0] : null;
+    }
+
+    async function Extract_CV(ai, cv_blob)
+    {
+      const base64 = await Blob_To_Base64(cv_blob);
+
+      console.info("Processing educations...");
+      const education_schema =
+      {
+        type: "array",
+        items:
+        {
+          type: "object",
+          properties:
+          {
+            title:
+            {
+              type: "string",
+              description: "The title of the certificate or degree obtained."
+            },
+            institution:
+            {
+              type: "string",
+              description: "The name of the educational institution."
+            },
+            year:
+            {
+              type: "integer",
+              description: "The year the education was completed or null if it could not be determined."
+            }
+          },
+          required: ["title", "institution"]
+        }
+      };
+      let prompt = 
+        "Extract the education history from the following CV document. " +
+        "Return a list of education objects, each with title, institution, and year.";
+      const educations = await Prompt(ai, prompt, education_schema, cv_blob.type, base64)
+      console.log("Extract_CV(): Extracted educations:", educations);
+      console.info("...Finished.");
+
+      console.info("Processing career...");
+      const career_schema =
+      {
+        type: "array",
+        items:
+        {
+          type: "object",
+          properties:
+          {
+            role_titles:
+            { 
+              type: "string",
+              description: "The name or names of the position held, including any seniority levels or specializations (e.g., 'Software Engineer II', 'Data Scientist - NLP'). If multiple roles were held at the same company, list them all separated by commas."
+            },
+            company_name:
+            { 
+              type: "string",
+              description: "The name of the company where the role was held."
+            },
+          },
+          required: ["role_titles", "company_name"]
+        }
+      };
+      prompt =
+        "Extract the career history from the following CV document. " +
+        //"Return a list of job objects, each with role_titles, company_name, start_date, end_date, work_type, location, tech, responsibilities, and projects.";
+        "Return a list of job objects, each with role_titles and company_name.";
+      const career = await Prompt(ai, prompt, career_schema, cv_blob.type, base64)
+      console.log("Extract_CV(): Extracted career:", career);
+      console.info("...Finished.");
+
+      for (const job of career)
+      {
+        const job_data = await Extract_Career_Job(ai, job, cv_blob.type, base64);
+        Object.assign(job, job_data);
+      }
+
+      return { educations, career };
+    }
+
+    async function Prompt(ai, prompt, responseSchema, mimeType, data)
+    {
+      const model_config =
+      {
+        model: "gemini-2.5-flash-lite",
+        generationConfig:
+        {
+          responseMimeType: "application/json",
+          responseSchema,
+          temperature: 0.1
+        }
+      };
+
+      let model = null;
+      try { model = fb_ai.getGenerativeModel(ai, model_config); }
+      catch (error)
+      {
+        console.warn(error);
+        model = null;
+      }
+      
+      let json_res = null;
+      if (model)
+      {
+        const inlineData = { mimeType, data };
+        const result = await model.generateContent([prompt, { inlineData }]);
+        const text_res = result.response.text();
+        try { json_res = JSON.parse(text_res); }
+        catch (error)
+        {
+          console.warn(error);
+          console.warn("Prompt(): text_res =", text_res);
+          json_res = null;
+        }
+      }
+
+      return json_res;
+    }
+
     // business logic =================================================================
 
     async function Agency_Insert_If_New(db, agency)
@@ -654,6 +843,93 @@
 
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
+    }
+
+    function Select_Files()
+    {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.multiple = true;
+      async function Files_Change(e, resolve_fn)
+      {
+        const files = Array.from(e.target.files);
+        if (files && files.length > 0)
+        {
+          resolve_fn(files);
+        }
+        else
+        {
+          resolve_fn(null);
+        }
+      }
+
+      const res = new Promise(On_Promise);
+      function On_Promise(resolve, reject)
+      {
+        input.onchange = (e) => Files_Change(e, resolve);
+        input.click();
+      }
+
+      return res;
+    }
+
+    function Blob_To_Base64(blob)
+    {
+      return new Promise((resolve, reject) =>
+      {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result.split(',')[1]);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    }
+
+    /**
+     * Converts a File object to a JSON-serializable object including content
+     * @param {File} file 
+     * @returns {Promise<Object>}
+     */
+    async function Serialize_File(file)
+    {
+      const promise = new Promise(On_Process);
+      function On_Process(resolve, reject)
+      {
+        const reader = new FileReader();
+
+        reader.onload = () =>
+        {
+          resolve({
+            name: file.name,
+            size: file.size,
+            type: file.type,
+            lastModified: file.lastModified,
+            content: reader.result // This is the base64 string
+          });
+        };
+
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      }
+
+      return promise;
+    }
+
+    /**
+     * Recreates a File object from serialized JSON data
+     * @param {Object} serialized - The object containing metadata and base64 content
+     * @returns {Promise<File>}
+     */
+    async function Deserialize_File(serialized)
+    {
+      // 1. Fetch the data URL to convert it back to a Blob
+      const response = await fetch(serialized.content);
+      const blob = await response.blob();
+
+      // 2. Reconstruct the File using the stored metadata
+      return new File([blob], serialized.name, {
+        type: serialized.type,
+        lastModified: serialized.lastModified
+      });
     }
 
     // rendering ======================================================================
@@ -1018,12 +1294,17 @@
     </de-input-list>
 
     <div id="profile_elem" class="panel hidden">
+
       <header slot="header">
         <h2>Profile</h2>
+        <button id="ai_add_profile_btn" class="img">
+          <img src="image/robot.svg" title="AI Add Certificates">
+        </button>
         <button id="edit_profile_btn" class="img">
           <img src="image/edit.svg" alt="Edit Profile">
         </button>
       </header>
+
       <div id="profile_details" class="details">
         <p>Address: <span id="profile_address"></span></p>
         <p>Seek URL: <span id="profile_seek_url"></span></p>
@@ -1034,43 +1315,37 @@
         <p>Interests: <span id="profile_interests"></span></p>
       </div>
       <de-form id="profile_form" class="hidden" hide-clr>
-        <h2 slot="header">Edit Profile</h2>
-        
-        <label slot="fields">
-          Address
-        </label>
-          <input name="address" type="text" placeholder="Street address">
-        
-        <label slot="fields">
-          Seek URL
-          <input name="seek_url" type="url" placeholder="https://seek.com.au/profile/...">
-        </label>
-        
-        <label slot="fields">
-          LinkedIn URL
-          <input name="linkedin_url" type="url" placeholder="https://linkedin.com/in/...">
-        </label>
-        
-        <label slot="fields">
-          Residency Status
-          <input name="residency_status" type="text" placeholder="e.g., Permanent Resident">
-        </label>
-        
-        <label slot="fields">
-          Personal Summary
-          <textarea name="personal_summary" placeholder="Tell us about yourself..." rows="4"></textarea>
-        </label>
-        
-        <label slot="fields">
-          Skills
-          <textarea name="skills" placeholder="List your skills..." rows="4"></textarea>
-        </label>
-        
-        <label slot="fields">
-          Interests
-          <textarea name="interests" placeholder="What are you interested in?" rows="4"></textarea>
-        </label>
+        <label slot="fields">Address</label>
+        <input slot="fields" name="address" type="text" placeholder="Street address">
+        <label slot="fields">Seek URL</label>
+        <input slot="fields" name="seek_url" type="url" placeholder="https://seek.com.au/profile/...">
+        <label slot="fields">LinkedIn URL</label>
+        <input slot="fields" name="linkedin_url" type="url" placeholder="https://linkedin.com/in/...">
+        <label slot="fields">Residency Status</label>
+        <input slot="fields" name="residency_status" type="text" placeholder="e.g., Permanent Resident">
+        <label slot="fields">Personal Summary</label>
+        <textarea slot="fields" name="personal_summary" placeholder="Tell us about yourself..." rows="4"></textarea>
+        <label slot="fields">Skills</label>
+        <textarea slot="fields" name="skills" placeholder="List your skills..." rows="4"></textarea>
+        <label slot="fields">Interests</label>
+        <textarea slot="fields" name="interests" placeholder="What are you interested in?" rows="4"></textarea>
       </de-form>
+
+      <de-input-list id="education_list">
+        <header slot="header">
+          <h2>Education</h2>
+          <button id="add_education_btn" class="img">
+            <img src="image/add.svg" title="Add Certificate">
+          </button>
+          <button id="filter_edu_btn" class="img">
+            <img src="image/filter-1.svg" title="Filter Education">
+          </button>
+          <button id="sort_edu_btn" class="img">
+            <img src="image/sort.svg" title="Sort Education">
+          </button>
+        </header>
+
+      </de-input-list>
     </div>
 
   </main>

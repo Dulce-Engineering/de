@@ -1,8 +1,8 @@
 
-export const DB_SCHEMA = 
+const DB_SCHEMA = 
 {
   name: 'JobTrakDB',
-  version: 2,
+  version: 5,
   stores: 
   {
     action_logs: 
@@ -101,6 +101,40 @@ export const DB_SCHEMA =
         skills: "string[]",
         interests: "string[]"
       }
+    },
+    education:
+    {
+      keyPath: 'id',
+      autoIncrement: false,
+      //indices: []
+      fields:
+      {
+        id: "int",
+        title: "string",
+        institution: "string",
+        year: "int",
+      }
+    },
+    career:
+    {
+      keyPath: 'id',
+      autoIncrement: false,
+      //indices: []
+      fields:
+      {
+        id: "int",
+        role_titles: "string",
+        company_name: "string",
+        start_date: "int",
+        end_date: "int",
+        work_type: "string",
+        location: "string",
+        tech: "string",
+        responsibilities: "string",
+        projects: "string"
+      }
     }
   }
 };
+
+export default DB_SCHEMA;

@@ -12,22 +12,13 @@ class Db
     return new Promise((resolve) => tx.oncomplete = resolve);
   }
 
-  static async Open_DB(ctx)
+  static async Open_DB(ctx, schema)
   {
     const promise = new Promise(On_Process);
     function On_Process(resolve, reject)
     {
-      const request = indexedDB.open("JobTrakDB", 3);
-      request.onupgradeneeded = (event) => 
-      {
-        const db = event.target.result;
-        if (!db.objectStoreNames.contains("jobs")) db.createObjectStore("jobs", { keyPath: "id" });
-        if (!db.objectStoreNames.contains("agencies")) db.createObjectStore("agencies", { keyPath: "id" });
-        if (!db.objectStoreNames.contains("contacts")) db.createObjectStore("contacts", { keyPath: "id" });
-        if (!db.objectStoreNames.contains("action_logs")) db.createObjectStore("action_logs", { keyPath: "id" });
-        if (!db.objectStoreNames.contains("attachments")) db.createObjectStore("attachments", { keyPath: "id" });
-        if (!db.objectStoreNames.contains("profiles")) db.createObjectStore("profiles", { keyPath: "id" });
-      };
+      const request = indexedDB.open("JobTrakDB", schema.version);
+      request.onupgradeneeded = (e) => Db.On_Upgrade_Needed(e, schema);
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
     }
@@ -36,47 +27,30 @@ class Db
     return ctx.db;
   }
 
-  static async Save_To_IndexedDB(db, db_data)
+  static async Save_To_IndexedDB(db, db_data, schema)
   {
-    await Db.Insert_Items(db, "jobs", db_data.jobs);
-    await Db.Insert_Items(db, "agencies", db_data.agencies);
-    await Db.Insert_Items(db, "contacts", db_data.contacts);
-    await Db.Insert_Items(db, "action_logs", db_data.action_logs);
-    await Db.Insert_Items(db, "attachments", db_data.attachments);
-    await Db.Insert_Items(db, "profiles", db_data.profiles);
-  }
-
-  static Get_Req_Res(request)
-  {
-    const res_promise = new Promise((resolve, reject) =>
+    for (const store_name in schema.stores)
     {
-      request.onsuccess = () => resolve(request.result || null);
-      request.onerror = () => Db.On_Db_Error(request, reject);
-    });
-
-    return res_promise;
-  }
-
-  static On_Db_Error(request, reject_fn)
-  {
-    console.error("IndexedDB error:", request.error);
-    reject_fn(request.error);
-  }
-
-  static Get_Table(db, table_name, is_readonly = true)
-  {
-    const read_type = is_readonly ? "readonly" : "readwrite";
-
-    let tx = null;
-    try { tx = db.transaction([table_name], read_type); }
-    catch (err)
-    {
-      console.warn(err);
-      tx = null;
+      await Db.Insert_Items(db, store_name, db_data[store_name]);
     }
+  }
 
-    const store = tx ? tx.objectStore(table_name) : null;
-    return store;
+  static On_Upgrade_Needed(event, schema)
+  {
+    const db = event.target.result;
+    for (const store_name in schema.stores)
+    {
+      if (!db.objectStoreNames.contains(store_name))
+      {
+        const store_schema = schema.stores[store_name];
+        const options = 
+        { 
+          keyPath: store_schema.keyPath, 
+          autoIncrement: store_schema.autoIncrement 
+        };
+        db.createObjectStore(store_name, options);
+      }
+    }
   }
 
   static async Next_Id(db, table)
@@ -146,13 +120,6 @@ class Db
     return res;
   }
 
-  static async Delete_By_Id(db, table_name, id)
-  {
-    const table = Db.Get_Table(db, table_name, false);
-    const res = Db.Get_Req_Res(table.delete(id));
-    return res;
-  }
-
   static async Update(db, table_name, new_item)
   {
     let res = null;
@@ -207,6 +174,63 @@ class Db
     return res;
   }
 
+  // low level api ============================================================
+
+  static Get_Req_Res(request)
+  {
+    const res_promise = new Promise((resolve, reject) =>
+    {
+      request.onsuccess = () => resolve(request.result || null);
+      request.onerror = () => Db.On_Db_Error(request, reject);
+    });
+
+    return res_promise;
+  }
+
+  static On_Db_Error(request, reject_fn)
+  {
+    console.error("IndexedDB error:", request.error);
+    reject_fn(request.error);
+  }
+
+  static Get_Table(db, table_name, is_readonly = true)
+  {
+    const read_type = is_readonly ? "readonly" : "readwrite";
+
+    let tx = null;
+    try { tx = db.transaction([table_name], read_type); }
+    catch (err)
+    {
+      console.warn(err);
+      tx = null;
+    }
+
+    const store = tx ? tx.objectStore(table_name) : null;
+    return store;
+  }
+
+  static async Delete(db, table_name, id)
+  {
+    const table = Db.Get_Table(db, table_name, false);
+    const res = Db.Get_Req_Res(table.delete(id));
+    return res;
+  }
+
+  static async Delete_All(db, table_name)
+  {
+    const table = Db.Get_Table(db, table_name, false);
+    const res = table ? Db.Get_Req_Res(table.clear()) : null;
+
+    return res;
+  }
+
+  static Add(db, table_name, item)
+  {
+    const table = Db.Get_Table(db, table_name, false);
+    const request = table.add(item);
+    return Db.Get_Req_Res(request);
+  }
+
   static Put(db, table_name, item)
   {
     const table = Db.Get_Table(db, table_name, false);
@@ -224,54 +248,6 @@ class Db
       res = Db.Get_Req_Res(request);
     }
     return res;
-  }
-
-  /**
-   * Converts a File object to a JSON-serializable object including content
-   * @param {File} file 
-   * @returns {Promise<Object>}
-   */
-  static async Serialize_File(file)
-  {
-    const promise = new Promise(On_Process);
-    function On_Process(resolve, reject)
-    {
-      const reader = new FileReader();
-
-      reader.onload = () =>
-      {
-        resolve({
-          name: file.name,
-          size: file.size,
-          type: file.type,
-          lastModified: file.lastModified,
-          content: reader.result // This is the base64 string
-        });
-      };
-
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    }
-
-    return promise;
-  }
-
-  /**
-   * Recreates a File object from serialized JSON data
-   * @param {Object} serialized - The object containing metadata and base64 content
-   * @returns {Promise<File>}
-   */
-  static async Deserialize_File(serialized)
-  {
-    // 1. Fetch the data URL to convert it back to a Blob
-    const response = await fetch(serialized.content);
-    const blob = await response.blob();
-
-    // 2. Reconstruct the File using the stored metadata
-    return new File([blob], serialized.name, {
-      type: serialized.type,
-      lastModified: serialized.lastModified
-    });
   }
 }
 
