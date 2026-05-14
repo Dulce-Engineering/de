@@ -69,18 +69,22 @@ class Utils
   static appendStr(a, b, sep)
   {
     let res = null;
+    const a_has_val = !Utils.Is_Empty(a);
+    const b_has_val = !Utils.Is_Empty(b);
 
     if (sep == null || sep == undefined)
     {
       sep = "";
     }
-    if (a && b && a.length > 0 && b.length > 0)
+    if (a_has_val && b_has_val)
     {
       res = a + sep + b;
-    } else if (a && !b && a.length > 0)
+    } 
+    else if (a_has_val && !b_has_val)
     {
       res = a;
-    } else if (!a && b && b.length > 0)
+    } 
+    else if (!a_has_val && b_has_val)
     {
       res = b;
     }
@@ -639,22 +643,6 @@ class Utils
     }
   }
 
-  static to2DigitStr(number)
-  {
-    let res;
-
-    if (number < 10)
-    {
-      res = "0" + number;
-    }
-    else
-    {
-      res = "" + number;
-    }
-
-    return res;
-  }
-
   static toAlwaysArray(array)
   {
     let res = array;
@@ -677,18 +665,6 @@ class Utils
       {
         res = strObj;
       }
-    }
-
-    return res;
-  }
-
-  static To_AUD(num)
-  {
-    let res = "n/a";
-    if (num)
-    {
-      res = 
-        Number.parseFloat(num).toLocaleString("en-AU", {style: "currency", currency: "AUD"});
     }
 
     return res;
@@ -725,28 +701,6 @@ class Utils
     return res;
   }
 
-  static To_Currency(value, currency)
-  {
-    let res = null;
-
-    if (currency)
-    {
-      const style = 'currency';
-      const formatter = new Intl.NumberFormat('en-US', { style, currency });
-      // These options are needed to round to whole numbers if that's what you want.
-      //minimumFractionDigits: 0, // (this suffices for whole numbers, but will print 2500.10 as $2,500.1)
-      //maximumFractionDigits: 0, // (causes 2500.99 to be printed as $2,501)
-
-      res = formatter.format(value);
-    }
-    else
-    {
-      res = Utils.To_AUD(value);
-    }
-
-    return res;
-  }
-
   static To_Class_Obj(obj, class_obj)
   {
     if (obj)
@@ -758,31 +712,7 @@ class Utils
     }
   }
 
-  static toEmptyStr(value)
-  {
-    let res = value;
-
-    if (value == null || value == undefined)
-    {
-      res = "";
-    }
-
-    return res;
-  }
-
   static toJSONArray(obj)
-  {
-    let res;
-
-    if (obj)
-    {
-      res = JSON.stringify(obj);
-    }
-
-    return res;
-  }
-
-  static toJSONStr(obj)
   {
     let res;
 
@@ -826,6 +756,82 @@ class Utils
     if (strArray)
     {
       res = strArray.map(item => item.value);
+    }
+
+    return res;
+  }
+
+  // Strings ========================================================
+
+  static to2DigitStr(number)
+  {
+    let res;
+
+    if (number < 10)
+    {
+      res = "0" + number;
+    }
+    else
+    {
+      res = "" + number;
+    }
+
+    return res;
+  }
+
+  static To_AUD(num)
+  {
+    let res = "n/a";
+    if (num)
+    {
+      res = 
+        Number.parseFloat(num).toLocaleString("en-AU", {style: "currency", currency: "AUD"});
+    }
+
+    return res;
+  }
+
+  static To_Currency(value, currency)
+  {
+    let res = null;
+
+    if (currency)
+    {
+      const style = 'currency';
+      const formatter = new Intl.NumberFormat('en-US', { style, currency });
+      // These options are needed to round to whole numbers if that's what you want.
+      //minimumFractionDigits: 0, // (this suffices for whole numbers, but will print 2500.10 as $2,500.1)
+      //maximumFractionDigits: 0, // (causes 2500.99 to be printed as $2,501)
+
+      res = formatter.format(value);
+    }
+    else
+    {
+      res = Utils.To_AUD(value);
+    }
+
+    return res;
+  }
+
+  static toEmptyStr(value)
+  {
+    let res = value;
+
+    if (value == null || value == undefined)
+    {
+      res = "";
+    }
+
+    return res;
+  }
+
+  static toJSONStr(obj)
+  {
+    let res;
+
+    if (obj)
+    {
+      res = JSON.stringify(obj);
     }
 
     return res;
@@ -1735,6 +1741,11 @@ class Utils
     return time;
   }
 
+  static To_Date_Only(dateStr)
+  {
+    return Utils.toDateOnly(dateStr);
+  }
+
   static toDateOnly(dateStr)
   {
     const values = dateStr.split("-");
@@ -1746,12 +1757,22 @@ class Utils
     return date;
   }
 
+  static To_Date_Str(date)
+  {
+    return Utils.toDateStr(date);
+  }
+
   static toDateStr(date)
   {
-    const day = date.getDate();
-    const month = date.getMonth() + 1;
-    const year = date.getFullYear();
-    const dateStr = year + "-" + Utils.to2DigitStr(month) + "-" + Utils.to2DigitStr(day);
+    let dateStr = null;
+    
+    if (date)
+    {
+      const day = date.getDate();
+      const month = date.getMonth() + 1;
+      const year = date.getFullYear();
+      dateStr = year + "-" + Utils.to2DigitStr(month) + "-" + Utils.to2DigitStr(day);
+    }
 
     return dateStr;
   }

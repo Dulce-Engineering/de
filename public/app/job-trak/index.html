@@ -54,6 +54,7 @@
   </script>
 
   <script type="module">
+    // @ts-check
     import * as fb_app from "firebase/app";
     import * as fb_ai from "firebase/ai";
     import Utils from "../../lib/Utils.js";
@@ -63,6 +64,7 @@
     import "../../component/DeDialogForm/index.js";
     import "../../component/DeDialogAlert/index.js";
     import "../../component/DeDialogConfirm/index.js";
+    import "./component/DeToolbarMenu/index.js";
     import DB_SCHEMA from "./db/schema.js";
 
     const table_names = 
@@ -89,6 +91,18 @@
       { id: "ghosted", label: "Ghosted", type: 1 },
       { id: "dismissed", label: "Not interested", type: 1 },
     ];
+    const work_types =
+    {
+      "full-time": "Fulltime",
+      "part-time": "Part-time",
+      "contract": "Contract",
+      "temp": "Temporary",
+      "casual": "Casual",
+      "internship": "Internship",
+      "volunteer": "Volunteer",
+      "vacation": "Vacation",
+      "other": "Other"
+    };
 
     Main();
     async function Main()
@@ -102,8 +116,9 @@
       Init_AI(ctx);
       const db = await Db.Open_DB(ctx, DB_SCHEMA);
 
-      Set_Options(note_status_select, job_status, "id", "label");
-      Set_Options(job_status_select, job_status, "id", "label");
+      Set_Options(note_status_select, job_status, s => s.id, s => s.label);
+      Set_Options(job_status_select, job_status, s => s.id, s => s.label);
+      Set_Options(career_work_type_select, Object.keys(work_types), t => t, t => work_types[t]);
 
       import_btn.onclick = () => On_Click_Import_Btn(db);
       export_btn.onclick = () => On_Click_Export_Btn(db);
@@ -125,6 +140,8 @@
       jobs_list.addEventListener("render", e => Render_Job_Item(e, db));
       contacts_list.addEventListener("render", e => Render_Contact_Item(e, db));
       companies_list.addEventListener("render", e => Render_Company_Item(e));
+      edu_list.addEventListener("render", Render_Edu_Item);
+      career_list.addEventListener("render", (e) => Render_Career_Item(ctx, e));
 
       ai_add_profile_btn.onclick = () => On_Click_AI_Add_Profile(ctx);
 
@@ -132,6 +149,8 @@
       Render_Contacts(db);
       Render_Companies(db);
       Render_Profile(db);
+      Render_Education(db);
+      Render_Career(db);
     }
 
     // events =========================================================================
@@ -269,7 +288,7 @@
 
       if (!Utils.Is_Empty(form_data?.status))
       {
-        await Update(db, "jobs", { id: job_id, status: form_data.status });
+        await Db.Update(db, "jobs", { id: job_id, status: form_data.status });
       }
 
       await Render_Job_Items(db);
@@ -279,8 +298,8 @@
     {
       const agencies = await Db.Get_All(db, "agencies");
       const contacts = await Db.Get_All(db, "contacts");
-      Set_Options(job_agency_select, agencies, "id", "name");
-      Set_Options(job_contact_select, contacts, "id", "name");
+      Set_Options(job_agency_select, agencies, a => a.id, a => a.name);
+      Set_Options(job_contact_select, contacts, c => c.id, c => c.name);
 
       const form_data = await job_dialog.Show_Async();
       if (form_data)
@@ -343,12 +362,37 @@
       }
     }
 
+    async function On_Click_Career_Edit(ctx, career_id)
+    {
+      const curr_career = await Db.Select_By_Id(ctx.db, "career", career_id);
+      const form_data = await career_dialog.Show_Async(curr_career);
+      if (form_data)
+      {
+        const career =
+        {
+          id: career_id,
+          company_name: form_data.company_name?.trim() || null,
+          role_titles: form_data.role_titles?.trim() || null,
+          work_type: form_data.work_type?.trim() || null,
+          location: form_data.location?.trim() || null,
+          tech: form_data.tech?.trim() || null,
+          responsibilities: form_data.responsibilities?.trim() || null,
+          projects: form_data.projects?.trim() || null,
+          start_date: form_data.start_date || null,
+          end_date: form_data.end_date || null
+        };
+
+        await Db.Update(ctx.db, "career", career);
+        await Render_Career(ctx.db);
+      }
+    }
+
     async function On_Click_Edit_Job(event, job_id, db)
     {
       const agencies = await Db.Get_All(db, "agencies");
       const contacts = await Db.Get_All(db, "contacts");
-      Set_Options(job_agency_select, agencies, "id", "name");
-      Set_Options(job_contact_select, contacts, "id", "name");
+      Set_Options(job_agency_select, agencies, a => a.id, a => a.name);
+      Set_Options(job_contact_select, contacts, c => c.id, c => c.name);
       const curr_job = await Db.Select_By_Id(db, "jobs", job_id);
 
       const form_data = await job_dialog.Show_Async(curr_job);
@@ -371,7 +415,7 @@
           status: form_data.status || null
         };
 
-        await Update(db, "jobs", job);
+        await Db.Update(db, "jobs", job);
         await Render_Job_Items(db);
       }
     }
@@ -411,7 +455,7 @@
     async function On_Click_Add_Contact(db)
     {
       const agencies = await Db.Get_All(db, "agencies");
-      Set_Options(contact_agency_select, agencies, "id", "name");
+      Set_Options(contact_agency_select, agencies, a => a.id, a => a.name);
 
       const form_data = await contact_dialog.Show_Async();
       if (form_data)
@@ -932,7 +976,19 @@
       });
     }
 
-    // rendering ======================================================================
+    // render lists ===================================================================
+
+    async function Render_Education(db)
+    {
+      const certificates = await Db.Get_All(db, "education");
+      edu_list.value = certificates;
+    }
+
+    async function Render_Companies(db)
+    {
+      const companies = await Db.Get_All(db, "agencies");
+      companies_list.value = companies;
+    }
 
     async function Render_Profile(db)
     {
@@ -945,12 +1001,13 @@
         profile_seek_url.textContent = profile.seek_url || "N/A";
         profile_linkedin_url.textContent = profile.linkedin_url || "N/A";
         profile_residency_status.textContent = profile.residency_status || "N/A";
-        profile_personal_summary.textContent = profile.personal_summary || "N/A";
+        profile_personal_summary.innerHTML = Str_To_HTML(profile.personal_summary || "N/A");
         profile_skills.textContent = profile.skills || "N/A";
-        profile_interests.textContent = profile.interests || "N/A";
+        profile_interests.innerHTML = Str_To_HTML(profile.interests || "N/A");
 
         // Set form value for editing
-        profile_form.value = {
+        profile_form.value = 
+        {
           address: profile.address || "",
           seek_url: profile.seek_url || "",
           linkedin_url: profile.linkedin_url || "",
@@ -962,45 +1019,10 @@
       }
     }
 
-    function Show_View(view_elem)
+    async function Render_Career(db)
     {
-      jobs_list.classList.add("hidden");
-      contacts_list.classList.add("hidden");
-      companies_list.classList.add("hidden");
-      profile_elem.classList.add("hidden");
-      view_elem.classList.remove("hidden");
-    }
-
-    async function Render_Companies(db)
-    {
-      const companies = await Db.Get_All(db, "agencies");
-      companies_list.value = companies;
-    }
-
-    function Render_Company_Item(event)
-    {
-      const item_elem = event.target;
-      const agency = item_elem.item_obj;
-
-      item_elem.agency_name_elem.textContent = agency.name || "Unnamed Company";
-      item_elem.agency_industry_elem.textContent = agency.industry ? `Industry: ${agency.industry}` : "";
-      item_elem.agency_url_elem.textContent = agency.url || "No website";
-      item_elem.agency_url_elem.href = agency.url || "#";
-      item_elem.agency_phone_elem.textContent = agency.phone || "N/A";
-      item_elem.agency_email_elem.textContent = agency.email || "N/A";
-      item_elem.agency_address_elem.textContent = agency.address || "N/A";
-    }
-
-    function Set_Options(select_elem, items, value_field, text_field)
-    {
-      select_elem.innerHTML = '<option value="">None</option>';
-      (items || []).forEach(item =>
-      {
-        const option = document.createElement("option");
-        option.value = item[value_field];
-        option.textContent = item[text_field];
-        select_elem.appendChild(option);
-      });
+      const career = await Db.Get_All(db, "career");
+      career_list.value = career;
     }
 
     async function Render_Job_Items(db)
@@ -1038,6 +1060,94 @@
       }
 
       jobs_list.value = enrichedJobs;
+    }
+
+    async function Render_Contacts(db)
+    {
+      const contacts = await Db.Get_All(db, "contacts");
+      const agencies = await Db.Get_All(db, "agencies");
+
+      const enrichedContacts = (contacts || []).map(contact => ({
+        ...contact,
+        agency_name: agencies?.find(a => a.id === contact.agency_id)?.name || "N/A"
+      }));
+
+      contacts_list.value = enrichedContacts;
+    }
+
+    function Render_Attachment_List(list_elem, attachments)
+    {
+      if (attachments && attachments.length > 0)
+      {
+        for (const attachment of attachments)
+        {
+          const name = attachment.filename || attachment.file?.name || 'Unnamed file';
+          const size = attachment.size || attachment.file?.size || 0;
+          const size_text = size ? ` (${Math.round(size / 1024)} KB)` : '';
+
+          const item_elem = document.createElement("li");
+          item_elem.classList.add("link");
+          item_elem.innerText = name + size_text;
+          item_elem.addEventListener("click", () => On_Click_Attachment(attachment));
+          list_elem.appendChild(item_elem);
+        }
+      }
+      else
+      {
+        list_elem.remove();
+      }
+    }
+
+    // render list item ===============================================================
+
+    function Render_Company_Item(event)
+    {
+      const item_elem = event.target;
+      const agency = item_elem.item_obj;
+
+      item_elem.agency_name_elem.textContent = agency.name || "Unnamed Company";
+      item_elem.agency_industry_elem.textContent = agency.industry ? `Industry: ${agency.industry}` : "";
+      item_elem.agency_url_elem.textContent = agency.url || "No website";
+      item_elem.agency_url_elem.href = agency.url || "#";
+      item_elem.agency_phone_elem.textContent = agency.phone || "N/A";
+      item_elem.agency_email_elem.textContent = agency.email || "N/A";
+      item_elem.agency_address_elem.textContent = agency.address || "N/A";
+    }
+
+    function Render_Career_Item(ctx, event)
+    {
+      const item_elem = event.target;
+      const job = item_elem.item_obj;
+
+      const start_time = job.start_date ? new Date(job.start_date) : null;
+      const start_time_str = Utils.To_Date_Str(start_time);
+      const end_time = job.end_date ? new Date(job.end_date) : null;
+      const end_time_str = Utils.To_Date_Str(end_time);
+      const duration_str = Duration_Str(start_time, end_time);
+      let time_str = Utils.Append_Str(start_time_str, end_time_str, " - ");
+      time_str = Utils.Append_Str(time_str, "(" + duration_str + ")", " ");
+      const role = Utils.Append_Str(job.role_titles, Work_Type_Label(job.work_type), " - ");
+      const summ = Utils.Append_Str(role, job.location, " - ");
+
+      item_elem.career_company_elem.textContent = job.company_name || "N/A";
+      item_elem.career_title_elem.textContent = summ || "N/A";
+      item_elem.career_time_elem.textContent = time_str || "N/A";
+      item_elem.career_tech_elem.textContent = job.tech || "N/A";
+      item_elem.career_resp_elem.innerHTML = Str_To_HTML(job.responsibilities || "N/A");
+      item_elem.career_proj_elem.innerHTML = Str_To_HTML(job.projects || "N/A");
+
+      item_elem.career_item_menu.addEventListener("edit", () => On_Click_Career_Edit(ctx, job.id));
+      //item_elem.career_item_menu.addEventListener("delete", On_Click_Career_Item_Delete);
+    }
+
+    function Render_Edu_Item(event)
+    {
+      const item_elem = event.target;
+      const edu = item_elem.item_obj;
+
+      const details = Utils.Append_Str(edu.institution, edu.year, " - ");
+      item_elem.edu_title_elem.textContent = edu.title || "Unnamed Education";
+      item_elem.edu_det_elem.textContent = details;
     }
 
     function Render_Job_Item(event, db)
@@ -1084,19 +1194,6 @@
         item_elem.classList.add("failed");
     }
 
-    async function Render_Contacts(db)
-    {
-      const contacts = await Db.Get_All(db, "contacts");
-      const agencies = await Db.Get_All(db, "agencies");
-
-      const enrichedContacts = (contacts || []).map(contact => ({
-        ...contact,
-        agency_name: agencies?.find(a => a.id === contact.agency_id)?.name || "N/A"
-      }));
-
-      contacts_list.value = enrichedContacts;
-    }
-
     function Render_Contact_Item(event, db)
     {
       const itemElem = event.target;
@@ -1109,26 +1206,75 @@
       itemElem.contact_position_elem.textContent = contact.position || "N/A";
     }
 
-    function Render_Attachment_List(list_elem, attachments)
-    {
-      if (attachments && attachments.length > 0)
-      {
-        for (const attachment of attachments)
-        {
-          const name = attachment.filename || attachment.file?.name || 'Unnamed file';
-          const size = attachment.size || attachment.file?.size || 0;
-          const size_text = size ? ` (${Math.round(size / 1024)} KB)` : '';
+    // rendering ======================================================================
 
-          const item_elem = document.createElement("li");
-          item_elem.classList.add("link");
-          item_elem.innerText = name + size_text;
-          item_elem.addEventListener("click", () => On_Click_Attachment(attachment));
-          list_elem.appendChild(item_elem);
-        }
-      }
-      else
+    function Work_Type_Label(work_type)
+    {
+      const work_types = 
       {
-        list_elem.remove();
+        "full-time": "Fulltime",
+        "part-time": "Part-time",
+        "contract": "Contract",
+        "temp": "Temporary",
+        "casual": "Casual",
+        "internship": "Internship",
+        "volunteer": "Volunteer",
+        "vacation": "Vacation",
+        "other": "Other"
+      };
+      const res = work_types[work_type?.toLowerCase()] || work_type["other"];
+
+      return res;
+    }
+
+    function Str_To_HTML(str)
+    {
+      const div = document.createElement("div");
+      div.textContent = str || "";
+      return div.innerHTML.replace(/\n/g, "<br>");
+    }
+
+    function Show_View(view_elem)
+    {
+      jobs_list.classList.add("hidden");
+      contacts_list.classList.add("hidden");
+      companies_list.classList.add("hidden");
+      profile_elem.classList.add("hidden");
+      view_elem.classList.remove("hidden");
+    }
+
+    function Duration_Str(start_time, end_time)
+    {
+      let res = "";
+
+      if (start_time && end_time)
+      {
+        const diff_ms = end_time - start_time;
+        const diff_years = diff_ms / (1000 * 60 * 60 * 24 * 365);
+        //res = diff_years.toFixed(1) + " years";
+
+        res = diff_years.toLocaleString('en-US', 
+        {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 1
+        }) + " years";
+      }
+
+      return res;
+    }
+
+    function Set_Options(select_elem, items, value_fn, text_fn)
+    {
+      select_elem.innerHTML = '<option value="">None</option>';
+      if (items)
+      {
+        for (const item of items)
+        {
+          const option = document.createElement("option");
+          option.value = value_fn(item);
+          option.textContent = text_fn(item);
+          select_elem.appendChild(option);
+        }
       }
     }
 
@@ -1137,22 +1283,22 @@
       const char_millis = 35;
       const wait_millis = 5000;
 
-      Render(0, 1, On_Completed_Reverse);
+      On_Render(0, 1, On_Completed_Reverse);
+
       function On_Completed_Reverse()
       {
-        setTimeout(() => Render(msg.length, -1, On_Completed_Clr), wait_millis);
+        setTimeout(() => On_Render(msg.length, -1, On_Completed_Clr), wait_millis);
       }
       function On_Completed_Clr()
       {
         alert_elem.textContent = "";
       }
-
-      function Render(length, step, on_complete_fn)
+      function On_Render(length, step, on_complete_fn)
       {
         alert_elem.textContent = "[ " + msg.substring(0, length) + " ]";
         if ((step > 0 && length <= msg.length) || (step < 0 && length >= 0))
         {
-          setTimeout(() => Render(length + step, step, on_complete_fn), char_millis);
+          setTimeout(() => On_Render(length + step, step, on_complete_fn), char_millis);
         }
         else if (on_complete_fn)
         {
@@ -1310,7 +1456,7 @@
         <p>Seek URL: <span id="profile_seek_url"></span></p>
         <p>LinkedIn URL: <span id="profile_linkedin_url"></span></p>
         <p>Residency Status: <span id="profile_residency_status"></span></p>
-        <p>Personal Summary: <span id="profile_personal_summary"></span></p>
+        <p>Personal Summary<br><span id="profile_personal_summary"></span></p>
         <p>Skills: <span id="profile_skills"></span></p>
         <p>Interests: <span id="profile_interests"></span></p>
       </div>
@@ -1331,21 +1477,42 @@
         <textarea slot="fields" name="interests" placeholder="What are you interested in?" rows="4"></textarea>
       </de-form>
 
-      <de-input-list id="education_list">
+      <de-input-list id="edu_list">
         <header slot="header">
           <h2>Education</h2>
-          <button id="add_education_btn" class="img">
-            <img src="image/add.svg" title="Add Certificate">
-          </button>
-          <button id="filter_edu_btn" class="img">
-            <img src="image/filter-1.svg" title="Filter Education">
-          </button>
-          <button id="sort_edu_btn" class="img">
-            <img src="image/sort.svg" title="Sort Education">
-          </button>
+          <de-toolbar-menu show-add show-delete show-filter show-sort>
+          </de-toolbar-menu>
         </header>
-
+        <details slot="item" class="">
+          <summary>
+            <h2 cid="edu_title_elem"></h2>
+            <de-toolbar-menu show-edit show-delete></de-toolbar-menu>
+          </summary>
+          <div cid="edu_det_elem"></div>
+        </details>
       </de-input-list>
+
+      <details>
+        <summary>
+          <h2>Career</h2>
+          <de-toolbar-menu show-add show-delete show-filter show-sort>
+          </de-toolbar-menu>
+        </summary>
+        <de-input-list id="career_list">
+          <details slot="item" class="">
+            <summary>
+              <h2 cid="career_company_elem"></h2>
+              <de-toolbar-menu cid="career_item_menu" show-edit show-delete></de-toolbar-menu>
+            </summary>
+            <div cid="career_title_elem" class="det_item"></div>
+            <div cid="career_time_elem" class="det_item"></div>
+            <div cid="career_tech_elem" class="det_item"></div>
+            <div class="det_item">Responsibilities<br><span cid="career_resp_elem"></span></div>
+            <div class="det_item">Projects<br><span cid="career_proj_elem"></span></div>
+          </details>
+        </de-input-list>
+      </details>
+
     </div>
 
   </main>
@@ -1421,6 +1588,28 @@
     <input slot="fields" type="email" name="email" placeholder="Email">
     <label slot="fields">Industry</label>
     <input slot="fields" type="text" name="industry" placeholder="Industry sector">
+  </de-dialog-form>
+
+  <de-dialog-form id="career_dialog">
+    <h2 slot="header">Add Career Experience</h2>
+    <label slot="fields">Company</label>
+    <input slot="fields" type="text" name="company_name" placeholder="Company name">
+    <label slot="fields">Title</label>
+    <input slot="fields" type="text" name="role_titles" placeholder="Job title">
+    <label slot="fields">Work Type</label>
+    <select id="career_work_type_select" slot="fields" name="work_type"></select>
+    <label slot="fields">Location</label>
+    <input slot="fields" type="text" name="location" placeholder="Location">
+    <label slot="fields">Technologies</label>
+    <textarea slot="fields" name="tech" placeholder="Technologies used..." rows="4"></textarea>
+    <label slot="fields">Responsibilities</label>
+    <textarea slot="fields" name="responsibilities" placeholder="Job responsibilities..." rows="4"></textarea>
+    <label slot="fields">Projects</label>
+    <textarea slot="fields" name="projects" placeholder="Projects worked on..." rows="4"></textarea>
+    <label slot="fields">Start Time</label>
+    <input slot="fields" type="date" name="start_date">
+    <label slot="fields">End Time</label>
+    <input slot="fields" type="date" name="end_date">
   </de-dialog-form>
 
   <de-dialog-form id="email_dialog">
