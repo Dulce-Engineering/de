@@ -82,7 +82,8 @@ const DB_SCHEMA =
         role_title: "string",
         role_type: "string",
         source: "string",
-        status: "string"
+        status: "string",
+        link: "string",
       }
     },
     profiles:
@@ -93,6 +94,7 @@ const DB_SCHEMA =
       fields:
       {
         id: "int",
+        name: "string",
         address: "string",
         seek_url: "string",
         linkedin_url: "string",

@@ -128,7 +128,9 @@
       contacts_btn.onclick = () => Show_View(contacts_list);
       profile_btn.onclick = () => Show_View(profile_elem);
       
-      edit_profile_btn.onclick = () => On_Click_Edit_Profile(db);
+      profile_menu.addEventListener("edit", () => On_Click_Edit_Profile(db));
+      profile_menu.addEventListener("ai", () => On_Click_AI_Add_Profile(ctx));
+      profile_menu.addEventListener("download", () => On_Click_Download_Profile(ctx));
       profile_form.addEventListener("ok", () => On_Click_Save_Profile(db));
       profile_form.addEventListener("cancel", () => Toggle_Profile_View(false));
 
@@ -143,7 +145,6 @@
       edu_list.addEventListener("render", Render_Edu_Item);
       career_list.addEventListener("render", (e) => Render_Career_Item(ctx, e));
 
-      ai_add_profile_btn.onclick = () => On_Click_AI_Add_Profile(ctx);
 
       Render_Job_Items(db);
       Render_Contacts(db);
@@ -265,6 +266,31 @@
       const url = URL.createObjectURL(blob);
 
       const filename = `job-trak-data-${new Date().toISOString().split('T')[0]}.json`;
+      Download_File(blob, filename);
+
+      Alert("Data exported successfully!");
+    }
+
+    async function On_Click_Download_Profile(ctx)
+    {
+      const profiles = await Db.Get_All(ctx.db, "profiles");
+      const education = await Db.Get_All(ctx.db, "education");
+      const career = await Db.Get_All(ctx.db, "career");
+      for (const job of career)
+      {
+        job.start_date = job.start_date ? new Date(job.start_date).toISOString().split('T')[0] : null;
+        job.end_date = job.end_date ? new Date(job.end_date).toISOString().split('T')[0] : null;
+      }
+      const employee = 
+      {
+        employee_profile: profiles[0],
+        education,
+        job_history: career
+      };
+
+      const filename = `job-trak-profile-${new Date().toISOString().split('T')[0]}.json`;
+      const json_string = JSON.stringify(employee, null, 2);
+      const blob = new Blob([json_string], { type: 'application/json' });
       Download_File(blob, filename);
 
       Alert("Data exported successfully!");
@@ -997,6 +1023,7 @@
       {
         const profile = profiles[0] || {}; // Assume first profile
 
+        profile_name.textContent = profile.name || "N/A";
         profile_address.textContent = profile.address || "N/A";
         profile_seek_url.textContent = profile.seek_url || "N/A";
         profile_linkedin_url.textContent = profile.linkedin_url || "N/A";
@@ -1008,6 +1035,7 @@
         // Set form value for editing
         profile_form.value = 
         {
+          name: profile.name || "",
           address: profile.address || "",
           seek_url: profile.seek_url || "",
           linkedin_url: profile.linkedin_url || "",
@@ -1365,12 +1393,22 @@
             <span cid="contact_elem"></span>
           </div>
           <div cid="status_elem">blah</div>
+
+          <de-toolbar-menu id="profile_menu" 
+            show-attach 
+            show-view 
+            show-edit 
+            show-delete 
+            show-download
+          >
+            <button cid="add_note_btn" class="img">
+              <img src="image/note-add.svg" title="Add Note">
+            </button>
+          </de-toolbar-menu>
+
           <div class="menu">
             <button cid="attach_btn" class="img">
               <img src="image/attach.svg" title="Attach Files">
-            </button>
-            <button cid="add_note_btn" class="img">
-              <img src="image/note-add.svg" title="Add Note">
             </button>
             <button cid="view_job_btn" class="img">
               <img src="image/zoom.svg" title="View Job">
@@ -1382,6 +1420,7 @@
               <img src="image/delete.svg" alt="" title="Delete Job">
             </button>
           </div>
+          
         </summary>
         <p cid="role_type_elem"></p>
         <p cid="note_elem"></p>
@@ -1443,24 +1482,23 @@
 
       <header slot="header">
         <h2>Profile</h2>
-        <button id="ai_add_profile_btn" class="img">
-          <img src="image/robot.svg" title="AI Add Certificates">
-        </button>
-        <button id="edit_profile_btn" class="img">
-          <img src="image/edit.svg" alt="Edit Profile">
-        </button>
+        <de-toolbar-menu id="profile_menu" show-ai show-edit show-download>
+        </de-toolbar-menu>
       </header>
 
       <div id="profile_details" class="details">
+        <h2 id="profile_name"></h2>
         <p>Address: <span id="profile_address"></span></p>
         <p>Seek URL: <span id="profile_seek_url"></span></p>
         <p>LinkedIn URL: <span id="profile_linkedin_url"></span></p>
         <p>Residency Status: <span id="profile_residency_status"></span></p>
-        <p>Personal Summary<br><span id="profile_personal_summary"></span></p>
+        <p>Personal Attributes<br><span id="profile_personal_summary"></span></p>
         <p>Skills: <span id="profile_skills"></span></p>
         <p>Interests: <span id="profile_interests"></span></p>
       </div>
       <de-form id="profile_form" class="hidden" hide-clr>
+        <label slot="fields">Name</label>
+        <input slot="fields" name="name" type="text" placeholder="Full name">
         <label slot="fields">Address</label>
         <input slot="fields" name="address" type="text" placeholder="Street address">
         <label slot="fields">Seek URL</label>

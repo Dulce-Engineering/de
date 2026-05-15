@@ -34,9 +34,9 @@ class DeToolbarMenu extends HTMLElement
   {
   }
 
-  On_Click_Edit_Btn()
+  On_Click_Btn(event_name)
   {
-    this.dispatchEvent(new Event("edit"));
+    this.dispatchEvent(new Event(event_name));
   }
 
   Render_Title(title, title_type)
@@ -77,9 +77,13 @@ class DeToolbarMenu extends HTMLElement
     let html = 
       this.Render_Btn("view_btn", "./image/zoom.svg", "View", "singular", show);
 
-    show = this.hasAttribute("show-ai-add");
-    html += 
-      this.Render_Btn("ai_add_btn", "./image/robot.svg", "AI Add", "singular", show);
+    const show_download = this.hasAttribute("show-download");
+    html +=
+      this.Render_Btn("download_btn", "./image/download.svg", "Download", "singular", show_download);
+
+    const show_ai = this.hasAttribute("show-ai");
+    html +=
+      this.Render_Btn("ai_add_btn", "./image/robot.svg", "AI Add", "singular", show_ai);
 
     show = this.hasAttribute("show-add");
     html += 
@@ -107,7 +111,15 @@ class DeToolbarMenu extends HTMLElement
 
     if (show_edit)
     {
-      this.edit_btn.addEventListener("click", this.On_Click_Edit_Btn);
+      this.edit_btn.addEventListener("click", () => this.On_Click_Btn("edit"));
+    }
+    if (show_ai)
+    {
+      this.ai_add_btn.addEventListener("click", () => this.On_Click_Btn("ai"));
+    }
+    if (show_download)
+    {
+      this.download_btn.addEventListener("click", () => this.On_Click_Btn("download"));
     }
     //this.some_elem.addEventListener("click", this.On_Click_Btn);
   }
