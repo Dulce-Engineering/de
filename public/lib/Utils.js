@@ -1022,6 +1022,16 @@ class Utils
     return Utils.To_Document(html, src_elems);
   }
 
+  static To_Element(html, attr_name) 
+  {
+    const element = Utils.toElement(html);
+    if (attr_name)
+    {
+      Utils.Set_Id_Shortcuts(element, element, attr_name);
+    }
+    return element;
+  }
+
   static toElement(html) 
   {
     return Utils.toDocument(html).firstChild;

@@ -65,11 +65,33 @@ class Db
     return next_id;
   }
 
+  static async Select(db, table_name, fn)
+  {
+    const items = await Db.Get_All(db, table_name);
+    const res = items.filter(fn);
+
+    return res;
+  }
+
+  static async Select_Ids(db, table_name, fn)
+  {
+    const items = await Db.Select(db, table_name, fn);
+    const res = items.map(item => item.id);
+
+    return res;
+  }
+
   static Select_By_Id(db, table_name, id)
   {
-    const table = Db.Get_Table(db, table_name,);
-    const request = table.get(id);
-    return Db.Get_Req_Res(request);
+    let res = null;
+    if (id)
+    {
+      const table = Db.Get_Table(db, table_name,);
+      const request = table.get(id);
+      res = Db.Get_Req_Res(request);
+    }
+
+    return res;
   }
 
   static Save(db, table_name, item)
@@ -209,10 +231,21 @@ class Db
     return store;
   }
 
-  static async Delete(db, table_name, id)
+  static async Delete(db, table_name, ids)
   {
-    const table = Db.Get_Table(db, table_name, false);
-    const res = Db.Get_Req_Res(table.delete(id));
+    let res = null;
+
+    if (ids?.length > 0)
+    {
+      const table = Db.Get_Table(db, table_name, false);
+      const req_res = [];
+      for (const id of ids) 
+      {
+        req_res.push(Db.Get_Req_Res(table.delete(id)));
+      }
+      res = Promise.all(req_res);
+    }
+
     return res;
   }
 

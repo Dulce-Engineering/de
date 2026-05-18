@@ -18,7 +18,7 @@ class DeToolbarMenu extends HTMLElement
     this.Render();
   }
 
-  set value(obj)
+  /*set value(obj)
   {
   }
 
@@ -32,7 +32,7 @@ class DeToolbarMenu extends HTMLElement
   ];
   attributeChangedCallback(name, old_value, new_value)
   {
-  }
+  }*/
 
   On_Click_Btn(event_name)
   {
@@ -73,55 +73,91 @@ class DeToolbarMenu extends HTMLElement
 
   Render()
   {
-    let show = this.hasAttribute("show-view");
+    const show_view = this.hasAttribute("show-view");
     let html = 
-      this.Render_Btn("view_btn", "./image/zoom.svg", "View", "singular", show);
+      this.Render_Btn("view_btn", "./image/zoom.svg", "View", "singular", show_view);
 
     const show_download = this.hasAttribute("show-download");
     html +=
       this.Render_Btn("download_btn", "./image/download.svg", "Download", "singular", show_download);
 
+    const show_upload = this.hasAttribute("show-upload");
+    html +=
+      this.Render_Btn("upload_btn", "./image/upload.svg", "Upload", "singular", show_upload);
+
     const show_ai = this.hasAttribute("show-ai");
     html +=
       this.Render_Btn("ai_add_btn", "./image/robot.svg", "AI Add", "singular", show_ai);
 
-    show = this.hasAttribute("show-add");
+    const show_add = this.hasAttribute("show-add");
     html += 
-      this.Render_Btn("add_btn", "./image/add.svg", "Add", "singular", show);
+      this.Render_Btn("add_btn", "./image/add.svg", "Add", "singular", show_add);
 
     const show_edit = this.hasAttribute("show-edit");
     html += 
       this.Render_Btn("edit_btn", "./image/edit.svg", "Edit", "singular", show_edit);
 
-    show = this.hasAttribute("show-delete");
+    const show_delete = this.hasAttribute("show-delete");
     html += 
-      this.Render_Btn("del_btn", "./image/delete.svg", "Delete", "singular", show);
+      this.Render_Btn("del_btn", "./image/delete.svg", "Delete", "singular", show_delete);
 
-    show = this.hasAttribute("show-filter");
+    const show_filter = this.hasAttribute("show-filter");
     html += 
-      this.Render_Btn("filter_btn", "./image/filter-1.svg", "Filter", "plural", show);
+      this.Render_Btn("filter_btn", "./image/filter-1.svg", "Filter", "plural", show_filter);
 
-    show = this.hasAttribute("show-sort");
-    html += 
-      this.Render_Btn("sort_btn", "./image/sort.svg", "Sort", "plural", show);
+    const show_sort = this.hasAttribute("show-sort");
+    html +=
+      this.Render_Btn("sort_btn", "./image/sort.svg", "Sort", "plural", show_sort);
+
+    const show_attach = this.hasAttribute("show-attach");
+    html +=
+      this.Render_Btn("attach_btn", "./image/attach.svg", "Attach Files", null, show_attach);
 
     const html_elements = Utils.To_Document(html, this);
-    this.replaceChildren(html_elements);
+    //this.replaceChildren(html_elements);
+    this.appendChild(html_elements);
     Utils.Set_Id_Shortcuts(this, this, "cid");
 
-    if (show_edit)
+    if (show_view)
     {
-      this.edit_btn.addEventListener("click", () => this.On_Click_Btn("edit"));
-    }
-    if (show_ai)
-    {
-      this.ai_add_btn.addEventListener("click", () => this.On_Click_Btn("ai"));
+      this.view_btn.addEventListener("click", () => this.On_Click_Btn("view"));
     }
     if (show_download)
     {
       this.download_btn.addEventListener("click", () => this.On_Click_Btn("download"));
     }
-    //this.some_elem.addEventListener("click", this.On_Click_Btn);
+    if (show_upload)
+    {
+      this.upload_btn.addEventListener("click", () => this.On_Click_Btn("upload"));
+    }
+    if (show_ai)
+    {
+      this.ai_add_btn.addEventListener("click", () => this.On_Click_Btn("ai"));
+    }
+    if (show_add)
+    {
+      this.add_btn.addEventListener("click", () => this.On_Click_Btn("add"));
+    }
+    if (show_edit)
+    {
+      this.edit_btn.addEventListener("click", () => this.On_Click_Btn("edit"));
+    }
+    if (show_delete)
+    {
+      this.del_btn.addEventListener("click", () => this.On_Click_Btn("delete"));
+    }
+    if (show_filter)
+    {
+      this.filter_btn.addEventListener("click", () => this.On_Click_Btn("filter"));
+    }
+    if (show_sort)
+    {
+      this.sort_btn.addEventListener("click", () => this.On_Click_Btn("sort"));
+    }
+    if (show_attach)
+    {
+      this.attach_btn.addEventListener("click", () => this.On_Click_Btn("attach"));
+    }
   }
 }
 

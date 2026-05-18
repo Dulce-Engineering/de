@@ -59,6 +59,7 @@
     import * as fb_ai from "firebase/ai";
     import Utils from "../../lib/Utils.js";
     import Db from "./lib/Db.js";
+    import AI from "./lib/AI.js";
     import "../../component/DeInputList/index3.js";
     import "../../component/DeForm/index.js";
     import "../../component/DeDialogForm/index.js";
@@ -90,6 +91,7 @@
       { id: "withdrawn", label: "Withdrawn", type: 1 },
       { id: "ghosted", label: "Ghosted", type: 1 },
       { id: "dismissed", label: "Not interested", type: 1 },
+      { id: "expired", label: "Expired", type: 1 },
     ];
     const work_types =
     {
@@ -112,8 +114,10 @@
         //await navigator.serviceWorker.register("./lib/service-worker.js");
       }
 
-      const ctx = { };
-      Init_AI(ctx);
+      const ctx = 
+      { 
+        ai: await AI.New(fb_app, fb_ai),
+      };
       const db = await Db.Open_DB(ctx, DB_SCHEMA);
 
       Set_Options(note_status_select, job_status, s => s.id, s => s.label);
@@ -134,17 +138,18 @@
       profile_form.addEventListener("ok", () => On_Click_Save_Profile(db));
       profile_form.addEventListener("cancel", () => Toggle_Profile_View(false));
 
-      add_job_btn.onclick = () => On_Click_Add_Job(db);
-      ai_add_job_btn.onclick = () => On_Click_AI_Add_Job(ctx);
+      jobs_menu.addEventListener("add", (e) => On_Click_Edit_Job(e, null, db));
+      jobs_menu.addEventListener("ai", () => On_Click_AI_Add_Job(ctx));
       add_contact_btn.onclick = () => On_Click_Add_Contact(db);
       add_company_btn.onclick = () => On_Click_Add_Company(db);
 
-      jobs_list.addEventListener("render", e => Render_Job_Item(e, db));
+      jobs_list.addEventListener("render", e => Render_Job_Item(e, ctx));
       contacts_list.addEventListener("render", e => Render_Contact_Item(e, db));
       companies_list.addEventListener("render", e => Render_Company_Item(e));
       edu_list.addEventListener("render", Render_Edu_Item);
       career_list.addEventListener("render", (e) => Render_Career_Item(ctx, e));
 
+      job_agency_select.onchange = () => Toggle_New_Agency_Fields();
 
       Render_Job_Items(db);
       Render_Contacts(db);
@@ -155,6 +160,12 @@
     }
 
     // events =========================================================================
+
+    function Toggle_New_Agency_Fields()
+    {
+      const is_new_agency = job_agency_select.value === "new";
+      job_dialog.Set_Field_Visibility("agency_name", is_new_agency);
+    }
 
     async function On_Click_Add_Company(db)
     {
@@ -233,16 +244,16 @@
 
     async function On_Click_Export_Btn(db)
     {
-      const action_logs = await Db.Get_All(db, "action_logs");
-      const agencies = await Db.Get_All(db, "agencies");
-      const contacts = await Db.Get_All(db, "contacts");
-      const jobs = await Db.Get_All(db, "jobs");
-      const profiles = await Db.Get_All(db, "profiles");
-
-      const attachments = await Db.Get_All(db, "attachments");
-      if (attachments)
+      const db_data = {};
+      const table_names = Array.from(db.objectStoreNames);
+      for (const table_name of table_names)
       {
-        for (const attachment of attachments)
+        db_data[table_name] = await Db.Get_All(db, table_name);
+      }
+
+      if (Array.isArray(db_data.attachments) && db_data.attachments.length > 0)
+      {
+        for (const attachment of db_data.attachments)
         {
           if (attachment.file)
           {
@@ -250,16 +261,6 @@
           }
         }
       }
-
-      const db_data = 
-      {
-        jobs,
-        agencies,
-        contacts,
-        action_logs,
-        attachments,
-        profiles,
-      };
 
       const json_string = JSON.stringify(db_data, null, 2);
       const blob = new Blob([json_string], { type: 'application/json' });
@@ -320,44 +321,13 @@
       await Render_Job_Items(db);
     }
 
-    async function On_Click_Add_Job(db)
-    {
-      const agencies = await Db.Get_All(db, "agencies");
-      const contacts = await Db.Get_All(db, "contacts");
-      Set_Options(job_agency_select, agencies, a => a.id, a => a.name);
-      Set_Options(job_contact_select, contacts, c => c.id, c => c.name);
-
-      const form_data = await job_dialog.Show_Async();
-      if (form_data)
-      {
-        const job =
-        {
-          role_title: form_data.role_title?.trim() || null,
-          role_type: form_data.role_type?.trim() || null,
-          location: form_data.location?.trim() || null,
-          company: form_data.company?.trim() || null,
-          duration: form_data.duration?.trim() || null,
-          source: form_data.source?.trim() || null,
-          description: form_data.description?.trim() || null,
-          remuneration: parseFloat(form_data.remuneration) || null,
-          remuneration_unit: form_data.remuneration_unit?.trim() || null,
-          agency_id: parseInt(form_data.agency_id) || null,
-          contact_id: parseInt(form_data.contact_id) || null,
-          status: form_data.status || "bookmarked"
-        };
-
-        await Db.Insert(db, "jobs", job);
-        await Render_Job_Items(db);
-      }
-    }
-
     async function On_Click_AI_Add_Job(ctx)
     {
       const form_data = await email_dialog.Show_Async();
       if (form_data?.email_text)
       {
         console.info("Processing...");
-        const data = await Extract_Job(ctx.ai, form_data.email_text);
+        const data = await ctx.ai.Extract_Job(form_data.email_text);
         console.log("On_Click_AI_Add_Job(): data =", data);
         console.info("...Finished.");
 
@@ -416,6 +386,7 @@
     async function On_Click_Edit_Job(event, job_id, db)
     {
       const agencies = await Db.Get_All(db, "agencies");
+      agencies.push({ id: "new", name: "New Agency" });
       const contacts = await Db.Get_All(db, "contacts");
       Set_Options(job_agency_select, agencies, a => a.id, a => a.name);
       Set_Options(job_contact_select, contacts, c => c.id, c => c.name);
@@ -424,8 +395,16 @@
       const form_data = await job_dialog.Show_Async(curr_job);
       if (form_data)
       {
+        if (form_data.agency_id == "new")
+        {
+          const new_agency = { name: form_data.agency_name?.trim() || "New Agency" };
+          const new_agency_id = await Db.Insert(db, "agencies", new_agency);
+          form_data.agency_id = new_agency_id;
+        }
+
         const job =
         {
+          link: form_data.link?.trim() || null,
           company: form_data.company?.trim() || null,
           duration: form_data.duration?.trim() || null,
           source: form_data.source?.trim() || null,
@@ -441,7 +420,7 @@
           status: form_data.status || null
         };
 
-        await Db.Update(db, "jobs", job);
+        await Db.Save(db, "jobs", job);
         await Render_Job_Items(db);
       }
     }
@@ -451,8 +430,16 @@
       const confirmed = confirm("Are you sure you want to delete this job?");
       if (confirmed)
       {
-        await Db.Delete(db, "jobs", job_id);
+        await Db.Delete(db, "jobs", [job_id]);
+        const attachment_ids = 
+          await Db.Select_Ids(db, "attachments", a => a.job_id === job_id);
+        await Db.Delete(db, "attachments", attachment_ids);
+        const action_log_ids = 
+          await Db.Select_Ids(db, "action_logs", l => l.job_id === job_id);
+        await Db.Delete(db, "action_logs", action_log_ids);
+
         await Render_Job_Items(db);
+        Alert("Job deleted successfully.");
       }
     }
 
@@ -502,11 +489,23 @@
 
     async function On_Click_View_Job(event, job_id, db)
     {
-      const curr_job = await Select_By_Id(db, "jobs", job_id);
+      const curr_job = await Db.Select_By_Id(db, "jobs", job_id);
 
       job_det_dialog.role_elem.innerText = curr_job.role_title;
       job_det_dialog.des_elem.innerText = curr_job.description || null;
       job_det_dialog.Show();
+    }
+
+    async function On_Click_Download_Job(e, job_id, db)
+    {
+      const job = Db.Select_By_Id(db, "jobs", job_id);
+
+      const filename = `job-trak-${new Date().toISOString().split('T')[0]}.json`;
+      const json_string = JSON.stringify(job, null, 2);
+      const blob = new Blob([json_string], { type: 'application/json' });
+      Download_File(blob, filename);
+
+      Alert("Job exported successfully!");
     }
 
     function On_Click_Attachment(attachment)
@@ -515,9 +514,19 @@
       Show_File(attachment.file, filename);
     }
 
+    function On_Click_Delete_Attachment(ctx, attachment)
+    {
+      const confirmed = confirm("Are you sure you want to delete this attachment?");
+      if (confirmed)
+      {
+        Db.Delete(ctx.db, "attachments", [attachment.id]);
+        Render_Job_Items(ctx.db);
+      }
+    }
+
     // ai =============================================================================
 
-    async function Init_AI(ctx)
+    /*async function Init_AI(ctx)
     {
       let res = null;
       const response = await fetch("/__/firebase/init.json");
@@ -617,7 +626,7 @@
       };
       const model_config =
       {
-        model: "gemini-2.5-flash-lite",
+        model: "gemini-2.5-flash-lite", // "gemini-2.5-flash", "gemini-3-flash",
         generationConfig:
         {
           responseMimeType: "application/json",
@@ -845,7 +854,7 @@
       }
 
       return json_res;
-    }
+    }*/
 
     // business logic =================================================================
 
@@ -855,7 +864,7 @@
 
       if (agency && agency.name)
       {
-        res = await Insert_If_New
+        res = await Db.Insert_If_New
           (db, "agencies", agency, a => a.name === agency.name);
       }
 
@@ -869,7 +878,7 @@
       if (contact && contact.email)
       {
         contact.agency_id = agency_id;
-        res = await Insert_If_New
+        res = await Db.Insert_If_New
           (db, "contacts", contact, c => c.email === contact.email);
       }
 
@@ -884,10 +893,13 @@
       {
         job.agency_id = agency_id;
         job.contact_id = contact_id;
-        res = await Insert_If_New(db, "jobs", job, Fail_If);
+        job.status = job.status || "bookmarked";
+        res = await Db.Insert_If_New(db, "jobs", job, Fail_If);
         function Fail_If(j)
         {
-          return (agency_id && j.agency_id == agency_id && j.role_title == job.role_title);
+          return (agency_id && 
+            j.agency_id == agency_id && 
+            j.role_title == job.role_title);
         }
       }
 
@@ -1103,7 +1115,7 @@
       contacts_list.value = enrichedContacts;
     }
 
-    function Render_Attachment_List(list_elem, attachments)
+    function Render_Attachment_List(ctx, list_elem, attachments)
     {
       if (attachments && attachments.length > 0)
       {
@@ -1113,10 +1125,19 @@
           const size = attachment.size || attachment.file?.size || 0;
           const size_text = size ? ` (${Math.round(size / 1024)} KB)` : '';
 
-          const item_elem = document.createElement("li");
-          item_elem.classList.add("link");
-          item_elem.innerText = name + size_text;
-          item_elem.addEventListener("click", () => On_Click_Attachment(attachment));
+          const html = `
+            <li>
+              <div>
+                <a cid="link_btn" class="link">${name + size_text}</a>
+                <button cid="del_btn" class="img-sml">
+                  <img src="./image/delete.svg" title="Delete Attachment">
+                </button>
+              </div>
+            </li>
+          `;
+          const item_elem = Utils.To_Element(html, "cid");
+          item_elem.link_btn.addEventListener("click", () => On_Click_Attachment(attachment));
+          item_elem.del_btn.addEventListener("click", () => On_Click_Delete_Attachment(ctx, attachment));
           list_elem.appendChild(item_elem);
         }
       }
@@ -1178,7 +1199,7 @@
       item_elem.edu_det_elem.textContent = details;
     }
 
-    function Render_Job_Item(event, db)
+    function Render_Job_Item(event, ctx)
     {
       const item_elem = event.target;
       const job = item_elem.item_obj;
@@ -1194,7 +1215,17 @@
       const des_text = Utils.Append_Str(type_text, salary_text, " - ");
       item_elem.role_type_elem.textContent = des_text;
 
-      Render_Attachment_List(item_elem.attachment_list_elem, job.attachments);
+      if (job.link)
+      {
+        item_elem.link_elem.href = job.link;
+        item_elem.link_elem.innerText = job.link;
+      }
+      else
+      {
+        item_elem.link_elem.remove();
+      }
+
+      Render_Attachment_List(ctx, item_elem.attachment_list_elem, job.attachments);
 
       if (job.latest_note)
       {
@@ -1210,11 +1241,12 @@
       
       item_elem.status_elem.textContent = job.status;
 
-      item_elem.attach_btn.onclick = e => On_Click_Attach_Files(e, job.id, db);
-      item_elem.add_note_btn.onclick = e => On_Click_Add_Note(e, job.id, db);
-      item_elem.edit_job_btn.onclick = e => On_Click_Edit_Job(e, job.id, db);
-      item_elem.del_job_btn.onclick = e => On_Click_Delete_Job(e, job.id, db);
-      item_elem.view_job_btn.onclick = e => On_Click_View_Job(e, job.id, db);
+      item_elem.job_menu.addEventListener("attach", e => On_Click_Attach_Files(e, job.id, ctx.db));
+      item_elem.job_menu.addEventListener("view", e => On_Click_View_Job(e, job.id, ctx.db));
+      item_elem.job_menu.addEventListener("edit", e => On_Click_Edit_Job(e, job.id, ctx.db));
+      item_elem.job_menu.addEventListener("delete", e => On_Click_Delete_Job(e, job.id, ctx.db));
+      item_elem.job_menu.addEventListener("download", e => On_Click_Download_Job(e, job.id, ctx.db));
+      item_elem.add_note_btn.onclick = e => On_Click_Add_Note(e, job.id, ctx.db);
 
       if (job.status_type == 0 || job.status_type == undefined)
         item_elem.classList.remove("failed");
@@ -1373,18 +1405,8 @@
     <de-input-list id="jobs_list">
       <header slot="header">
         <h2>Jobs</h2>
-        <button id="add_job_btn" class="img">
-          <img src="image/add.svg" title="Add Job">
-        </button>
-        <button id="ai_add_job_btn" class="img">
-          <img src="image/robot.svg" title="AI Add Job">
-        </button>
-        <button id="filter_btn" class="img">
-          <img src="image/filter-1.svg" title="Filter Jobs">
-        </button>
-        <button id="sort_btn" class="img">
-          <img src="image/sort.svg" title="Sort Jobs">
-        </button>
+        <de-toolbar-menu id="jobs_menu" show-add show-ai show-filter show-sort show-upload>
+        </de-toolbar-menu>
       </header>
       <details slot="item" class="job-item">
         <summary>
@@ -1393,36 +1415,14 @@
             <span cid="contact_elem"></span>
           </div>
           <div cid="status_elem">blah</div>
-
-          <de-toolbar-menu id="profile_menu" 
-            show-attach 
-            show-view 
-            show-edit 
-            show-delete 
-            show-download
-          >
+          <de-toolbar-menu cid="job_menu" show-attach show-view show-edit show-delete show-download>
             <button cid="add_note_btn" class="img">
               <img src="image/note-add.svg" title="Add Note">
             </button>
           </de-toolbar-menu>
-
-          <div class="menu">
-            <button cid="attach_btn" class="img">
-              <img src="image/attach.svg" title="Attach Files">
-            </button>
-            <button cid="view_job_btn" class="img">
-              <img src="image/zoom.svg" title="View Job">
-            </button>
-            <button cid="edit_job_btn" class="img">
-              <img src="image/edit.svg" title="Edit Job">
-            </button>
-            <button cid="del_job_btn" class="img">
-              <img src="image/delete.svg" alt="" title="Delete Job">
-            </button>
-          </div>
-          
         </summary>
         <p cid="role_type_elem"></p>
+        <a cid="link_elem" class="link" target="_blank"></a>
         <p cid="note_elem"></p>
         <div class="attachment-list">
           <strong>Attachments:</strong>
@@ -1566,6 +1566,8 @@
     <h2 slot="header">Add Job</h2>
     <label slot="fields">Role Title</label>
     <input slot="fields" type="text" name="role_title" placeholder="Job title">
+    <label slot="fields">Link</label>
+    <input slot="fields" type="text" name="link" placeholder="Job link">
     <label slot="fields">Role Type</label>
     <input slot="fields" type="text" name="role_type" placeholder="e.g., Full-time, Contract">
     <label slot="fields">Location</label>
@@ -1583,7 +1585,9 @@
     <label slot="fields">Remuneration Unit</label>
     <input slot="fields" type="text" name="remuneration_unit" placeholder="e.g., AUD/year, $/hour">
     <label slot="fields">Agency</label>
-    <select id="job_agency_select" slot="fields" name="agency_id"></select>
+    <select slot="fields" id="job_agency_select" name="agency_id"></select>
+    <label slot="fields" hidden>New Agency Name</label>
+    <input slot="fields" hidden type="text" name="agency_name" placeholder="Enter new agency name">
     <label slot="fields">Contact</label>
     <select id="job_contact_select" slot="fields" name="contact_id"></select>
     <label slot="fields">Status</label>

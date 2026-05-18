@@ -208,8 +208,6 @@ button, .btn
   --border-color: #ff0;
   background-color: #0004;
   color: #ff0;
-  xbackground-color: #ff0;
-  xcolor: #000;
   font-family: hyperspace-bold;
   padding: 12px 16px;
   font-size: 1rem;
@@ -222,6 +220,14 @@ button, .btn
     font-size: 0;  
     padding: 8px 8px;  
   }
+  &.img-sml
+  {
+    font-size: 0;  
+    padding: 0 0;  
+    border: none;
+    animation: none;
+  }
+
 }
 
 footer {
@@ -519,19 +525,39 @@ de-form
   display: block;
 }
 
+de-toolbar-menu
+{
+  display: flex;
+  gap: 5px;
+}
+
 .link
 {
   cursor: pointer;
   text-decoration: underline solid var(--link);
-  text-underline-offset: 8px;
-  margin: 0 0 10px 0;
+  text-underline-offset: 5px;
+  margin: 0 0 5px 0;
 
   &:hover
   {
     color: var(--link);
   }
+  &:visited
+  {
+    color: var(--main);
+  }
 }
+.attachment-list
+{
+  margin: 10px 0 0 0;
 
+  li div
+  {
+    display: inline-flex;
+    gap: 0 5px;
+    align-items: flex-start;
+  }
+}
 .hidden 
 {
   display: none;
