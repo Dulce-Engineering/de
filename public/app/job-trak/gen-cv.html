@@ -91,30 +91,20 @@
 
         const job_id_str = new URLSearchParams(window.location.search).get("job_id");
         const job_id = Utils.Is_Empty(job_id_str) ? null : parseInt(job_id_str);
-        const job = await ctx.db.Select_By_Id("jobs", job_id);
+        const prospective_job = await ctx.db.Select_By_Id("jobs", job_id);
 
         summ_value.innerText = "generating...";
-        const summ_text = null; //await Generate_Summary(ctx, job, profile);
+        const summ_text = await Generate_Summary(ctx, prospective_job, profile);
         summ_value.innerText = summ_text || "Unable to generate.";
 
         skills_value.innerText = "generating...";
-        const jobs = await ctx.db.Get_All("career");
-        const career_skills = jobs.map(j => (
-        {
-          role_titles: j.role_titles, 
-          company_name: j.company_name, 
-          tech: j.tech
-        }));
-        const skills = null; //await Generate_Skills(ctx, job, career_skills);
-        let skills_html = null;
-        if (Array.isArray(skills))
-        {
-          skills_html = skills.join(", ");
-        }
-        skills_value.innerHTML = skills_html || "Unable to generate.";
+        const career_jobs = await ctx.db.Get_All("career");
+        const skills = await Generate_Skills(ctx, prospective_job, career_jobs);
+        skills_value.innerHTML = Render_List(skills);
 
-        const best_jobs = await ctx.db.Get_All("career");
-        jobs_list.addEventListener("render", Render_Job_Item);
+        const best_job_ids = await Select_Best_Jobs(ctx, career_jobs, prospective_job);
+        const best_jobs = career_jobs.filter(j => best_job_ids.includes(j.id));
+        jobs_list.addEventListener("render", e => Render_Job_Item(e, ctx, prospective_job, best_jobs));
         jobs_list.value = best_jobs;
 
         education_list.addEventListener("render", Render_Education_Item);
@@ -125,6 +115,87 @@
     // events =========================================================================
 
     // business logic =================================================================
+
+    async function Select_Best_Jobs(ctx, career_jobs, target_job)
+    {
+      let res = null;
+
+      if (career_jobs && target_job)
+      {
+        const job_summaries = career_jobs.map( j => (
+        {
+          id: j.id, 
+          role_titles: j.role_titles, 
+          company_name: j.company_name,  
+          start_date: To_AI_Date(j.start_date), 
+          end_date: To_AI_Date(j.end_date),
+          work_type: j.work_type,
+          tech: j.tech,
+          responsibilities: j.responsibilities,
+          projects: j.projects
+        }));
+        const Schema = ctx.ai.fb_ai.Schema;
+        const schema = Schema.object(
+        {
+          properties: 
+          {
+            selected_job_ids: Schema.array(
+            {
+              items: Schema.integer(),
+              description: 
+                "The unique IDs of the selected career job records, sorted in " +
+                "recommended order of appearance."
+            }),
+            justification: Schema.string(
+            {
+              description: 
+                "A brief professional explanation of why this specific selection " +
+                "represents the strongest strategic fit for the target role."
+            })
+          },
+          required: ["selected_job_ids", "justification"]
+        });
+        const sys_instruction = `
+          You are an expert technical recruiter and resume strategist. Your job is to select the 
+          most impactful and chronologically relevant professional roles from an applicant's history 
+          to tailor their CV for a specific target job opening.
+          
+          CRITICAL SELECTION MATRICES:
+          1. RECENCY CRITERIA: Always prioritize the applicant's current or most recent role 
+            to prevent major, unexplainable gaps at the top of the resume.
+          2. RELEVANCE CRITERIA: Select remaining roles based on technical overlap, 
+            architectural alignment, and scope of responsibility demanded by the job description.
+          3. EFFICIENCY: Select only the most meaningful positions (typically a maximum of 5 to 6 roles) 
+            that build a compelling narrative for this specific target position.
+          
+          Do not output conversational markdown text or text block wrappers outside the schema.
+        `;
+        const prompt = `
+          Analyze the applicant's complete employment timeline against the new target job description. 
+          Select the optimal historical roles to feature on a tailored CV.
+
+          ### TARGET JOB DESCRIPTION:
+          - Title: ${target_job.role_title}
+          - Description Text:
+          \`\`\`text
+          ${target_job.description}
+          \`\`\`
+
+          ### COMPLETE APPLICANT EMPLOYMENT HISTORY (JSON):
+          \`\`\`json
+          ${JSON.stringify(job_summaries, null, 2)}
+          \`\`\`
+
+          OUTPUT REQUIREMENT:
+          Return a structured JSON object matching the requested schema containing the selected IDs.
+        `;
+
+        const ai_res = await ctx.ai.Prompt(prompt, schema, null, sys_instruction);
+        res = ai_res?.selected_job_ids;
+      }
+
+      return res;
+    }
 
     async function Generate_Summary(ctx, job, profile)
     {
@@ -164,13 +235,20 @@
       return res;
     }
 
-    async function Generate_Skills(ctx, job, skills)
+    async function Generate_Skills(ctx, job, career_jobs)
     {
       let res = null;
       const SKILL_COUNT = 15;
 
-      if (job && skills)
+      if (job && career_jobs)
       {
+        const skills = career_jobs.map(j => (
+        {
+          role_titles: j.role_titles,
+          company_name: j.company_name,
+          tech: j.tech
+        }));
+
         const Schema = ctx.ai.fb_ai.Schema;
         const schema = Schema.object({
           properties: 
@@ -209,9 +287,10 @@
           Analyze the following data sources to find intersections in technical skills.
 
           ### TARGET JOB DESCRIPTION:
+          - Title: ${job.role_title}
+          - Description Text:
           \`\`\`text
-          Job Title: ${job.role_title}  
-          Job Description: ${job.description}
+          ${job.description}
           \`\`\`
 
           ### APPLICANT DESCRIPTIONS OF PREVIOUS JOBS:
@@ -231,19 +310,130 @@
       return res;
     }
 
+    async function Generate_Job_Description(ctx, career_job, target_job)
+    {
+      let res = null;
+
+      if (career_job && target_job)
+      {
+        const job_summary = 
+        {
+          role_titles: career_job.role_titles,
+          company_name: career_job.company_name,
+          tech: career_job.tech,
+          responsibilities: career_job.responsibilities,
+          projects: career_job.projects
+        };
+        const Schema = ctx.ai.fb_ai.Schema;
+        const schema = Schema.object(
+        {
+          properties: 
+          {
+            summary: Schema.string(
+            {
+              description: 
+                "A 2-3 sentence high-level overview of the role, framed to match " +
+                "the prospective job's tone and focus."
+            }),
+            bullet_points: Schema.array(
+            {
+              items: Schema.string(),
+              description: 
+                "3 to 5 high-impact, results-oriented bullet points tracking real " +
+                "accomplishments, starting with strong action verbs."
+            })
+          },
+          required: ["summary", "bullet_points"]
+        });
+        const sys_instruction = `
+          You are an elite resume editor specializing in technical role alignment. Your goal 
+          is to rewrite the details of a single past job experience so that it speaks directly 
+          to the requirements, technical stacks, and core problems outlined in a target job description.
+          
+          CRITICAL ALIGNMENT RULES:
+          1. RE-FRAME, DO NOT FABRICATE: Elevate and emphasize existing technical choices, 
+            architectures, or methodologies that overlap with the target role. Never invent 
+            new skills, keywords, or metrics that do not exist in the source text.
+          2. LANGUAGE TUNING: Use strong, industry-standard action verbs. Match the vocabulary 
+            and tone of the prospective job description (e.g., if they ask for "performance optimization", 
+            frame relevant past optimization work using those exact structural themes).
+          3. BULLET ARCHITECTURE: Each bullet point should ideally tie an action to a technical context 
+            and a professional outcome.
+          
+          Do not output conversational text or markdown code blocks outside the schema boundaries.
+        `;
+        const prompt = `
+          Please review the target prospective job opening and rewrite the provided historical job entry 
+          to optimize its alignment with the new role's requirements.
+
+          ### TARGET PROSPECTIVE JOB DETAILS:
+          - Title: ${target_job.role_title}
+          - Description Text:
+          \`\`\`text
+          ${target_job.description}
+          \`\`\`
+
+          ### SOURCE HISTORICAL JOB TO REWRITE (JSON):
+          \`\`\`json
+          ${JSON.stringify(job_summary, null, 2)}
+          \`\`\`
+
+          OUTPUT REQUIREMENT:
+          Return a structured JSON object adhering perfectly to the schema containing the rewritten summary and bullet points.
+        `;
+        res = await ctx.ai.Prompt(prompt, schema, null, sys_instruction);
+      }
+
+      return res;
+    }
+
+    function Get_Next_Job(job, all_jobs)
+    {
+      let res = null;
+
+      const jobs_after = all_jobs.filter(j => j.start_date > job.start_date);
+      if (!Utils.Is_Empty(jobs_after))
+      {
+        let min_job = jobs_after[0];
+        let min_dt = min_job.start_date - job.start_date;
+        for (const job_after of jobs_after)
+        {
+          const dt = job_after.start_date - job.start_date;
+          if (dt < min_dt)
+          {
+            min_dt = dt;
+            min_job = job_after;
+          }
+        }
+        res = min_job;
+      }
+
+      return res;
+    }
+
     // render lists ===================================================================
 
     // render list item ===============================================================
 
-    function Render_Job_Item(event)
+    async function Render_Job_Item(event, ctx, target_job, all_jobs)
     {
       const item_elem = event.target;
       const job = item_elem.item_obj;
+      const next_job = Get_Next_Job(job, all_jobs);
+
+      const start_date = job.start_date;
+      const end_date = next_job ? next_job.start_date : job.end_date;
+      const duration_str = Duration_Str(start_date, end_date);
+      const start_date_str = Render_Date(start_date);
+      item_elem.dates.innerText = start_date_str + " (" + duration_str + ")";
 
       item_elem.job_title.innerText = job.role_titles;
       item_elem.job_company.innerText = job.company_name;
-      item_elem.dates.innerText = job.start_date + " - " + job.end_date;
-      item_elem.job_description.innerText = job.responsibilities;
+      item_elem.job_tech.innerText = job.tech;
+
+      const tailored_job = await Generate_Job_Description(ctx, job, target_job);
+      item_elem.job_description.innerText = tailored_job.summary;
+      item_elem.job_points.innerHTML = Render_List(tailored_job.bullet_points);
     }
 
     function Render_Education_Item(event)
@@ -256,6 +446,63 @@
     }
 
     // rendering ======================================================================
+
+    function Render_Date(date_ms)
+    {
+      let res = "";
+
+      if (date_ms)
+      {
+        const date = new Date(date_ms);
+        const month_name = date.toLocaleString('default', { month: 'long' });
+        const year = date.getFullYear();
+        res = month_name + " " + year;
+      }
+
+      return res;
+    }
+
+    function Duration_Str(start_time, end_time)
+    {
+      let res = "";
+
+      if (start_time && end_time)
+      {
+        const diff_ms = end_time - start_time;
+        const diff_years = diff_ms / (1000 * 60 * 60 * 24 * 365);
+        //res = diff_years.toFixed(1) + " years";
+
+        res = diff_years.toLocaleString('en-US',
+          {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 1
+          }) + " years";
+      }
+
+      return res;
+    }
+
+    function Render_List(items)
+    {
+      let html = "no data";
+
+      if (Array.isArray(items))
+      {
+        html = "";
+        for (const item of items)
+        {
+          html += `<li>${item}</li>`;
+        }
+        html = `<ul>${html}</ul>`;
+      }
+
+      return html;
+    }
+
+    function To_AI_Date(ms)
+    {
+      return new Date(ms).toISOString().split('T')[0];
+    }
 
     function Render_Field(field_elem, field_value_elem, value)
     {
@@ -310,7 +557,9 @@
       <div slot="item">
         <h2 cid="job_title"></h2>
         <span cid="job_company"></span> | <span cid="dates"></span>
-        <div cid="job_description"></div>
+        <p cid="job_description"></p>
+        <div>Acievements: <span cid="job_points"></span></div>
+        <div>Tech: <span cid="job_tech"></span></div>
       </div>
     </de-input-list>
   </section>

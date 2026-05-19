@@ -328,6 +328,8 @@ class AI
 
   async Prompt(prompt, schema, file, sys_instruction)
   {
+    console.log("AI.Prompt(): entry");
+
     const model_config =
     {
       //model: "gemini-2.5-flash-lite",
