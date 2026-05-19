@@ -326,7 +326,7 @@ class AI
     return { educations, career };
   }
 
-  async Prompt(prompt, responseSchema, file)
+  async Prompt(prompt, schema, file, sys_instruction)
   {
     const model_config =
     {
@@ -334,8 +334,6 @@ class AI
       model: "gemini-2.5-flash",
       generationConfig:
       {
-        responseMimeType: "application/json",
-        responseSchema,
         temperature: 0.1
       },
       requestOptions:
@@ -343,6 +341,16 @@ class AI
         timeout: 120000
       }
     };
+
+    if (schema)
+    {
+      model_config.generationConfig.responseSchema = schema;
+      model_config.generationConfig.responseMimeType = "application/json";
+    }
+    if (sys_instruction)
+    {
+      model_config.systemInstruction = sys_instruction;
+    }
 
     let model = null;
     try { model = this.fb_ai.getGenerativeModel(this.ai, model_config); }
@@ -352,7 +360,7 @@ class AI
       model = null;
     }
 
-    let json_res = null;
+    let prompt_res = null;
     if (model)
     {
       let result = null;
@@ -369,17 +377,22 @@ class AI
       if (result)
       {
         const text_res = result.response.text();
-        try { json_res = JSON.parse(text_res); }
-        catch (error)
+        prompt_res = text_res;
+
+        if (schema)
         {
-          console.warn(error);
-          console.warn("Prompt(): text_res =", text_res);
-          json_res = null;
+          try { prompt_res = JSON.parse(text_res); }
+          catch (error)
+          {
+            console.warn(error);
+            console.warn("Prompt(): text_res =", text_res);
+            prompt_res = null;
+          }
         }
       }
     }
 
-    return json_res;
+    return prompt_res;
   }
 }
 

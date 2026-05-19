@@ -228,6 +228,10 @@ button, .btn
     animation: none;
   }
 
+  .label
+  {
+    display: none;
+  }
 }
 
 footer {
@@ -376,7 +380,7 @@ de-input-tree {
   }
 }
 
-de-dialog-form, de-dialog-alert, de-form 
+de-dialog-form, de-dialog-alert, de-form, de-toolbar-menu
 {
   dialog 
   {
@@ -529,6 +533,33 @@ de-toolbar-menu
 {
   display: flex;
   gap: 5px;
+}
+
+de-toolbar-menu
+{
+  dialog 
+  {
+    width: fit-content;
+  }
+  main
+  {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  button
+  {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  &[compact] button .label
+  {
+    display: inline-block;
+    font-size: 0.85rem;
+  }
 }
 
 .link

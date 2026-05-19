@@ -12,6 +12,23 @@ class Db
     return new Promise((resolve) => tx.oncomplete = resolve);
   }
 
+  static async New(schema)
+  {
+    const promise = new Promise(On_Process);
+    function On_Process(resolve, reject)
+    {
+      const request = indexedDB.open("JobTrakDB", schema.version);
+      request.onupgradeneeded = (e) => Db.On_Upgrade_Needed(e, schema);
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    }
+
+    const res = new Db();
+    res.db = await promise;
+
+    return res;
+  }
+
   static async Open_DB(ctx, schema)
   {
     const promise = new Promise(On_Process);
@@ -79,6 +96,11 @@ class Db
     const res = items.map(item => item.id);
 
     return res;
+  }
+
+  Select_By_Id(table_name, id)
+  {
+    return Db.Select_By_Id(this.db, table_name, id);
   }
 
   static Select_By_Id(db, table_name, id)
@@ -269,6 +291,11 @@ class Db
     const table = Db.Get_Table(db, table_name, false);
     const request = table.put(item);
     return Db.Get_Req_Res(request);
+  }
+
+  Get_All(table_name)
+  {
+    return Db.Get_All(this.db, table_name);
   }
 
   static Get_All(db, table_name)

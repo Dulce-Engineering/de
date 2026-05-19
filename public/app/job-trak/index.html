@@ -54,7 +54,6 @@
   </script>
 
   <script type="module">
-    // @ts-check
     import * as fb_app from "firebase/app";
     import * as fb_ai from "firebase/ai";
     import Utils from "../../lib/Utils.js";
@@ -68,15 +67,6 @@
     import "./component/DeToolbarMenu/index.js";
     import DB_SCHEMA from "./db/schema.js";
 
-    const table_names = 
-    [
-      "jobs", 
-      "agencies", 
-      "contacts", 
-      "action_logs", 
-      "attachments",
-      "profiles"
-    ];
     const job_status =
     [
       { id: "bookmarked", label: "Bookmarked", type: 0 },
@@ -522,6 +512,17 @@
         Db.Delete(ctx.db, "attachments", [attachment.id]);
         Render_Job_Items(ctx.db);
       }
+    }
+
+    function On_Click_Generate_CV(e, job, ctx)
+    {
+      const url = "gen-cv.html?job_id=" + job.id;
+      window.open(url, "_blank");
+    }
+
+    function On_Click_Generate_Cover_Letter(e, job, ctx)
+    {
+
     }
 
     // ai =============================================================================
@@ -1246,7 +1247,9 @@
       item_elem.job_menu.addEventListener("edit", e => On_Click_Edit_Job(e, job.id, ctx.db));
       item_elem.job_menu.addEventListener("delete", e => On_Click_Delete_Job(e, job.id, ctx.db));
       item_elem.job_menu.addEventListener("download", e => On_Click_Download_Job(e, job.id, ctx.db));
-      item_elem.add_note_btn.onclick = e => On_Click_Add_Note(e, job.id, ctx.db);
+      item_elem.job_menu.addEventListener("status", e => On_Click_Add_Note(e, job.id, ctx.db));
+      item_elem.job_menu.addEventListener("gencv", e => On_Click_Generate_CV(e, job, ctx));
+      item_elem.job_menu.addEventListener("genletter", e => On_Click_Generate_Cover_Letter(e, job, ctx));
 
       if (job.status_type == 0 || job.status_type == undefined)
         item_elem.classList.remove("failed");
@@ -1415,10 +1418,16 @@
             <span cid="contact_elem"></span>
           </div>
           <div cid="status_elem">blah</div>
-          <de-toolbar-menu cid="job_menu" show-attach show-view show-edit show-delete show-download>
-            <button cid="add_note_btn" class="img">
-              <img src="image/note-add.svg" title="Add Note">
-            </button>
+          <de-toolbar-menu cid="job_menu" compact
+            show-status label-status="Update Status"
+            show-attach label-attach="Attach Files"
+            show-view label-view="View Details"
+            show-edit label-edit="Edit Job"
+            show-delete label-delete="Delete Job"
+            show-download label-download="Download Job Details"
+            show-gencv label-gencv="Generate CV"
+            show-genletter label-genletter="Generate Cover Letter"
+          >
           </de-toolbar-menu>
         </summary>
         <p cid="role_type_elem"></p>

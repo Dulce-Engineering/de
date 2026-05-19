@@ -36,6 +36,8 @@ class DeToolbarMenu extends HTMLElement
 
   On_Click_Btn(event_name)
   {
+    if (this.menu_elem)
+      this.menu_elem.hidePopover();
     this.dispatchEvent(new Event(event_name));
   }
 
@@ -55,109 +57,69 @@ class DeToolbarMenu extends HTMLElement
     return res;
   }
 
-  Render_Btn(id, img_src, title, title_type, show)
+  Render_Btn(id, img_src, dst_elem)
   {
-    let html = "";
-
+    const show = this.hasAttribute("show-" + id);
     if (show)
     {
-      html = `
-        <button cid="${id}" class="img">
-          <img src="${img_src}" title="${this.Render_Title(title, title_type)}">
+      const title = 
+        this.hasAttribute("label-" + id) ? 
+        `title="${this.getAttribute("label-" + id)}"` : "";
+
+      const html = `
+        <button cid="${id}_btn" class="img" ${title}>
+          <img src="${img_src}">
+          <span class="label">${this.getAttribute("label-" + id)}</span>
         </button>
       `;
-    }
+      const btn_elem = Utils.To_Element(html);
+      btn_elem.addEventListener("click", () => this.On_Click_Btn(id));
 
-    return html;
+      dst_elem.append(btn_elem);
+    }
   }
 
   Render()
   {
-    const show_view = this.hasAttribute("show-view");
-    let html = 
-      this.Render_Btn("view_btn", "./image/zoom.svg", "View", "singular", show_view);
+    let dst_elem = this;
 
-    const show_download = this.hasAttribute("show-download");
-    html +=
-      this.Render_Btn("download_btn", "./image/download.svg", "Download", "singular", show_download);
+    const render_compact = this.hasAttribute("compact");
+    if (render_compact)
+    {
+      const menu_id = "menu_" + Date.now();
 
-    const show_upload = this.hasAttribute("show-upload");
-    html +=
-      this.Render_Btn("upload_btn", "./image/upload.svg", "Upload", "singular", show_upload);
+      const dlg_html = `
+        <button type="button" popovertarget="${menu_id}" title="Menu" class="img">
+          <img src="./image/menu.svg">
+        </button>
+        <dialog popover cid="menu_elem" id="${menu_id}">
+          <main id="${menu_id + "_main"}">
+            <button type="button" popovertarget="${menu_id}" class="img" popoveraction="close" title="Close Menu">
+              <img src="./image/close.svg">
+            </button>
+          </main>
+        </dialog>
+      `;
+      const dlg_elems = Utils.To_Elements(dlg_html);
+      dst_elem = dlg_elems[2].querySelector("#" + menu_id + "_main");
+      this.append(...dlg_elems);
+    }
 
-    const show_ai = this.hasAttribute("show-ai");
-    html +=
-      this.Render_Btn("ai_add_btn", "./image/robot.svg", "AI Add", "singular", show_ai);
+    this.Render_Btn("status", "./image/note-add.svg", dst_elem);
+    this.Render_Btn("download", "./image/download.svg", dst_elem);
+    this.Render_Btn("upload", "./image/upload.svg", dst_elem);
+    this.Render_Btn("ai", "./image/robot.svg", dst_elem);
+    this.Render_Btn("attach", "./image/attach.svg", dst_elem);
+    this.Render_Btn("gencv", "./image/guide.svg", dst_elem);
+    this.Render_Btn("genletter", "./image/mail.svg", dst_elem);
+    this.Render_Btn("filter", "./image/filter-1.svg", dst_elem);
+    this.Render_Btn("sort", "./image/sort.svg", dst_elem);
+    this.Render_Btn("view", "./image/zoom.svg", dst_elem);
+    this.Render_Btn("edit", "./image/edit.svg", dst_elem);
+    this.Render_Btn("add", "./image/add.svg", dst_elem);
+    this.Render_Btn("delete", "./image/delete.svg", dst_elem);
 
-    const show_add = this.hasAttribute("show-add");
-    html += 
-      this.Render_Btn("add_btn", "./image/add.svg", "Add", "singular", show_add);
-
-    const show_edit = this.hasAttribute("show-edit");
-    html += 
-      this.Render_Btn("edit_btn", "./image/edit.svg", "Edit", "singular", show_edit);
-
-    const show_delete = this.hasAttribute("show-delete");
-    html += 
-      this.Render_Btn("del_btn", "./image/delete.svg", "Delete", "singular", show_delete);
-
-    const show_filter = this.hasAttribute("show-filter");
-    html += 
-      this.Render_Btn("filter_btn", "./image/filter-1.svg", "Filter", "plural", show_filter);
-
-    const show_sort = this.hasAttribute("show-sort");
-    html +=
-      this.Render_Btn("sort_btn", "./image/sort.svg", "Sort", "plural", show_sort);
-
-    const show_attach = this.hasAttribute("show-attach");
-    html +=
-      this.Render_Btn("attach_btn", "./image/attach.svg", "Attach Files", null, show_attach);
-
-    const html_elements = Utils.To_Document(html, this);
-    //this.replaceChildren(html_elements);
-    this.appendChild(html_elements);
     Utils.Set_Id_Shortcuts(this, this, "cid");
-
-    if (show_view)
-    {
-      this.view_btn.addEventListener("click", () => this.On_Click_Btn("view"));
-    }
-    if (show_download)
-    {
-      this.download_btn.addEventListener("click", () => this.On_Click_Btn("download"));
-    }
-    if (show_upload)
-    {
-      this.upload_btn.addEventListener("click", () => this.On_Click_Btn("upload"));
-    }
-    if (show_ai)
-    {
-      this.ai_add_btn.addEventListener("click", () => this.On_Click_Btn("ai"));
-    }
-    if (show_add)
-    {
-      this.add_btn.addEventListener("click", () => this.On_Click_Btn("add"));
-    }
-    if (show_edit)
-    {
-      this.edit_btn.addEventListener("click", () => this.On_Click_Btn("edit"));
-    }
-    if (show_delete)
-    {
-      this.del_btn.addEventListener("click", () => this.On_Click_Btn("delete"));
-    }
-    if (show_filter)
-    {
-      this.filter_btn.addEventListener("click", () => this.On_Click_Btn("filter"));
-    }
-    if (show_sort)
-    {
-      this.sort_btn.addEventListener("click", () => this.On_Click_Btn("sort"));
-    }
-    if (show_attach)
-    {
-      this.attach_btn.addEventListener("click", () => this.On_Click_Btn("attach"));
-    }
   }
 }
 

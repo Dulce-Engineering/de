@@ -971,11 +971,14 @@ class Utils
    */
   static Set_Id_Shortcuts(src_elem, dest_elem, attr_name = "id")
   {
-    const elements = src_elem.querySelectorAll("[" + attr_name + "]");
-    for (const elem of elements)
+    if (src_elem?.querySelectorAll)
     {
-      const id_value = elem.getAttribute(attr_name);
-      dest_elem[id_value] = elem;
+      const elements = src_elem.querySelectorAll("[" + attr_name + "]");
+      for (const elem of elements)
+      {
+        const id_value = elem.getAttribute(attr_name);
+        dest_elem[id_value] = elem;
+      }
     }
   }
 
@@ -1030,6 +1033,17 @@ class Utils
       Utils.Set_Id_Shortcuts(element, element, attr_name);
     }
     return element;
+  }
+
+  static To_Elements(html, attr_name) 
+  {
+    const elements = Utils.toElements(html);
+    if (attr_name && elements && elements.length > 0)
+    {
+      for (const elem of elements)
+        Utils.Set_Id_Shortcuts(elem, elements, attr_name);
+    }
+    return elements;
   }
 
   static toElement(html) 

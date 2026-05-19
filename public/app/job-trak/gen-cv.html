@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-KMFPTFXKGX"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-KMFPTFXKGX');
+  </script>
+
+  <link rel="manifest" href="/app/job-trak/manifest.json">
+  <title>JOPR: Generate CV</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+  <meta name="author" content="Dulce Engineering Pty. Ltd.">
+  <meta name="robots" content="index, follow">
+  <meta property="og:title" content="JOPR">
+  <meta property="og:description" content="">
+  <meta property="og:image" content="https://dulceeng.com.au/app/job-trak/image/screenshot-landscape.png">
+  <meta property="og:url" content="https://dulceeng.com.au/app/job-trak">
+  <meta property="og:type" content="website">
+  <link rel="shortcut icon" href="./image/favicon.ico">
+  <link rel="stylesheet" href="styles-cv.css">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Website",
+    "name": "JOPR",
+    "url": "https://dulceeng.com.au/app/job-trak",
+    "description": "",
+    "image": "https://dulceeng.com.au/app/job-trak/image/screenshot-landscape.png"
+  }
+  </script>
+
+  <script type="importmap">
+  {
+    "imports": 
+    {
+      "firebase/app":       "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js",
+      "firebase/functions": "https://www.gstatic.com/firebasejs/12.12.1/firebase-functions.js",
+      "firebase/firestore": "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js",
+      "firebase/auth":      "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js",
+      "firebase-analytics": "https://www.gstatic.com/firebasejs/12.12.1/firebase-analytics.js",
+      "firebase/ai":        "https://www.gstatic.com/firebasejs/12.12.1/firebase-ai.js"
+    }
+  }
+  </script>
+
+  <script type="module">
+    import * as fb_app from "firebase/app";
+    import * as fb_ai from "firebase/ai";
+    import DB_SCHEMA from "./db/schema.js";
+    import Utils from "../../lib/Utils.js";
+    import Db from "./lib/Db.js";
+    import AI from "./lib/AI.js";
+    import "../../component/DeInputList/index3.js";
+    import "../../component/DeForm/index.js";
+    import "../../component/DeDialogForm/index.js";
+    import "../../component/DeDialogAlert/index.js";
+    import "../../component/DeDialogConfirm/index.js";
+    import "./component/DeToolbarMenu/index.js";
+
+    Main();
+    async function Main()
+    {
+      const ctx = 
+      { 
+        ai: await AI.New(fb_app, fb_ai),
+        db: await Db.New(DB_SCHEMA),
+      };
+
+      const profiles = await ctx.db.Get_All("profiles");
+      const profile = !Utils.Is_Empty(profiles) ? profiles[0] : null;
+      if (profile)
+      {
+        prof_name.innerText = profile.name;
+        Render_Field(prof_address_field, prof_address_value, profile.address);
+        Render_Field(prof_residency_field, prof_residency_value, profile.residency_status);
+        
+        const seek_html = `<a href="${profile.seek_url}" target="_blank">Seek Profile</a>`;
+        const linkedin_html = `<a href="${profile.linkedin_url}" target="_blank">LinkedIn</a>`;
+        const links_html = Utils.Append_Str(seek_html, linkedin_html, " | ");
+        Render_Field(prof_links_field, prof_links_value, links_html);
+
+        const job_id_str = new URLSearchParams(window.location.search).get("job_id");
+        const job_id = Utils.Is_Empty(job_id_str) ? null : parseInt(job_id_str);
+        const job = await ctx.db.Select_By_Id("jobs", job_id);
+
+        summ_value.innerText = "generating...";
+        const summ_text = null; //await Generate_Summary(ctx, job, profile);
+        summ_value.innerText = summ_text || "Unable to generate.";
+
+        skills_value.innerText = "generating...";
+        const jobs = await ctx.db.Get_All("career");
+        const career_skills = jobs.map(j => (
+        {
+          role_titles: j.role_titles, 
+          company_name: j.company_name, 
+          tech: j.tech
+        }));
+        const skills = null; //await Generate_Skills(ctx, job, career_skills);
+        let skills_html = null;
+        if (Array.isArray(skills))
+        {
+          skills_html = skills.join(", ");
+        }
+        skills_value.innerHTML = skills_html || "Unable to generate.";
+
+        const best_jobs = await ctx.db.Get_All("career");
+        jobs_list.addEventListener("render", Render_Job_Item);
+        jobs_list.value = best_jobs;
+
+        education_list.addEventListener("render", Render_Education_Item);
+        education_list.value = await ctx.db.Get_All("education");
+      }
+    }
+
+    // events =========================================================================
+
+    // business logic =================================================================
+
+    async function Generate_Summary(ctx, job, profile)
+    {
+      let res = null;
+
+      if (job && profile)
+      {
+        const sys_instruction = `
+          You are an expert resume writer and career coach. Your task is to craft a highly 
+          tailored, impactful "Professional Summary" for a CV (approximately 3-4 sentences). 
+          The summary must directly align the applicant's real work history and skills 
+          with the core requirements found in the provided job description. Maintain a 
+          confident, professional, and sophisticated tone. Avoid generic buzzwords.
+        `;
+        const prompt = `
+          Please write a tailored CV Professional Summary based on the two data sources provided below.
+
+          ### TARGET JOB DESCRIPTION (Pasted Text):
+          \`\`\`text
+          ${job.description}
+          \`\`\`
+
+          ### APPLICANT PROFILE & WORK HISTORY (JSON Data):
+          \`\`\`json
+          ${JSON.stringify(profile, null, 2)}
+          \`\`\`
+
+          ### OUTPUT INSTRUCTIONS:
+          - Write a cohesive 3-4 sentence paragraph.
+          - Synthesize the applicant's experience to highlight the specific metrics, languages, or architectural preferences demanded by the job description.
+          - Do not invent any historical achievements or technologies not explicitly listed in the profile JSON data.
+          - Output only the final paragraph text.
+        `;
+        res = await ctx.ai.Prompt(prompt, null, null, sys_instruction);
+      }
+
+      return res;
+    }
+
+    async function Generate_Skills(ctx, job, skills)
+    {
+      let res = null;
+      const SKILL_COUNT = 15;
+
+      if (job && skills)
+      {
+        const Schema = ctx.ai.fb_ai.Schema;
+        const schema = Schema.object({
+          properties: 
+          {
+            matched_skills: Schema.array(
+            {
+              items: Schema.string(),
+              maxItems: SKILL_COUNT,
+              description: 
+                "The top " + SKILL_COUNT + " most critical and relevant technologies from the " +
+                "applicant's history that are explicitly or " +
+                "conceptually requested in the job description or might be relevant, " +
+                "sorted in descending order of importance. " +
+                "Unless explicitly requested EXCLUDE any legacy, deprecated, or " +
+                "obsolete tools that are no longer actively maintained or standard " +
+                "in modern development environments."
+            })
+          },
+          required: ["matched_skills"]
+        });
+        const sys_instruction = `
+          You are a precise technical data parser. Your job is to compare a list of 
+          applicant skills against a raw job description and extract a filtered list 
+          of matching or relevant skills. Only include skills that the applicant actually possesses 
+          and that are relevant to the requirements, technologies, or architectural concepts 
+          mentioned in the job description. Do not add any conversational text or markdown formatting.
+
+          SELECTION RULES:
+          1. Unless explicitly requested only include modern, actively utilized, and maintained technologies.
+          2. Evaluate their importance relative to the core responsibilities outlined in the job description.
+          3. Sort the matching skills in descending order of relevance (highest priority skills first).
+          4. Select ONLY the top 10 most relevant matching items. If there are fewer than ${SKILL_COUNT} matches,
+            return all available matches. Under no circumstances return more than ${SKILL_COUNT} items.
+        `;
+        const prompt = `
+          Analyze the following data sources to find intersections in technical skills.
+
+          ### TARGET JOB DESCRIPTION:
+          \`\`\`text
+          Job Title: ${job.role_title}  
+          Job Description: ${job.description}
+          \`\`\`
+
+          ### APPLICANT DESCRIPTIONS OF PREVIOUS JOBS:
+          \`\`\`json
+          ${JSON.stringify(skills, null, 2)}
+          \`\`\`
+
+          OUTPUT REQUIREMENT:
+          - Filter out any outdated or legacy tech stack items unless explicitly requested.
+          - Return a JSON object matching the requested schema containing only the matching skills.
+          - Return up to ${SKILL_COUNT} sorted skills.
+        `;
+        const ai_res = await ctx.ai.Prompt(prompt, schema, null, sys_instruction);
+        res = ai_res?.matched_skills;
+      }
+
+      return res;
+    }
+
+    // render lists ===================================================================
+
+    // render list item ===============================================================
+
+    function Render_Job_Item(event)
+    {
+      const item_elem = event.target;
+      const job = item_elem.item_obj;
+
+      item_elem.job_title.innerText = job.role_titles;
+      item_elem.job_company.innerText = job.company_name;
+      item_elem.dates.innerText = job.start_date + " - " + job.end_date;
+      item_elem.job_description.innerText = job.responsibilities;
+    }
+
+    function Render_Education_Item(event)
+    {
+      const item_elem = event.target;
+      const education = item_elem.item_obj;
+
+      item_elem.edu_title.innerText = education.title;
+      item_elem.edu_institution.innerText = education.institution;
+    }
+
+    // rendering ======================================================================
+
+    function Render_Field(field_elem, field_value_elem, value)
+    {
+      if (!Utils.Is_Empty(value))
+      {
+        field_value_elem.innerHTML = value;
+      }
+      else
+      {
+        field_elem.style.display = "none";
+      }
+    }
+  </script>
+
+</head>
+
+<body>
+
+  <!-- personal details -->
+  <section>
+    <h1 id="prof_name"></h1>
+    <dl id="prof_address_field">
+      <dt>Address:</dt>
+      <dd id="prof_address_value"></dd>
+    </dl>
+    <dl id="prof_residency_field">
+      <dt>Residency Status:</dt>
+      <dd id="prof_residency_value"></dd>
+    </dl>
+    <dl id="prof_links_field">
+      <dt>Links:</dt>
+      <dd id="prof_links_value"></dd>
+    </dl>
+  </section>
+
+  <!-- summary -->
+  <section>
+    <h1>Professional Summary</h1>
+    <div id="summ_value"></div>
+  </section>
+
+  <!-- skills -->
+  <section>
+    <h1>Technical Skills</h1>
+    <div id="skills_value"></div>
+  </section>
+
+  <!-- experience -->
+  <section>
+    <h1>Experience</h1>
+    <de-input-list id="jobs_list">
+      <div slot="item">
+        <h2 cid="job_title"></h2>
+        <span cid="job_company"></span> | <span cid="dates"></span>
+        <div cid="job_description"></div>
+      </div>
+    </de-input-list>
+  </section>
+
+  <!-- education -->
+  <section>
+    <h1>Education</h1>
+    <de-input-list id="education_list">
+      <div slot="item">
+        <span cid="edu_title"></span> | <span cid="edu_institution"></span>
+      </div>
+    </de-input-list>
+  </section>
+
+</body>
+
+</html>
