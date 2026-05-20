@@ -240,8 +240,10 @@ footer {
 
 de-input-list, .panel
 {
+  display: block;
   width: 100%;
-  padding: 0 40px 40px 40px;
+  xpadding: 0 40px 40px 40px;
+  padding: 0;
   box-sizing: border-box;
 
   header
@@ -297,6 +299,18 @@ de-input-list, .panel
       }
     }
 
+    .body
+    {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin: 15px 0 0 0;
+
+      p
+      {
+        margin: 0;
+      }
+    }
     .det_item
     {
       margin: 0 0 8px 0;
@@ -568,6 +582,7 @@ de-toolbar-menu
   text-decoration: underline solid var(--link);
   text-underline-offset: 5px;
   margin: 0 0 5px 0;
+  color: var(--main);
 
   &:hover
   {
@@ -580,9 +595,14 @@ de-toolbar-menu
 }
 .attachment-list
 {
-  margin: 10px 0 0 0;
+  margin: 0 0 0 0;
 
-  li div
+  main
+  {
+    gap: 0;
+    margin: 0 0 0 20px;
+  }
+  li div, main div
   {
     display: inline-flex;
     gap: 0 5px;

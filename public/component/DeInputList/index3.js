@@ -79,8 +79,13 @@ class DeInputList extends HTMLElement
   {
     //console.log("DeInputList.Add()");
     const item_elem = this.Render_Item(obj);
-    this.items_elem.append(item_elem);
-    item_elem.dispatchEvent(new Event("render", { bubbles: true }));
+    if (item_elem)
+    {
+      this.items_elem.append(item_elem);
+      const event = new CustomEvent("render", 
+        { detail: { obj, item_elem }, bubbles: false });
+      this.dispatchEvent(event);
+    }
   }
 
   /**
@@ -123,8 +128,11 @@ class DeInputList extends HTMLElement
     //console.log("DeInputList.Render_Item()");
     const fragment = this.item_template.content.cloneNode(true);
     const item_elem = fragment.firstElementChild;
-    item_elem.item_obj = obj;
-    Utils.Set_Id_Shortcuts(item_elem, item_elem, "cid");
+    if (item_elem)
+    {
+      item_elem.item_obj = obj;
+      Utils.Set_Id_Shortcuts(item_elem, item_elem, "cid");
+    }
     return item_elem;
   }
 
