@@ -387,6 +387,64 @@
       return res;
     }
 
+    async function Generate_Job_Title(ctx, career_job, target_job)
+    {
+      let res = null;
+
+      if (career_job && target_job)
+      {
+        const job_summary =
+        {
+          role_titles: career_job.role_titles,
+          company_name: career_job.company_name,
+          tech: career_job.tech,
+          responsibilities: career_job.responsibilities,
+          projects: career_job.projects
+        };
+        const Schema = ctx.ai.fb_ai.Schema;
+        const schema = Schema.object(
+        {
+          properties: 
+          {
+            suggested_title: Schema.string(
+            {
+              description: 'The contextually adjusted title for the past job node.'
+            }),
+            reasoning: Schema.string(
+            {
+              description: 'A 1-sentence explanation of why this title is an accurate structural match.'
+            }),
+          },
+          required: ['suggested_title', 'reasoning']
+        });
+        const prompt = `
+          You are the core Resume Optimization Engine for jopr, a privacy-focused job tracker.
+          Analyze this historical job against the target job requirements to suggest a tailored alternate title.
+
+          ### Title Tailoring Directives:
+          1. **Maintain Integrity:** Never inflate a title beyond the user's historical scope (e.g., do not turn a Mid-level developer into a Principal/Lead).
+          2. **The Seniority Cap:** If the target role is an Individual Contributor (e.g., "Senior React Engineer") and the past title is a leadership or management tier (e.g., "Team Lead", "Manager"), down-level the suggested title to the appropriate technical tier (e.g., "Senior React Developer"). A lead encompasses senior execution capabilities.
+          3. **Tech Stack Injection:** If the target job specifically names a technology stack (e.g., "React", "TypeScript") and the past role's accomplishments verify active usage of that stack, inject the keyword directly into the suggested title.
+          4. **Vocabulary Alignment:** Match designator styles if appropriate (e.g., shifting "Frontend Developer" to "UI Engineer" if the target role consistently favors engineering language).
+
+          ### TARGET PROSPECTIVE JOB DETAILS:
+          - Title: ${target_job.role_title}
+          - Description Text:
+          \`\`\`text
+          ${target_job.description}
+          \`\`\`
+
+          ### SOURCE HISTORICAL JOB TO TAILOR (JSON):
+          \`\`\`json
+          ${JSON.stringify(job_summary, null, 2)}
+          \`\`\`
+        `;
+        res = await ctx.ai.Prompt(prompt, schema);
+      }
+
+      return res;
+    }
+    
     function Get_Next_Job(job, all_jobs)
     {
       let res = null;
@@ -427,13 +485,15 @@
       const start_date_str = Render_Date(start_date);
       item_elem.dates.innerText = start_date_str + " (" + duration_str + ")";
 
-      item_elem.job_title.innerText = job.role_titles;
-      item_elem.job_company.innerText = job.company_name;
-      item_elem.job_tech.innerText = job.tech;
+      const role_title = await Generate_Job_Title(ctx, job, target_job);
+      item_elem.job_title.innerText = role_title?.suggested_title || job.role_titles;
 
       const tailored_job = await Generate_Job_Description(ctx, job, target_job);
       item_elem.job_description.innerText = tailored_job.summary;
       item_elem.job_points.innerHTML = Render_List(tailored_job.bullet_points);
+      
+      item_elem.job_company.innerText = job.company_name;
+      item_elem.job_tech.innerText = job.tech;
     }
 
     function Render_Education_Item(event)
