@@ -26,8 +26,7 @@
   <meta property="og:url" content="https://dulceeng.com.au/app/job-trak">
   <meta property="og:type" content="website">
   <link rel="shortcut icon" href="./image/favicon.ico">
-  <link rel="stylesheet" href="styles-cv.css">
-
+  <!--link rel="stylesheet" href="styles-cv.css"-->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -38,7 +37,6 @@
     "image": "https://dulceeng.com.au/app/job-trak/image/screenshot-landscape.png"
   }
   </script>
-
   <script type="importmap">
   {
     "imports": 
@@ -52,6 +50,69 @@
     }
   }
   </script>
+
+  <style>
+    :root 
+    {
+      background-color: #fff;
+      font-family: Arial;
+      font-size: 15px;
+    }
+    body 
+    {
+      xdisplay: flex;
+      xflex-direction: column;
+      xalign-items: center;
+      xmin-height: 100vh;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    section
+    {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    dl
+    {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-block-start: 0;
+      margin-block-end: 0;
+    }
+    dt
+    {
+      display: inline-block;
+    }
+    dd
+    {
+      display: inline-block;
+      margin: 0;
+      margin-inline-start: 0;
+    }
+    h2
+    {
+      xdisplay: block;
+      font-size: 1.7rem;
+      letter-spacing: 2px;
+      margin-block-start: 0;
+      margin-block-end: 0;
+      margin-inline-start: 0;
+      margin-inline-end: 0;
+      font-weight: bold;
+      border-bottom: 1px solid #fff;
+      padding: 0 0 12px 0;
+      margin: 0 0 4px 0;
+    }
+    .coloured
+    {
+      background-color: #44a;
+      color: #fff;
+    }
+  </style>
 
   <script type="module">
     import * as fb_app from "firebase/app";
@@ -81,13 +142,16 @@
       if (profile)
       {
         prof_name.innerText = profile.name;
-        Render_Field(prof_address_field, prof_address_value, profile.address);
-        Render_Field(prof_residency_field, prof_residency_value, profile.residency_status);
+        Render_Field(prof_email_field, profile.email);
+        Render_Field(prof_phone_field, profile.phone);
+        Render_Field(prof_address_field, profile.address);
+        Render_Field(prof_residency_field, profile.residency_status);
+        Render_Field(prof_website_field, profile.url);
         
         const seek_html = `<a href="${profile.seek_url}" target="_blank">Seek Profile</a>`;
         const linkedin_html = `<a href="${profile.linkedin_url}" target="_blank">LinkedIn</a>`;
         const links_html = Utils.Append_Str(seek_html, linkedin_html, " | ");
-        Render_Field(prof_links_field, prof_links_value, links_html);
+        Render_Field(prof_links_field, links_html);
 
         const job_id_str = new URLSearchParams(window.location.search).get("job_id");
         const job_id = Utils.Is_Empty(job_id_str) ? null : parseInt(job_id_str);
@@ -103,9 +167,12 @@
         skills_value.innerHTML = Render_List(skills);
 
         const best_job_ids = await Select_Best_Jobs(ctx, career_jobs, prospective_job);
-        const best_jobs = career_jobs.filter(j => best_job_ids.includes(j.id));
-        jobs_list.addEventListener("render", e => Render_Job_Item(e, ctx, prospective_job, best_jobs));
-        jobs_list.value = best_jobs;
+        if (best_job_ids)
+        {
+          const best_jobs = career_jobs.filter(j => best_job_ids.includes(j.id));
+          jobs_list.addEventListener("render", e => Render_Job_Item(e, ctx, prospective_job, best_jobs));
+          jobs_list.value = best_jobs;
+        }
 
         education_list.addEventListener("render", Render_Education_Item);
         education_list.value = await ctx.db.Get_All("education");
@@ -120,7 +187,7 @@
     {
       let res = null;
 
-      if (career_jobs && target_job)
+      if (ctx.ai && career_jobs && target_job)
       {
         const job_summaries = career_jobs.map( j => (
         {
@@ -201,7 +268,7 @@
     {
       let res = null;
 
-      if (job && profile)
+      if (ctx.ai && job && profile)
       {
         const sys_instruction = `
           You are an expert resume writer and career coach. Your task is to craft a highly 
@@ -240,7 +307,7 @@
       let res = null;
       const SKILL_COUNT = 15;
 
-      if (job && career_jobs)
+      if (ctx.ai && job && career_jobs)
       {
         const skills = career_jobs.map(j => (
         {
@@ -314,7 +381,7 @@
     {
       let res = null;
 
-      if (career_job && target_job)
+      if (ctx.ai && career_job && target_job)
       {
         const job_summary = 
         {
@@ -391,7 +458,7 @@
     {
       let res = null;
 
-      if (career_job && target_job)
+      if (ctx.ai && career_job && target_job)
       {
         const job_summary =
         {
@@ -564,10 +631,11 @@
       return new Date(ms).toISOString().split('T')[0];
     }
 
-    function Render_Field(field_elem, field_value_elem, value)
+    function Render_Field(field_elem, value)
     {
       if (!Utils.Is_Empty(value))
       {
+        const field_value_elem = field_elem.querySelector("dd");
         field_value_elem.innerHTML = value;
       }
       else
@@ -581,21 +649,47 @@
 
 <body>
 
-  <!-- personal details -->
-  <section>
+  <header>
     <h1 id="prof_name"></h1>
+  </header>
+
+  <!-- personal details -->
+  <section class="coloured">
+    <h2>Contact</h2>
+    <dl id="prof_email_field">
+      <dt><img src="image/mail.svg"></dt>
+      <dd></dd>
+    </dl>
+    <dl id="prof_phone_field">
+      <dt><img src="image/call.svg"></dt>
+      <dd></dd>
+    </dl>
     <dl id="prof_address_field">
-      <dt>Address:</dt>
-      <dd id="prof_address_value"></dd>
+      <dt><img src="image/home.svg"></dt>
+      <dd></dd>
+    </dl>
+    <dl id="prof_website_field">
+      <dt><img src="image/website.svg"></dt>
+      <dd></dd>
     </dl>
     <dl id="prof_residency_field">
-      <dt>Residency Status:</dt>
-      <dd id="prof_residency_value"></dd>
+      <dt><img src="image/passport.svg"></dt>
+      <dd></dd>
     </dl>
     <dl id="prof_links_field">
-      <dt>Links:</dt>
+      <dt><img src="image/link.svg"></dt>
       <dd id="prof_links_value"></dd>
     </dl>
+  </section>
+
+  <!-- education -->
+  <section class="coloured">
+    <h2>Education</h2>
+    <de-input-list id="education_list">
+      <div slot="item">
+        <span cid="edu_title"></span> | <span cid="edu_institution"></span>
+      </div>
+    </de-input-list>
   </section>
 
   <!-- summary -->
@@ -620,16 +714,6 @@
         <p cid="job_description"></p>
         <div>Acievements: <span cid="job_points"></span></div>
         <div>Tech: <span cid="job_tech"></span></div>
-      </div>
-    </de-input-list>
-  </section>
-
-  <!-- education -->
-  <section>
-    <h1>Education</h1>
-    <de-input-list id="education_list">
-      <div slot="item">
-        <span cid="edu_title"></span> | <span cid="edu_institution"></span>
       </div>
     </de-input-list>
   </section>

@@ -382,5 +382,11 @@
     "datetime": 1779119657544,
     "id": "30a692aa-3308-4674-a09f-083795da037d",
     "query_id": "-nextjs"
+  },
+  {
+    "count": 97,
+    "datetime": 1779244499108,
+    "id": "1c5c60b0-2ec5-47cf-9e9f-37b5c6468587",
+    "query_id": "-nextjs"
   }
 ]

@@ -101,7 +101,10 @@ const DB_SCHEMA =
         residency_status: "string",
         personal_summary: "string[]",
         skills: "string[]",
-        interests: "string[]"
+        interests: "string[]",
+        email: "string",
+        phone: "string",
+        url: "string",
       }
     },
     education:
