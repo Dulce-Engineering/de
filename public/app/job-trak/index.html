@@ -676,6 +676,22 @@
 
     // rendering ======================================================================
 
+    function Toggle_Field(value, value_elem, label_elem)
+    {
+      if (value)
+      {
+        value_elem.textContent = value;
+        value_elem.style.display = null;
+        label_elem.style.display = null;
+      }
+      else
+      {
+        value_elem.textContent = null;
+        value_elem.style.display = "none";
+        label_elem.style.display = "none";
+      }
+    }
+
     function Toggle_New_Agency_Fields(is_new_agency)
     {
       if (is_new_agency == undefined)
@@ -1002,7 +1018,20 @@
       console.log("On_Click_View_Job(): job =", curr_job.id, curr_job.role_title);
 
       job_det_dialog.role_elem.innerText = curr_job.role_title;
-      job_det_dialog.des_elem.innerText = curr_job.description || null;
+      job_det_dialog.des_elem.innerText = curr_job.description || "No job description available.";
+
+      const contact = await Db.Select_By_Id(db, "contacts", curr_job.contact_id);
+      const agency = await Db.Select_By_Id(db, "agencies", curr_job.agency_id);
+      job_det_dialog.contact_name_elem.textContent = contact?.name;
+      job_det_dialog.contact_agency_elem.textContent = agency?.name;
+      Toggle_Field(contact?.phone, job_det_dialog.contact_phone_elem, job_det_dialog.contact_phone_img);
+      Toggle_Field(contact?.email, job_det_dialog.contact_email_elem, job_det_dialog.contact_email_img);
+
+      if (agency?.url)
+        job_det_dialog.contact_agency_elem.href = agency?.url;
+      else
+        job_det_dialog.contact_agency_elem.removeAttribute("href");
+      
       job_det_dialog.Show();
     }
 
@@ -1276,6 +1305,13 @@
   </main>
 
   <main id="docs">
+    <ul>
+      <li>No Signup required</li>
+      <li>Free</li>
+      <li>Track job applications</li>
+      <li>Generate job-customised CVs & cover letters</li>
+      <li>Monitor job statistics</li>
+    </ul>
   </main>
 
   <footer>
@@ -1393,8 +1429,15 @@
 
   <de-dialog-alert id="job_det_dialog">
     <h2 cid="role_elem" slot="header">Job Details</h2>
+    <div slot="body">
+      <span cid="contact_name_elem"></span> @ 
+      <a cid="contact_agency_elem"></a>
+      <div class="contact">
+        <img cid="contact_phone_img" src="image/call.svg"><span cid="contact_phone_elem"></span>
+        <img cid="contact_email_img" src="image/mail.svg"><span cid="contact_email_elem"></span>
+      </div>
+    </div>
     <span cid="des_elem" slot="body"></span>
-    <label slot="body"></label><span cid="xrole_elem" slot="body"></span>
   </de-dialog-alert>
 
   <de-dialog-confirm></de-dialog-confirm>

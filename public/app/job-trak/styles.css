@@ -403,13 +403,11 @@ de-dialog-form, de-dialog-alert, de-form, de-toolbar-menu
     background-color: #000;
     color: var(--main);
     width: 60%;
-    padding: 40px;
+    padding: 30px;
   }
-
   dialog::backdrop {
     background-color: var(--shade);
   }
-
   h1 
   {
     font-size: 2rem;
@@ -418,11 +416,9 @@ de-dialog-form, de-dialog-alert, de-form, de-toolbar-menu
   {
     margin: 0;
   }
-
   label {
     margin: 10px 0 0 0;
   }
-
   input, textarea, select, option
   {
     font-family: octagonal-bold;
@@ -437,18 +433,22 @@ de-dialog-form, de-dialog-alert, de-form, de-toolbar-menu
   {
     background: #000;
   }
-
-  main {
-    gap: 10px;
-    padding: 0 0 40px 0;
+  main 
+  {
+    gap: 20px;
+    padding: 0;
     display: flex;
     flex-direction: column
   }
-
-  footer {
-    text-align: center;
+  header
+  {
+    margin: 0 0 20px 0;
   }
-
+  footer 
+  {
+    text-align: center;
+    margin: 20px 0 0 0;
+  }
   &.wait dialog
   {
     background-color: #f00;
@@ -576,6 +576,12 @@ de-toolbar-menu
   }
 }
 
+.contact
+{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
 .link
 {
   cursor: pointer;

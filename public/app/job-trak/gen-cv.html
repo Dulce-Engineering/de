@@ -52,10 +52,21 @@
   </script>
 
   <style>
+    @font-face 
+    {
+      font-family: roboto;
+      src: url("font/Roboto/Roboto-VariableFont_wdth-wght.ttf");
+    }
+    @font-face 
+    {
+      font-family: roboto-condensed;
+      src: url("font/Roboto_Condensed/RobotoCondensed-VariableFont_wght.ttf");
+    }
+
     :root 
     {
       background-color: #fff;
-      font-family: Arial;
+      font-family: roboto;
       font-size: 14px;
     }
     body 
@@ -107,7 +118,7 @@
     {
       xdisplay: block;
       font-size: 1.8rem;
-      letter-spacing: 1px;
+      xletter-spacing: 1px;
       margin-block-start: 0;
       margin-block-end: 0;
       margin-inline-start: 0;
@@ -146,6 +157,7 @@
       margin-block-end: 0;
       margin-inline-start: 0;
       margin-inline-end: 0;
+      font-family: roboto-condensed;
     }
     footer
     {
@@ -676,7 +688,7 @@
 
     async function Render_Job_Item(event, ctx, target_job, all_jobs)
     {
-      const item_elem = event.target;
+      const item_elem = event.detail.item_elem;
       const job = item_elem.item_obj;
       const next_job = Get_Next_Job(job, all_jobs);
 
@@ -703,7 +715,7 @@
 
     function Render_Education_Item(event)
     {
-      const item_elem = event.target;
+      const item_elem = event.detail.item_elem;
       const education = item_elem.item_obj;
 
       item_elem.edu_title.innerText = education.title;
