@@ -388,5 +388,11 @@
     "datetime": 1779244243528,
     "id": "5fa14edf-e326-436e-9bd0-cb7cc12fbc00",
     "query_id": "-bitcoin"
+  },
+  {
+    "count": 38,
+    "datetime": 1779357314451,
+    "id": "ee7db4b0-c6bd-4367-8d73-8be90714878e",
+    "query_id": "-bitcoin"
   }
 ]
