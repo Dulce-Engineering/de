@@ -51,12 +51,92 @@
   }
   </script>
 
+  <style>
+    de-dial
+    {
+      position: fixed;
+      display: inline-block;
+      width: 250px;
+      height: 250px;
+      color: #000;
+      fill: none;
+      left: 50%;
+      top: 50%;
+      animation: zoom infinite ease-in-out alternate;
+    }
+    de-dial .dial
+    {
+      transform: rotate(-90deg);
+    }
+    de-dial#dial1
+    {
+      stroke-width: 10px;
+      animation-duration: 3s;
+      stroke: #f00a;
+    }
+    de-dial#dial2
+    {
+      stroke-width: 20px;
+      animation-duration: 4s;
+      stroke: #0f0;
+    }
+    de-dial#dial3
+    {
+      stroke-width: 40px;
+      animation-duration: 5s;
+      stroke: #ff08;
+    }
+    de-dial#dial4
+    {
+      stroke-width: 80px;
+      animation-duration: 6s;
+      stroke: #00f;
+    }
+    #progress_dlg
+    {
+      width: 80%;
+      height: 80%;
+      overflow: visible;
+      background-color: #fff0;
+      border: none;
+      padding: 0;
+
+      &:focus-visible
+      {
+        outline: none;
+      }
+    }
+    @keyframes zoom
+    {
+      from
+      {
+        transform: translate(-50%, -50%) scale(0.5) rotate(0deg);
+      }
+      to
+      {
+        transform: translate(-50%, -50%) scale(5) rotate(360deg);
+      }
+    }
+    #info_elem
+    {
+      position: fixed;
+      display: inline-block;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      color: #fff;
+      font-size: 2rem;
+      z-index: 1;
+    }
+  </style>
+
   <script type="module">
     import * as fb_app from "firebase/app";
     import * as fb_ai from "firebase/ai";
     import Utils from "../../lib/Utils.js";
     import Db from "./lib/Db.js";
     import AI from "./lib/AI.js";
+    import "../../dedial/dedial.js";
     import "../../component/DeInputList/index3.js";
     import "../../component/DeForm/index.js";
     import "../../component/DeDialogForm/index.js";
@@ -146,9 +226,22 @@
       Render_Profile(db);
       Render_Education(db);
       Render_Career(db);
+
+      hdr_elem.addEventListener("click", Test);
     }
 
     // events =========================================================================
+
+    async function Test()
+    {
+      await Info("Going to start some shit...");
+      await Utils.sleep(4000);
+      await Info("Are you looking for trouble?");
+      await Utils.sleep(4000);
+      await Info("I didn't think so!");
+      await Utils.sleep(4000);
+      await Info();
+    }
 
     async function On_Click_Add_Company(db)
     {
@@ -304,25 +397,6 @@
       await Render_Job_Items(db);
     }
 
-    async function On_Click_AI_Add_Job(ctx)
-    {
-      const form_data = await email_dialog.Show_Async();
-      if (form_data?.email_text)
-      {
-        console.info("Processing...");
-        const data = await ctx.ai.Extract_Job(form_data.email_text);
-        console.log("On_Click_AI_Add_Job(): data =", data);
-        console.info("...Finished.");
-
-        const agency_id = await Agency_Insert_If_New(ctx.db, data?.agency);
-        const contact_id = await Contact_Insert_If_New(ctx.db, data?.contact, agency_id);
-        await Job_Insert_If_New(ctx.db, data?.job, agency_id, contact_id);
-
-        Alert("Job extracted and added successfully!");
-        await Render_Job_Items(ctx.db);
-      }
-    }
-
     async function On_Click_AI_Add_Profile(ctx)
     {
       const files = await Select_Files();
@@ -330,7 +404,7 @@
       {
         console.info("Processing CV...");
         const cv_blob = files[0];
-        const cv_data = await Extract_CV(ctx.ai, cv_blob);
+        const cv_data = await ctx.ai.Extract_CV(ctx.ai, cv_blob);
 
         Db.Delete_All(ctx.db, "education");
         Db.Insert_Items(ctx.db, "education", cv_data.educations);
@@ -811,6 +885,52 @@
       }
     }
 
+    async function Info(msg)
+    {
+      progress_dlg.addEventListener('cancel', (event) =>
+      {
+        event.preventDefault();
+      });
+      
+      if (msg)
+      {
+        progress_dlg.showModal();
+        await Show_Msg(msg, info_elem);
+      }
+      else if (progress_dlg.open)
+      {
+        await Hide_Msg(info_elem);
+        progress_dlg.close();
+      }
+
+      async function Show_Msg(msg, elem)
+      {
+        await Hide_Msg(elem);
+
+        elem.last_msg = msg;
+        for (let c = 0; c <= msg.length; c++)
+        {
+          elem.textContent = "[ " + msg.substring(0, c) + " ]";
+          await Utils.sleep(35);
+        }
+      }
+
+      async function Hide_Msg(elem)
+      {
+        const msg = elem.last_msg;
+        if (msg)
+        {
+          for (let c = msg.length; c >= 0; c--)
+          {
+            elem.textContent = "[ " + msg.substring(0, c) + " ]";
+            await Utils.sleep(35);
+          }
+          elem.textContent = "";
+          elem.last_msg = null;
+        }
+      }
+    }
+
     // jobs list ======================================================================
 
     async function Render_Job_Items(db)
@@ -854,7 +974,6 @@
     {
       const item_elem = event.detail.item_elem;
       const job = item_elem.item_obj;
-      console.log("Render_Job_Item(): job =", job.id, job.role_title);
 
       const title_text = Utils.Append_Str(job.role_title, job.company, " - ");
       item_elem.role_title_elem.textContent = title_text;
@@ -930,6 +1049,29 @@
       item_elem.del2_btn.addEventListener("click", () => On_Click_Delete_Attachment(ctx, attachment));
     }
 
+    async function On_Click_AI_Add_Job(ctx)
+    {
+      const form_data = await email_dialog.Show_Async();
+      if (form_data?.email_text && ctx.ai)
+      {
+        await Info("Extracting job data...");
+        await Utils.sleep(1000);
+        const data = await ctx.ai.Extract_Job(form_data.email_text, Info);
+
+        const agency_id = await Agency_Insert_If_New(ctx.db, data?.agency);
+        const contact_id = await Contact_Insert_If_New(ctx.db, data?.contact, agency_id);
+        await Job_Insert_If_New(ctx.db, data?.job, agency_id, contact_id);
+
+        await Info();
+        Alert("Job extracted and added successfully!");
+        await Render_Job_Items(ctx.db);
+      }
+      else if (!ctx.ai)
+      {
+        Alert("Unable to extract job data");
+      }
+    }
+
     function On_Click_Attachment(attachment)
     {
       const filename = attachment.filename || attachment.file?.name || 'Unnamed file';
@@ -1000,14 +1142,12 @@
 
     function On_Click_Generate_CV(e, job, ctx)
     {
-      console.log("On_Click_Generate_CV(): job =", job?.id);
       const url = "gen-cv.html?job_id=" + job.id;
       window.open(url, "_blank");
     }
 
     function On_Click_Generate_Cover_Letter(e, job, ctx)
     {
-      console.log("On_Click_Generate_Cover_Letter(): job =", job?.id);
       const url = "gen-letter.html?job_id=" + job.id;
       window.open(url, "_blank");
     }
@@ -1015,7 +1155,6 @@
     async function On_Click_View_Job(event, job_id, db)
     {
       const curr_job = await Db.Select_By_Id(db, "jobs", job_id);
-      console.log("On_Click_View_Job(): job =", curr_job.id, curr_job.role_title);
 
       job_det_dialog.role_elem.innerText = curr_job.role_title;
       job_det_dialog.des_elem.innerText = curr_job.description || "No job description available.";
@@ -1048,7 +1187,6 @@
       Toggle_New_Contact_Fields(false);
 
       const curr_job = await Db.Select_By_Id(db, "jobs", job_id);
-      console.log("On_Click_Edit_Job(): job =", curr_job?.id, curr_job?.role_title);
 
       const form_data = await job_dialog.Show_Async(curr_job);
       if (form_data)
@@ -1440,7 +1578,13 @@
     <span cid="des_elem" slot="body"></span>
   </de-dialog-alert>
 
-  <de-dialog-confirm></de-dialog-confirm>
+  <dialog id="progress_dlg">
+    <output id="info_elem" role="status"></output>
+    <de-dial id="dial1" max-value="4" gap-width="20" value="4"></de-dial>
+    <de-dial id="dial2" max-value="8" gap-width="30" value="8"></de-dial>
+    <de-dial id="dial3" max-value="16" tick-width="2" value="16" viewbox-radius="140"></de-dial>
+    <de-dial id="dial4" max-value="128" gap-width="3" value="128" viewbox-radius="140"></de-dial>
+  </dialog>
 
 </body>
 

@@ -19,7 +19,7 @@ class AI
     return res;
   }
 
-  async Extract_Job(text)
+  async Extract_Job(text, notify_fn)
   {
     const contact_schema =
     {
@@ -56,6 +56,7 @@ class AI
       Job details follow:
       ${text}
     `;
+    if (notify_fn) await notify_fn("Extracting contact details...");
     const contact = await this.Prompt(prompt, contact_schema);
 
     const agency_schema =
@@ -105,6 +106,7 @@ class AI
       Job details follow:
       ${text}
     `;
+    if (notify_fn) await notify_fn("Extracting agency details...");
     const agency = await this.Prompt(prompt, agency_schema);
 
     const job_schema =
@@ -159,6 +161,7 @@ class AI
       Job details follow:
       ${text}
     `;
+    if (notify_fn) await notify_fn("Extracting job details...");
     const job = await this.Prompt(prompt, job_schema);
 
     const details_schema =
@@ -179,6 +182,7 @@ class AI
       "If available, make sure to include a list of the technical skills required " +
       "for the job and a list of the responsibilities. " +
       "Job details follow: /n" + text;
+    if (notify_fn) await notify_fn("Extracting job description...");
     const details = await this.Prompt(prompt, details_schema);
     job.description = details.description;
 
