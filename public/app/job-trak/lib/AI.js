@@ -1,5 +1,9 @@
 class AI
 {
+  fb_ai = null;
+  fb_app = null;
+  ai = null;
+
   static async New(fb_app, fb_ai)
   {
     let res = null;
@@ -330,9 +334,363 @@ class AI
     return { educations, career };
   }
 
+  async Select_Best_Jobs(career_jobs, target_job)
+  {
+    let res = null;
+
+    if (this.ai && career_jobs && target_job)
+    {
+      const job_summaries = career_jobs.map(j => (
+        {
+          id: j.id,
+          role_titles: j.role_titles,
+          company_name: j.company_name,
+          start_date: AI.To_AI_Date(j.start_date),
+          end_date: AI.To_AI_Date(j.end_date),
+          work_type: j.work_type,
+          tech: j.tech,
+          responsibilities: j.responsibilities,
+          projects: j.projects
+        }));
+      const Schema = this.fb_ai.Schema;
+      const schema = Schema.object(
+        {
+          properties:
+          {
+            selected_job_ids: Schema.array(
+              {
+                items: Schema.integer(),
+                description:
+                  "The unique IDs of the selected career job records, sorted in " +
+                  "recommended order of appearance."
+              }),
+            justification: Schema.string(
+              {
+                description:
+                  "A brief professional explanation of why this specific selection " +
+                  "represents the strongest strategic fit for the target role."
+              })
+          },
+          required: ["selected_job_ids", "justification"]
+        });
+      const sys_instruction = `
+            You are an expert technical recruiter and resume strategist. Your job is to select the 
+            most impactful and chronologically relevant professional roles from an applicant's history 
+            to tailor their CV for a specific target job opening.
+            
+            CRITICAL SELECTION MATRICES:
+            1. RECENCY CRITERIA: Always prioritize the applicant's current or most recent role 
+              to prevent major, unexplainable gaps at the top of the resume.
+            2. RELEVANCE CRITERIA: Select remaining roles based on technical overlap, 
+              architectural alignment, and scope of responsibility demanded by the job description.
+            3. EFFICIENCY: Select only the most meaningful positions (typically a maximum of 5 to 6 roles) 
+              that build a compelling narrative for this specific target position.
+            
+            Do not output conversational markdown text or text block wrappers outside the schema.
+          `;
+      const prompt = `
+            Analyze the applicant's complete employment timeline against the new target job description. 
+            Select the optimal historical roles to feature on a tailored CV.
+
+            ### TARGET JOB DESCRIPTION:
+            - Title: ${target_job.role_title}
+            - Description Text:
+            \`\`\`text
+            ${target_job.description}
+            \`\`\`
+
+            ### COMPLETE APPLICANT EMPLOYMENT HISTORY (JSON):
+            \`\`\`json
+            ${JSON.stringify(job_summaries, null, 2)}
+            \`\`\`
+
+            OUTPUT REQUIREMENT:
+            Return a structured JSON object matching the requested schema containing the selected IDs.
+          `;
+
+      const ai_res = await this.Prompt(prompt, schema, null, sys_instruction);
+      res = ai_res?.selected_job_ids;
+    }
+    else if (career_jobs)
+    {
+      res = career_jobs.map(j => j.id);
+    }
+
+    return res;
+  }
+
+  async Generate_Summary(job, profile)
+  {
+    let res = null;
+
+    if (this.ai && job && profile)
+    {
+      const sys_instruction = `
+            You are an expert resume writer and career coach. Your task is to craft a highly 
+            tailored, impactful "Professional Summary" for a CV (approximately 3-4 sentences). 
+            The summary must directly align the applicant's real work history and skills 
+            with the core requirements found in the provided job description. Maintain a 
+            confident, professional, and sophisticated tone. Avoid generic buzzwords.
+          `;
+      const prompt = `
+            Please write a tailored CV Professional Summary based on the two data sources provided below.
+
+            ### TARGET JOB DESCRIPTION (Pasted Text):
+            \`\`\`text
+            ${job.description}
+            \`\`\`
+
+            ### APPLICANT PROFILE & WORK HISTORY (JSON Data):
+            \`\`\`json
+            ${JSON.stringify(profile, null, 2)}
+            \`\`\`
+
+            ### OUTPUT INSTRUCTIONS:
+            - Write a cohesive 3-4 sentence paragraph.
+            - Synthesize the applicant's experience to highlight the specific metrics, languages, or architectural preferences demanded by the job description.
+            - Do not invent any historical achievements or technologies not explicitly listed in the profile JSON data.
+            - Output only the final paragraph text.
+          `;
+      res = await this.Prompt(prompt, null, null, sys_instruction);
+    }
+    else if (profile)
+    {
+      res = profile.personal_summary;
+    }
+
+    return res;
+  }
+
+  async Generate_Skills(job, career_jobs, profile)
+  {
+    let res = null;
+    const SKILL_COUNT = 15;
+
+    if (this.ai && job && career_jobs)
+    {
+      const skills = career_jobs.map(j => (
+        {
+          role_titles: j.role_titles,
+          company_name: j.company_name,
+          tech: j.tech
+        }));
+
+      const Schema = this.fb_ai.Schema;
+      const schema = Schema.object({
+        properties:
+        {
+          matched_skills: Schema.array(
+            {
+              items: Schema.string(),
+              maxItems: SKILL_COUNT,
+              description:
+                "The top " + SKILL_COUNT + " most critical and relevant technologies from the " +
+                "applicant's history that are explicitly or " +
+                "conceptually requested in the job description or might be relevant, " +
+                "sorted in descending order of importance. " +
+                "Unless explicitly requested EXCLUDE any legacy, deprecated, or " +
+                "obsolete tools that are no longer actively maintained or standard " +
+                "in modern development environments."
+            })
+        },
+        required: ["matched_skills"]
+      });
+      const sys_instruction = `
+            You are a precise technical data parser. Your job is to compare a list of 
+            applicant skills against a raw job description and extract a filtered list 
+            of matching or relevant skills. Only include skills that the applicant actually possesses 
+            and that are relevant to the requirements, technologies, or architectural concepts 
+            mentioned in the job description. Do not add any conversational text or markdown formatting.
+
+            SELECTION RULES:
+            1. Unless explicitly requested only include modern, actively utilized, and maintained technologies.
+            2. Evaluate their importance relative to the core responsibilities outlined in the job description.
+            3. Sort the matching skills in descending order of relevance (highest priority skills first).
+            4. Select ONLY the top 10 most relevant matching items. If there are fewer than ${SKILL_COUNT} matches,
+              return all available matches. Under no circumstances return more than ${SKILL_COUNT} items.
+          `;
+      const prompt = `
+            Analyze the following data sources to find intersections in technical skills.
+
+            ### TARGET JOB DESCRIPTION:
+            - Title: ${job.role_title}
+            - Description Text:
+            \`\`\`text
+            ${job.description}
+            \`\`\`
+
+            ### APPLICANT DESCRIPTIONS OF PREVIOUS JOBS:
+            \`\`\`json
+            ${JSON.stringify(skills, null, 2)}
+            \`\`\`
+
+            OUTPUT REQUIREMENT:
+            - Filter out any outdated or legacy tech stack items unless explicitly requested.
+            - Return a JSON object matching the requested schema containing only the matching skills.
+            - Return up to ${SKILL_COUNT} sorted skills.
+          `;
+      const ai_res = await this.Prompt(prompt, schema, null, sys_instruction);
+      res = ai_res?.matched_skills;
+    }
+    else if (profile.skills)
+    {
+      res = profile.skills.split(",");
+    }
+
+    return res;
+  }
+
+  async Generate_Job_Description(career_job, target_job)
+  {
+    let res = null;
+
+    if (this.ai && career_job && target_job)
+    {
+      const job_summary =
+      {
+        role_titles: career_job.role_titles,
+        company_name: career_job.company_name,
+        tech: career_job.tech,
+        responsibilities: career_job.responsibilities,
+        projects: career_job.projects
+      };
+      const Schema = this.fb_ai.Schema;
+      const schema = Schema.object(
+        {
+          properties:
+          {
+            summary: Schema.string(
+              {
+                description:
+                  "A 2-3 sentence high-level overview of the role, framed to match " +
+                  "the prospective job's tone and focus."
+              }),
+            bullet_points: Schema.array(
+              {
+                items: Schema.string(),
+                description:
+                  "3 to 5 high-impact, results-oriented bullet points tracking real " +
+                  "accomplishments, starting with strong action verbs."
+              })
+          },
+          required: ["summary", "bullet_points"]
+        });
+      const sys_instruction = `
+            You are an elite resume editor specializing in technical role alignment. Your goal 
+            is to rewrite the details of a single past job experience so that it speaks directly 
+            to the requirements, technical stacks, and core problems outlined in a target job description.
+            
+            CRITICAL ALIGNMENT RULES:
+            1. RE-FRAME, DO NOT FABRICATE: Elevate and emphasize existing technical choices, 
+              architectures, or methodologies that overlap with the target role. Never invent 
+              new skills, keywords, or metrics that do not exist in the source text.
+            2. LANGUAGE TUNING: Use strong, industry-standard action verbs. Match the vocabulary 
+              and tone of the prospective job description (e.g., if they ask for "performance optimization", 
+              frame relevant past optimization work using those exact structural themes).
+            3. BULLET ARCHITECTURE: Each bullet point should ideally tie an action to a technical context 
+              and a professional outcome.
+            
+            Do not output conversational text or markdown code blocks outside the schema boundaries.
+          `;
+      const prompt = `
+            Please review the target prospective job opening and rewrite the provided historical job entry 
+            to optimize its alignment with the new role's requirements.
+
+            ### TARGET PROSPECTIVE JOB DETAILS:
+            - Title: ${target_job.role_title}
+            - Description Text:
+            \`\`\`text
+            ${target_job.description}
+            \`\`\`
+
+            ### SOURCE HISTORICAL JOB TO REWRITE (JSON):
+            \`\`\`json
+            ${JSON.stringify(job_summary, null, 2)}
+            \`\`\`
+
+            OUTPUT REQUIREMENT:
+            Return a structured JSON object adhering perfectly to the schema containing the rewritten summary and bullet points.
+          `;
+      res = await this.Prompt(prompt, schema, null, sys_instruction);
+    }
+    else if (career_job)
+    {
+      res =
+      {
+        summary: career_job.responsibilities,
+        bullet_points: career_job.projects?.split(/\r?\n|\r/),
+      };
+    }
+
+    return res;
+  }
+
+  async Generate_Job_Title(career_job, target_job)
+  {
+    let res = null;
+
+    if (this.ai && career_job && target_job)
+    {
+      const job_summary =
+      {
+        role_titles: career_job.role_titles,
+        company_name: career_job.company_name,
+        tech: career_job.tech,
+        responsibilities: career_job.responsibilities,
+        projects: career_job.projects
+      };
+      const Schema = this.fb_ai.Schema;
+      const schema = Schema.object(
+        {
+          properties:
+          {
+            suggested_title: Schema.string(
+              {
+                description: 'The contextually adjusted title for the past job node.'
+              }),
+            reasoning: Schema.string(
+              {
+                description: 'A 1-sentence explanation of why this title is an accurate structural match.'
+              }),
+          },
+          required: ['suggested_title', 'reasoning']
+        });
+      const prompt = `
+            You are the core Resume Optimization Engine for jopr, a privacy-focused job tracker.
+            Analyze this historical job against the target job requirements to suggest a tailored alternate title.
+
+            ### Title Tailoring Directives:
+            1. **Maintain Integrity:** Never inflate a title beyond the user's historical scope (e.g., do not turn a Mid-level developer into a Principal/Lead).
+            2. **The Seniority Cap:** If the target role is an Individual Contributor (e.g., "Senior React Engineer") and the past title is a leadership or management tier (e.g., "Team Lead", "Manager"), down-level the suggested title to the appropriate technical tier (e.g., "Senior React Developer"). A lead encompasses senior execution capabilities.
+            3. **Tech Stack Injection:** If the target job specifically names a technology stack (e.g., "React", "TypeScript") and the past role's accomplishments verify active usage of that stack, inject the keyword directly into the suggested title.
+            4. **Vocabulary Alignment:** Match designator styles if appropriate (e.g., shifting "Frontend Developer" to "UI Engineer" if the target role consistently favors engineering language).
+
+            ### TARGET PROSPECTIVE JOB DETAILS:
+            - Title: ${target_job.role_title}
+            - Description Text:
+            \`\`\`text
+            ${target_job.description}
+            \`\`\`
+
+            ### SOURCE HISTORICAL JOB TO TAILOR (JSON):
+            \`\`\`json
+            ${JSON.stringify(job_summary, null, 2)}
+            \`\`\`
+          `;
+      res = await this.Prompt(prompt, schema);
+    }
+
+    return res;
+  }
+
+  static To_AI_Date(ms)
+  {
+    return new Date(ms).toISOString().split('T')[0];
+  }
+
   async Prompt(prompt, schema, file, sys_instruction)
   {
-    console.log("AI.Prompt(): entry");
+    //console.log("AI.Prompt(): entry");
 
     const model_config =
     {

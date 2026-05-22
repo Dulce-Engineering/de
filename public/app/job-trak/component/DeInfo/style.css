@@ -1,0 +1,75 @@
+de-info
+{
+  de-dial {
+    position: fixed;
+    display: inline-block;
+    width: 250px;
+    height: 250px;
+    color: #000;
+    fill: none;
+    left: 50%;
+    top: 50%;
+    animation: zoom infinite ease-in-out alternate;
+  }
+
+  de-dial .dial {
+    transform: rotate(-90deg);
+  }
+
+  de-dial.dial1 {
+    stroke-width: 10px;
+    animation-duration: 3s;
+    stroke: #f00a;
+  }
+
+  de-dial.dial2 {
+    stroke-width: 20px;
+    animation-duration: 4s;
+    stroke: #0f0;
+  }
+
+  de-dial.dial3 {
+    stroke-width: 40px;
+    animation-duration: 5s;
+    stroke: #ff08;
+  }
+
+  de-dial.dial4 {
+    stroke-width: 80px;
+    animation-duration: 6s;
+    stroke: #00f;
+  }
+
+  [cid=progress_dlg] {
+    width: 80%;
+    height: 80%;
+    overflow: visible;
+    background-color: #fff0;
+    border: none;
+    padding: 0;
+
+    &:focus-visible {
+      outline: none;
+    }
+  }
+
+  [cid=info_elem] {
+    position: fixed;
+    display: inline-block;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    color: #fff;
+    font-size: 2rem;
+    z-index: 1;
+  }
+}
+
+@keyframes zoom {
+  from {
+    transform: translate(-50%, -50%) scale(0.5) rotate(0deg);
+  }
+  to {
+    transform: translate(-50%, -50%) scale(5) rotate(360deg);
+  }
+}

@@ -26,7 +26,9 @@
   <meta property="og:url" content="https://dulceeng.com.au/app/job-trak">
   <meta property="og:type" content="website">
   <link rel="shortcut icon" href="./image/favicon.ico">
+
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="./component/DeInfo/style.css">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -51,85 +53,6 @@
   }
   </script>
 
-  <style>
-    de-dial
-    {
-      position: fixed;
-      display: inline-block;
-      width: 250px;
-      height: 250px;
-      color: #000;
-      fill: none;
-      left: 50%;
-      top: 50%;
-      animation: zoom infinite ease-in-out alternate;
-    }
-    de-dial .dial
-    {
-      transform: rotate(-90deg);
-    }
-    de-dial#dial1
-    {
-      stroke-width: 10px;
-      animation-duration: 3s;
-      stroke: #f00a;
-    }
-    de-dial#dial2
-    {
-      stroke-width: 20px;
-      animation-duration: 4s;
-      stroke: #0f0;
-    }
-    de-dial#dial3
-    {
-      stroke-width: 40px;
-      animation-duration: 5s;
-      stroke: #ff08;
-    }
-    de-dial#dial4
-    {
-      stroke-width: 80px;
-      animation-duration: 6s;
-      stroke: #00f;
-    }
-    #progress_dlg
-    {
-      width: 80%;
-      height: 80%;
-      overflow: visible;
-      background-color: #fff0;
-      border: none;
-      padding: 0;
-
-      &:focus-visible
-      {
-        outline: none;
-      }
-    }
-    @keyframes zoom
-    {
-      from
-      {
-        transform: translate(-50%, -50%) scale(0.5) rotate(0deg);
-      }
-      to
-      {
-        transform: translate(-50%, -50%) scale(5) rotate(360deg);
-      }
-    }
-    #info_elem
-    {
-      position: fixed;
-      display: inline-block;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      color: #fff;
-      font-size: 2rem;
-      z-index: 1;
-    }
-  </style>
-
   <script type="module">
     import * as fb_app from "firebase/app";
     import * as fb_ai from "firebase/ai";
@@ -143,6 +66,7 @@
     import "../../component/DeDialogAlert/index.js";
     import "../../component/DeDialogConfirm/index.js";
     import "./component/DeToolbarMenu/index.js";
+    import "./component/DeInfo/index.js";
     import DB_SCHEMA from "./db/schema.js";
 
     const job_status =
@@ -234,13 +158,13 @@
 
     async function Test()
     {
-      await Info("Going to start some shit...");
+      await info_elem.Info("Going to start some shit...");
       await Utils.sleep(4000);
-      await Info("Are you looking for trouble?");
+      await info_elem.Info("Are you looking for trouble?");
       await Utils.sleep(4000);
-      await Info("I didn't think so!");
+      await info_elem.Info("I didn't think so!");
       await Utils.sleep(4000);
-      await Info();
+      await info_elem.Info();
     }
 
     async function On_Click_Add_Company(db)
@@ -885,52 +809,6 @@
       }
     }
 
-    async function Info(msg)
-    {
-      progress_dlg.addEventListener('cancel', (event) =>
-      {
-        event.preventDefault();
-      });
-      
-      if (msg)
-      {
-        progress_dlg.showModal();
-        await Show_Msg(msg, info_elem);
-      }
-      else if (progress_dlg.open)
-      {
-        await Hide_Msg(info_elem);
-        progress_dlg.close();
-      }
-
-      async function Show_Msg(msg, elem)
-      {
-        await Hide_Msg(elem);
-
-        elem.last_msg = msg;
-        for (let c = 0; c <= msg.length; c++)
-        {
-          elem.textContent = "[ " + msg.substring(0, c) + " ]";
-          await Utils.sleep(35);
-        }
-      }
-
-      async function Hide_Msg(elem)
-      {
-        const msg = elem.last_msg;
-        if (msg)
-        {
-          for (let c = msg.length; c >= 0; c--)
-          {
-            elem.textContent = "[ " + msg.substring(0, c) + " ]";
-            await Utils.sleep(35);
-          }
-          elem.textContent = "";
-          elem.last_msg = null;
-        }
-      }
-    }
-
     // jobs list ======================================================================
 
     async function Render_Job_Items(db)
@@ -1054,15 +932,15 @@
       const form_data = await email_dialog.Show_Async();
       if (form_data?.email_text && ctx.ai)
       {
-        await Info("Extracting job data...");
+        await info_elem.Info("Extracting job data...");
         await Utils.sleep(1000);
-        const data = await ctx.ai.Extract_Job(form_data.email_text, Info);
+        const data = await ctx.ai.Extract_Job(form_data.email_text, info_elem.Info);
 
         const agency_id = await Agency_Insert_If_New(ctx.db, data?.agency);
         const contact_id = await Contact_Insert_If_New(ctx.db, data?.contact, agency_id);
         await Job_Insert_If_New(ctx.db, data?.job, agency_id, contact_id);
 
-        await Info();
+        await info_elem.Info();
         Alert("Job extracted and added successfully!");
         await Render_Job_Items(ctx.db);
       }
@@ -1142,7 +1020,7 @@
 
     function On_Click_Generate_CV(e, job, ctx)
     {
-      const url = "gen-cv.html?job_id=" + job.id;
+      const url = "gen-cv-1.html?job_id=" + job.id;
       window.open(url, "_blank");
     }
 
@@ -1578,13 +1456,7 @@
     <span cid="des_elem" slot="body"></span>
   </de-dialog-alert>
 
-  <dialog id="progress_dlg">
-    <output id="info_elem" role="status"></output>
-    <de-dial id="dial1" max-value="4" gap-width="20" value="4"></de-dial>
-    <de-dial id="dial2" max-value="8" gap-width="30" value="8"></de-dial>
-    <de-dial id="dial3" max-value="16" tick-width="2" value="16" viewbox-radius="140"></de-dial>
-    <de-dial id="dial4" max-value="128" gap-width="3" value="128" viewbox-radius="140"></de-dial>
-  </dialog>
+  <de-info id="info_elem"></de-info>
 
 </body>
 
