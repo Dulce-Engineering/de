@@ -968,7 +968,7 @@
 
     async function On_Click_Download_Job(e, job_id, db)
     {
-      const job = Db.Select_By_Id(db, "jobs", job_id);
+      const job = await Db.Select_By_Id(db, "jobs", job_id);
 
       const filename = `job-trak-${new Date().toISOString().split('T')[0]}.json`;
       const json_string = JSON.stringify(job, null, 2);
@@ -1020,7 +1020,7 @@
 
     function On_Click_Generate_CV(e, job, ctx)
     {
-      const url = "gen-cv-1.html?job_id=" + job.id;
+      const url = "gen-cv-2.html?job_id=" + job.id;
       window.open(url, "_blank");
     }
 

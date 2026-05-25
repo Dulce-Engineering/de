@@ -4,6 +4,8 @@ class DeInfo extends HTMLElement
 {
   static tname = "de-info";
 
+  queue = [];
+
   constructor()
   {
     super();
@@ -16,17 +18,34 @@ class DeInfo extends HTMLElement
     this.Render();
   }
 
-  async Info(msg)
+  Info(msg)
   {
-    if (msg)
+    this.queue.push(msg);
+    this.Process();
+  }
+
+  async Process()
+  {
+    if (!this.is_processing)
     {
-      this.progress_dlg.showModal();
-      await this.Show_Msg(msg, );
-    }
-    else if (this.progress_dlg.open)
-    {
-      await this.Hide_Msg();
-      this.progress_dlg.close();
+      this.is_processing = true;
+
+      while (this.queue.length > 0)
+      {
+        const msg = this.queue.shift();
+        if (msg)
+        {
+          this.progress_dlg.showModal();
+          await this.Show_Msg(msg);
+        }
+        else if (this.progress_dlg.open)
+        {
+          await this.Hide_Msg();
+          this.progress_dlg.close();
+        }
+      }
+
+      this.is_processing = false;
     }
   }
 
@@ -57,7 +76,12 @@ class DeInfo extends HTMLElement
   async Animate(msg, forward = true)
   {
     this.is_animating = true;
-    if (forward)
+    const no_anim = this.hasAttribute("no-anim");
+    if (no_anim)
+    {
+      this.info_elem.textContent = "[ " + msg + " ]";
+    }
+    else if (forward)
     {
       for (let c = 0; c <= msg.length; c++)
       {
