@@ -628,6 +628,7 @@
     {
       const item_elem = event.detail.item_elem;
       const job = item_elem.item_obj;
+      const job_id = job.id;
 
       const start_time = job.start_date ? new Date(job.start_date) : null;
       const start_time_str = Utils.To_Date_Str(start_time);
@@ -646,7 +647,7 @@
       item_elem.career_resp_elem.innerHTML = Str_To_HTML(job.responsibilities || "N/A");
       item_elem.career_proj_elem.innerHTML = Str_To_HTML(job.projects || "N/A");
 
-      item_elem.career_item_menu.addEventListener("edit", () => On_Click_Career_Edit(ctx, job.id));
+      item_elem.career_item_menu.addEventListener("edit", () => On_Click_Career_Edit(ctx, job_id));
       //item_elem.career_item_menu.addEventListener("delete", On_Click_Career_Item_Delete);
     }
 
@@ -852,6 +853,7 @@
     {
       const item_elem = event.detail.item_elem;
       const job = item_elem.item_obj;
+      const job_id = job.id;
 
       const title_text = Utils.Append_Str(job.role_title, job.company, " - ");
       item_elem.role_title_elem.textContent = title_text;
@@ -898,12 +900,12 @@
       
       item_elem.status_elem.textContent = job.status;
 
-      item_elem.job_menu.addEventListener("attach", e => On_Click_Attach_Files(e, job.id, ctx.db));
-      item_elem.job_menu.addEventListener("view", e => On_Click_View_Job(e, job.id, ctx.db));
-      item_elem.job_menu.addEventListener("edit", e => On_Click_Edit_Job(e, job.id, ctx.db));
-      item_elem.job_menu.addEventListener("delete", e => On_Click_Delete_Job(e, job.id, ctx.db));
-      item_elem.job_menu.addEventListener("download", e => On_Click_Download_Job(e, job.id, ctx.db));
-      item_elem.job_menu.addEventListener("status", e => On_Click_Add_Note(e, job.id, ctx.db));
+      item_elem.job_menu.addEventListener("attach", e => On_Click_Attach_Files(e, job_id, ctx.db));
+      item_elem.job_menu.addEventListener("view", e => On_Click_View_Job(e, job_id, ctx.db));
+      item_elem.job_menu.addEventListener("edit", e => On_Click_Edit_Job(e, job_id, ctx.db));
+      item_elem.job_menu.addEventListener("delete", e => On_Click_Delete_Job(e, job_id, ctx.db));
+      item_elem.job_menu.addEventListener("download", e => On_Click_Download_Job(e, job_id, ctx.db));
+      item_elem.job_menu.addEventListener("status", e => On_Click_Add_Note(e, job_id, ctx.db));
       item_elem.job_menu.addEventListener("gencv", e => On_Click_Generate_CV(e, job, ctx));
       item_elem.job_menu.addEventListener("genletter", e => On_Click_Generate_Cover_Letter(e, job, ctx));
 

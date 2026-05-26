@@ -402,8 +402,9 @@ de-dialog-form, de-dialog-alert, de-form, de-toolbar-menu
     border-width: 3px;
     background-color: #000;
     color: var(--main);
-    width: 60%;
     padding: 30px;
+    max-height: 90vh;
+    max-width: 90vw;
   }
   dialog::backdrop {
     background-color: var(--shade);
@@ -438,7 +439,9 @@ de-dialog-form, de-dialog-alert, de-form, de-toolbar-menu
     gap: 20px;
     padding: 0;
     display: flex;
-    flex-direction: column
+    flex-direction: column;
+    max-height: 80vh;
+    overflow: auto;
   }
   header
   {
