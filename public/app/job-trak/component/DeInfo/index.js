@@ -20,8 +20,11 @@ class DeInfo extends HTMLElement
 
   Info(msg)
   {
-    this.queue.push(msg);
-    this.Process();
+    if (!this.hasAttribute("no-op"))
+    {
+      this.queue.push(msg);
+      this.Process();
+    }
   }
 
   async Process()

@@ -82,6 +82,11 @@ class Db
     return next_id;
   }
 
+  async Select(table_name, fn)
+  {
+    return Db.Select(this.db, table_name, fn);
+  }
+
   static async Select(db, table_name, fn)
   {
     const items = await Db.Get_All(db, table_name);
@@ -114,6 +119,11 @@ class Db
     }
 
     return res;
+  }
+
+  Save(table_name, item)
+  {
+    return Db.Save(this.db, table_name, item);
   }
 
   static Save(db, table_name, item)
@@ -162,6 +172,11 @@ class Db
     }
 
     return res;
+  }
+
+  Update(table_name, new_item)
+  {
+    return Db.Update(this.db, table_name, new_item);
   }
 
   static async Update(db, table_name, new_item)

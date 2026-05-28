@@ -15,11 +15,11 @@ class DeEditText extends HTMLElement
     this.Render();
   }
 
-  set value(text_str)
+  set value(data)
   {
-    this.text_elem.textContent = text_str;
+    this.text_elem.textContent = data.text;
+    this.orig_elem.textContent = data.original_text
   }
-
 
   On_Click_Edit_Btn()
   {
@@ -42,6 +42,7 @@ class DeEditText extends HTMLElement
       <dialog id="${dlg_id}" popover>
         <header>Change Text</header>
         <main>
+          <div>Original Text: <span cid="orig_elem"></span></div>
           <input type="text" cid="input_elem">
         </main>
         <footer>

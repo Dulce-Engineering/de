@@ -61,6 +61,7 @@ const DB_SCHEMA =
         name: "string",
         phone: "string",
         position: "string",
+        linkedin: "string"
       }
     },
     jobs:
@@ -84,6 +85,7 @@ const DB_SCHEMA =
         source: "string",
         status: "string",
         link: "string",
+        last_update: "int",
       }
     },
     profiles:

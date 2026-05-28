@@ -59,6 +59,7 @@
     import Utils from "../../lib/Utils.js";
     import Db from "./lib/Db.js";
     import AI from "./lib/AI.js";
+    import Job from "./lib/Job.js";
     import "../../dedial/dedial.js";
     import "../../component/DeInputList/index3.js";
     import "../../component/DeForm/index.js";
@@ -109,6 +110,7 @@
       const ctx = 
       { 
         ai: await AI.New(fb_app, fb_ai),
+        db2: await Db.New(DB_SCHEMA),
       };
       const db = await Db.Open_DB(ctx, DB_SCHEMA);
 
@@ -116,7 +118,7 @@
       Set_Options(job_status_select, job_status, s => s.id, s => s.label);
       Set_Options(career_work_type_select, Object.keys(work_types), t => t, t => work_types[t]);
 
-      import_btn.onclick = () => On_Click_Import_Btn(db);
+      import_btn.onclick = () => On_Click_Import_Btn(db, ctx);
       export_btn.onclick = () => On_Click_Export_Btn(db);
 
       jobs_btn.onclick = () => Show_View(jobs_list);
@@ -132,7 +134,6 @@
 
       jobs_menu.addEventListener("add", (e) => On_Click_Edit_Job(e, null, db));
       jobs_menu.addEventListener("ai", () => On_Click_AI_Add_Job(ctx));
-      add_contact_btn.onclick = () => On_Click_Add_Contact(db);
       add_company_btn.onclick = () => On_Click_Add_Company(db);
 
       jobs_list.addEventListener("render", e => Render_Job_Item(e, ctx));
@@ -144,28 +145,17 @@
       job_agency_select.addEventListener("change", Toggle_New_Agency_Fields);
       job_contact_select.addEventListener("change", Toggle_New_Contact_Fields);
 
-      Render_Job_Items(db);
-      Render_Contacts(db);
+      Render_Job_Items(ctx.db2);
       Render_Companies(db);
       Render_Profile(db);
       Render_Education(db);
       Render_Career(db);
 
-      hdr_elem.addEventListener("click", Test);
+      add_contact_btn.onclick = (e) => On_Click_Edit_Contact(e, null, db);
+      Render_Contacts(db);
     }
 
     // events =========================================================================
-
-    async function Test()
-    {
-      await info_elem.Info("Going to start some shit...");
-      await Utils.sleep(4000);
-      await info_elem.Info("Are you looking for trouble?");
-      await Utils.sleep(4000);
-      await info_elem.Info("I didn't think so!");
-      await Utils.sleep(4000);
-      await info_elem.Info();
-    }
 
     async function On_Click_Add_Company(db)
     {
@@ -207,7 +197,7 @@
       profile_form.classList.add("hidden");
     }
 
-    async function On_Click_Import_Btn(db)
+    async function On_Click_Import_Btn(db, ctx)
     {
       const input = document.createElement('input');
       input.type = 'file';
@@ -235,7 +225,7 @@
 
         await Clear_DB(db);
         await Save_To_IndexedDB(db, db_data, DB_SCHEMA);
-        Render_Job_Items(db);
+        Render_Job_Items(ctx.db2);
         Alert("Data imported from " + file.name + " to IndexedDB instance.");
       };
 
@@ -297,7 +287,7 @@
       Alert("Data exported successfully!");
     }
 
-    async function On_Click_Add_Note(e, job_id, db)
+    async function On_Click_Add_Note(e, job_id, ctx)
     {
       const form_data = await note_dialog.Show_Async();
       if (!Utils.Is_Empty(form_data?.note))
@@ -310,15 +300,15 @@
           timestamp: now.getTime(),
           note: form_data.note
         };
-        await Db.Insert(db, "action_logs", action);
+        await Db.Insert(ctx.db, "action_logs", action);
       }
 
       if (!Utils.Is_Empty(form_data?.status))
       {
-        await Db.Update(db, "jobs", { id: job_id, status: form_data.status });
+        await Db.Update(ctx.db, "jobs", { id: job_id, status: form_data.status });
       }
 
-      await Render_Job_Items(db);
+      await Render_Job_Items(ctx.db2);
     }
 
     async function On_Click_AI_Add_Profile(ctx)
@@ -361,28 +351,6 @@
 
         await Db.Update(ctx.db, "career", career);
         await Render_Career(ctx.db);
-      }
-    }
-
-    async function On_Click_Add_Contact(db)
-    {
-      const agencies = await Db.Get_All(db, "agencies");
-      Set_Options(contact_agency_select, agencies, a => a.id, a => a.name);
-
-      const form_data = await contact_dialog.Show_Async();
-      if (form_data)
-      {
-        const contact =
-        {
-          name: form_data.name?.trim() || null,
-          email: form_data.email?.trim() || null,
-          phone: form_data.phone?.trim() || null,
-          position: form_data.position?.trim() || null,
-          agency_id: parseInt(form_data.agency_id) || null,
-        };
-
-        await Db.Insert(db, "contacts", contact);
-        await Render_Contacts(db);
       }
     }
 
@@ -595,19 +563,6 @@
       career_list.value = career;
     }
 
-    async function Render_Contacts(db)
-    {
-      const contacts = await Db.Get_All(db, "contacts");
-      const agencies = await Db.Get_All(db, "agencies");
-
-      const enrichedContacts = (contacts || []).map(contact => ({
-        ...contact,
-        agency_name: agencies?.find(a => a.id === contact.agency_id)?.name || "N/A"
-      }));
-
-      contacts_list.value = enrichedContacts;
-    }
-
     // render list item ===============================================================
 
     function Render_Company_Item(event)
@@ -659,18 +614,6 @@
       const details = Utils.Append_Str(edu.institution, edu.year, " - ");
       item_elem.edu_title_elem.textContent = edu.title || "Unnamed Education";
       item_elem.edu_det_elem.textContent = details;
-    }
-
-    function Render_Contact_Item(event, db)
-    {
-      const item_elem = event.detail.item_elem;
-      const contact = item_elem.item_obj;
-
-      item_elem.contact_name_elem.textContent = contact.name || "";
-      item_elem.contact_phone_elem.textContent = contact.phone || "N/A";
-      item_elem.contact_email_elem.textContent = contact.email || "N/A";
-      item_elem.contact_agency_elem.textContent = contact.agency_name || "N/A";
-      item_elem.contact_position_elem.textContent = contact.position || "N/A";
     }
 
     // rendering ======================================================================
@@ -810,43 +753,79 @@
       }
     }
 
+    // contacts list ==================================================================
+
+    async function Render_Contacts(db)
+    {
+      const contacts = await Db.Get_All(db, "contacts");
+      const agencies = await Db.Get_All(db, "agencies");
+
+      const enrichedContacts = (contacts || []).map(contact => ({
+        ...contact,
+        agency_name: agencies?.find(a => a.id === contact.agency_id)?.name || "N/A"
+      }));
+
+      contacts_list.value = enrichedContacts;
+    }
+
+    function Render_Contact_Item(event, db)
+    {
+      const item_elem = event.detail.item_elem;
+      const contact = item_elem.item_obj;
+      const contact_id = contact.id;
+
+      item_elem.contact_name_elem.textContent = contact.name || contact.email || "N/A";
+      item_elem.contact_phone_elem.textContent = contact.phone || "N/A";
+      item_elem.contact_email_elem.textContent = contact.email || "N/A";
+      item_elem.contact_agency_elem.textContent = contact.agency_name || "N/A";
+      item_elem.contact_position_elem.textContent = contact.position || "N/A";
+
+      item_elem.contact_menu.addEventListener("edit", e => On_Click_Edit_Contact(e, contact_id, db));
+      item_elem.contact_menu.addEventListener("delete", e => On_Click_Delete_Contact(e, contact_id, db));
+    }
+
+    async function On_Click_Edit_Contact(event, contact_id, db)
+    {
+      const agencies = await Db.Get_All(db, "agencies");
+      Set_Options(contact_agency_select, agencies, a => a.id, a => a.name);
+
+      const curr_contact = await Db.Select_By_Id(db, "contacts", contact_id);
+      const form_data = await contact_dialog.Show_Async(curr_contact);
+      if (form_data)
+      {
+        const contact =
+        {
+          id: contact_id,
+          name: form_data.name?.trim() || null,
+          email: form_data.email?.trim() || null,
+          phone: form_data.phone?.trim() || null,
+          position: form_data.position?.trim() || null,
+          linkedin: form_data.linkedin?.trim() || null,
+          agency_id: parseInt(form_data.agency_id) || null,
+        };
+
+        await Db.Save(db, "contacts", contact);
+        await Render_Contacts(db);
+      }
+    }
+
+    async function On_Click_Delete_Contact(event, contact_id, db)
+    {
+      const confirmed = confirm("Are you sure you want to delete this contact?");
+      if (confirmed)
+      {
+        await Db.Delete(db, "contacts", [contact_id]);
+
+        await Render_Contacts(db);
+        Alert("Contact deleted successfully.");
+      }
+    }
+
     // jobs list ======================================================================
 
     async function Render_Job_Items(db)
     {
-      const jobs = await Db.Get_All(db, "jobs");
-      const agencies = await Db.Get_All(db, "agencies");
-      const contacts = await Db.Get_All(db, "contacts");
-      const actionLogs = await Db.Get_All(db, "action_logs");
-      const attachments = await Db.Get_All(db, "attachments");
-
-      const enrichedJobs = jobs.map(Add_Details);
-      enrichedJobs.sort((a, b) => a.status_type - b.status_type);
-
-      function Add_Details(job) 
-      {
-        const status_type = job_status.find(s => s.id === job.status)?.type;
-        const latestLog = actionLogs
-          .filter(log => log.job_id === job.id)
-          .sort((a, b) => b.timestamp - a.timestamp || b.id - a.id)[0];
-        const agency_name = agencies?.find(a => a.id === job.agency_id)?.name;
-        const contact_name = contacts?.find(c => c.id === job.contact_id)?.name;
-        const latest_note = latestLog?.note;
-        const latest_note_time_formatted = latestLog ? new Date(latestLog.timestamp).toLocaleString() : "";
-        const job_attachments = attachments.filter(a => a.job_id === job.id);
-
-        return {
-          ...job,
-          status_type,
-          agency_name,
-          contact_name,
-          latest_note,
-          latest_note_time_formatted,
-          attachments: job_attachments
-        };
-      }
-
-      jobs_list.value = enrichedJobs;
+      jobs_list.value = await Job.Select_All_Extended_Sorted(db);
     }
 
     function Render_Job_Item(event, ctx)
@@ -900,19 +879,24 @@
       
       item_elem.status_elem.textContent = job.status;
 
-      item_elem.job_menu.addEventListener("attach", e => On_Click_Attach_Files(e, job_id, ctx.db));
+      item_elem.job_menu.addEventListener("attach", e => On_Click_Attach_Files(e, job_id, ctx));
       item_elem.job_menu.addEventListener("view", e => On_Click_View_Job(e, job_id, ctx.db));
-      item_elem.job_menu.addEventListener("edit", e => On_Click_Edit_Job(e, job_id, ctx.db));
-      item_elem.job_menu.addEventListener("delete", e => On_Click_Delete_Job(e, job_id, ctx.db));
+      item_elem.job_menu.addEventListener("edit", e => On_Click_Edit_Job(e, job_id, ctx));
+      item_elem.job_menu.addEventListener("delete", e => On_Click_Delete_Job(e, job_id, ctx));
       item_elem.job_menu.addEventListener("download", e => On_Click_Download_Job(e, job_id, ctx.db));
-      item_elem.job_menu.addEventListener("status", e => On_Click_Add_Note(e, job_id, ctx.db));
+      item_elem.job_menu.addEventListener("status", e => On_Click_Add_Note(e, job_id, ctx));
       item_elem.job_menu.addEventListener("gencv", e => On_Click_Generate_CV(e, job, ctx));
       item_elem.job_menu.addEventListener("genletter", e => On_Click_Generate_Cover_Letter(e, job, ctx));
 
-      if (job.status_type == 0 || job.status_type == undefined)
-        item_elem.classList.remove("failed");
-      else
+      item_elem.status_elem.classList.remove("old");
+      item_elem.classList.remove("failed");
+      const now = Date.now();
+      const elapsed_time = now - job.last_update;
+      const two_weeks = 1209600000;
+      if (job.status_type > 0)
         item_elem.classList.add("failed");
+      else if (elapsed_time > two_weeks)
+        item_elem.classList.add("old");
     }
 
     function Render_Attachment_Item(event, ctx)
@@ -944,7 +928,7 @@
 
         await info_elem.Info();
         Alert("Job extracted and added successfully!");
-        await Render_Job_Items(ctx.db);
+        await Render_Job_Items(ctx.db2);
       }
       else if (!ctx.ai)
       {
@@ -964,7 +948,7 @@
       if (confirmed)
       {
         Db.Delete(ctx.db, "attachments", [attachment.id]);
-        Render_Job_Items(ctx.db);
+        Render_Job_Items(ctx.db2);
       }
     }
 
@@ -980,7 +964,7 @@
       Alert("Job exported successfully!");
     }
 
-    async function On_Click_Attach_Files(event, job_id, db)
+    async function On_Click_Attach_Files(event, job_id, ctx)
     {
       //event?.stopPropagation?.();
       //event?.preventDefault?.();
@@ -996,26 +980,26 @@
           timestamp: Date.now()
         }));
 
-        await Db.Insert_Items(db, 'attachments', attachments);
-        await Render_Job_Items(db);
+        await Db.Insert_Items(ctx.db, 'attachments', attachments);
+        await Render_Job_Items(ctx.db2);
         Alert(`${files.length} file${files.length === 1 ? '' : 's'} attached to the job.`);
       }
     }
 
-    async function On_Click_Delete_Job(event, job_id, db)
+    async function On_Click_Delete_Job(event, job_id, ctx)
     {
       const confirmed = confirm("Are you sure you want to delete this job?");
       if (confirmed)
       {
-        await Db.Delete(db, "jobs", [job_id]);
+        await Db.Delete(ctx.db, "jobs", [job_id]);
         const attachment_ids =
-          await Db.Select_Ids(db, "attachments", a => a.job_id === job_id);
-        await Db.Delete(db, "attachments", attachment_ids);
+          await Db.Select_Ids(ctx.db, "attachments", a => a.job_id === job_id);
+        await Db.Delete(ctx.db, "attachments", attachment_ids);
         const action_log_ids =
-          await Db.Select_Ids(db, "action_logs", l => l.job_id === job_id);
-        await Db.Delete(db, "action_logs", action_log_ids);
+          await Db.Select_Ids(ctx.db, "action_logs", l => l.job_id === job_id);
+        await Db.Delete(ctx.db, "action_logs", action_log_ids);
 
-        await Render_Job_Items(db);
+        await Render_Job_Items(ctx.db2);
         Alert("Job deleted successfully.");
       }
     }
@@ -1054,19 +1038,19 @@
       job_det_dialog.Show();
     }
 
-    async function On_Click_Edit_Job(event, job_id, db)
+    async function On_Click_Edit_Job(event, job_id, ctx)
     {
-      const agencies = await Db.Get_All(db, "agencies");
+      const agencies = await Db.Get_All(ctx.db, "agencies");
       agencies.push({ id: "new", name: "New Agency" });
       Set_Options(job_agency_select, agencies, a => a.id, a => a.name);
       Toggle_New_Agency_Fields(false);
 
-      const contacts = await Db.Get_All(db, "contacts");
+      const contacts = await Db.Get_All(ctx.db, "contacts");
       contacts.push({ id: "new", name: "New Contact" });
       Set_Options(job_contact_select, contacts, c => c.id, c => c.name);
       Toggle_New_Contact_Fields(false);
 
-      const curr_job = await Db.Select_By_Id(db, "jobs", job_id);
+      const curr_job = await Db.Select_By_Id(ctx.db, "jobs", job_id);
 
       const form_data = await job_dialog.Show_Async(curr_job);
       if (form_data)
@@ -1074,7 +1058,7 @@
         if (form_data.agency_id == "new")
         {
           const new_agency = { name: form_data.agency_name?.trim() || "New Agency" };
-          const new_agency_id = await Db.Insert(db, "agencies", new_agency);
+          const new_agency_id = await Db.Insert(ctx.db, "agencies", new_agency);
           form_data.agency_id = new_agency_id;
         }
         
@@ -1087,7 +1071,7 @@
             agency_id: parseInt(form_data.agency_id) || null,
             email: form_data.contact_email?.trim(),
           };
-          const new_contact_id = await Db.Insert(db, "contacts", new_contact);
+          const new_contact_id = await Db.Insert(ctx.db, "contacts", new_contact);
           form_data.contact_id = new_contact_id;
         }
         
@@ -1109,11 +1093,10 @@
           status: form_data.status || null
         };
 
-        await Db.Save(db, "jobs", job);
-        await Render_Job_Items(db);
+        await Db.Save(ctx.db, "jobs", job);
+        await Render_Job_Items(ctx.db2);
       }
     }
-
   </script>
 
 </head>
@@ -1162,7 +1145,7 @@
             <h2 cid="role_title_elem"></h2>
             <span cid="contact_elem"></span>
           </div>
-          <div cid="status_elem">blah</div>
+          <div cid="status_elem"></div>
           <de-toolbar-menu cid="job_menu" compact
             show-status label-status="Update Status"
             show-attach label-attach="Attach Files"
@@ -1205,6 +1188,11 @@
           <div>
             <span cid="contact_agency_elem"></span>
           </div>
+          <de-toolbar-menu cid="contact_menu" 
+            show-edit label-edit="Edit Contact" 
+            show-delete label-delete="Delete Contact"
+          >
+          </de-toolbar-menu>
         </summary>
         <p>Email: <span cid="contact_email_elem"></span></p>
         <p>Phone: <span cid="contact_phone_elem"></span></p>
@@ -1395,6 +1383,8 @@
     <input slot="fields" type="tel" name="phone" placeholder="Contact phone">
     <label slot="fields">Position</label>
     <input slot="fields" type="text" name="position" placeholder="Contact position">
+    <label slot="fields">LinkedIn</label>
+    <input slot="fields" type="text" name="linkedin" placeholder="Contact LinkedIn URL">
     <label slot="fields">Agency</label>
     <select id="contact_agency_select" slot="fields" name="agency_id"></select>
   </de-dialog-form>

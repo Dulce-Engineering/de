@@ -16,7 +16,12 @@ de-edit-text
     main
     {
       padding: 0 0 10px 0;
+      gap: 10px;
 
+      div
+      {
+        font-size: 1.3rem;
+      }
       input
       {
         padding: 5px 10px;

@@ -120,7 +120,11 @@ async function Render_Job_Item(event, ctx, target_job, all_jobs)
 
   info_elem.Info("Generating " + job.company_name + " job title...");
   const role_title = await ctx.ai.Generate_Job_Title(job, target_job);
-  item_elem.job_title.value = role_title?.suggested_title || job.role_titles;
+  item_elem.job_title.value = 
+  {
+    text: role_title?.suggested_title || job.role_titles, 
+    original_text: job.role_titles
+  };
 
   info_elem.Info("Generating " + job.company_name + " job description...");
   const tailored_job = await ctx.ai.Generate_Job_Description(job, target_job);
