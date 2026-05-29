@@ -216,6 +216,11 @@ class Db
     return exists;
   }
 
+  async Insert_If_New(table_name, data, fn)
+  {
+    return Db.Insert_If_New(this.db, table_name, data, fn);
+  }
+
   static async Insert_If_New(db, table_name, data, fn)
   {
     let res = null;

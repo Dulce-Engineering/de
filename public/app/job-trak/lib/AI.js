@@ -181,11 +181,21 @@ class AI
       },
     };
     prompt =
-      "Analyze the following text about a job opportunity and extract the job " +
-      "description, technical requirements, and responsibilities, if available. " +
-      "If available, make sure to include a list of the technical skills required " +
-      "for the job and a list of the responsibilities. " +
-      "Job details follow: /n" + text;
+      "You are an expert data parsing assistant.Your sole task is to extract the main " +
+      "body of a job description from a messy copy - and - pasted text string./n/n" +
+      "### CRITICAL RULES:/n" +
+      "1. PRESERVE THE CONTENT: Copy the actual job description text(responsibilities, " +
+      "requirements, about the company, daily tasks) completely VERBATIM.Do not rewrite, " +
+      "summarize, or paraphrase a single sentence./n" +
+      "2. EXCLUDE ALL METADATA: Absolutely do not include any metadata.If you see fields " +
+      "like Job Title, Location, Salary, Pay Range, Job Type(Full - time / Part - time), " +
+      "Benefits list, Date Posted, or Company Name at the top or bottom, IGNORE them " +
+      "completely./n" +
+      "3. NO EXTRA TEXT: Do not include introductory text like " +
+      "'Here is the extracted text:' or any polite sign - offs. Output ONLY the " +
+      "extracted job description body text./n/n" +
+      "### MESSY INPUT TEXT TO PARSE:/n" + text + "/n/n" +
+      "### MAIN BODY JOB DESCRIPTION OUTPUT:";
     if (notify_fn) await notify_fn("Extracting job description...");
     const details = await this.Prompt(prompt, details_schema);
     job.description = details.description;

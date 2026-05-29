@@ -81,6 +81,40 @@ class Job
       await db.Update("jobs", job);
     }
   }
+  
+  static async AI_Import(ctx, raw_text, notify_fn)
+  {
+    let res = null;
+
+    if (raw_text && ctx.ai)
+    {
+      if (notify_fn) await notify_fn("Extracting job data...");
+      await ctx.Utils.sleep(1000);
+
+      const data = await ctx.ai.Extract_Job(raw_text, notify_fn);
+      const job = data?.job;
+      const agency_id = await ctx.Agency.Insert_If_New(ctx, data?.agency);
+      const contact_id = await ctx.Contact.Insert_If_New(ctx, data?.contact, agency_id);
+
+      if (job && job.role_title)
+      {
+        job.agency_id = agency_id;
+        job.contact_id = contact_id;
+        job.status = job.status || "bookmarked";
+        job.last_update = Date.now();
+        res = await ctx.db2.Insert_If_New("jobs", job, Fail_If);
+        function Fail_If(j)
+        {
+          return (agency_id &&
+            j.agency_id == agency_id &&
+            j.role_title == job.role_title);
+        }
+      }
+
+      if (notify_fn) await notify_fn();
+    }
+    return res;
+  }
 }
 
 export default Job;

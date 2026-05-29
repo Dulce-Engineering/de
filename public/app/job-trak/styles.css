@@ -2,27 +2,22 @@
   font-family: hyperspace-bold;
   src: url("font/Hyperspace Bold.otf");
 }
-
 @font-face {
   font-family: hyperspace;
   src: url("font/Hyperspace.otf");
 }
-
 @font-face {
   font-family: octagonal-ultra-light;
   src: url("font/octaul-017.ttf");
 }
-
 @font-face {
   font-family: octagonal-light;
   src: url("font/octal-017.ttf");
 }
-
 @font-face {
   font-family: octagonal-regular;
   src: url("font/octar-017.ttf");
 }
-
 @font-face {
   font-family: octagonal-bold;
   src: url("font/octab-017.ttf");
@@ -148,6 +143,10 @@ de-input-list details:hover,
   display: none;
 }
 
+html
+{
+  interpolate-size: allow-keywords;
+}
 body {
   display: flex;
   flex-direction: column;
@@ -170,7 +169,7 @@ header
 
   h1 
   {
-    font-size: 6rem;
+    font-size: 5rem;
     font-family: "Arial";
     margin: 0 30px 20px 30px;
     xbackground-image: linear-gradient(to top, #ff4 15%, #d44 30%, #33a 60%, #000);
@@ -300,6 +299,7 @@ de-input-list, .panel
     &.failed
     {
       --border-color: #f00;
+      opacity: 0.7;
 
       [cid="status_elem"]
       {
@@ -324,6 +324,16 @@ de-input-list, .panel
     {
       margin: 0 0 8px 0;
     }
+  }
+  details::details-content 
+  {
+    transition: height 0.3s ease, content-visibility 0.3s allow-discrete;
+    height: 0;
+    overflow: hidden;
+  }
+  details[open]::details-content 
+  {
+    height: auto;
   }
 
   summary
@@ -438,6 +448,11 @@ de-dialog-form, de-dialog-alert, de-form, de-toolbar-menu
     background: none;
     color: var(--input-text);
     border: 1px solid var(--border);
+  }
+  textarea
+  {
+    min-height: 200px;
+    min-width: 50vw;
   }
   option
   {
@@ -594,7 +609,7 @@ de-toolbar-menu
   align-items: center;
   gap: 10px;
 }
-.link
+.link, a
 {
   cursor: pointer;
   text-decoration: underline solid var(--link);

@@ -60,6 +60,8 @@
     import Db from "./lib/Db.js";
     import AI from "./lib/AI.js";
     import Job from "./lib/Job.js";
+    import Contact from "./lib/Contact.js";
+    import Agency from "./lib/Agency.js";
     import "../../dedial/dedial.js";
     import "../../component/DeInputList/index3.js";
     import "../../component/DeForm/index.js";
@@ -111,6 +113,10 @@
       { 
         ai: await AI.New(fb_app, fb_ai),
         db2: await Db.New(DB_SCHEMA),
+        Job,
+        Contact,
+        Agency,
+        Utils
       };
       const db = await Db.Open_DB(ctx, DB_SCHEMA);
 
@@ -132,7 +138,7 @@
       profile_form.addEventListener("ok", () => On_Click_Save_Profile(db));
       profile_form.addEventListener("cancel", () => Toggle_Profile_View(false));
 
-      jobs_menu.addEventListener("add", (e) => On_Click_Edit_Job(e, null, db));
+      jobs_menu.addEventListener("add", (e) => On_Click_Edit_Job(e, null, ctx));
       jobs_menu.addEventListener("ai", () => On_Click_AI_Add_Job(ctx));
       add_company_btn.onclick = () => On_Click_Add_Company(db);
 
@@ -355,54 +361,6 @@
     }
 
     // business logic =================================================================
-
-    async function Agency_Insert_If_New(db, agency)
-    {
-      let res = null;
-
-      if (agency && agency.name)
-      {
-        res = await Db.Insert_If_New
-          (db, "agencies", agency, a => a.name === agency.name);
-      }
-
-      return res;
-    }
-
-    async function Contact_Insert_If_New(db, contact, agency_id)
-    {
-      let res = null;
-
-      if (contact && contact.email)
-      {
-        contact.agency_id = agency_id;
-        res = await Db.Insert_If_New
-          (db, "contacts", contact, c => c.email === contact.email);
-      }
-
-      return res;
-    }
-
-    async function Job_Insert_If_New(db, job, agency_id, contact_id)
-    {
-      let res = null;
-
-      if (job && job.role_title)
-      {
-        job.agency_id = agency_id;
-        job.contact_id = contact_id;
-        job.status = job.status || "bookmarked";
-        res = await Db.Insert_If_New(db, "jobs", job, Fail_If);
-        function Fail_If(j)
-        {
-          return (agency_id && 
-            j.agency_id == agency_id && 
-            j.role_title == job.role_title);
-        }
-      }
-
-      return res;
-    }
 
     function Show_File(blob, filename)
     {
@@ -833,6 +791,7 @@
       const item_elem = event.detail.item_elem;
       const job = item_elem.item_obj;
       const job_id = job.id;
+      //console.log("Render_Job_Item(): job =", job);
 
       const title_text = Utils.Append_Str(job.role_title, job.company, " - ");
       item_elem.role_title_elem.textContent = title_text;
@@ -916,23 +875,11 @@
     async function On_Click_AI_Add_Job(ctx)
     {
       const form_data = await email_dialog.Show_Async();
-      if (form_data?.email_text && ctx.ai)
+      const job = await ctx.Job.AI_Import(ctx, form_data?.email_text, info_elem.Info);
+      if (job)
       {
-        await info_elem.Info("Extracting job data...");
-        await Utils.sleep(1000);
-        const data = await ctx.ai.Extract_Job(form_data.email_text, info_elem.Info);
-
-        const agency_id = await Agency_Insert_If_New(ctx.db, data?.agency);
-        const contact_id = await Contact_Insert_If_New(ctx.db, data?.contact, agency_id);
-        await Job_Insert_If_New(ctx.db, data?.job, agency_id, contact_id);
-
-        await info_elem.Info();
         Alert("Job extracted and added successfully!");
         await Render_Job_Items(ctx.db2);
-      }
-      else if (!ctx.ai)
-      {
-        Alert("Unable to extract job data");
       }
     }
 
@@ -1104,7 +1051,7 @@
 <body>
 
   <header id="hdr_elem">
-    <h1><span>JOPR&nbsp;&nbsp;</span></h1>
+    <h1><span>JOPR&nbsp;&nbsp;&nbsp;</span></h1>
     <nav>
       <button id="import_btn" class="img" title="Upload">
         <img src="image/upload.svg">
