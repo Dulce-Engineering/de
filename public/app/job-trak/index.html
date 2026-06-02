@@ -57,6 +57,7 @@
     import * as fb_app from "firebase/app";
     import * as fb_ai from "firebase/ai";
     import Utils from "../../lib/Utils.js";
+    import JOPR from "./lib/Utils.js";
     import Db from "./lib/Db.js";
     import AI from "./lib/AI.js";
     import Job from "./lib/Job.js";
@@ -109,14 +110,14 @@
         //await navigator.serviceWorker.register("./lib/service-worker.js");
       }
 
+      const db_id = new URLSearchParams(window.location.search).get("db_id");
+      if (db_id) DB_SCHEMA.name = db_id;
+
       const ctx = 
       { 
         ai: await AI.New(fb_app, fb_ai),
         db2: await Db.New(DB_SCHEMA),
-        Job,
-        Contact,
-        Agency,
-        Utils
+        Job, Contact, Agency, Utils
       };
       const db = await Db.Open_DB(ctx, DB_SCHEMA);
 
@@ -124,26 +125,24 @@
       Set_Options(job_status_select, job_status, s => s.id, s => s.label);
       Set_Options(career_work_type_select, Object.keys(work_types), t => t, t => work_types[t]);
 
-      import_btn.onclick = () => On_Click_Import_Btn(db, ctx);
-      export_btn.onclick = () => On_Click_Export_Btn(db);
+      import_btn.onclick = () => On_Click_Import_Btn(ctx);
+      export_btn.onclick = () => On_Click_Export_Btn(ctx);
 
       jobs_btn.onclick = () => Show_View(jobs_list);
       companies_btn.onclick = () => Show_View(companies_list);
       contacts_btn.onclick = () => Show_View(contacts_list);
       profile_btn.onclick = () => Show_View(profile_elem);
       
-      profile_menu.addEventListener("edit", () => On_Click_Edit_Profile(db));
+      profile_menu.addEventListener("edit", () => On_Click_Edit_Profile(ctx));
       profile_menu.addEventListener("ai", () => On_Click_AI_Add_Profile(ctx));
       profile_menu.addEventListener("download", () => On_Click_Download_Profile(ctx));
-      profile_form.addEventListener("ok", () => On_Click_Save_Profile(db));
-      profile_form.addEventListener("cancel", () => Toggle_Profile_View(false));
 
       jobs_menu.addEventListener("add", (e) => On_Click_Edit_Job(e, null, ctx));
       jobs_menu.addEventListener("ai", () => On_Click_AI_Add_Job(ctx));
-      add_company_btn.onclick = () => On_Click_Add_Company(db);
+      add_company_btn.onclick = () => On_Click_Add_Company(ctx);
 
       jobs_list.addEventListener("render", e => Render_Job_Item(e, ctx));
-      contacts_list.addEventListener("render", e => Render_Contact_Item(e, db));
+      contacts_list.addEventListener("render", e => Render_Contact_Item(e, ctx));
       companies_list.addEventListener("render", e => Render_Company_Item(e));
       edu_list.addEventListener("render", Render_Edu_Item);
       career_list.addEventListener("render", (e) => Render_Career_Item(ctx, e));
@@ -151,59 +150,19 @@
       job_agency_select.addEventListener("change", Toggle_New_Agency_Fields);
       job_contact_select.addEventListener("change", Toggle_New_Contact_Fields);
 
-      Render_Job_Items(ctx.db2);
-      Render_Companies(db);
-      Render_Profile(db);
-      Render_Education(db);
-      Render_Career(db);
+      Render_Job_Items(ctx);
+      Render_Companies(ctx);
+      Render_Profile(ctx);
+      Render_Education(ctx);
+      Render_Career(ctx);
 
-      add_contact_btn.onclick = (e) => On_Click_Edit_Contact(e, null, db);
-      Render_Contacts(db);
+      add_contact_btn.onclick = (e) => On_Click_Edit_Contact(e, null, ctx);
+      Render_Contacts(ctx);
     }
 
     // events =========================================================================
 
-    async function On_Click_Add_Company(db)
-    {
-      const form_data = await company_dialog.Show_Async();
-      if (form_data)
-      {
-        const company =
-        {
-          name: form_data.name?.trim() || null,
-          url: form_data.url?.trim() || null,
-          address: form_data.address?.trim() || null,
-          phone: form_data.phone?.trim() || null,
-          email: form_data.email?.trim() || null,
-          industry: form_data.industry?.trim() || null
-        };
-
-        await Db.Insert(db, "agencies", company);
-        await Render_Companies(db);
-        Alert("Company added successfully.");
-      }
-    }
-
-    async function On_Click_Edit_Profile(db)
-    {
-      profile_details.classList.add("hidden");
-      profile_form.classList.remove("hidden");
-
-      const profiles = await Db.Get_All(db, "profiles");
-      const profile = profiles && profiles.length > 0 ? profiles[0] : null;
-      const form_data = await profile_form.Submit(profile);
-      if (form_data)
-      {
-        await Db.Save(db, "profiles", { ...form_data, id: profile?.id });
-        Alert("Profile saved successfully.");
-        Render_Profile(db);
-      }
-
-      profile_details.classList.remove("hidden");
-      profile_form.classList.add("hidden");
-    }
-
-    async function On_Click_Import_Btn(db, ctx)
+    async function On_Click_Import_Btn(ctx)
     {
       const input = document.createElement('input');
       input.type = 'file';
@@ -224,27 +183,27 @@
           {
             if (attachment.file)
             {
-              attachment.file = await Deserialize_File(attachment.file);
+              attachment.file = await Utils.Deserialize_File(attachment.file);
             }
           }
         }
 
-        await Clear_DB(db);
-        await Save_To_IndexedDB(db, db_data, DB_SCHEMA);
-        Render_Job_Items(ctx.db2);
+        await ctx.db2.Clear();
+        await ctx.db2.Save_To_IndexedDB(db_data, DB_SCHEMA);
+        Render_Job_Items(ctx);
         Alert("Data imported from " + file.name + " to IndexedDB instance.");
       };
 
       input.click();
     }
 
-    async function On_Click_Export_Btn(db)
+    async function On_Click_Export_Btn(ctx)
     {
       const db_data = {};
-      const table_names = Array.from(db.objectStoreNames);
+      const table_names = Array.from(ctx.db2.db.objectStoreNames);
       for (const table_name of table_names)
       {
-        db_data[table_name] = await Db.Get_All(db, table_name);
+        db_data[table_name] = await ctx.db2.Get_All(table_name);
       }
 
       if (Array.isArray(db_data.attachments) && db_data.attachments.length > 0)
@@ -253,7 +212,7 @@
         {
           if (attachment.file)
           {
-            attachment.file = await Serialize_File(attachment.file);
+            attachment.file = await Utils.Serialize_File(attachment.file);
           }
         }
       }
@@ -261,232 +220,17 @@
       const json_string = JSON.stringify(db_data, null, 2);
       const blob = new Blob([json_string], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
-
       const filename = `job-trak-data-${new Date().toISOString().split('T')[0]}.json`;
-      Download_File(blob, filename);
+      Utils.Download_File(blob, filename);
 
       Alert("Data exported successfully!");
     }
 
-    async function On_Click_Download_Profile(ctx)
+    // career & profile ===============================================================
+
+    async function Render_Profile(ctx)
     {
-      const profiles = await Db.Get_All(ctx.db, "profiles");
-      const education = await Db.Get_All(ctx.db, "education");
-      const career = await Db.Get_All(ctx.db, "career");
-      for (const job of career)
-      {
-        job.start_date = job.start_date ? new Date(job.start_date).toISOString().split('T')[0] : null;
-        job.end_date = job.end_date ? new Date(job.end_date).toISOString().split('T')[0] : null;
-      }
-      const employee = 
-      {
-        employee_profile: profiles[0],
-        education,
-        job_history: career
-      };
-
-      const filename = `job-trak-profile-${new Date().toISOString().split('T')[0]}.json`;
-      const json_string = JSON.stringify(employee, null, 2);
-      const blob = new Blob([json_string], { type: 'application/json' });
-      Download_File(blob, filename);
-
-      Alert("Data exported successfully!");
-    }
-
-    async function On_Click_Add_Note(e, job_id, ctx)
-    {
-      const form_data = await note_dialog.Show_Async();
-      if (!Utils.Is_Empty(form_data?.note))
-      {
-        const now = new Date();
-        const action =
-        {
-          job_id,
-          time_str: now.toISOString().split('T')[0],
-          timestamp: now.getTime(),
-          note: form_data.note
-        };
-        await Db.Insert(ctx.db, "action_logs", action);
-      }
-
-      if (!Utils.Is_Empty(form_data?.status))
-      {
-        await Db.Update(ctx.db, "jobs", { id: job_id, status: form_data.status });
-      }
-
-      await Render_Job_Items(ctx.db2);
-    }
-
-    async function On_Click_AI_Add_Profile(ctx)
-    {
-      const files = await Select_Files();
-      if (files && files.length > 0) 
-      {
-        console.info("Processing CV...");
-        const cv_blob = files[0];
-        const cv_data = await ctx.ai.Extract_CV(ctx.ai, cv_blob);
-
-        Db.Delete_All(ctx.db, "education");
-        Db.Insert_Items(ctx.db, "education", cv_data.educations);
-        Db.Delete_All(ctx.db, "career");
-        Db.Insert_Items(ctx.db, "career", cv_data.career);
-
-        Alert("CV extracted successfully!");
-      }
-    }
-
-    async function On_Click_Career_Edit(ctx, career_id)
-    {
-      const curr_career = await Db.Select_By_Id(ctx.db, "career", career_id);
-      const form_data = await career_dialog.Show_Async(curr_career);
-      if (form_data)
-      {
-        const career =
-        {
-          id: career_id,
-          company_name: form_data.company_name?.trim() || null,
-          role_titles: form_data.role_titles?.trim() || null,
-          work_type: form_data.work_type?.trim() || null,
-          location: form_data.location?.trim() || null,
-          tech: form_data.tech?.trim() || null,
-          responsibilities: form_data.responsibilities?.trim() || null,
-          projects: form_data.projects?.trim() || null,
-          start_date: form_data.start_date || null,
-          end_date: form_data.end_date || null
-        };
-
-        await Db.Update(ctx.db, "career", career);
-        await Render_Career(ctx.db);
-      }
-    }
-
-    // business logic =================================================================
-
-    function Show_File(blob, filename)
-    {
-      const url = URL.createObjectURL(blob);
-
-      window.open(url, '_blank');
-      setTimeout(() => URL.revokeObjectURL(url), 5000);
-    }
-
-    function Download_File(blob, filename)
-    {
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    }
-
-    function Select_Files()
-    {
-      const input = document.createElement('input');
-      input.type = 'file';
-      input.multiple = true;
-      async function Files_Change(e, resolve_fn)
-      {
-        const files = Array.from(e.target.files);
-        if (files && files.length > 0)
-        {
-          resolve_fn(files);
-        }
-        else
-        {
-          resolve_fn(null);
-        }
-      }
-
-      const res = new Promise(On_Promise);
-      function On_Promise(resolve, reject)
-      {
-        input.onchange = (e) => Files_Change(e, resolve);
-        input.click();
-      }
-
-      return res;
-    }
-
-    function Blob_To_Base64(blob)
-    {
-      return new Promise((resolve, reject) =>
-      {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result.split(',')[1]);
-        reader.onerror = reject;
-        reader.readAsDataURL(blob);
-      });
-    }
-
-    /**
-     * Converts a File object to a JSON-serializable object including content
-     * @param {File} file 
-     * @returns {Promise<Object>}
-     */
-    async function Serialize_File(file)
-    {
-      const promise = new Promise(On_Process);
-      function On_Process(resolve, reject)
-      {
-        const reader = new FileReader();
-
-        reader.onload = () =>
-        {
-          resolve({
-            name: file.name,
-            size: file.size,
-            type: file.type,
-            lastModified: file.lastModified,
-            content: reader.result // This is the base64 string
-          });
-        };
-
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-      }
-
-      return promise;
-    }
-
-    /**
-     * Recreates a File object from serialized JSON data
-     * @param {Object} serialized - The object containing metadata and base64 content
-     * @returns {Promise<File>}
-     */
-    async function Deserialize_File(serialized)
-    {
-      // 1. Fetch the data URL to convert it back to a Blob
-      const response = await fetch(serialized.content);
-      const blob = await response.blob();
-
-      // 2. Reconstruct the File using the stored metadata
-      return new File([blob], serialized.name, {
-        type: serialized.type,
-        lastModified: serialized.lastModified
-      });
-    }
-
-    // render lists ===================================================================
-
-    async function Render_Education(db)
-    {
-      const certificates = await Db.Get_All(db, "education");
-      edu_list.value = certificates;
-    }
-
-    async function Render_Companies(db)
-    {
-      const companies = await Db.Get_All(db, "agencies");
-      companies_list.value = companies;
-    }
-
-    async function Render_Profile(db)
-    {
-      const profiles = await Db.Get_All(db, "profiles");
+      const profiles = await ctx.db2.Get_All("profiles");
       if (profiles)
       {
         const profile = profiles[0] || {}; // Assume first profile
@@ -515,26 +259,16 @@
       }
     }
 
-    async function Render_Career(db)
+    async function Render_Career(ctx)
     {
-      const career = await Db.Get_All(db, "career");
+      const career = await ctx.db2.Get_All("career");
       career_list.value = career;
     }
 
-    // render list item ===============================================================
-
-    function Render_Company_Item(event)
+    async function Render_Education(ctx)
     {
-      const item_elem = event.detail.item_elem;
-      const agency = item_elem.item_obj;
-
-      item_elem.agency_name_elem.textContent = agency.name || "Unnamed Company";
-      item_elem.agency_industry_elem.textContent = agency.industry ? `Industry: ${agency.industry}` : "";
-      item_elem.agency_url_elem.textContent = agency.url || "No website";
-      item_elem.agency_url_elem.href = agency.url || "#";
-      item_elem.agency_phone_elem.textContent = agency.phone || "N/A";
-      item_elem.agency_email_elem.textContent = agency.email || "N/A";
-      item_elem.agency_address_elem.textContent = agency.address || "N/A";
+      const certificates = await ctx.db2.Get_All("education");
+      edu_list.value = certificates;
     }
 
     function Render_Career_Item(ctx, event)
@@ -572,6 +306,136 @@
       const details = Utils.Append_Str(edu.institution, edu.year, " - ");
       item_elem.edu_title_elem.textContent = edu.title || "Unnamed Education";
       item_elem.edu_det_elem.textContent = details;
+    }
+
+    async function On_Click_Career_Edit(ctx, career_id)
+    {
+      const curr_career = await Db.Select_By_Id(ctx.db, "career", career_id);
+      const form_data = await career_dialog.Show_Async(curr_career);
+      if (form_data)
+      {
+        const career =
+        {
+          id: career_id,
+          company_name: form_data.company_name?.trim() || null,
+          role_titles: form_data.role_titles?.trim() || null,
+          work_type: form_data.work_type?.trim() || null,
+          location: form_data.location?.trim() || null,
+          tech: form_data.tech?.trim() || null,
+          responsibilities: form_data.responsibilities?.trim() || null,
+          projects: form_data.projects?.trim() || null,
+          start_date: form_data.start_date || null,
+          end_date: form_data.end_date || null
+        };
+
+        await Db.Update(ctx.db, "career", career);
+        await Render_Career(ctx.db);
+      }
+    }
+
+    async function On_Click_Edit_Profile(ctx)
+    {
+      profile_details.classList.add("hidden");
+      profile_form.classList.remove("hidden");
+
+      const profiles = await ctx.db2.Get_All("profiles");
+      const profile = profiles && profiles.length > 0 ? profiles[0] : null;
+      const form_data = await profile_form.Submit(profile);
+      if (form_data)
+      {
+        await ctx.db2.Save("profiles", { ...form_data, id: profile?.id });
+        Alert("Profile saved successfully.");
+        Render_Profile(ctx);
+      }
+
+      profile_details.classList.remove("hidden");
+      profile_form.classList.add("hidden");
+    }
+
+    async function On_Click_Download_Profile(ctx)
+    {
+      const profiles = await ctx.db2.Get_All("profiles");
+      const education = await ctx.db2.Get_All("education");
+      const career = await ctx.db2.Get_All("career");
+      for (const job of career)
+      {
+        job.start_date = job.start_date ? new Date(job.start_date).toISOString().split('T')[0] : null;
+        job.end_date = job.end_date ? new Date(job.end_date).toISOString().split('T')[0] : null;
+      }
+      const employee =
+      {
+        employee_profile: profiles[0],
+        education,
+        job_history: career
+      };
+
+      const filename = `job-trak-profile-${new Date().toISOString().split('T')[0]}.json`;
+      const json_string = JSON.stringify(employee, null, 2);
+      const blob = new Blob([json_string], { type: 'application/json' });
+      Utils.Download_File(blob, filename);
+
+      Alert("Data exported successfully!");
+    }
+
+    async function On_Click_AI_Add_Profile(ctx)
+    {
+      const files = await Utils.Select_Files();
+      if (files && files.length > 0) 
+      {
+        console.info("Processing CV...");
+        const cv_blob = files[0];
+        const cv_data = await ctx.ai.Extract_CV(ctx.ai, cv_blob);
+
+        await ctx.db2.Delete_All("education");
+        await ctx.db2.Insert_Items("education", cv_data.educations);
+        await ctx.db2.Delete_All("career");
+        await ctx.db2.Insert_Items("career", cv_data.career);
+
+        Alert("CV extracted successfully!");
+      }
+    }
+
+    // companies ======================================================================
+
+    async function Render_Companies(ctx)
+    {
+      const companies = await ctx.db2.Get_All("agencies");
+      companies_list.value = companies;
+    }
+
+    async function On_Click_Add_Company(ctx)
+    {
+      const form_data = await company_dialog.Show_Async();
+      if (form_data)
+      {
+        const company =
+        {
+          name: form_data.name?.trim() || null,
+          url: form_data.url?.trim() || null,
+          address: form_data.address?.trim() || null,
+          phone: form_data.phone?.trim() || null,
+          email: form_data.email?.trim() || null,
+          industry: form_data.industry?.trim() || null
+        };
+
+        await ctx.db2.Insert("agencies", company);
+        await Render_Companies(ctx);
+        Alert("Company added successfully.");
+      }
+    }
+
+    function Render_Company_Item(event)
+    {
+      const item_elem = event.detail.item_elem;
+      const agency = item_elem.item_obj;
+
+      item_elem.agency_name_elem.textContent = agency.name || "Unnamed Company";
+      item_elem.agency_industry_elem.textContent = agency.industry ? `Industry: ${agency.industry}` : "";
+      item_elem.agency_url_elem.textContent = agency.url || "No website";
+      item_elem.agency_url_elem.href = agency.url || "#";
+      item_elem.agency_phone_elem.textContent = agency.phone || "N/A";
+      item_elem.agency_email_elem.textContent = agency.email || "N/A";
+      item_elem.agency_address_elem.textContent = agency.address || "N/A";
     }
 
     // rendering ======================================================================
@@ -711,22 +575,15 @@
       }
     }
 
-    // contacts list ==================================================================
+    // contacts =======================================================================
 
-    async function Render_Contacts(db)
+    async function Render_Contacts(ctx)
     {
-      const contacts = await Db.Get_All(db, "contacts");
-      const agencies = await Db.Get_All(db, "agencies");
-
-      const enrichedContacts = (contacts || []).map(contact => ({
-        ...contact,
-        agency_name: agencies?.find(a => a.id === contact.agency_id)?.name || "N/A"
-      }));
-
-      contacts_list.value = enrichedContacts;
+      const contacts = await ctx.Contact.Select_Extended(ctx);
+      contacts_list.value = contacts;
     }
 
-    function Render_Contact_Item(event, db)
+    function Render_Contact_Item(event, ctx)
     {
       const item_elem = event.detail.item_elem;
       const contact = item_elem.item_obj;
@@ -735,55 +592,59 @@
       item_elem.contact_name_elem.textContent = contact.name || contact.email || "N/A";
       item_elem.contact_phone_elem.textContent = contact.phone || "N/A";
       item_elem.contact_email_elem.textContent = contact.email || "N/A";
-      item_elem.contact_agency_elem.textContent = contact.agency_name || "N/A";
+      item_elem.contact_agency_elem.textContent = contact.agency?.name || "N/A";
       item_elem.contact_position_elem.textContent = contact.position || "N/A";
 
-      item_elem.contact_menu.addEventListener("edit", e => On_Click_Edit_Contact(e, contact_id, db));
-      item_elem.contact_menu.addEventListener("delete", e => On_Click_Delete_Contact(e, contact_id, db));
+      item_elem.contact_menu.addEventListener("edit", e => On_Click_Edit_Contact(e, contact_id, ctx));
+      item_elem.contact_menu.addEventListener("delete", e => On_Click_Delete_Contact(e, contact_id, ctx));
     }
 
-    async function On_Click_Edit_Contact(event, contact_id, db)
+    async function On_Click_Edit_Contact(event, contact_id, ctx)
     {
-      const agencies = await Db.Get_All(db, "agencies");
+      const agencies = await ctx.db2.Get_All("agencies");
       Set_Options(contact_agency_select, agencies, a => a.id, a => a.name);
 
-      const curr_contact = await Db.Select_By_Id(db, "contacts", contact_id);
+      const curr_contact = await ctx.Contact.Select_By_Id(ctx, contact_id);
       const form_data = await contact_dialog.Show_Async(curr_contact);
       if (form_data)
       {
-        const contact =
+        form_data.id = contact_id;
+        const is_saved = await ctx.Contact.Save(ctx, form_data);
+        if (is_saved)
         {
-          id: contact_id,
-          name: form_data.name?.trim() || null,
-          email: form_data.email?.trim() || null,
-          phone: form_data.phone?.trim() || null,
-          position: form_data.position?.trim() || null,
-          linkedin: form_data.linkedin?.trim() || null,
-          agency_id: parseInt(form_data.agency_id) || null,
-        };
-
-        await Db.Save(db, "contacts", contact);
-        await Render_Contacts(db);
+          await Render_Contacts(ctx);
+          Alert("Contact saved successfully.");          
+        }
+        else
+        {
+          Alert("Failed to save contact.");
+        }
       }
     }
 
-    async function On_Click_Delete_Contact(event, contact_id, db)
+    async function On_Click_Delete_Contact(event, contact_id, ctx)
     {
       const confirmed = confirm("Are you sure you want to delete this contact?");
       if (confirmed)
       {
-        await Db.Delete(db, "contacts", [contact_id]);
-
-        await Render_Contacts(db);
-        Alert("Contact deleted successfully.");
+        const is_deleted = await ctx.Contact.Delete(ctx, contact_id);
+        if (is_deleted)
+        {
+          await Render_Contacts(ctx);
+          Alert("Contact deleted successfully.");
+        }
+        else
+        {
+          Alert("Failed to delete contact.");
+        }
       }
     }
 
-    // jobs list ======================================================================
+    // jobs ===========================================================================
 
-    async function Render_Job_Items(db)
+    async function Render_Job_Items(ctx)
     {
-      jobs_list.value = await Job.Select_All_Extended_Sorted(db);
+      jobs_list.value = await Job.Select_All_Extended_Sorted(ctx.db2);
     }
 
     function Render_Job_Item(event, ctx)
@@ -844,8 +705,8 @@
       item_elem.job_menu.addEventListener("delete", e => On_Click_Delete_Job(e, job_id, ctx));
       item_elem.job_menu.addEventListener("download", e => On_Click_Download_Job(e, job_id, ctx.db));
       item_elem.job_menu.addEventListener("status", e => On_Click_Add_Note(e, job_id, ctx));
-      item_elem.job_menu.addEventListener("gencv", e => On_Click_Generate_CV(e, job, ctx));
-      item_elem.job_menu.addEventListener("genletter", e => On_Click_Generate_Cover_Letter(e, job, ctx));
+      item_elem.job_menu.addEventListener("gencv", e => On_Click_Generate_CV(e, job_id, ctx));
+      item_elem.job_menu.addEventListener("genletter", e => On_Click_Generate_Cover_Letter(e, job_id, ctx));
 
       item_elem.status_elem.classList.remove("old");
       item_elem.classList.remove("failed");
@@ -879,23 +740,23 @@
       if (job)
       {
         Alert("Job extracted and added successfully!");
-        await Render_Job_Items(ctx.db2);
+        await Render_Job_Items(ctx);
       }
     }
 
     function On_Click_Attachment(attachment)
     {
       const filename = attachment.filename || attachment.file?.name || 'Unnamed file';
-      Show_File(attachment.file, filename);
+      Utils.Show_File(attachment.file, filename);
     }
 
-    function On_Click_Delete_Attachment(ctx, attachment)
+    async function On_Click_Delete_Attachment(ctx, attachment)
     {
       const confirmed = confirm("Are you sure you want to delete this attachment?");
       if (confirmed)
       {
         Db.Delete(ctx.db, "attachments", [attachment.id]);
-        Render_Job_Items(ctx.db2);
+        await Render_Job_Items(ctx);
       }
     }
 
@@ -906,7 +767,7 @@
       const filename = `job-trak-${new Date().toISOString().split('T')[0]}.json`;
       const json_string = JSON.stringify(job, null, 2);
       const blob = new Blob([json_string], { type: 'application/json' });
-      Download_File(blob, filename);
+      Utils.Download_File(blob, filename);
 
       Alert("Job exported successfully!");
     }
@@ -915,7 +776,7 @@
     {
       //event?.stopPropagation?.();
       //event?.preventDefault?.();
-      const files = await Select_Files();
+      const files = await Utils.Select_Files();
       if (files && files.length > 0)
       {
         const attachments = files.map(file => ({
@@ -928,7 +789,7 @@
         }));
 
         await Db.Insert_Items(ctx.db, 'attachments', attachments);
-        await Render_Job_Items(ctx.db2);
+        await Render_Job_Items(ctx);
         Alert(`${files.length} file${files.length === 1 ? '' : 's'} attached to the job.`);
       }
     }
@@ -946,20 +807,20 @@
           await Db.Select_Ids(ctx.db, "action_logs", l => l.job_id === job_id);
         await Db.Delete(ctx.db, "action_logs", action_log_ids);
 
-        await Render_Job_Items(ctx.db2);
+        await Render_Job_Items(ctx);
         Alert("Job deleted successfully.");
       }
     }
 
-    function On_Click_Generate_CV(e, job, ctx)
+    function On_Click_Generate_CV(e, job_id, ctx)
     {
-      const url = "gen-cv-2.html?job_id=" + job.id;
+      const url = "gen-cv-2.html?job_id=" + job_id;
       window.open(url, "_blank");
     }
 
-    function On_Click_Generate_Cover_Letter(e, job, ctx)
+    function On_Click_Generate_Cover_Letter(e, job_id, ctx)
     {
-      const url = "gen-letter.html?job_id=" + job.id;
+      const url = "gen-letter.html?job_id=" + job_id;
       window.open(url, "_blank");
     }
 
@@ -997,54 +858,41 @@
       Set_Options(job_contact_select, contacts, c => c.id, c => c.name);
       Toggle_New_Contact_Fields(false);
 
-      const curr_job = await Db.Select_By_Id(ctx.db, "jobs", job_id);
-
-      const form_data = await job_dialog.Show_Async(curr_job);
+      const job = await Db.Select_By_Id(ctx.db, "jobs", job_id);
+      const form_data = await job_dialog.Show_Async(job);
       if (form_data)
       {
-        if (form_data.agency_id == "new")
-        {
-          const new_agency = { name: form_data.agency_name?.trim() || "New Agency" };
-          const new_agency_id = await Db.Insert(ctx.db, "agencies", new_agency);
-          form_data.agency_id = new_agency_id;
-        }
-        
-        if (form_data.contact_id == "new")
-        {
-          const new_contact = 
-          { 
-            name: form_data.contact_name?.trim(),
-            phone: form_data.contact_phone?.trim(),
-            agency_id: parseInt(form_data.agency_id) || null,
-            email: form_data.contact_email?.trim(),
-          };
-          const new_contact_id = await Db.Insert(ctx.db, "contacts", new_contact);
-          form_data.contact_id = new_contact_id;
-        }
-        
-        const job =
-        {
-          link: form_data.link?.trim() || null,
-          company: form_data.company?.trim() || null,
-          duration: form_data.duration?.trim() || null,
-          source: form_data.source?.trim() || null,
-          description: form_data.description?.trim() || null,
-          id: job_id,
-          role_title: form_data.role_title?.trim() || null,
-          role_type: form_data.role_type?.trim() || null,
-          location: form_data.location?.trim() || null,
-          remuneration: parseFloat(form_data.remuneration) || null,
-          remuneration_unit: form_data.remuneration_unit?.trim() || null,
-          agency_id: parseInt(form_data.agency_id) || null,
-          contact_id: parseInt(form_data.contact_id) || null,
-          status: form_data.status || null
-        };
-
-        await Db.Save(ctx.db, "jobs", job);
-        await Render_Job_Items(ctx.db2);
+        form_data.id = job_id;
+        await ctx.Job.Save(ctx.db2, form_data);
+        await Render_Job_Items(ctx);
       }
     }
-  </script>
+
+    async function On_Click_Add_Note(e, job_id, ctx)
+    {
+      const form_data = await note_dialog.Show_Async();
+      if (!Utils.Is_Empty(form_data?.note))
+      {
+        const now = new Date();
+        const action =
+        {
+          job_id,
+          time_str: now.toISOString().split('T')[0],
+          timestamp: now.getTime(),
+          note: form_data.note
+        };
+        await Db.Insert(ctx.db, "action_logs", action);
+      }
+
+      if (!Utils.Is_Empty(form_data?.status))
+      {
+        await Db.Update(ctx.db, "jobs", { id: job_id, status: form_data.status });
+      }
+
+      await Render_Job_Items(ctx);
+    }
+
+</script>
 
 </head>
 

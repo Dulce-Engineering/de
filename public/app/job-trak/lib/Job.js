@@ -1,5 +1,6 @@
 class Job
 {
+  static table_name = "jobs";
   static job_status =
   [
     { id: "bookmarked", label: "Bookmarked", type: 0 },
@@ -17,9 +18,14 @@ class Job
     { id: "expired", label: "Expired", type: 1 },
   ];
 
+  static async Select_By_Id(db, id)
+  {
+    return await db.Select_By_Id(Job.table_name, id);
+  }
+
   static async Select_All_Extended_Sorted(db)
   {
-    const jobs = await db.Get_All("jobs");
+    const jobs = await db.Get_All(Job.table_name);
     const agencies = await db.Get_All("agencies");
     const contacts = await db.Get_All("contacts");
     const actionLogs = await db.Get_All("action_logs");
@@ -73,15 +79,65 @@ class Job
 
   static async Set_Update_Dates(db)
   {
-    const jobs = await db.Get_All("jobs");
+    const jobs = await db.Get_All(Job.table_name);
     for (const job of jobs)
     {
       const last_action = await Job.Get_Last_Update(db, job.id);
       job.last_update = last_action ? last_action.timestamp : 0;
-      await db.Update("jobs", job);
+      await db.Update(Job.table_name, job);
     }
   }
-  
+
+  static async Save(db, form_data)
+  {
+    let res = null;
+
+    if (form_data)
+    {
+      if (form_data.agency_id == "new")
+      {
+        const new_agency = { name: form_data.agency_name?.trim() || "New Agency" };
+        const new_agency_id = await db.Insert("agencies", new_agency);
+        form_data.agency_id = new_agency_id;
+      }
+
+      if (form_data.contact_id == "new")
+      {
+        const new_contact =
+        {
+          name: form_data.contact_name?.trim(),
+          phone: form_data.contact_phone?.trim(),
+          agency_id: parseInt(form_data.agency_id) || null,
+          email: form_data.contact_email?.trim(),
+        };
+        const new_contact_id = await db.Insert("contacts", new_contact);
+        form_data.contact_id = new_contact_id;
+      }
+
+      const job =
+      {
+        link: form_data.link?.trim() || null,
+        company: form_data.company?.trim() || null,
+        duration: form_data.duration?.trim() || null,
+        source: form_data.source?.trim() || null,
+        description: form_data.description?.trim() || null,
+        id: form_data.id,
+        role_title: form_data.role_title?.trim() || null,
+        role_type: form_data.role_type?.trim() || null,
+        location: form_data.location?.trim() || null,
+        remuneration: parseFloat(form_data.remuneration) || null,
+        remuneration_unit: form_data.remuneration_unit?.trim() || null,
+        agency_id: parseInt(form_data.agency_id) || null,
+        contact_id: parseInt(form_data.contact_id) || null,
+        status: form_data.status || null
+      };
+
+      res = await db.Save(Job.table_name, job);
+    }
+
+    return res;
+  }
+
   static async AI_Import(ctx, raw_text, notify_fn)
   {
     let res = null;
@@ -102,7 +158,7 @@ class Job
         job.contact_id = contact_id;
         job.status = job.status || "bookmarked";
         job.last_update = Date.now();
-        res = await ctx.db2.Insert_If_New("jobs", job, Fail_If);
+        res = await ctx.db2.Insert_If_New(Job.table_name, job, Fail_If);
         function Fail_If(j)
         {
           return (agency_id &&

@@ -1097,6 +1097,114 @@ class Utils
     }
   }
 
+  static Show_File(blob, filename)
+  {
+    const url = URL.createObjectURL(blob);
+
+    window.open(url, '_blank');
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
+  }
+
+  static Download_File(blob, filename)
+  {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  static Select_Files()
+  {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.multiple = true;
+    async function Files_Change(e, resolve_fn)
+    {
+      const files = Array.from(e.target.files);
+      if (files && files.length > 0)
+      {
+        resolve_fn(files);
+      }
+      else
+      {
+        resolve_fn(null);
+      }
+    }
+
+    const res = new Promise(On_Promise);
+    function On_Promise(resolve, reject)
+    {
+      input.onchange = (e) => Files_Change(e, resolve);
+      input.click();
+    }
+
+    return res;
+  }
+
+  static Blob_To_Base64(blob)
+  {
+    return new Promise((resolve, reject) =>
+    {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result.split(',')[1]);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  }
+
+  /**
+   * Converts a File object to a JSON-serializable object including content
+   * @param {File} file 
+   * @returns {Promise<Object>}
+   */
+  static async Serialize_File(file)
+  {
+    const promise = new Promise(On_Process);
+    function On_Process(resolve, reject)
+    {
+      const reader = new FileReader();
+
+      reader.onload = () =>
+      {
+        resolve({
+          name: file.name,
+          size: file.size,
+          type: file.type,
+          lastModified: file.lastModified,
+          content: reader.result // This is the base64 string
+        });
+      };
+
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    }
+
+    return promise;
+  }
+
+  /**
+   * Recreates a File object from serialized JSON data
+   * @param {Object} serialized - The object containing metadata and base64 content
+   * @returns {Promise<File>}
+   */
+  static async Deserialize_File(serialized)
+  {
+    // 1. Fetch the data URL to convert it back to a Blob
+    const response = await fetch(serialized.content);
+    const blob = await response.blob();
+
+    // 2. Reconstruct the File using the stored metadata
+    return new File([blob], serialized.name, {
+      type: serialized.type,
+      lastModified: serialized.lastModified
+    });
+  }
+
   // Geometry =======================================================
   
   static Calc_Arrival_Time(x1, y1, t1, x2, y2, v)

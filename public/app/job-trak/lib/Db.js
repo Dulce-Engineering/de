@@ -1,7 +1,78 @@
 class Db
 {
-  static async Clear_DB(db)
+  db = null;
+  schema = null;
+
+  async Clear()
   {
+    return Db.Clear(this.db, this.schema);
+  }
+
+  Delete(table_name, ids)
+  {
+    return Db.Delete(this.db, table_name, ids);
+  }
+
+  Delete_All(table_name)
+  {
+    return Db.Delete_All(this.db, table_name);
+  }
+
+  Get_All(table_name)
+  {
+    return Db.Get_All(this.db, table_name);
+  }
+
+  Get_Table(table_name, is_readonly)
+  {
+    return Db.Get_Table(this.db, table_name, is_readonly);
+  }
+
+  Insert(table_name, item)
+  {
+    return Db.Insert(this.db, table_name, item);
+  }
+
+  Insert_If_New(table_name, data, fn)
+  {
+    return Db.Insert_If_New(this.db, table_name, data, fn);
+  }
+
+  Insert_Items(table_name, items)
+  {
+    return Db.Insert_Items(this.db, table_name, items);
+  }
+
+  Save(table_name, item)
+  {
+    return Db.Save(this.db, table_name, item);
+  }
+
+  Save_To_IndexedDB(db_data, schema)
+  {
+    return Db.Save_To_IndexedDB(this.db, db_data, schema);
+  }
+
+  Select(table_name, fn)
+  {
+    return Db.Select(this.db, table_name, fn);
+  }
+
+  Select_By_Id(table_name, id)
+  {
+    return Db.Select_By_Id(this.db, table_name, id);
+  }
+
+  Update(table_name, new_item)
+  {
+    return Db.Update(this.db, table_name, new_item);
+  }
+
+  // static ===================================================================
+
+  static async Clear(db, schema)
+  {
+    const table_names = Object.keys(schema.stores);
     const tx = db.transaction(table_names, "readwrite");
 
     for (const storeName of table_names) 
@@ -17,13 +88,14 @@ class Db
     const promise = new Promise(On_Process);
     function On_Process(resolve, reject)
     {
-      const request = indexedDB.open("JobTrakDB", schema.version);
+      const request = indexedDB.open(schema.name, schema.version);
       request.onupgradeneeded = (e) => Db.On_Upgrade_Needed(e, schema);
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
     }
 
     const res = new Db();
+    res.schema = schema;
     res.db = await promise;
 
     return res;
@@ -34,7 +106,7 @@ class Db
     const promise = new Promise(On_Process);
     function On_Process(resolve, reject)
     {
-      const request = indexedDB.open("JobTrakDB", schema.version);
+      const request = indexedDB.open(schema.name, schema.version);
       request.onupgradeneeded = (e) => Db.On_Upgrade_Needed(e, schema);
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
@@ -82,11 +154,6 @@ class Db
     return next_id;
   }
 
-  async Select(table_name, fn)
-  {
-    return Db.Select(this.db, table_name, fn);
-  }
-
   static async Select(db, table_name, fn)
   {
     const items = await Db.Get_All(db, table_name);
@@ -103,11 +170,6 @@ class Db
     return res;
   }
 
-  Select_By_Id(table_name, id)
-  {
-    return Db.Select_By_Id(this.db, table_name, id);
-  }
-
   static Select_By_Id(db, table_name, id)
   {
     let res = null;
@@ -119,11 +181,6 @@ class Db
     }
 
     return res;
-  }
-
-  Save(table_name, item)
-  {
-    return Db.Save(this.db, table_name, item);
   }
 
   static Save(db, table_name, item)
@@ -174,11 +231,6 @@ class Db
     return res;
   }
 
-  Update(table_name, new_item)
-  {
-    return Db.Update(this.db, table_name, new_item);
-  }
-
   static async Update(db, table_name, new_item)
   {
     let res = null;
@@ -216,11 +268,6 @@ class Db
     return exists;
   }
 
-  async Insert_If_New(table_name, data, fn)
-  {
-    return Db.Insert_If_New(this.db, table_name, data, fn);
-  }
-
   static async Insert_If_New(db, table_name, data, fn)
   {
     let res = null;
@@ -237,8 +284,6 @@ class Db
 
     return res;
   }
-
-  // low level api ============================================================
 
   static Get_Req_Res(request)
   {
@@ -311,11 +356,6 @@ class Db
     const table = Db.Get_Table(db, table_name, false);
     const request = table.put(item);
     return Db.Get_Req_Res(request);
-  }
-
-  Get_All(table_name)
-  {
-    return Db.Get_All(this.db, table_name);
   }
 
   static Get_All(db, table_name)
