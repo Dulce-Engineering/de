@@ -1,0 +1,91 @@
+de-clock-2
+{
+  width: 180px;
+  height: 180px;
+  display: grid;
+  grid-template-columns: auto;
+  grid-template-rows: auto;
+  xborder: 2px solid #a00;
+  xborder-radius: 100%;
+  font-size: 0;
+  
+  .text
+  {
+    font-size: 1rem;
+    grid-column: 1;
+    grid-row: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  [cid="millis_dial"],
+  [cid="sec_dial"],
+  [cid="min_dial"],
+  [cid="hr_dial"]
+  {
+    grid-column: 1;
+    grid-row: 1;
+    align-self: center;
+    justify-self: center;
+    transform: rotateZ(-90deg);
+    fill: none;
+  }
+  [cid="millis_dial"]
+  {
+    stroke: #ff0;
+    stroke-width: 10px;
+    animation: de-clock-2-rotation 15s infinite linear;
+  }
+  [cid="sec_dial"]
+  {
+    stroke: #0f0;
+    stroke-width: 8px;
+    width: 138px;
+    height: 138px;
+  }
+  [cid="min_dial"]
+  {
+    stroke: #0c0;
+    stroke-width: 5px;
+    width: 152px;
+    height: 152px;
+  }
+  [cid="hr_dial"]
+  {
+    stroke: #090;
+    stroke-width: 5px;
+    width: 164px;
+    height: 164px;
+  }
+  [cid="month_name_span"]
+  {
+    font-size: 0.7rem;
+  }
+  [cid="date_span"]
+  {
+    font-size: 0.7rem;
+    margin: 0 0 5px 0
+  }
+  [cid="day_name_span"]
+  {
+    font-size: 0.9rem;
+  }
+  [cid="time_span"]
+  {
+    font-size: 0.7rem;
+  }
+}
+
+@keyframes de-clock-2-rotation 
+{
+  from 
+  {
+    transform: rotate(0deg) translateZ(-60px);
+  }
+  to 
+  {
+    transform: rotate(359deg) translateZ(-60px);
+  }
+}

@@ -11,7 +11,7 @@ import "../../../component/DeDialogForm/index.js";
 import "../../../component/DeDialogAlert/index.js";
 import "../../../component/DeDialogConfirm/index.js";
 import "../component/DeToolbarMenu/index.js";
-import "../component/DeInfo/index.js";*/
+import "../component/de-info/index.js";*/
 
 Main();
 async function Main()
