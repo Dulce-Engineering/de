@@ -21,9 +21,9 @@ class Contact
     return ctx.db2.Save(Contact.table_name, contact);
   }
 
-  static Delete(ctx, contact_id)
+  static Delete(ctx, id)
   {
-    return ctx.db2.Delete(Contact.table_name, [contact_id]);
+    return ctx.db2.Delete(Contact.table_name, [id]);
   }
 
   //Select

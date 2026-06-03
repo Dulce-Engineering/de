@@ -119,7 +119,6 @@
         db2: await Db.New(DB_SCHEMA),
         Job, Contact, Agency, Utils
       };
-      const db = await Db.Open_DB(ctx, DB_SCHEMA);
 
       Set_Options(note_status_select, job_status, s => s.id, s => s.label);
       Set_Options(job_status_select, job_status, s => s.id, s => s.label);
@@ -139,11 +138,11 @@
 
       jobs_menu.addEventListener("add", (e) => On_Click_Edit_Job(e, null, ctx));
       jobs_menu.addEventListener("ai", () => On_Click_AI_Add_Job(ctx));
-      add_company_btn.onclick = () => On_Click_Add_Company(ctx);
+      add_company_btn.onclick = (e) => On_Click_Add_Company(e, null, ctx);
 
       jobs_list.addEventListener("render", e => Render_Job_Item(e, ctx));
       contacts_list.addEventListener("render", e => Render_Contact_Item(e, ctx));
-      companies_list.addEventListener("render", e => Render_Company_Item(e));
+      companies_list.addEventListener("render", e => Render_Company_Item(e, ctx));
       edu_list.addEventListener("render", Render_Edu_Item);
       career_list.addEventListener("render", (e) => Render_Career_Item(ctx, e));
 
@@ -310,7 +309,7 @@
 
     async function On_Click_Career_Edit(ctx, career_id)
     {
-      const curr_career = await Db.Select_By_Id(ctx.db, "career", career_id);
+      const curr_career = await ctx.db2.Select_By_Id("career", career_id);
       const form_data = await career_dialog.Show_Async(curr_career);
       if (form_data)
       {
@@ -328,8 +327,8 @@
           end_date: form_data.end_date || null
         };
 
-        await Db.Update(ctx.db, "career", career);
-        await Render_Career(ctx.db);
+        await ctx.db2.Update("career", career);
+        await Render_Career(ctx);
       }
     }
 
@@ -403,39 +402,62 @@
       companies_list.value = companies;
     }
 
-    async function On_Click_Add_Company(ctx)
+    async function On_Click_Add_Company(event, id, ctx)
     {
-      const form_data = await company_dialog.Show_Async();
+      const curr_agency = await ctx.Agency.Select_By_Id(ctx, id);
+      const form_data = await company_dialog.Show_Async(curr_agency);
       if (form_data)
       {
-        const company =
+        form_data.id = id;
+        const is_saved = await ctx.Agency.Save(ctx, form_data);
+        if (is_saved)
         {
-          name: form_data.name?.trim() || null,
-          url: form_data.url?.trim() || null,
-          address: form_data.address?.trim() || null,
-          phone: form_data.phone?.trim() || null,
-          email: form_data.email?.trim() || null,
-          industry: form_data.industry?.trim() || null
-        };
-
-        await ctx.db2.Insert("agencies", company);
-        await Render_Companies(ctx);
-        Alert("Company added successfully.");
+          await Render_Companies(ctx);
+          Alert("Company saved successfully.");
+        }
+        else
+        {
+          Alert("Failed to save company.");
+        }
       }
     }
 
-    function Render_Company_Item(event)
+    async function On_Click_Delete_Company(e, agency_id, ctx)
+    {
+      const confirmed = confirm("Are you sure you want to delete this company?");
+      if (confirmed)
+      {
+        const is_deleted = await ctx.Agency.Delete(ctx, agency_id);
+        if (is_deleted)
+        {
+          await Render_Companies(ctx);
+          Alert("Company deleted successfully.");
+        }
+        else
+        {
+          Alert("Failed to delete company.");
+        }
+      }
+
+    }
+
+    function Render_Company_Item(event, ctx)
     {
       const item_elem = event.detail.item_elem;
       const agency = item_elem.item_obj;
+      const agency_id = agency.id;
 
       item_elem.agency_name_elem.textContent = agency.name || "Unnamed Company";
-      item_elem.agency_industry_elem.textContent = agency.industry ? `Industry: ${agency.industry}` : "";
       item_elem.agency_url_elem.textContent = agency.url || "No website";
       item_elem.agency_url_elem.href = agency.url || "#";
       item_elem.agency_phone_elem.textContent = agency.phone || "N/A";
       item_elem.agency_email_elem.textContent = agency.email || "N/A";
       item_elem.agency_address_elem.textContent = agency.address || "N/A";
+
+      Toggle_Field(agency.industry, item_elem.agency_industry_elem, item_elem.agency_industry_field);
+
+      item_elem.edit_company_btn.addEventListener("click", e => On_Click_Add_Company(e, agency_id, ctx));
+      item_elem.del_company_btn.addEventListener("click", e => On_Click_Delete_Company(e, agency_id, ctx));
     }
 
     // rendering ======================================================================
@@ -700,10 +722,10 @@
       item_elem.status_elem.textContent = job.status;
 
       item_elem.job_menu.addEventListener("attach", e => On_Click_Attach_Files(e, job_id, ctx));
-      item_elem.job_menu.addEventListener("view", e => On_Click_View_Job(e, job_id, ctx.db));
+      item_elem.job_menu.addEventListener("view", e => On_Click_View_Job(e, job_id, ctx));
       item_elem.job_menu.addEventListener("edit", e => On_Click_Edit_Job(e, job_id, ctx));
       item_elem.job_menu.addEventListener("delete", e => On_Click_Delete_Job(e, job_id, ctx));
-      item_elem.job_menu.addEventListener("download", e => On_Click_Download_Job(e, job_id, ctx.db));
+      item_elem.job_menu.addEventListener("download", e => On_Click_Download_Job(e, job_id, ctx));
       item_elem.job_menu.addEventListener("status", e => On_Click_Add_Note(e, job_id, ctx));
       item_elem.job_menu.addEventListener("gencv", e => On_Click_Generate_CV(e, job_id, ctx));
       item_elem.job_menu.addEventListener("genletter", e => On_Click_Generate_Cover_Letter(e, job_id, ctx));
@@ -755,14 +777,14 @@
       const confirmed = confirm("Are you sure you want to delete this attachment?");
       if (confirmed)
       {
-        Db.Delete(ctx.db, "attachments", [attachment.id]);
+        await ctx.db2.Delete("attachments", [attachment.id]);
         await Render_Job_Items(ctx);
       }
     }
 
-    async function On_Click_Download_Job(e, job_id, db)
+    async function On_Click_Download_Job(e, job_id, ctx)
     {
-      const job = await Db.Select_By_Id(db, "jobs", job_id);
+      const job = await ctx.db2.Select_By_Id("jobs", job_id);
 
       const filename = `job-trak-${new Date().toISOString().split('T')[0]}.json`;
       const json_string = JSON.stringify(job, null, 2);
@@ -788,7 +810,7 @@
           timestamp: Date.now()
         }));
 
-        await Db.Insert_Items(ctx.db, 'attachments', attachments);
+        await ctx.db2.Insert_Items('attachments', attachments);
         await Render_Job_Items(ctx);
         Alert(`${files.length} file${files.length === 1 ? '' : 's'} attached to the job.`);
       }
@@ -799,13 +821,13 @@
       const confirmed = confirm("Are you sure you want to delete this job?");
       if (confirmed)
       {
-        await Db.Delete(ctx.db, "jobs", [job_id]);
+        await ctx.db2.Delete("jobs", [job_id]);
         const attachment_ids =
-          await Db.Select_Ids(ctx.db, "attachments", a => a.job_id === job_id);
-        await Db.Delete(ctx.db, "attachments", attachment_ids);
+          await ctx.db2.Select_Ids("attachments", a => a.job_id === job_id);
+        await ctx.db2.Delete("attachments", attachment_ids);
         const action_log_ids =
-          await Db.Select_Ids(ctx.db, "action_logs", l => l.job_id === job_id);
-        await Db.Delete(ctx.db, "action_logs", action_log_ids);
+          await ctx.db2.Select_Ids("action_logs", l => l.job_id === job_id);
+        await ctx.db2.Delete("action_logs", action_log_ids);
 
         await Render_Job_Items(ctx);
         Alert("Job deleted successfully.");
@@ -824,15 +846,15 @@
       window.open(url, "_blank");
     }
 
-    async function On_Click_View_Job(event, job_id, db)
+    async function On_Click_View_Job(event, job_id, ctx)
     {
-      const curr_job = await Db.Select_By_Id(db, "jobs", job_id);
+      const curr_job = await ctx.db2.Select_By_Id("jobs", job_id);
 
       job_det_dialog.role_elem.innerText = curr_job.role_title;
       job_det_dialog.des_elem.innerText = curr_job.description || "No job description available.";
 
-      const contact = await Db.Select_By_Id(db, "contacts", curr_job.contact_id);
-      const agency = await Db.Select_By_Id(db, "agencies", curr_job.agency_id);
+      const contact = await ctx.db2.Select_By_Id("contacts", curr_job.contact_id);
+      const agency = await ctx.db2.Select_By_Id("agencies", curr_job.agency_id);
       job_det_dialog.contact_name_elem.textContent = contact?.name;
       job_det_dialog.contact_agency_elem.textContent = agency?.name;
       Toggle_Field(contact?.phone, job_det_dialog.contact_phone_elem, job_det_dialog.contact_phone_img);
@@ -848,17 +870,17 @@
 
     async function On_Click_Edit_Job(event, job_id, ctx)
     {
-      const agencies = await Db.Get_All(ctx.db, "agencies");
+      const agencies = await ctx.db2.Get_All("agencies");
       agencies.push({ id: "new", name: "New Agency" });
       Set_Options(job_agency_select, agencies, a => a.id, a => a.name);
       Toggle_New_Agency_Fields(false);
 
-      const contacts = await Db.Get_All(ctx.db, "contacts");
+      const contacts = await ctx.db2.Get_All("contacts");
       contacts.push({ id: "new", name: "New Contact" });
       Set_Options(job_contact_select, contacts, c => c.id, c => c.name);
       Toggle_New_Contact_Fields(false);
 
-      const job = await Db.Select_By_Id(ctx.db, "jobs", job_id);
+      const job = await ctx.db2.Select_By_Id("jobs", job_id);
       const form_data = await job_dialog.Show_Async(job);
       if (form_data)
       {
@@ -881,12 +903,12 @@
           timestamp: now.getTime(),
           note: form_data.note
         };
-        await Db.Insert(ctx.db, "action_logs", action);
+        await ctx.db2.Insert("action_logs", action);
       }
 
       if (!Utils.Is_Empty(form_data?.status))
       {
-        await Db.Update(ctx.db, "jobs", { id: job_id, status: form_data.status });
+        await ctx.db2.Update("jobs", { id: job_id, status: form_data.status });
       }
 
       await Render_Job_Items(ctx);
@@ -1004,8 +1026,8 @@
       </header>
       <details slot="item" class="company-item">
         <summary>
-          <b cid="agency_name_elem"></b>
-          <div><span cid="agency_industry_elem"></span></div>
+          <h2 cid="agency_name_elem"></h2>
+          <div cid="agency_industry_field">Industry: <span cid="agency_industry_elem"></span></div>
           <div class="menu">
             <button cid="edit_company_btn" class="img">
               <img src="image/edit.svg" title="Edit Company">
