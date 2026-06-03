@@ -334,5 +334,11 @@
     "datetime": 1779936225959,
     "id": "ddc43b10-9afd-4aec-9421-e8e1bff4501a",
     "query_id": "-frontend"
+  },
+  {
+    "count": 575,
+    "datetime": 1780447798518,
+    "id": "12a6001f-f297-409d-b027-62f1eb8ac4a3",
+    "query_id": "-frontend"
   }
 ]
