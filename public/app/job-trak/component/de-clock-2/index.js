@@ -23,13 +23,14 @@ class DeClock2 extends HTMLElement
   On_Tick_Clock()
   {
     let now = new Date();
-    let hr = now.getHours() % 12;
+    let hr = now.getHours();
     let min = now.getMinutes();
     let sec = now.getSeconds();
 
     this.sec_dial.value = sec;
     this.min_dial.value = min;
     this.hr_dial.value = hr;
+
     this.month_name_span.textContent = now.toLocaleString('default', { month: 'long' });
     this.date_span.textContent = now.getDate() + "/" + (now.getMonth() + 1) + "/" + now.getFullYear();
     this.day_name_span.textContent = now.toLocaleString('default', { weekday: 'long' });

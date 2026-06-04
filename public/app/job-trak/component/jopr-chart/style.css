@@ -1,0 +1,8 @@
+jopr-chart
+{
+  width: 160px;
+  height: 160px;
+  display: grid;
+  border: 1px solid #f00;
+  border-radius: 50%;
+}

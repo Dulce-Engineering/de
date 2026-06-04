@@ -77,8 +77,8 @@ button,
 de-input-list details,
 de-dialog-form dialog,
 de-dialog-alert dialog,
-.panel .details,
-.panel de-form,
+#profile_elem .details,
+#profile_elem de-form,
 .btn
 {
   border: 1px solid;
@@ -88,8 +88,8 @@ de-dialog-alert dialog,
 }
 button:hover,
 de-input-list details:hover,
-.panel .details:hover,
-.panel de-form:hover,
+#profile_elem .details:hover,
+#profile_elem de-form:hover,
 .btn:hover
 {
   border: 1px solid;
@@ -123,7 +123,7 @@ de-input-list details:hover,
 
   background-color: #000;
   font-family: octagonal-bold;
-  font-size: 22px;
+  font-size: 20px;
   letter-spacing: 1px;
 
   stroke: var(--main);
@@ -159,14 +159,13 @@ body
   box-sizing: border-box;
 }
 
-
 header 
 {
   display: grid;
-  grid-template-columns: auto auto auto;
+  grid-template-columns: 1fr auto 1fr;
   grid-template-rows: auto auto auto;
   width: 100%;
-  column-gap: 20px;
+  column-gap: 40px;
 
   nav
   {
@@ -179,6 +178,13 @@ header
     grid-column: 1 / 4;
     grid-row: 3;
     justify-self: center;
+    align-items: center;
+    xoverflow-x: 80px;
+    xdisplay: flex;
+    font-size: 2rem;
+    color: var(--highlight);
+    text-align: center;
+    height: 2.25rem;
   }
 
   jopr-chart
@@ -211,15 +217,6 @@ header
     grid-column: 2;
     grid-row: 1;
     justify-self: center;
-  }
-
-  output
-  {
-    height: 80px;
-    display: flex;
-    font-size: 2rem;
-    color: var(--highlight);
-    align-items: center;
   }
 }
 
@@ -268,17 +265,19 @@ footer {
   margin: 0 0 20px 0;
 }
 
-de-input-list, .panel
+de-input-list, #profile_elem
 {
-  display: block;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
   width: 100%;
-  xpadding: 0 40px 40px 40px;
   padding: 0;
   box-sizing: border-box;
 
   header
   {
-    margin: 0 0 20px 0;
+    xmargin: 0 0 20px 0;
+    margin: 0;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -397,6 +396,11 @@ de-input-list, .panel
   {
     flex-grow: 1;
   }
+
+  &.hidden 
+  {
+    display: none;
+  }
 }
 
 de-input-tree {
@@ -452,9 +456,10 @@ de-dialog-form, de-dialog-alert, de-form, de-toolbar-menu
     border-width: 3px;
     background-color: #000;
     color: var(--main);
-    padding: 30px 10px 30px 10px;
-    max-height: 90vh;
-    max-width: 90vw;
+    padding: 15px 20px 20px 20px;
+    box-sizing: border-box;
+    xmax-height: 90vh;
+    xmax-width: 90vw;
   }
   dialog::backdrop {
     background-color: var(--shade);
@@ -467,13 +472,14 @@ de-dialog-form, de-dialog-alert, de-form, de-toolbar-menu
   {
     margin: 0;
   }
-  label {
+  label 
+  {
     margin: 10px 0 0 0;
   }
   input, textarea, select, option
   {
     font-family: octagonal-bold;
-    font-size: 1.2rem;
+    font-size: 1rem;
     padding: 5px 10px;
     margin: 0;
     background: none;
@@ -510,6 +516,23 @@ de-dialog-form, de-dialog-alert, de-form, de-toolbar-menu
   &.wait dialog
   {
     background-color: #f00;
+  }
+}
+de-dialog-form main
+{
+  display: grid;
+  grid-template-columns: auto auto auto auto;
+  max-height: 75vh;
+  padding: 5px 10px 5px 5px;
+  gap: 10px;
+
+  label
+  {
+    justify-self: end;
+    align-self: center;
+    text-align: right;
+    margin: 0;
+    xgrid-column: span 2;
   }
 }
 
@@ -632,7 +655,7 @@ de-toolbar-menu
 
     button
     {
-      border: none;
+      --border-color: transparent;
     }
   }
   button
@@ -647,15 +670,6 @@ de-toolbar-menu
     display: inline-block;
     font-size: 0.85rem;
   }
-}
-
-jopr-chart
-{
-  width: 180px;
-  height: 180px;
-  display: grid;
-  border: 1px solid #f00;
-  border-radius: 50%;
 }
 
 .contact
@@ -705,6 +719,128 @@ jopr-chart
 #items
 {
   xopacity: 0.2;
+}
+#profile_form
+{
+  [name="linkedin_url"],
+  [name="seek_url"],
+  [name="address"],
+  [name="email"]
+  {
+    grid-column: span 3;
+  }
+
+  [cid="personal_summary_label"],
+  [cid="skills_label"],
+  [cid="interests_label"]
+  {
+    justify-self: start;
+  }
+  [cid="personal_summary_label"], [name="personal_summary"],
+  [cid="skills_label"], [name="skills"],
+  [cid="interests_label"], [name="interests"]
+  {
+    grid-column: span 4;
+  }
+}
+#job_dialog
+{
+  [name="link"],
+  [name="location"]
+  {
+    grid-column: span 3;
+  }
+  [cid="description_label"]
+  {
+    justify-self: start;
+  }
+  [cid="description_label"], [name="description"]
+  {
+    grid-column: span 4;
+  }
+  [cid="agency_name_label"], [name="agency_name"]
+  {
+    grid-row: 10;
+  }
+  [cid="contact_name_label"], [name="contact_name"]
+  {
+    grid-row: 10;
+  }
+  [cid="contact_phone_label"], [name="contact_phone"]
+  {
+    grid-row: 11;
+  }
+  [cid="contact_email_label"], [name="contact_email"]
+  {
+    grid-row: 12;
+  }
+  [cid="contact_name_label"],
+  [cid="contact_phone_label"],
+  [cid="contact_email_label"]
+  {
+    grid-column: 3;
+  }
+  [name="contact_name"],
+  [name="contact_phone"],
+  [name="contact_email"]
+  {
+    grid-column: 4;
+  }
+}
+#note_dialog
+{
+  [cid="note_label"], [name="note"]
+  {
+    grid-column: span 4;
+  }
+  [cid="note_label"]
+  {
+    justify-self: start;
+  }
+}
+#contact_dialog
+{
+  [name="email"],
+  [name="linkedin"]
+  {
+    grid-column: span 3;
+  }
+}
+#company_dialog
+{
+  [name="address"],
+  [name="url"],
+  [name="email"]
+  {
+    grid-column: span 3;
+  }
+  [cid="address_label"], [name="address"]
+  {
+    grid-row: 3;
+  }
+  [cid="url_label"], [name="url"]
+  {
+    grid-row: 4;
+  }
+  [cid="email_label"], [name="email"]
+  {
+    grid-row: 5;
+  }
+}
+#career_dialog
+{
+  [cid="tech_label"],
+  [cid="responsibilities_label"],
+  [cid="projects_label"]
+  {
+    justify-self: start;
+  }
+  [cid="tech_label"], [name="tech"],
+  [cid="responsibilities_label"], [name="responsibilities"],
+  [cid="projects_label"], [name="projects"]
+  {
+    grid-column: span 4;
+  }
 }
 
 /* large screen */
@@ -776,7 +912,7 @@ jopr-chart
     }
   }
 
-  de-input-list, .panel 
+  de-input-list, #profile_elem
   {
     padding: 0;
     margin: 10px 0 0 0;

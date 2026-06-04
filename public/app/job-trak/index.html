@@ -30,6 +30,7 @@
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="./component/de-info/style.css">
   <link rel="stylesheet" href="./component/de-clock-2/style.css">
+  <link rel="stylesheet" href="./component/jopr-chart/style.css">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -244,19 +245,6 @@
         profile_personal_summary.innerHTML = Str_To_HTML(profile.personal_summary || "N/A");
         profile_skills.textContent = profile.skills || "N/A";
         profile_interests.innerHTML = Str_To_HTML(profile.interests || "N/A");
-
-        // Set form value for editing
-        profile_form.value = 
-        {
-          name: profile.name || "",
-          address: profile.address || "",
-          seek_url: profile.seek_url || "",
-          linkedin_url: profile.linkedin_url || "",
-          residency_status: profile.residency_status || "",
-          personal_summary: profile.personal_summary || "",
-          skills: profile.skills || "",
-          interests: profile.interests || ""
-        };
       }
     }
 
@@ -336,21 +324,16 @@
 
     async function On_Click_Edit_Profile(ctx)
     {
-      profile_details.classList.add("hidden");
-      profile_form.classList.remove("hidden");
-
       const profiles = await ctx.db2.Get_All("profiles");
       const profile = profiles && profiles.length > 0 ? profiles[0] : null;
-      const form_data = await profile_form.Submit(profile);
+      const form_data = await profile_form.Show_Async(profile);
       if (form_data)
       {
-        await ctx.db2.Save("profiles", { ...form_data, id: profile?.id });
+        form_data.id = profile?.id;
+        await ctx.db2.Save("profiles", form_data);
         Alert("Profile saved successfully.");
         Render_Profile(ctx);
       }
-
-      profile_details.classList.remove("hidden");
-      profile_form.classList.add("hidden");
     }
 
     async function On_Click_Download_Profile(ctx)
@@ -480,16 +463,18 @@
       }
     }
 
-    function Toggle_New_Agency_Fields(is_new_agency)
+    function Toggle_New_Agency_Fields()
     {
+      const is_new_agency = job_agency_select.value === "new";
       if (is_new_agency == undefined)
         is_new_agency = job_agency_select.value === "new";
       new_agency_label.hidden = !is_new_agency;
       new_agency_input.hidden = !is_new_agency;
     }
 
-    function Toggle_New_Contact_Fields(is_new_contact)
+    function Toggle_New_Contact_Fields()
     {
+      const is_new_contact = job_contact_select.value === "new";
       if (is_new_contact == undefined)
         is_new_contact = job_contact_select.value === "new";
       contact_name_label.hidden = !is_new_contact;
@@ -1048,7 +1033,7 @@
       </details>
     </de-input-list>
 
-    <div id="profile_elem" class="panel hidden">
+    <div id="profile_elem" class="hidden">
 
       <header slot="header">
         <h2>Profile</h2>
@@ -1066,30 +1051,6 @@
         <p>Skills: <span id="profile_skills"></span></p>
         <p>Interests: <span id="profile_interests"></span></p>
       </div>
-      <de-form id="profile_form" class="hidden" hide-clr>
-        <label slot="fields">Name</label>
-        <input slot="fields" name="name" type="text" placeholder="Full name">
-        <label slot="fields">E-Mail</label>
-        <input slot="fields" name="email" type="email">
-        <label slot="fields">Phone</label>
-        <input slot="fields" name="phone" type="tel">
-        <label slot="fields">Website</label>
-        <input slot="fields" name="url" type="url">
-        <label slot="fields">Address</label>
-        <input slot="fields" name="address" type="text" placeholder="Street address">
-        <label slot="fields">Seek URL</label>
-        <input slot="fields" name="seek_url" type="url" placeholder="https://seek.com.au/profile/...">
-        <label slot="fields">LinkedIn URL</label>
-        <input slot="fields" name="linkedin_url" type="url" placeholder="https://linkedin.com/in/...">
-        <label slot="fields">Residency Status</label>
-        <input slot="fields" name="residency_status" type="text" placeholder="e.g., Permanent Resident">
-        <label slot="fields">Personal Summary</label>
-        <textarea slot="fields" name="personal_summary" placeholder="Tell us about yourself..." rows="4"></textarea>
-        <label slot="fields">Skills</label>
-        <textarea slot="fields" name="skills" placeholder="List your skills..." rows="4"></textarea>
-        <label slot="fields">Interests</label>
-        <textarea slot="fields" name="interests" placeholder="What are you interested in?" rows="4"></textarea>
-      </de-form>
 
       <de-input-list id="edu_list">
         <header slot="header">
@@ -1106,26 +1067,24 @@
         </details>
       </de-input-list>
 
-      <details>
-        <summary>
+      <de-input-list id="career_list">
+        <header slot="header">
           <h2>Career</h2>
           <de-toolbar-menu show-add show-delete show-filter show-sort>
           </de-toolbar-menu>
-        </summary>
-        <de-input-list id="career_list">
-          <details slot="item" class="">
-            <summary>
-              <h2 cid="career_company_elem"></h2>
-              <de-toolbar-menu cid="career_item_menu" show-edit show-delete></de-toolbar-menu>
-            </summary>
-            <div cid="career_title_elem" class="det_item"></div>
-            <div cid="career_time_elem" class="det_item"></div>
-            <div cid="career_tech_elem" class="det_item"></div>
-            <div class="det_item">Responsibilities<br><span cid="career_resp_elem"></span></div>
-            <div class="det_item">Projects<br><span cid="career_proj_elem"></span></div>
-          </details>
-        </de-input-list>
-      </details>
+        </header>
+        <details slot="item" class="">
+          <summary>
+            <h2 cid="career_company_elem"></h2>
+            <de-toolbar-menu cid="career_item_menu" show-edit show-delete></de-toolbar-menu>
+          </summary>
+          <div cid="career_title_elem" class="det_item"></div>
+          <div cid="career_time_elem" class="det_item"></div>
+          <div cid="career_tech_elem" class="det_item"></div>
+          <div class="det_item">Responsibilities<br><span cid="career_resp_elem"></span></div>
+          <div class="det_item">Projects<br><span cid="career_proj_elem"></span></div>
+        </details>
+      </de-input-list>
 
     </div>
 
@@ -1144,52 +1103,74 @@
   <footer>
     © Copyright Dulce Engineering 2025. All rights reserved. v1
   </footer>
+  
+  <de-dialog-form id="profile_form" hide-clr>
+    <label slot="fields">Name</label>
+    <input slot="fields" name="name" type="text" placeholder="Full name">
+    <label slot="fields">Phone</label>
+    <input slot="fields" name="phone" type="tel">
+    <label slot="fields">Website</label>
+    <input slot="fields" name="url" type="url">
+    <label slot="fields">Residency Status</label>
+    <input slot="fields" name="residency_status" type="text" placeholder="e.g., Permanent Resident">
+    <label slot="fields">E-Mail</label>
+    <input slot="fields" name="email" type="email">
+    <label slot="fields">Address</label>
+    <input slot="fields" name="address" type="text" placeholder="Street address">
+    <label slot="fields">Seek URL</label>
+    <input slot="fields" name="seek_url" type="url" placeholder="https://seek.com.au/profile/...">
+    <label cid="linkedin_url_label" slot="fields">LinkedIn URL</label>
+    <input slot="fields" name="linkedin_url" type="url" placeholder="https://linkedin.com/in/...">
+    <label cid="personal_summary_label" slot="fields">Personal Summary</label>
+    <textarea slot="fields" name="personal_summary" placeholder="Tell us about yourself..." rows="4"></textarea>
+    <label cid="skills_label" slot="fields">Skills</label>
+    <textarea slot="fields" name="skills" placeholder="List your skills..." rows="4"></textarea>
+    <label cid="interests_label" slot="fields">Interests</label>
+    <textarea slot="fields" name="interests" placeholder="What are you interested in?" rows="4"></textarea>
+  </de-dialog-form>
 
   <de-dialog-form id="job_dialog">
     <h2 slot="header">Add Job</h2>
     <label slot="fields">Role Title</label>
-    <input slot="fields" type="text" name="role_title" placeholder="Job title">
-    <label slot="fields">Link</label>
-    <input slot="fields" type="text" name="link" placeholder="Job link">
+    <input slot="fields" type="text" name="role_title">
     <label slot="fields">Role Type</label>
-    <input slot="fields" type="text" name="role_type" placeholder="e.g., Full-time, Contract">
-    <label slot="fields">Location</label>
-    <input slot="fields" type="text" name="location" placeholder="Job location">
+    <input slot="fields" type="text" name="role_type">
     <label slot="fields">Company</label>
-    <input slot="fields" type="text" name="company" placeholder="Company name">
+    <input slot="fields" type="text" name="company">
     <label slot="fields">Duration</label>
-    <input slot="fields" type="text" name="duration" placeholder="Job duration">
+    <input slot="fields" type="text" name="duration">
     <label slot="fields">Source</label>
-    <input slot="fields" type="text" name="source" placeholder="Job source">
-    <label slot="fields">Description</label>
-    <textarea slot="fields" name="description" placeholder="Job description" rows="4"></textarea>
+    <input slot="fields" type="text" name="source">
     <label slot="fields">Remuneration</label>
-    <input slot="fields" type="number" name="remuneration" placeholder="Salary/rate" step="0.01">
+    <input slot="fields" type="number" name="remuneration" step="0.01">
     <label slot="fields">Remuneration Unit</label>
     <input slot="fields" type="text" name="remuneration_unit" placeholder="e.g., AUD/year, $/hour">
-    
-    <label slot="fields">Agency</label>
-    <select slot="fields" id="job_agency_select" name="agency_id"></select>
-    <label slot="fields" id="new_agency_label" hidden>Agency Name</label>
-    <input slot="fields" id="new_agency_input" hidden type="text" name="agency_name">
-    
-    <label slot="fields">Contact</label>
-    <select id="job_contact_select" slot="fields" name="contact_id"></select>
-    <label slot="fields" id="contact_name_label" hidden>Contact Name</label>
-    <input slot="fields" id="contact_name_input" hidden type="text" name="contact_name">
-    <label slot="fields" id="contact_phone_label" hidden>Contact Phone</label>
-    <input slot="fields" id="contact_phone_input" hidden type="tel" name="contact_phone">
-    <label slot="fields" id="contact_email_label" hidden>Contact E-Mail</label>
-    <input slot="fields" id="contact_email_input" hidden type="email" name="contact_email">
-
     <label slot="fields">Status</label>
     <select id="job_status_select" slot="fields" name="status"></select>
+    <label slot="fields">Link</label>
+    <input slot="fields" type="text" name="link">
+    <label slot="fields">Location</label>
+    <input slot="fields" type="text" name="location">
+    <label cid="description_label" slot="fields">Description</label>
+    <textarea slot="fields" name="description" rows="4"></textarea>
+    <label cid="agency_id_label" slot="fields">Agency</label>
+    <select slot="fields" id="job_agency_select" name="agency_id"></select>
+    <label cid="agency_name_label" slot="fields" id="new_agency_label" hidden>Agency Name</label>
+    <input slot="fields" id="new_agency_input" hidden type="text" name="agency_name">
+    <label slot="fields">Contact</label>
+    <select id="job_contact_select" slot="fields" name="contact_id"></select>
+    <label cid="contact_name_label" slot="fields" id="contact_name_label" hidden>Contact Name</label>
+    <input slot="fields" id="contact_name_input" hidden type="text" name="contact_name">
+    <label cid="contact_phone_label" slot="fields" id="contact_phone_label" hidden>Contact Phone</label>
+    <input slot="fields" id="contact_phone_input" hidden type="tel" name="contact_phone">
+    <label cid="contact_email_label" slot="fields" id="contact_email_label" hidden>Contact E-Mail</label>
+    <input slot="fields" id="contact_email_input" hidden type="email" name="contact_email">
   </de-dialog-form>
 
   <de-dialog-form id="note_dialog">
     <h2 slot="header">Add Job Note</h2>
-    <label slot="fields">Note</label>
-    <textarea slot="fields" name="note" placeholder="Enter your note here..." rows="5"></textarea>
+    <label cid="note_label" slot="fields">Note</label>
+    <textarea slot="fields" name="note" rows="5"></textarea>
     <label slot="fields">Status</label>
     <select id="note_status_select" slot="fields" name="status"></select>
   </de-dialog-form>
@@ -1197,55 +1178,56 @@
   <de-dialog-form id="contact_dialog">
     <h2 slot="header">Add Contact</h2>
     <label slot="fields">Name</label>
-    <input slot="fields" type="text" name="name" placeholder="Contact name">
-    <label slot="fields">Email</label>
-    <input slot="fields" type="email" name="email" placeholder="Contact email">
+    <input slot="fields" type="text" name="name">
     <label slot="fields">Phone</label>
-    <input slot="fields" type="tel" name="phone" placeholder="Contact phone">
+    <input slot="fields" type="tel" name="phone">
     <label slot="fields">Position</label>
-    <input slot="fields" type="text" name="position" placeholder="Contact position">
-    <label slot="fields">LinkedIn</label>
-    <input slot="fields" type="text" name="linkedin" placeholder="Contact LinkedIn URL">
+    <input slot="fields" type="text" name="position">
     <label slot="fields">Agency</label>
     <select id="contact_agency_select" slot="fields" name="agency_id"></select>
+    <label cid="email_label" slot="fields">Email</label>
+    <input slot="fields" type="email" name="email">
+    <label cid="linkedin_label" slot="fields">LinkedIn</label>
+    <input slot="fields" type="text" name="linkedin">
   </de-dialog-form>
 
   <de-dialog-form id="company_dialog">
     <h2 slot="header">Add Agency / Company</h2>
     <label slot="fields">Name</label>
-    <input slot="fields" type="text" name="name" placeholder="Company name">
-    <label slot="fields">URL</label>
-    <input slot="fields" type="url" name="url" placeholder="https://example.com">
-    <label slot="fields">Address</label>
-    <input slot="fields" type="text" name="address" placeholder="Address">
+    <input slot="fields" type="text" name="name">
     <label slot="fields">Phone</label>
-    <input slot="fields" type="tel" name="phone" placeholder="Phone">
-    <label slot="fields">Email</label>
-    <input slot="fields" type="email" name="email" placeholder="Email">
+    <input slot="fields" type="tel" name="phone">
     <label slot="fields">Industry</label>
-    <input slot="fields" type="text" name="industry" placeholder="Industry sector">
+    <input slot="fields" type="text" name="industry">
+    <label cid="address_label" slot="fields">Address</label>
+    <input slot="fields" type="text" name="address">
+    <label cid="url_label" slot="fields">URL</label>
+    <input slot="fields" type="url" name="url">
+    <label cid="email_label" slot="fields">Email</label>
+    <input slot="fields" type="email" name="email">
   </de-dialog-form>
 
   <de-dialog-form id="career_dialog">
     <h2 slot="header">Add Career Experience</h2>
     <label slot="fields">Company</label>
-    <input slot="fields" type="text" name="company_name" placeholder="Company name">
+    <input slot="fields" type="text" name="company_name">
     <label slot="fields">Title</label>
-    <input slot="fields" type="text" name="role_titles" placeholder="Job title">
+    <input slot="fields" type="text" name="role_titles">
     <label slot="fields">Work Type</label>
     <select id="career_work_type_select" slot="fields" name="work_type"></select>
     <label slot="fields">Location</label>
-    <input slot="fields" type="text" name="location" placeholder="Location">
-    <label slot="fields">Technologies</label>
-    <textarea slot="fields" name="tech" placeholder="Technologies used..." rows="4"></textarea>
-    <label slot="fields">Responsibilities</label>
-    <textarea slot="fields" name="responsibilities" placeholder="Job responsibilities..." rows="4"></textarea>
-    <label slot="fields">Projects</label>
-    <textarea slot="fields" name="projects" placeholder="Projects worked on..." rows="4"></textarea>
+    <input slot="fields" type="text" name="location">
     <label slot="fields">Start Time</label>
     <input slot="fields" type="date" name="start_date">
     <label slot="fields">End Time</label>
     <input slot="fields" type="date" name="end_date">
+
+    <label cid="tech_label" slot="fields">Technologies</label>
+    <textarea slot="fields" name="tech" rows="4"></textarea>
+    <label cid="responsibilities_label" slot="fields">Responsibilities</label>
+    <textarea slot="fields" name="responsibilities" rows="4"></textarea>
+    <label cid="projects_label" slot="fields">Projects</label>
+    <textarea slot="fields" name="projects" rows="4"></textarea>
   </de-dialog-form>
 
   <de-dialog-form id="email_dialog">
