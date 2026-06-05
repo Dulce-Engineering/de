@@ -26,7 +26,15 @@ class Agency
     return ctx.db2.Delete(Agency.table_name, [id]);
   }
 
-  //Select
+  static async Select(ctx)
+  {
+    const agencies = await ctx.db2.Select(Agency.table_name);
+    if (agencies)
+    {
+      agencies.sort((a, b) => a.name.localeCompare(b.name));
+    }
+    return agencies;
+  }
 
   static Select_By_Id(ctx, id)
   {
@@ -58,6 +66,24 @@ class Agency
     }
 
     return res;
+  }
+
+  static async Get_Options(ctx)
+  {
+    let html = null;
+    const agencies = await Agency.Select(ctx);
+    if (agencies)
+    {
+      html = 
+        "<option>None</option>" +
+        "<option value='new'>New agency</option>";
+      for (const agency of agencies)
+      {
+        html += "<option value='" + agency.id + "'>" + agency.name + "</option>";
+      }
+    }
+
+    return html;
   }
 }
 

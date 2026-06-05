@@ -65,17 +65,6 @@ class DeDialogConfirm extends HTMLElement
       this.main_elem.innerText = msg;
     }
 
-    let text = this.ok_btn.innerText;
-    if (!this.Has_Text(text))
-    {
-      this.ok_btn.innerText = "OK";
-    }
-    text = this.cancel_btn.innerText;
-    if (!this.Has_Text(text))
-    {
-      this.cancel_btn.innerText = "Cancel";
-    }
-
     this.dlg.showModal();
 
     const promise = new Promise((resolve, reject) =>
@@ -128,9 +117,18 @@ class DeDialogConfirm extends HTMLElement
     {
       this.ok_btn.textContent = this.getAttribute("label-ok");
     }
+    else
+    {
+      this.ok_btn.textContent = "OK";
+    }
+
     if (this.hasAttribute("label-cancel"))
     {
       this.cancel_btn.textContent = this.getAttribute("label-cancel");
+    }
+    else
+    {
+      this.cancel_btn.textContent = "Cancel";
     }
   
     this.ok_btn.addEventListener("click", this.On_Click_OK_Btn);

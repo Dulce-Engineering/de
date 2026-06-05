@@ -448,7 +448,7 @@ de-input-tree {
   }
 }
 
-de-dialog-form, de-dialog-alert, de-form, de-toolbar-menu
+de-dialog-form, de-dialog-alert, de-form, de-toolbar-menu, de-dialog-confirm
 {
   dialog 
   {
@@ -485,6 +485,7 @@ de-dialog-form, de-dialog-alert, de-form, de-toolbar-menu
     background: none;
     color: var(--input-text);
     border: 1px solid var(--border);
+    color-scheme: dark;
   }
   textarea
   {
@@ -507,6 +508,13 @@ de-dialog-form, de-dialog-alert, de-form, de-toolbar-menu
   header
   {
     margin: 0 0 20px 0;
+    display: block;
+
+    img
+    {
+      width: 128px;
+      height: 128px;
+    }
   }
   footer 
   {
@@ -533,6 +541,30 @@ de-dialog-form main
     text-align: right;
     margin: 0;
     xgrid-column: span 2;
+  }
+}
+
+de-dialog-confirm
+{
+  header
+  {
+    text-align: center;
+    margin: 0;
+  }
+  dialog
+  {
+    border-color: #f00;
+    color: #f00;
+  }
+  button
+  {
+    --border-color: #f00;
+    color: #f00;
+  }
+  [cid="ok_btn"]
+  {
+    --border-color: #ff0;
+    color: #ff0;  
   }
 }
 
@@ -840,6 +872,20 @@ de-toolbar-menu
   [cid="projects_label"], [name="projects"]
   {
     grid-column: span 4;
+  }
+}
+#email_dialog
+{
+  [cid="email_text_label"], [name="email_text"]
+  {
+    grid-column: span 4;
+  }
+}
+#edu_dialog
+{
+  [name="title"], [name="institution"]
+  {
+    grid-column: span 3;
   }
 }
 

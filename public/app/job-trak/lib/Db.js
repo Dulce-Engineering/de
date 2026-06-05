@@ -157,7 +157,7 @@ class Db
   static async Select(db, table_name, fn)
   {
     const items = await Db.Get_All(db, table_name);
-    const res = items.filter(fn);
+    const res = fn ? items.filter(fn) : items;
 
     return res;
   }

@@ -26,7 +26,15 @@ class Contact
     return ctx.db2.Delete(Contact.table_name, [id]);
   }
 
-  //Select
+  static async Select(ctx)
+  {
+    const contacts = await ctx.db2.Select(Contact.table_name);
+    if (contacts)
+    {
+      contacts.sort((a, b) => Contact.Get_Name(a).localeCompare(Contact.Get_Name(b)));
+    }
+    return contacts;
+  }
 
   static Select_By_Id(ctx, id)
   {
@@ -59,6 +67,29 @@ class Contact
     }
 
     return res;
+  }
+
+  static async Get_Options(ctx)
+  {
+    let html = null;
+    const contacts = await Contact.Select(ctx);
+    if (contacts)
+    {
+      html =
+        "<option>None</option>" +
+        "<option value='new'>New contact</option>";
+      for (const contact of contacts)
+      {
+        html += "<option value='" + contact.id + "'>" + Contact.Get_Name(contact) + "</option>";
+      }
+    }
+
+    return html;
+  }
+
+  static Get_Name(contact)
+  {
+    return contact?.name || contact?.email || "Unknown Contact";
   }
 }
 

@@ -65,6 +65,7 @@
     import Job from "./lib/Job.js";
     import Contact from "./lib/Contact.js";
     import Agency from "./lib/Agency.js";
+    import Profile from "./lib/Profile.js";
     import "../../dedial/dedial.js";
     import "../../component/DeInputList/index3.js";
     import "../../component/DeForm/index.js";
@@ -120,7 +121,7 @@
       { 
         ai: await AI.New(fb_app, fb_ai),
         db2: await Db.New(DB_SCHEMA),
-        Job, Contact, Agency, Utils
+        Job, Contact, Agency, Utils, Profile
       };
 
       Set_Options(note_status_select, job_status, s => s.id, s => s.label);
@@ -131,35 +132,36 @@
       export_btn.onclick = () => On_Click_Export_Btn(ctx);
 
       jobs_btn.onclick = () => Show_View(jobs_list);
+      job_agency_select.addEventListener("change", Toggle_New_Agency_Fields);
+      job_contact_select.addEventListener("change", Toggle_New_Contact_Fields);
+      jobs_menu.addEventListener("add", (e) => On_Click_Edit_Job(e, null, ctx));
+      jobs_menu.addEventListener("ai", () => On_Click_AI_Add_Job(ctx));
+      jobs_list.addEventListener("render", e => Render_Job_Item(e, ctx));
+      Render_Job_Items(ctx);
+
       companies_btn.onclick = () => Show_View(companies_list);
+      add_company_btn.onclick = (e) => On_Click_Add_Company(e, null, ctx);
+      companies_list.addEventListener("render", e => Render_Company_Item(e, ctx));
+      Render_Companies(ctx);
+
       contacts_btn.onclick = () => Show_View(contacts_list);
+      add_contact_btn.onclick = (e) => On_Click_Edit_Contact(e, null, ctx);
+      contacts_list.addEventListener("render", e => Render_Contact_Item(e, ctx));
+      Render_Contacts(ctx);
+
       profile_btn.onclick = () => Show_View(profile_elem);
-      
       profile_menu.addEventListener("edit", () => On_Click_Edit_Profile(ctx));
       profile_menu.addEventListener("ai", () => On_Click_AI_Add_Profile(ctx));
       profile_menu.addEventListener("download", () => On_Click_Download_Profile(ctx));
-
-      jobs_menu.addEventListener("add", (e) => On_Click_Edit_Job(e, null, ctx));
-      jobs_menu.addEventListener("ai", () => On_Click_AI_Add_Job(ctx));
-      add_company_btn.onclick = (e) => On_Click_Add_Company(e, null, ctx);
-
-      jobs_list.addEventListener("render", e => Render_Job_Item(e, ctx));
-      contacts_list.addEventListener("render", e => Render_Contact_Item(e, ctx));
-      companies_list.addEventListener("render", e => Render_Company_Item(e, ctx));
-      edu_list.addEventListener("render", Render_Edu_Item);
-      career_list.addEventListener("render", (e) => Render_Career_Item(ctx, e));
-
-      job_agency_select.addEventListener("change", Toggle_New_Agency_Fields);
-      job_contact_select.addEventListener("change", Toggle_New_Contact_Fields);
-
-      Render_Job_Items(ctx);
-      Render_Companies(ctx);
       Render_Profile(ctx);
-      Render_Education(ctx);
-      Render_Career(ctx);
 
-      add_contact_btn.onclick = (e) => On_Click_Edit_Contact(e, null, ctx);
-      Render_Contacts(ctx);
+      edu_list_menu.addEventListener("add", (e) => On_Click_Update_Edu(e, null, ctx));
+      edu_list.addEventListener("render", (e) => Render_Edu_Item(e, ctx));
+      Render_Education(ctx);
+
+      career_list_menu.addEventListener("add", (e) => On_Click_Career_Edit(ctx, null));
+      career_list.addEventListener("render", (e) => Render_Career_Item(ctx, e));
+      Render_Career(ctx);
     }
 
     // events =========================================================================
@@ -248,80 +250,6 @@
       }
     }
 
-    async function Render_Career(ctx)
-    {
-      const career = await ctx.db2.Get_All("career");
-      career_list.value = career;
-    }
-
-    async function Render_Education(ctx)
-    {
-      const certificates = await ctx.db2.Get_All("education");
-      edu_list.value = certificates;
-    }
-
-    function Render_Career_Item(ctx, event)
-    {
-      const item_elem = event.detail.item_elem;
-      const job = item_elem.item_obj;
-      const job_id = job.id;
-
-      const start_time = job.start_date ? new Date(job.start_date) : null;
-      const start_time_str = Utils.To_Date_Str(start_time);
-      const end_time = job.end_date ? new Date(job.end_date) : null;
-      const end_time_str = Utils.To_Date_Str(end_time);
-      const duration_str = Duration_Str(start_time, end_time);
-      let time_str = Utils.Append_Str(start_time_str, end_time_str, " - ");
-      time_str = Utils.Append_Str(time_str, "(" + duration_str + ")", " ");
-      const role = Utils.Append_Str(job.role_titles, Work_Type_Label(job.work_type), " - ");
-      const summ = Utils.Append_Str(role, job.location, " - ");
-
-      item_elem.career_company_elem.textContent = job.company_name || "N/A";
-      item_elem.career_title_elem.textContent = summ || "N/A";
-      item_elem.career_time_elem.textContent = time_str || "N/A";
-      item_elem.career_tech_elem.textContent = job.tech || "N/A";
-      item_elem.career_resp_elem.innerHTML = Str_To_HTML(job.responsibilities || "N/A");
-      item_elem.career_proj_elem.innerHTML = Str_To_HTML(job.projects || "N/A");
-
-      item_elem.career_item_menu.addEventListener("edit", () => On_Click_Career_Edit(ctx, job_id));
-      //item_elem.career_item_menu.addEventListener("delete", On_Click_Career_Item_Delete);
-    }
-
-    function Render_Edu_Item(event)
-    {
-      const item_elem = event.detail.item_elem;
-      const edu = item_elem.item_obj;
-
-      const details = Utils.Append_Str(edu.institution, edu.year, " - ");
-      item_elem.edu_title_elem.textContent = edu.title || "Unnamed Education";
-      item_elem.edu_det_elem.textContent = details;
-    }
-
-    async function On_Click_Career_Edit(ctx, career_id)
-    {
-      const curr_career = await ctx.db2.Select_By_Id("career", career_id);
-      const form_data = await career_dialog.Show_Async(curr_career);
-      if (form_data)
-      {
-        const career =
-        {
-          id: career_id,
-          company_name: form_data.company_name?.trim() || null,
-          role_titles: form_data.role_titles?.trim() || null,
-          work_type: form_data.work_type?.trim() || null,
-          location: form_data.location?.trim() || null,
-          tech: form_data.tech?.trim() || null,
-          responsibilities: form_data.responsibilities?.trim() || null,
-          projects: form_data.projects?.trim() || null,
-          start_date: form_data.start_date || null,
-          end_date: form_data.end_date || null
-        };
-
-        await ctx.db2.Update("career", career);
-        await Render_Career(ctx);
-      }
-    }
-
     async function On_Click_Edit_Profile(ctx)
     {
       const profiles = await ctx.db2.Get_All("profiles");
@@ -379,6 +307,135 @@
       }
     }
 
+    async function Render_Education(ctx)
+    {
+      const certificates = await ctx.Profile.Edu_Select(ctx);
+      edu_list.value = certificates;
+    }
+
+    function Render_Edu_Item(event, ctx)
+    {
+      const item_elem = event.detail.item_elem;
+      const edu = item_elem.item_obj;
+      const edu_id = edu.id;
+
+      const details = Utils.Append_Str(edu.institution, edu.year, " - ");
+      item_elem.edu_title_elem.textContent = edu.title || "Unnamed Education";
+      item_elem.edu_det_elem.textContent = details;
+
+      item_elem.edu_item_menu.addEventListener("edit", (e) => On_Click_Update_Edu(e, edu_id, ctx));
+      item_elem.edu_item_menu.addEventListener("delete", (e) => On_Click_Delete_Edu(e, edu_id, ctx));
+    }
+
+    async function On_Click_Update_Edu(e, id, ctx)
+    {
+      const curr_edu = await ctx.Profile.Edu_Select_By_Id(ctx, id);
+      const form_data = await edu_dialog.Show_Async(curr_edu);
+      if (form_data)
+      {
+        form_data.id = id;
+        const is_saved = await ctx.Profile.Edu_Save(ctx, form_data);
+        if (is_saved)
+        {
+          await Render_Education(ctx);
+          Alert("Education saved successfully.");
+        }
+        else
+        {
+          Alert("Failed to save education.");
+        }
+      }
+    }
+
+    async function On_Click_Delete_Edu(e, id, ctx)
+    {
+      const confirmed = await warning_dlg.Confirm("Are you sure you want to delete this certificate?");
+      if (confirmed)
+      {
+        const is_deleted = await ctx.Profile.Edu_Delete(ctx, id);
+        if (is_deleted)
+        {
+          await Render_Education(ctx);
+          Alert("Certificate deleted successfully.");
+        }
+        else
+        {
+          Alert("Failed to delete certificate.");
+        }
+      }
+    }
+
+    async function Render_Career(ctx)
+    {
+      const career = await ctx.db2.Get_All("career");
+      career_list.value = career;
+    }
+
+    function Render_Career_Item(ctx, event)
+    {
+      const item_elem = event.detail.item_elem;
+      const job = item_elem.item_obj;
+      const job_id = job.id;
+
+      const start_time = job.start_date ? new Date(job.start_date) : null;
+      const start_time_str = Utils.To_Date_Str(start_time);
+      const end_time = job.end_date ? new Date(job.end_date) : null;
+      const end_time_str = Utils.To_Date_Str(end_time);
+      const duration_str = Duration_Str(start_time, end_time);
+      let time_str = Utils.Append_Str(start_time_str, end_time_str, " - ");
+      time_str = Utils.Append_Str(time_str, "(" + duration_str + ")", " ");
+      const role = Utils.Append_Str(job.role_titles, Work_Type_Label(job.work_type), " - ");
+      const summ = Utils.Append_Str(role, job.location, " - ");
+
+      item_elem.career_company_elem.textContent = job.company_name || "N/A";
+      item_elem.career_title_elem.textContent = summ || "N/A";
+      item_elem.career_time_elem.textContent = time_str || "N/A";
+      item_elem.career_tech_elem.textContent = job.tech || "N/A";
+      item_elem.career_resp_elem.innerHTML = Str_To_HTML(job.responsibilities || "N/A");
+      item_elem.career_proj_elem.innerHTML = Str_To_HTML(job.projects || "N/A");
+
+      item_elem.career_item_menu.addEventListener("edit", () => On_Click_Career_Edit(ctx, job_id));
+      item_elem.career_item_menu.addEventListener("delete", (e) => On_Click_Delete_Career(e, job_id, ctx));
+    }
+
+    async function On_Click_Career_Edit(ctx, id)
+    {
+      const curr_job = await ctx.Profile.Job_Select_By_Id(ctx, id);
+      const form_data = await career_dialog.Show_Async(curr_job);
+      if (form_data)
+      {
+        form_data.id = id;
+        const is_saved = await ctx.Profile.Job_Save(ctx, form_data);
+        if (is_saved)
+        {
+          await Render_Career(ctx);
+          Alert("Job saved successfully.");
+        }
+        else
+        {
+          Alert("Failed to save job.");
+        }
+      }
+    }
+
+    async function On_Click_Delete_Career(e, id, ctx)
+    {
+      const confirmed = await warning_dlg.Confirm("Are you sure you want to delete this job?");
+      if (confirmed)
+      {
+        const is_deleted = await ctx.Profile.Job_Delete(ctx, id);
+        if (is_deleted)
+        {
+          await Render_Career(ctx);
+          Alert("Job deleted successfully.");
+        }
+        else
+        {
+          Alert("Failed to delete job.");
+        }
+      }
+    }
+
     // companies ======================================================================
 
     async function Render_Companies(ctx)
@@ -409,7 +466,7 @@
 
     async function On_Click_Delete_Company(e, agency_id, ctx)
     {
-      const confirmed = confirm("Are you sure you want to delete this company?");
+      const confirmed = await warning_dlg.Confirm("Are you sure you want to delete this company?");
       if (confirmed)
       {
         const is_deleted = await ctx.Agency.Delete(ctx, agency_id);
@@ -423,7 +480,6 @@
           Alert("Failed to delete company.");
         }
       }
-
     }
 
     function Render_Company_Item(event, ctx)
@@ -610,8 +666,7 @@
 
     async function On_Click_Edit_Contact(event, contact_id, ctx)
     {
-      const agencies = await ctx.db2.Get_All("agencies");
-      Set_Options(contact_agency_select, agencies, a => a.id, a => a.name);
+      contact_agency_select.innerHTML = await ctx.Agency.Get_Options(ctx);
 
       const curr_contact = await ctx.Contact.Select_By_Id(ctx, contact_id);
       const form_data = await contact_dialog.Show_Async(curr_contact);
@@ -633,7 +688,7 @@
 
     async function On_Click_Delete_Contact(event, contact_id, ctx)
     {
-      const confirmed = confirm("Are you sure you want to delete this contact?");
+      const confirmed = await warning_dlg.Confirm("Are you sure you want to delete this contact?");
       if (confirmed)
       {
         const is_deleted = await ctx.Contact.Delete(ctx, contact_id);
@@ -761,7 +816,7 @@
 
     async function On_Click_Delete_Attachment(ctx, attachment)
     {
-      const confirmed = confirm("Are you sure you want to delete this attachment?");
+      const confirmed = await warning_dlg.Confirm("Are you sure you want to delete this attachment?");
       if (confirmed)
       {
         await ctx.db2.Delete("attachments", [attachment.id]);
@@ -805,7 +860,7 @@
 
     async function On_Click_Delete_Job(event, job_id, ctx)
     {
-      const confirmed = confirm("Are you sure you want to delete this job?");
+      const confirmed = await warning_dlg.Confirm("Are you sure you want to delete this job?");
       if (confirmed)
       {
         await ctx.db2.Delete("jobs", [job_id]);
@@ -857,14 +912,10 @@
 
     async function On_Click_Edit_Job(event, job_id, ctx)
     {
-      const agencies = await ctx.db2.Get_All("agencies");
-      agencies.push({ id: "new", name: "New Agency" });
-      Set_Options(job_agency_select, agencies, a => a.id, a => a.name);
+      job_agency_select.innerHTML = await ctx.Agency.Get_Options(ctx);
       Toggle_New_Agency_Fields(false);
 
-      const contacts = await ctx.db2.Get_All("contacts");
-      contacts.push({ id: "new", name: "New Contact" });
-      Set_Options(job_contact_select, contacts, c => c.id, c => c.name);
+      job_contact_select.innerHTML = await ctx.Contact.Get_Options(ctx);
       Toggle_New_Contact_Fields(false);
 
       const job = await ctx.db2.Select_By_Id("jobs", job_id);
@@ -942,8 +993,7 @@
     <de-input-list id="jobs_list">
       <header slot="header">
         <h2>Jobs</h2>
-        <de-toolbar-menu id="jobs_menu" show-add show-ai show-filter show-sort show-upload>
-        </de-toolbar-menu>
+        <de-toolbar-menu id="jobs_menu" show-add show-ai show-upload></de-toolbar-menu>
       </header>
       <details slot="item" class="job-item">
         <summary>
@@ -1055,13 +1105,12 @@
       <de-input-list id="edu_list">
         <header slot="header">
           <h2>Education</h2>
-          <de-toolbar-menu show-add show-delete show-filter show-sort>
-          </de-toolbar-menu>
+          <de-toolbar-menu id="edu_list_menu" show-add></de-toolbar-menu>
         </header>
         <details slot="item" class="">
           <summary>
             <h2 cid="edu_title_elem"></h2>
-            <de-toolbar-menu show-edit show-delete></de-toolbar-menu>
+            <de-toolbar-menu cid="edu_item_menu" show-edit show-delete></de-toolbar-menu>
           </summary>
           <div cid="edu_det_elem"></div>
         </details>
@@ -1070,8 +1119,7 @@
       <de-input-list id="career_list">
         <header slot="header">
           <h2>Career</h2>
-          <de-toolbar-menu show-add show-delete show-filter show-sort>
-          </de-toolbar-menu>
+          <de-toolbar-menu id="career_list_menu" show-add></de-toolbar-menu>
         </header>
         <details slot="item" class="">
           <summary>
@@ -1232,10 +1280,10 @@
 
   <de-dialog-form id="email_dialog">
     <h2 slot="header">Extract Job from Text</h2>
-    <label slot="fields">Paste Text</label>
-    <textarea slot="fields" name="email_text" placeholder="Paste the job email content here..." rows="10"></textarea>
-    <p slot="fields" style="font-size: 0.9em; color: #666;">AI will attempt to extract job details, contact info, and
-      agency details from the email text.</p>
+    <textarea slot="fields" name="email_text" rows="10"></textarea>
+    <p cid="email_text_label" slot="fields">
+      AI will attempt to extract job details, contact info, and
+      agency details from the given text.</p>
   </de-dialog-form>
 
   <de-dialog-alert id="job_det_dialog">
@@ -1251,7 +1299,21 @@
     <span cid="des_elem" slot="body"></span>
   </de-dialog-alert>
 
+  <de-dialog-form id="edu_dialog">
+    <h2 slot="header">Certificate Details</h2>
+    <label slot="fields">Title</label>
+    <input slot="fields" type="text" name="title">
+    <label slot="fields">Institution</label>
+    <input slot="fields" type="text" name="institution">
+    <label slot="fields">Year</label>
+    <input slot="fields" type="number" name="year" min="1900" max="3000" step="1">
+  </de-dialog-form>
+
   <de-info id="info_elem"></de-info>
+
+  <de-dialog-confirm id="warning_dlg">
+    <img src="image/red/warning.svg" slot="header">
+  </de-dialog-confirm>
 
 </body>
 
