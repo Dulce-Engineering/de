@@ -1,6 +1,6 @@
 class Profile
 {
-  static table_name = "template";
+  static table_name = "profiles";
   static edu_table_name = "education";
   static job_table_name = "career";
 
@@ -9,14 +9,14 @@ class Profile
 
   static Save(ctx, form_data)
   {
-    const obj =
+    /*const obj =
     {
       id: form_data.id,
       name: form_data.name?.trim() || null,
       url: form_data.url?.trim() || null,
-    };
+    };*/
 
-    return ctx.db2.Save(Profile.table_name, obj);
+    return ctx.db2.Save(Profile.table_name, form_data);
   }
 
   static Edu_Save(ctx, form_data)
@@ -66,14 +66,15 @@ class Profile
     return ctx.db2.Delete(Profile.job_table_name, [id]);
   }
 
-  static async Select(ctx)
+  static async Select_First(ctx)
   {
-    const agencies = await ctx.db2.Select(Profile.table_name);
-    if (agencies)
+    let profile = null;
+    const profiles = await ctx.db2.Select(Profile.table_name);
+    if (profiles)
     {
-      agencies.sort((a, b) => a.name.localeCompare(b.name));
+      profile = profiles[0];
     }
-    return agencies;
+    return profile;
   }
 
   static async Edu_Select(ctx)
@@ -84,6 +85,16 @@ class Profile
       certificates.sort((a, b) => a.year - b.year);
     }
     return certificates;
+  }
+
+  static async Job_Select(ctx)
+  {
+    const jobs = await ctx.db2.Select(Profile.job_table_name);
+    if (jobs)
+    {
+      jobs.sort((a, b) => a.start_date - b.start_date);
+    }
+    return jobs;
   }
 
   static Select_By_Id(ctx, id)

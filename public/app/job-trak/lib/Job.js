@@ -23,13 +23,13 @@ class Job
     return await db.Select_By_Id(Job.table_name, id);
   }
 
-  static async Select_All_Extended_Sorted(db)
+  static async Select_All_Extended_Sorted(ctx)
   {
-    const jobs = await db.Get_All(Job.table_name);
-    const agencies = await db.Get_All("agencies");
-    const contacts = await db.Get_All("contacts");
-    const actionLogs = await db.Get_All("action_logs");
-    const attachments = await db.Get_All("attachments");
+    const jobs = await ctx.db2.Get_All(Job.table_name);
+    const agencies = await ctx.db2.Get_All("agencies");
+    const contacts = await ctx.db2.Get_All("contacts");
+    const actionLogs = await ctx.db2.Get_All("action_logs");
+    const attachments = await ctx.db2.Get_All("attachments");
 
     const enrichedJobs = jobs.map(Add_Details);
     function Add_Details(job) 

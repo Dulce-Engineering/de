@@ -234,11 +234,9 @@
 
     async function Render_Profile(ctx)
     {
-      const profiles = await ctx.db2.Get_All("profiles");
-      if (profiles)
+      const profile = await ctx.Profile.Select_First(ctx);
+      if (profile)
       {
-        const profile = profiles[0] || {}; // Assume first profile
-
         profile_name.textContent = profile.name || "N/A";
         profile_address.textContent = profile.address || "N/A";
         profile_seek_url.textContent = profile.seek_url || "N/A";
@@ -252,23 +250,29 @@
 
     async function On_Click_Edit_Profile(ctx)
     {
-      const profiles = await ctx.db2.Get_All("profiles");
-      const profile = profiles && profiles.length > 0 ? profiles[0] : null;
+      const profile = await ctx.Profile.Select_First(ctx);
       const form_data = await profile_form.Show_Async(profile);
       if (form_data)
       {
         form_data.id = profile?.id;
-        await ctx.db2.Save("profiles", form_data);
-        Alert("Profile saved successfully.");
-        Render_Profile(ctx);
+        const is_saved = await ctx.Profile.Save(ctx, form_data);
+        if (is_saved)
+        {
+          await Render_Profile(ctx);
+          Alert("Profile saved successfully.");
+        }
+        else
+        {
+          Alert("Failed to save profile.");
+        }
       }
     }
 
     async function On_Click_Download_Profile(ctx)
     {
-      const profiles = await ctx.db2.Get_All("profiles");
-      const education = await ctx.db2.Get_All("education");
-      const career = await ctx.db2.Get_All("career");
+      const employee_profile = await ctx.Profile.Select_First(ctx);
+      const education = await ctx.Profile.Edu_Select(ctx);
+      const career = await ctx.Profile.Job_Select(ctx);
       for (const job of career)
       {
         job.start_date = job.start_date ? new Date(job.start_date).toISOString().split('T')[0] : null;
@@ -276,7 +280,7 @@
       }
       const employee =
       {
-        employee_profile: profiles[0],
+        employee_profile,
         education,
         job_history: career
       };
@@ -367,8 +371,8 @@
 
     async function Render_Career(ctx)
     {
-      const career = await ctx.db2.Get_All("career");
-      career_list.value = career;
+      const jobs = await ctx.Profile.Job_Select(ctx);
+      career_list.value = jobs;
     }
 
     function Render_Career_Item(ctx, event)
@@ -440,7 +444,7 @@
 
     async function Render_Companies(ctx)
     {
-      const companies = await ctx.db2.Get_All("agencies");
+      const companies = await ctx.Agency.Select(ctx);
       companies_list.value = companies;
     }
 
@@ -708,7 +712,7 @@
 
     async function Render_Job_Items(ctx)
     {
-      jobs_list.value = await Job.Select_All_Extended_Sorted(ctx.db2);
+      jobs_list.value = await Job.Select_All_Extended_Sorted(ctx);
     }
 
     function Render_Job_Item(event, ctx)
