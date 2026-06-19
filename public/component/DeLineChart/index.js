@@ -50,13 +50,13 @@ class DeLineChart extends HTMLElement
   plot_width = 800;
   plot_height = 200;
 
-  padding_top = 10;
-  padding_right = 40;
-  padding_bottom = 60;
-  padding_left = 80;
+  padding_top = 10; // top spacing from plot area
+  padding_right = 40; // right spacing from plot area
+  padding_bottom = 60; // bottom spacing from axis line
+  padding_left = 80; // left spacing from axis line
 
-  padding_axis = 20;
-  overhang_axis = 10;
+  padding_axis = 20; // space between data plot area and x/y axis lines
+  overhang_axis = 10; // extra distance start axis line so they cross
 
   data_bounds = null;
   // attr: title = "Title";
@@ -353,62 +353,20 @@ class DeLineChart extends HTMLElement
     return nearestPoint;
   }
 
-  /**
-   * Calculates the X offset for the SVG viewBox to account for axis labels and padding.
-   *
-   * @returns {number} X offset value for SVG viewBox
-   * @private
-   */
-  Calc_SVG_X_Offset()
+  Calc_View_Box()
   {
     const x = 0 - this.padding_axis - this.padding_left;
-    return x;
-  }
-
-  /**
-   * Calculates the Y offset for the SVG viewBox to account for axis labels and padding.
-   *
-   * @returns {number} Y offset value for SVG viewBox
-   * @private
-   */
-  Calc_SVG_Y_Offset()
-  {
     const y = 0 - this.padding_axis - this.padding_bottom;
-    return y;
-  }
-
-  /**
-   * Calculates the total width needed for the SVG viewBox.
-   * Includes plot area, padding, and axis space.
-   *
-   * @returns {number} Total width for SVG viewBox
-   * @private
-   */
-  Calc_SVG_Width()
-  {
-    const w = 
+    const w =
       this.plot_width + // data rendering width
       (this.padding_left + this.padding_right) + // outer padding for axes
       this.padding_axis; // inner padding for axes
-
-    return w;
-  }
-
-  /**
-   * Calculates the total height needed for the SVG viewBox.
-   * Includes plot area, padding, and axis space.
-   *
-   * @returns {number} Total height for SVG viewBox
-   * @private
-   */
-  Calc_SVG_Height()
-  {
-    const h = 
+    const h =
       this.plot_height + // data rendering height
-      (this.padding_top + this.padding_bottom) + 
+      (this.padding_top + this.padding_bottom) +
       this.padding_axis;
 
-    return h;
+    return { x, y, w, h };
   }
 
   // events ===================================================================
@@ -430,8 +388,10 @@ class DeLineChart extends HTMLElement
     const elem_y = (rect.top + rect.height) - event.clientY;
     const elem_pt = { x: elem_x, y: elem_y };
 
-    const svg_x = (elem_x / rect.width * this.Calc_SVG_Width()) + this.Calc_SVG_X_Offset();
-    const svg_y = (elem_y / rect.height * this.Calc_SVG_Height()) + this.Calc_SVG_Y_Offset();
+    // map page/element coordinates to viewbox
+    const vb = this.Calc_View_Box();
+    const svg_x = (elem_x / rect.width * vb.w) + vb.x;
+    const svg_y = (elem_y / rect.height * vb.h) + vb.y;
     const svg_pt = { x: svg_x, y: svg_y };
 
     const data_pt = this.Map_SVG_Point_To_Data(svg_pt);
@@ -448,7 +408,6 @@ class DeLineChart extends HTMLElement
     }
 
     this.dispatchEvent(new CustomEvent("point-selected", {detail: nearest_data_pts}));
-    
   }
 
   // rendering ================================================================
@@ -505,10 +464,7 @@ class DeLineChart extends HTMLElement
   {
     if (this.isConnected)
     {
-      const x = this.Calc_SVG_X_Offset();
-      const y = this.Calc_SVG_Y_Offset();
-      const w = this.Calc_SVG_Width();
-      const h = this.Calc_SVG_Height();
+      const vb = this.Calc_View_Box();
       const title = this.getAttribute("title") || "Title";
       //console.log("Render(): x, y, w, h =", x, y, w, h);
 
@@ -519,7 +475,7 @@ class DeLineChart extends HTMLElement
         </h1>
         <svg 
           cid="svg" 
-          viewBox="${x} ${y} ${w} ${h}" 
+          viewBox="${vb.x} ${vb.y} ${vb.w} ${vb.h}" 
           style="transform: scale(1, -1);"
           preserveAspectRatio="none"
         >
@@ -544,7 +500,7 @@ class DeLineChart extends HTMLElement
    */
   Render_Chart() 
   {
-    if (this.isConnected)
+    if (this.isConnected && this.svg)
     {
       this.svg.replaceChildren();
       if (this.data && Object.keys(this.data).length > 0) 
@@ -619,9 +575,11 @@ class DeLineChart extends HTMLElement
       {
         // Render straight line segments
         pathData = `M ${points[0].x},${points[0].y}`;
+        console.log("x, y:", data[0].x, data[0].y, "=>", points[0].x, points[0].y);
         for (let i = 1; i < points.length; i++)
         {
           pathData += ` L ${points[i].x},${points[i].y}`;
+          console.log("x, y:", data[0].x, data[0].y, "=>", points[i].x, points[i].y);
         }
       }
       else
@@ -711,17 +669,22 @@ class DeLineChart extends HTMLElement
     xAxis.classList.add("axis-line");
     xAxis.classList.add("axis-x");
 
-    const x = x1 + 40;
-    const y = y1 - 20;
-    const label_elem = document.createElementNS("http://www.w3.org/2000/svg", "text");
-    label_elem.setAttribute("x", x);
-    label_elem.setAttribute("y", y);
-    label_elem.setAttribute("alignment-baseline", "hanging");
-    label_elem.setAttribute("transform-origin", `${x} ${y}`);
-    label_elem.setAttribute("transform", "scale(1, -1)");
-    label_elem.classList.add("axis-label");
-    label_elem.classList.add("axis-x");
-    label_elem.innerHTML = this.getAttribute("x-label") || "X Axis";
+    let label_elem = null;
+    const show_label = !this.hasAttribute("hide-labels");
+    if (show_label)
+    {
+      const x = x1 + 40;
+      const y = y1 - 20;
+      label_elem = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      label_elem.setAttribute("x", x);
+      label_elem.setAttribute("y", y);
+      label_elem.setAttribute("alignment-baseline", "hanging");
+      label_elem.setAttribute("transform-origin", `${x} ${y}`);
+      label_elem.setAttribute("transform", "scale(1, -1)");
+      label_elem.classList.add("axis-label");
+      label_elem.classList.add("axis-x");
+      label_elem.innerHTML = this.getAttribute("x-label") || "X Axis";
+    }
 
     return [xAxis, label_elem];
   }
@@ -745,16 +708,21 @@ class DeLineChart extends HTMLElement
     yAxis.classList.add("axis-line");
     yAxis.classList.add("axis-y");
 
-    const x = x1 - 20;
-    const y = y1 + 40;
-    const label_elem = document.createElementNS("http://www.w3.org/2000/svg", "text");
-    label_elem.setAttribute("x", x);
-    label_elem.setAttribute("y", y);
-    label_elem.setAttribute("transform-origin", `${x} ${y}`);
-    label_elem.setAttribute("transform", "scale(1, -1), rotate(-90)");
-    label_elem.classList.add("axis-label");
-    label_elem.classList.add("axis-y");
-    label_elem.innerHTML = this.getAttribute("y-label") || "Y Axis";
+    let label_elem = null;
+    const show_label = !this.hasAttribute("hide-labels");
+    if (show_label)
+    {
+      const x = x1 - 20;
+      const y = y1 + 40;
+      label_elem = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      label_elem.setAttribute("x", x);
+      label_elem.setAttribute("y", y);
+      label_elem.setAttribute("transform-origin", `${x} ${y}`);
+      label_elem.setAttribute("transform", "scale(1, -1), rotate(-90)");
+      label_elem.classList.add("axis-label");
+      label_elem.classList.add("axis-y");
+      label_elem.innerHTML = this.getAttribute("y-label") || "Y Axis";
+    }
 
     return [yAxis, label_elem];
   }
