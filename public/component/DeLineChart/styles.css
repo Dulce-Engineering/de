@@ -17,7 +17,7 @@ de-line-chart {
   .data-line {
     --c0: #000;
 
-    stroke-width: 2px;
+    stroke-width: 1px;
     fill: none;
   }
 
@@ -29,11 +29,11 @@ de-line-chart {
   .axis-label {
     stroke: none;
     fill: #000;
-    font-size: 2rem;
+    font-size: 1rem;
   }
 
   .axis-line {
     stroke: #000;
-    stroke-width: 2px;
+    stroke-width: 1px;
   }
 }

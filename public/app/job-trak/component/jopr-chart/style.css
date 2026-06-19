@@ -1,8 +1,84 @@
-jopr-chart
+de-line-chart
 {
-  width: 160px;
-  height: 160px;
+  width: 180px;
+  height: 180px;
   display: grid;
-  border: 1px solid #f00;
-  border-radius: 50%;
+  grid-template-columns: auto;
+  grid-template-rows: auto;
+  justify-items: center;
+  align-items: center;
+  border: 2px solid #a00;
+  border-radius: 100%;
+  font-size: 0;
+
+  svg[cid="svg"]
+  {
+    height: 65%;
+    width: 65%;
+    xborder: 1px solid #f00;
+    grid-column: 1 / 2;
+    grid-row: 1 / 2;
+  }
+
+  .title
+  {
+    grid-column: 1 / 2;
+    grid-row: 1 / 2;
+    font-size: 1rem;
+    transform: none;
+    letter-spacing: 0;
+    line-height: inherit;
+    background-image: none;
+    background-clip: initial;
+    color: inherit;
+    font-family: inherit;
+    text-align: center;
+    z-index: 1;
+
+    .trend
+    {
+      width: 72px;
+      height: 72px;
+    }
+  }
+
+  .input-mask 
+  {
+    display: none;
+    stroke: none;
+    fill: #0000;
+  }
+  .highlight 
+  {
+    /*visibility: hidden;*/
+    display: none;
+    stroke: none;
+    fill: #ff08;
+  }
+  .axis-label 
+  {
+    stroke: none;
+    fill: #fff;
+    font-size: 1rem;
+  }
+
+  .data-line 
+  {
+    --c0: url(#data_gradient);
+
+    stroke-width: 2px;
+    fill: none;
+  }
+
+  .data-point 
+  {
+    stroke: none;
+    fill: none;
+  }
+
+  .axis-line 
+  {
+    stroke: #fff;
+    stroke-width: 1px;
+  }
 }

@@ -72,10 +72,12 @@
     import "../../component/DeDialogForm/index.js";
     import "../../component/DeDialogAlert/index.js";
     import "../../component/DeDialogConfirm/index.js";
+    import "../../component/DeLineChart/index.js";
     import "./component/DeToolbarMenu/index.js";
     import "./component/de-info/index.js";
     import "./component/de-clock-2/index.js";
     import DB_SCHEMA from "./db/schema.js";
+    import * as Stats from "../job-woper/lib/index.js";
 
     const job_status =
     [
@@ -162,9 +164,48 @@
       career_list_menu.addEventListener("add", (e) => On_Click_Career_Edit(ctx, null));
       career_list.addEventListener("render", (e) => Render_Career_Item(ctx, e));
       Render_Career(ctx);
+
+      Update_Chart(ctx);
     }
 
     // events =========================================================================
+
+    async function Update_Chart(ctx)
+    {
+      const queries = await Stats.Query.Select_All();
+      const seek_queries = queries.filter(q => q.src == "seek");
+      const random_index = Math.floor(Math.random() * seek_queries.length);
+      const query = seek_queries[random_index];
+      console.log("query =", query);
+      const query_id = query.id;
+      const one_week_ago = Date.now() - Utils.MILLIS_WEEK;
+      const data = await Stats.Trend.Select_By_Query_Id(query_id);
+      const recent_data = data.filter(item => item.datetime >= one_week_ago);
+      const chart_data = recent_data.map(t => { return { x: t.datetime, y: t.count } });
+      console.log("chart_data =", chart_data);
+      chart_elem.items = {"items": chart_data};
+
+      const chart_data_by_time = chart_data.sort((a, b) => a.x - b.x);
+      const start_count = chart_data_by_time[0].y;
+      const end_count = chart_data_by_time[chart_data_by_time.length - 1].y;
+      const diff_count = end_count - start_count;
+      const percent_change = diff_count / start_count * 100;
+      let title_html = query.title + "<br>" + percent_change.toFixed(2) + "%";
+      if (percent_change > 0)
+      {
+        title_html += "<br><img src='./image/green/trending_up.svg' class='trend'>";
+      }
+      else if (percent_change < 0)
+      {
+        title_html += "<br><img src='./image/red/trending_down.svg' class='trend'>";
+      }
+      else
+      {
+        title_html += "<br><img src='./image/red/trending_flat.svg' class='trend'>";
+      }
+      chart_elem.setAttribute("title", title_html);
+      
+    }
 
     async function On_Click_Import_Btn(ctx)
     {
@@ -963,7 +1004,14 @@
 <body>
 
   <header id="hdr_elem">
-    <jopr-chart></jopr-chart>
+    <de-line-chart id="chart_elem" hide-labels chart-type="smooth">
+      <defs slot="svg">
+        <linearGradient id="data_gradient">
+          <stop offset="50%" stop-color="#f00" />
+          <stop offset="100%" stop-color="#0f0" />
+        </linearGradient>
+      </defs>
+    </de-line-chart>
     <h1 class="title">JOPR&nbsp;&nbsp;&nbsp;</h1>
     <de-clock-2 id="clock_elem"></de-clock-2>
     <nav>

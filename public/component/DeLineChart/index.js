@@ -47,15 +47,10 @@ class DeLineChart extends HTMLElement
     return ["title", "chart-type"];
   }
 
-  plot_width = 800;
-  plot_height = 200;
-
   padding_top = 10; // top spacing from plot area
-  padding_right = 40; // right spacing from plot area
-  padding_bottom = 60; // bottom spacing from axis line
-  padding_left = 80; // left spacing from axis line
+  padding_right = 0; // right spacing from plot area
 
-  padding_axis = 20; // space between data plot area and x/y axis lines
+  padding_axis = 10; // space between data plot area and x/y axis lines
   overhang_axis = 10; // extra distance start axis line so they cross
 
   data_bounds = null;
@@ -80,6 +75,16 @@ class DeLineChart extends HTMLElement
   }
 
   // properties ===============================================================
+
+  get plot_width()
+  {
+    return this.clientWidth - this.padding_left - this.padding_right - this.padding_axis;
+  }
+
+  get plot_height()
+  {
+    return this.clientHeight - this.padding_top - this.padding_bottom - this.padding_axis;
+  }
 
   /**
    * Sets the data series to be displayed in the chart.
@@ -123,6 +128,21 @@ class DeLineChart extends HTMLElement
     const h = this.Get_Highlight();
     h.x2 = value / 100 * this.plot_width;
     this.Set_Highlight(h);
+  }
+
+  get show_label()
+  {
+    return !this.hasAttribute("hide-labels");
+  }
+
+  get padding_left()
+  {
+    return this.show_label ? 30 : this.overhang_axis;
+  }
+
+  get padding_bottom()
+  {
+    return this.show_label ? 30 : this.overhang_axis;
   }
 
   // attributes ===============================================================
@@ -357,14 +377,8 @@ class DeLineChart extends HTMLElement
   {
     const x = 0 - this.padding_axis - this.padding_left;
     const y = 0 - this.padding_axis - this.padding_bottom;
-    const w =
-      this.plot_width + // data rendering width
-      (this.padding_left + this.padding_right) + // outer padding for axes
-      this.padding_axis; // inner padding for axes
-    const h =
-      this.plot_height + // data rendering height
-      (this.padding_top + this.padding_bottom) +
-      this.padding_axis;
+    const w = this.clientWidth;
+    const h = this.clientHeight;
 
     return { x, y, w, h };
   }
@@ -466,7 +480,7 @@ class DeLineChart extends HTMLElement
     {
       const vb = this.Calc_View_Box();
       const title = this.getAttribute("title") || "Title";
-      //console.log("Render(): x, y, w, h =", x, y, w, h);
+      const slot_svg_html = this.querySelector("[slot='svg']").outerHTML;
 
       const html = `
         <h1 class="title">
@@ -479,6 +493,8 @@ class DeLineChart extends HTMLElement
           style="transform: scale(1, -1);"
           preserveAspectRatio="none"
         >
+          ${slot_svg_html}
+          <g cid="chart_elems"></g>
         </svg>
       `;
       const elems = Utils.toDocument(html, this);
@@ -500,36 +516,37 @@ class DeLineChart extends HTMLElement
    */
   Render_Chart() 
   {
-    if (this.isConnected && this.svg)
+    if (this.isConnected && this.chart_elems)
     {
-      this.svg.replaceChildren();
+      this.chart_elems.replaceChildren();
       if (this.data && Object.keys(this.data).length > 0) 
       {
         this.Set_Bounds();
 
         //const title_elem = this.Render_Title();
-        //this.svg.appendChild(title_elem);
+        //this.chart_elems.appendChild(title_elem);
 
         //this.color = 0;
-        this.Render_Data();
+        this.chart_elems.append(...this.Render_Data());
 
         const xAxis = this.Render_X_Axis();
-        this.svg.append(...xAxis);
+        this.chart_elems.append(...xAxis);
 
         const yAxis = this.Render_Y_Axis();
-        this.svg.append(...yAxis);
+        this.chart_elems.append(...yAxis);
 
         this.highlight = this.Render_Highlight();
-        this.svg.appendChild(this.highlight);
+        this.chart_elems.appendChild(this.highlight);
 
         this.mask = this.Render_Input_Mask();
-        this.svg.appendChild(this.mask);
+        this.chart_elems.appendChild(this.mask);
       }
     }
   }
 
   Render_Data()
   {
+    let elems = [];
     this.color = 0;
     for (const key in this.data)
     {
@@ -540,14 +557,16 @@ class DeLineChart extends HTMLElement
 
       const path = this.Render_Line(line_data);
       path.setAttribute("data-series", key);
-      this.svg.appendChild(path);
+      elems.push(path);
 
       if (this.hasAttribute("data-points"))
       {
         const circles = this.Render_Data_Points(key, line_data);
-        this.svg.append(...circles);
+        elems = elems.concat(circles);
       }
     }
+
+    return elems;
   }
 
   /**
@@ -575,11 +594,11 @@ class DeLineChart extends HTMLElement
       {
         // Render straight line segments
         pathData = `M ${points[0].x},${points[0].y}`;
-        console.log("x, y:", data[0].x, data[0].y, "=>", points[0].x, points[0].y);
+        //console.log("x, y:", data[0].x, data[0].y, "=>", points[0].x, points[0].y);
         for (let i = 1; i < points.length; i++)
         {
           pathData += ` L ${points[i].x},${points[i].y}`;
-          console.log("x, y:", data[0].x, data[0].y, "=>", points[i].x, points[i].y);
+          //console.log("x, y:", data[0].x, data[0].y, "=>", points[i].x, points[i].y);
         }
       }
       else
@@ -670,11 +689,10 @@ class DeLineChart extends HTMLElement
     xAxis.classList.add("axis-x");
 
     let label_elem = null;
-    const show_label = !this.hasAttribute("hide-labels");
-    if (show_label)
+    if (this.show_label)
     {
-      const x = x1 + 40;
-      const y = y1 - 20;
+      const x = x1 + 20;
+      const y = y1 - 10;
       label_elem = document.createElementNS("http://www.w3.org/2000/svg", "text");
       label_elem.setAttribute("x", x);
       label_elem.setAttribute("y", y);
@@ -709,11 +727,10 @@ class DeLineChart extends HTMLElement
     yAxis.classList.add("axis-y");
 
     let label_elem = null;
-    const show_label = !this.hasAttribute("hide-labels");
-    if (show_label)
+    if (this.show_label)
     {
-      const x = x1 - 20;
-      const y = y1 + 40;
+      const x = x1 - 10;
+      const y = y1 + 20;
       label_elem = document.createElementNS("http://www.w3.org/2000/svg", "text");
       label_elem.setAttribute("x", x);
       label_elem.setAttribute("y", y);

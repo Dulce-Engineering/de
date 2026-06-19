@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import Logic from '../public/app/blottolog/lib/logic.js';
-import Utils from '../public/lib/Utils.js';
+import Logic from '../../public/app/blottolog/lib/logic.js';
+import Utils from '../../public/lib/Utils.js';
 
 test('Logic.Get_Wait_Time_To_Next_Drink()', Test_Get_Wait_Time_To_Next_Drink);
 test('Logic.Get_Drink_Contribution()', Test_Get_Drink_Contribution);
