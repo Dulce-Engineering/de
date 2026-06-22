@@ -92,7 +92,7 @@ class Profile
     const jobs = await ctx.db2.Select(Profile.job_table_name);
     if (jobs)
     {
-      jobs.sort((a, b) => a.start_date - b.start_date);
+      jobs.sort((a, b) => -(a.start_date - b.start_date));
     }
     return jobs;
   }
