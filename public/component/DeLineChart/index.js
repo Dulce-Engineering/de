@@ -480,7 +480,10 @@ class DeLineChart extends HTMLElement
     {
       const vb = this.Calc_View_Box();
       const title = this.getAttribute("title") || "Title";
-      const slot_svg_html = this.querySelector("[slot='svg']").outerHTML;
+      const slot_svg_html = 
+        this.querySelector("[slot='svg']") ?
+        this.querySelector("[slot='svg']").outerHTML :
+        "";
 
       const html = `
         <h1 class="title">

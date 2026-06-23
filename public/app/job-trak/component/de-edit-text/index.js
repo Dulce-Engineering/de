@@ -33,7 +33,7 @@ class DeEditText extends HTMLElement
 
   Render()
   {
-    const dlg_id = "de_edit_text_dlg_" + Date.now();
+    const dlg_id = "de_edit_text_dlg_" + crypto.randomUUID();
     const html = `
       <span cid="text_elem"></span>
       <button cid="edit_btn" type="button" popovertarget="${dlg_id}" class="img-btn">

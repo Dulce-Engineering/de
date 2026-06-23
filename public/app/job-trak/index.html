@@ -180,30 +180,45 @@
       const query_id = query.id;
       const one_week_ago = Date.now() - Utils.MILLIS_WEEK;
       const data = await Stats.Trend.Select_By_Query_Id(query_id);
-      const recent_data = data.filter(item => item.datetime >= one_week_ago);
-      const chart_data = recent_data.map(t => { return { x: t.datetime, y: t.count } });
-      console.log("chart_data =", chart_data);
-      chart_elem.items = {"items": chart_data};
+      if (data && data.length > 0)
+      {
+        const recent_data = data.filter(item => item.datetime >= one_week_ago);
+        const chart_data = recent_data.map(t => { return { x: t.datetime, y: t.count } });
+        //console.log("chart_data =", chart_data);
+        chart_elem.items = {"items": chart_data};
 
-      const chart_data_by_time = chart_data.sort((a, b) => a.x - b.x);
-      const start_count = chart_data_by_time[0].y;
-      const end_count = chart_data_by_time[chart_data_by_time.length - 1].y;
-      const diff_count = end_count - start_count;
-      const percent_change = diff_count / start_count * 100;
-      let title_html = query.title + "<br>" + percent_change.toFixed(2) + "%";
-      if (percent_change > 0)
-      {
-        title_html += "<br><img src='./image/green/trending_up.svg' class='trend'>";
-      }
-      else if (percent_change < 0)
-      {
-        title_html += "<br><img src='./image/red/trending_down.svg' class='trend'>";
+        const chart_data_by_time = chart_data.sort((a, b) => a.x - b.x);
+        const start_count = chart_data_by_time[0].y;
+        const end_count = chart_data_by_time[chart_data_by_time.length - 1].y;
+        const diff_count = end_count - start_count;
+        const percent_change = diff_count / start_count * 100;
+        let title_html = query.title + "<br>" + percent_change.toFixed(2) + "%";
+        chart_elem.svg.classList.remove("trend-up");
+        chart_elem.svg.classList.remove("trend-down");
+        chart_elem.svg.classList.remove("trend-flat");
+        if (percent_change > 0)
+        {
+          title_html += "<br><img src='./image/green/trending_up.svg' class='trend'>";
+          chart_elem.svg.classList.add("trend-up");
+        }
+        else if (percent_change < 0)
+        {
+          title_html += "<br><img src='./image/red/trending_down.svg' class='trend'>";
+          chart_elem.svg.classList.add("trend-down");
+        }
+        else
+        {
+          title_html += "<br><img src='./image/yellow/trending_flat.svg' class='trend'>";
+          chart_elem.svg.classList.add("trend-flat");
+        }
+        chart_elem.setAttribute("title", title_html);
       }
       else
       {
-        title_html += "<br><img src='./image/yellow/trending_flat.svg' class='trend'>";
+        chart_elem.items = null;
       }
-      chart_elem.setAttribute("title", title_html);
+
+      setTimeout(Update_Chart, 60000);
     }
 
     async function On_Click_Import_Btn(ctx)
@@ -1003,14 +1018,12 @@
 <body>
 
   <header id="hdr_elem">
-    <de-line-chart id="chart_elem" hide-labels chart-type="smooth">
-      <defs slot="svg">
-        <linearGradient id="data_gradient">
-          <stop offset="50%" stop-color="#f00" />
-          <stop offset="100%" stop-color="#0f0" />
-        </linearGradient>
-      </defs>
-    </de-line-chart>
+    <div class="chart">
+      <de-line-chart id="chart_elem" hide-labels chart-type="smooth">
+      </de-line-chart>
+      <div class="b1"></div>
+      <div class="b2"></div>
+    </div>
     <h1 class="title">JOPR&nbsp;&nbsp;&nbsp;</h1>
     <de-clock-2 id="clock_elem"></de-clock-2>
     <nav>

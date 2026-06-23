@@ -4,14 +4,6 @@ import DB_SCHEMA from "../db/schema.js";
 import Utils from "../../../lib/Utils.js";
 import Db from "../lib/Db.js";
 import AI from "../lib/AI.js";
-/*import "../../../dedial/dedial.js";
-import "../../../component/DeInputList/index3.js";
-import "../../../component/DeForm/index.js";
-import "../../../component/DeDialogForm/index.js";
-import "../../../component/DeDialogAlert/index.js";
-import "../../../component/DeDialogConfirm/index.js";
-import "../component/DeToolbarMenu/index.js";
-import "../component/de-info/index.js";*/
 
 Main();
 async function Main()
@@ -24,7 +16,7 @@ async function Main()
 
   const profiles = await ctx.db.Get_All("profiles");
   const profile = !Utils.Is_Empty(profiles) ? profiles[0] : null;
-  if (profile)
+  if (profile && ctx.ai)
   {
     info_elem.Info("Generating CV...");
     await Utils.sleep(1500);

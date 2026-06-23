@@ -39,6 +39,15 @@ de-edit-text
         padding: 5px 10px;
         color: #000;
         cursor: pointer;
+
+        &[cid="cancel_btn"]
+        {
+          background-color: #f00;
+        }
+        &[cid="ok_btn"]
+        {
+          background-color: #0f0;
+        }
       }
     }
 
