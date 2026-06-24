@@ -21,9 +21,9 @@ https://www.youtube.com/watch?v=oVy-KKWsdNg&list=PLDTPrMoGHssBulfAaczSuk0f8luCiK
 
 ## To Do
 - generate cover letter
-- standardise db references
 - refactor cv page to show saved data
 - add marketing material
+- standardise db references
 - link to job woper
 - add error reporting
-- add usage reporting
+- add usage reporting (done)
