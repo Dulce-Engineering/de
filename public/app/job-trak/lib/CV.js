@@ -4,6 +4,8 @@ import DB_SCHEMA from "../db/schema.js";
 import Utils from "../../../lib/Utils.js";
 import Db from "../lib/Db.js";
 import AI from "../lib/AI.js";
+import Profile from "../lib/Profile.js";
+import Job from "../lib/Job.js";
 
 Main();
 async function Main()
@@ -12,10 +14,11 @@ async function Main()
   {
     ai: await AI.New(fb_app, fb_ai),
     db: await Db.New(DB_SCHEMA),
+    db2: await Db.New(DB_SCHEMA),
+    Profile, Utils, Job
   };
 
-  const profiles = await ctx.db.Get_All("profiles");
-  const profile = !Utils.Is_Empty(profiles) ? profiles[0] : null;
+  const profile = await ctx.Profile.Select(ctx);
   if (profile && ctx.ai)
   {
     info_elem.Info("Generating CV...");
@@ -36,14 +39,14 @@ async function Main()
 
     const job_id_str = new URLSearchParams(window.location.search).get("job_id");
     const job_id = Utils.Is_Empty(job_id_str) ? null : parseInt(job_id_str);
-    const prospective_job = await ctx.db.Select_By_Id("jobs", job_id);
+    const prospective_job = await ctx.Job.Select_By_Id(ctx.db, job_id);
 
     info_elem.Info("Generating profile...");
     const summ_text = await ctx.ai.Generate_Summary(prospective_job, profile);
     summ_value.innerText = summ_text || "Unable to generate.";
 
     info_elem.Info("Generating skills list...");
-    const career_jobs = await ctx.db.Get_All("career");
+    const career_jobs = await ctx.Profile.Job_Select(ctx);
     const skills = await ctx.ai.Generate_Skills(prospective_job, career_jobs, profile);
     skills_value.innerHTML = Render_List(skills);
 
@@ -59,8 +62,19 @@ async function Main()
       job_elems[0].style.padding = "0";
     }
 
+    info_elem.Info("Adding previous jobs...");
+    const legacy_jobs = 
+      await ctx.Profile.Job_Select_Legacy(ctx, best_job_ids);
+    if (legacy_jobs)
+    {
+      legacy_jobs_list.addEventListener
+        ("render", e => Render_Legacy_Job_Item(e, legacy_jobs));
+      legacy_jobs_list.value = legacy_jobs;
+    }
+
+    info_elem.Info("Adding education...");
     education_list.addEventListener("render", Render_Education_Item);
-    education_list.value = await ctx.db.Get_All("education");
+    education_list.value = await ctx.Profile.Edu_Select(ctx);
   }
 }
 
@@ -96,19 +110,28 @@ function Get_Next_Job(job, all_jobs)
 
 // render list item ===============================================================
 
+function Render_Legacy_Job_Item(event, all_jobs)
+{
+  const item_elem = event.detail.item_elem;
+  const job = item_elem.item_obj;
+
+  const date_info = Render_Date_Strs(job, all_jobs);
+
+  item_elem.job_title.innerText = job.role_titles;
+  item_elem.job_company.innerText = job.company_name;
+  item_elem.dates.innerText = date_info.start_date_str;
+}
+
 async function Render_Job_Item(event, ctx, target_job, all_jobs)
 {
   ctx.item_count = ctx.item_count === undefined ? 1 : ctx.item_count + 1;
 
   const item_elem = event.detail.item_elem;
   const job = item_elem.item_obj;
-  const next_job = Get_Next_Job(job, all_jobs);
 
-  const start_date = job.start_date;
-  const end_date = next_job ? next_job.start_date : job.end_date;
-  const duration_str = Duration_Str(start_date, end_date);
-  const start_date_str = Render_Date(start_date);
-  item_elem.dates.innerText = start_date_str + " (" + duration_str + ")";
+  const date_info = Render_Date_Strs(job, all_jobs);
+  item_elem.dates.innerText = 
+    date_info.start_date_str; // + " (" + date_info.duration_str + ")";
 
   info_elem.Info("Generating " + job.company_name + " job title...");
   const role_title = await ctx.ai.Generate_Job_Title(job, target_job);
@@ -144,6 +167,17 @@ function Render_Education_Item(event)
 }
 
 // rendering ======================================================================
+
+function Render_Date_Strs(job, all_jobs)
+{
+  const start_date = job.start_date;
+  const next_job = Get_Next_Job(job, all_jobs);
+  const end_date = next_job ? next_job.start_date : job.end_date;
+  const duration_str = Duration_Str(start_date, end_date);
+  const start_date_str = Render_Date(start_date);
+
+  return { start_date_str, duration_str };
+}
 
 function Render_Date(date_ms)
 {

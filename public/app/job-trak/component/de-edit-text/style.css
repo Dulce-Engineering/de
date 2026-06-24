@@ -33,20 +33,22 @@ de-edit-text
       display: flex;
       justify-content: center;
       gap: 10px;
+      opacity: 1;
 
       button
       {
         padding: 5px 10px;
         color: #000;
         cursor: pointer;
+        border: 2px solid #000;
 
         &[cid="cancel_btn"]
         {
-          background-color: #f00;
+          background-color: #f88;
         }
         &[cid="ok_btn"]
         {
-          background-color: #0f0;
+          background-color: #8f8;
         }
       }
     }

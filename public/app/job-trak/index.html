@@ -180,9 +180,9 @@
       const query_id = query.id;
       const one_week_ago = Date.now() - Utils.MILLIS_WEEK;
       const data = await Stats.Trend.Select_By_Query_Id(query_id);
-      if (data && data.length > 0)
+      const recent_data = data.filter(item => item.datetime >= one_week_ago);
+      if (recent_data && recent_data.length > 0)
       {
-        const recent_data = data.filter(item => item.datetime >= one_week_ago);
         const chart_data = recent_data.map(t => { return { x: t.datetime, y: t.count } });
         //console.log("chart_data =", chart_data);
         chart_elem.items = {"items": chart_data};

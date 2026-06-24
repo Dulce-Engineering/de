@@ -87,9 +87,20 @@ class Profile
     return certificates;
   }
 
-  static async Job_Select(ctx)
+  static async Select(ctx)
   {
-    const jobs = await ctx.db2.Select(Profile.job_table_name);
+    let profile = null;
+    const profiles = await ctx.db2.Select(Profile.table_name);
+    if (profiles)
+    {
+      profile = !ctx.Utils.Is_Empty(profiles) ? profiles[0] : null;
+    }
+    return profile;
+  }
+
+  static async Job_Select(ctx, where_fn)
+  {
+    const jobs = await ctx.db2.Select(Profile.job_table_name, where_fn);
     if (jobs)
     {
       jobs.sort((a, b) => -(a.start_date - b.start_date));
@@ -97,9 +108,29 @@ class Profile
     return jobs;
   }
 
+  static async Job_Select_Legacy(ctx, exclude_ids)
+  {
+    const exclude_jobs = 
+      await Profile.Job_Select(ctx, j => exclude_ids.includes(j.id));
+    const last_job = exclude_jobs[exclude_jobs.length - 1];
+    // last_job.start_date
+
+    const legacy_jobs =
+      await Profile.Job_Select(ctx, j => j.start_date < last_job.start_date);
+
+    return legacy_jobs;
+  }
+
   static Select_By_Id(ctx, id)
   {
     return ctx.db2.Select_By_Id(Profile.table_name, id);
+  }
+
+  static Edu_Select(ctx)
+  {
+    const edu = ctx.db2.Select(Profile.edu_table_name);
+
+    return edu;
   }
 
   static Edu_Select_By_Id(ctx, id)
