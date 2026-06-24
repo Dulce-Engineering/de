@@ -2,17 +2,8 @@
 <html lang="en">
 
 <head>
-
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-KMFPTFXKGX"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag() { dataLayer.push(arguments); }
-    gtag('js', new Date());
-    gtag('config', 'G-KMFPTFXKGX');
-  </script>
-
-  <link rel="manifest" href="/app/job-trak/manifest.json">
+  <script async src="/lib/ga.js"></script>
+  <link rel="manifest" href="/app/jopr/manifest.json">
   <title>JOPR</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -22,8 +13,8 @@
   <meta name="robots" content="index, follow">
   <meta property="og:title" content="JOPR">
   <meta property="og:description" content="">
-  <meta property="og:image" content="https://dulceeng.com.au/app/job-trak/image/screenshot-landscape.png">
-  <meta property="og:url" content="https://dulceeng.com.au/app/job-trak">
+  <meta property="og:image" content="https://dulceeng.com.au/app/jopr/image/screenshot-landscape.png">
+  <meta property="og:url" content="https://dulceeng.com.au/app/jopr">
   <meta property="og:type" content="website">
   <link rel="shortcut icon" href="./image/favicon.ico">
 
@@ -36,9 +27,9 @@
     "@context": "https://schema.org",
     "@type": "Website",
     "name": "JOPR",
-    "url": "https://dulceeng.com.au/app/job-trak",
+    "url": "https://dulceeng.com.au/app/jopr",
     "description": "",
-    "image": "https://dulceeng.com.au/app/job-trak/image/screenshot-landscape.png"
+    "image": "https://dulceeng.com.au/app/jopr/image/screenshot-landscape.png"
   }
   </script>
   <script type="importmap">
@@ -279,7 +270,7 @@
       const json_string = JSON.stringify(db_data, null, 2);
       const blob = new Blob([json_string], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
-      const filename = `job-trak-data-${new Date().toISOString().split('T')[0]}.json`;
+      const filename = `jopr-data-${new Date().toISOString().split('T')[0]}.json`;
       Utils.Download_File(blob, filename);
 
       Alert("Data exported successfully!");
@@ -340,7 +331,7 @@
         job_history: career
       };
 
-      const filename = `job-trak-profile-${new Date().toISOString().split('T')[0]}.json`;
+      const filename = `jopr-profile-${new Date().toISOString().split('T')[0]}.json`;
       const json_string = JSON.stringify(employee, null, 2);
       const blob = new Blob([json_string], { type: 'application/json' });
       Utils.Download_File(blob, filename);
@@ -887,7 +878,7 @@
     {
       const job = await ctx.db2.Select_By_Id("jobs", job_id);
 
-      const filename = `job-trak-${new Date().toISOString().split('T')[0]}.json`;
+      const filename = `jopr-${new Date().toISOString().split('T')[0]}.json`;
       const json_string = JSON.stringify(job, null, 2);
       const blob = new Blob([json_string], { type: 'application/json' });
       Utils.Download_File(blob, filename);

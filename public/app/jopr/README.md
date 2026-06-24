@@ -10,7 +10,7 @@ The war against recruitment agencies and HR departments is merciless. Don't beco
 - Watch IT trends based on actual job postings.
 
 ## Links
-- https://dulceengineering.com.au/app/job-trak
+- https://dulceengineering.com.au/app/jopr
 
 ## WarGames
 https://www.youtube.com/watch?v=s93KC4AGKnY
@@ -19,3 +19,11 @@ https://www.youtube.com/watch?v=NHWjlCaIrQo
 ## Planet America
 https://www.youtube.com/watch?v=oVy-KKWsdNg&list=PLDTPrMoGHssBulfAaczSuk0f8luCiKYi3
 
+## To Do
+- generate cover letter
+- standardise db references
+- refactor cv page to show saved data
+- add marketing material
+- link to job woper
+- add error reporting
+- add usage reporting
