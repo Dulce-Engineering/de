@@ -114,6 +114,7 @@
       { 
         ai: await AI.New(fb_app, fb_ai),
         db2: await Db.New(DB_SCHEMA),
+        db: await Db.New(DB_SCHEMA),
         Job, Contact, Agency, Utils, Profile
       };
 
@@ -973,7 +974,7 @@
       if (form_data)
       {
         form_data.id = job_id;
-        await ctx.Job.Save(ctx.db2, form_data);
+        await ctx.Job.Save(ctx, form_data);
         await Render_Job_Items(ctx);
       }
     }

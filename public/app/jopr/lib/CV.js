@@ -18,8 +18,20 @@ async function Main2()
     Profile, Utils, Job
   };
 
-  const cv = await Generate_CV(ctx);
-  Render_CV(cv);
+  const url_params = new URLSearchParams(window.location.search);
+  const gen = url_params.has("gen", "true");
+
+  const job_id_str = url_params.get("job_id");
+  const job_id = Utils.Is_Empty(job_id_str) ? null : parseInt(job_id_str);
+  const job = await ctx.Job.Select_By_Id(ctx, job_id);
+
+  if (gen || !job.cv)
+  {
+    job.cv = await Generate_CV(ctx, job);
+    await ctx.Job.Save(ctx, job);
+  }
+
+  Render_CV(job.cv);
 }
 
 async function Main()
@@ -96,7 +108,7 @@ async function Main()
 
 // business logic =================================================================
 
-async function Generate_CV(ctx)
+async function Generate_CV(ctx, prospective_job)
 {
   let cv = {};
 
@@ -106,29 +118,25 @@ async function Generate_CV(ctx)
     info_elem.Info("Generating CV...");
     await Utils.sleep(1500);
 
-    const job_id_str = new URLSearchParams(window.location.search).get("job_id");
-    const job_id = Utils.Is_Empty(job_id_str) ? null : parseInt(job_id_str);
-    cv.prospective_job = await ctx.Job.Select_By_Id(ctx, job_id);
-
     info_elem.Info("Generating profile...");
-    cv.summ_text = await ctx.ai.Generate_Summary(cv.prospective_job, cv.profile);
+    cv.summ_text = await ctx.ai.Generate_Summary(prospective_job, cv.profile);
 
     info_elem.Info("Generating skills list...");
     cv.career_jobs = await ctx.Profile.Job_Select(ctx);
-    cv.skills = await ctx.ai.Generate_Skills(cv.prospective_job, cv.career_jobs, cv.profile);
+    cv.skills = await ctx.ai.Generate_Skills(prospective_job, cv.career_jobs, cv.profile);
 
     info_elem.Info("Selecting jobs...");
-    const best_job_ids = await ctx.ai.Select_Best_Jobs(cv.career_jobs, cv.prospective_job);
+    const best_job_ids = await ctx.ai.Select_Best_Jobs(cv.career_jobs, prospective_job);
     if (best_job_ids)
     {
       cv.best_jobs = cv.career_jobs.filter(j => best_job_ids.includes(j.id));
       for (const job of cv.best_jobs)
       {
         info_elem.Info("Generating " + job.company_name + " job title...");
-        job.role_title = await ctx.ai.Generate_Job_Title(job, cv.prospective_job);
+        job.role_title = await ctx.ai.Generate_Job_Title(job, prospective_job);
 
         info_elem.Info("Generating " + job.company_name + " job description...");
-        job.tailored_job = await ctx.ai.Generate_Job_Description(job, cv.prospective_job);
+        job.tailored_job = await ctx.ai.Generate_Job_Description(job, prospective_job);
       }
     }
 

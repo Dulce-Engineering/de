@@ -88,7 +88,7 @@ class Job
     }
   }
 
-  static async Save(db, form_data)
+  static async Save(ctx, form_data)
   {
     let res = null;
 
@@ -97,7 +97,7 @@ class Job
       if (form_data.agency_id == "new")
       {
         const new_agency = { name: form_data.agency_name?.trim() || "New Agency" };
-        const new_agency_id = await db.Insert("agencies", new_agency);
+        const new_agency_id = await ctx.db.Insert("agencies", new_agency);
         form_data.agency_id = new_agency_id;
       }
 
@@ -110,7 +110,7 @@ class Job
           agency_id: parseInt(form_data.agency_id) || null,
           email: form_data.contact_email?.trim(),
         };
-        const new_contact_id = await db.Insert("contacts", new_contact);
+        const new_contact_id = await ctx.db.Insert("contacts", new_contact);
         form_data.contact_id = new_contact_id;
       }
 
@@ -129,10 +129,11 @@ class Job
         remuneration_unit: form_data.remuneration_unit?.trim() || null,
         agency_id: parseInt(form_data.agency_id) || null,
         contact_id: parseInt(form_data.contact_id) || null,
-        status: form_data.status || null
+        status: form_data.status || null,
+        cv: form_data.cv || null
       };
 
-      res = await db.Save(Job.table_name, job);
+      res = await ctx.db.Save(Job.table_name, job);
     }
 
     return res;
