@@ -18,9 +18,9 @@ class Job
     { id: "expired", label: "Expired", type: 1 },
   ];
 
-  static async Select_By_Id(db, id)
+  static async Select_By_Id(ctx, id)
   {
-    return await db.Select_By_Id(Job.table_name, id);
+    return await ctx.db.Select_By_Id(Job.table_name, id);
   }
 
   static async Select_All_Extended_Sorted(ctx)

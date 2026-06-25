@@ -7,7 +7,21 @@ import AI from "../lib/AI.js";
 import Profile from "../lib/Profile.js";
 import Job from "../lib/Job.js";
 
-Main();
+Main2();
+async function Main2()
+{
+  const ctx =
+  {
+    ai: await AI.New(fb_app, fb_ai),
+    db: await Db.New(DB_SCHEMA),
+    db2: await Db.New(DB_SCHEMA),
+    Profile, Utils, Job
+  };
+
+  const cv = await Generate_CV(ctx);
+  Render_CV(cv);
+}
+
 async function Main()
 {
   const ctx =
@@ -39,7 +53,7 @@ async function Main()
 
     const job_id_str = new URLSearchParams(window.location.search).get("job_id");
     const job_id = Utils.Is_Empty(job_id_str) ? null : parseInt(job_id_str);
-    const prospective_job = await ctx.Job.Select_By_Id(ctx.db, job_id);
+    const prospective_job = await ctx.Job.Select_By_Id(ctx, job_id);
 
     info_elem.Info("Generating profile...");
     const summ_text = await ctx.ai.Generate_Summary(prospective_job, profile);
@@ -81,6 +95,54 @@ async function Main()
 // events =========================================================================
 
 // business logic =================================================================
+
+async function Generate_CV(ctx)
+{
+  let cv = {};
+
+  cv.profile = await ctx.Profile.Select(ctx);
+  if (cv.profile && ctx.ai)
+  {
+    info_elem.Info("Generating CV...");
+    await Utils.sleep(1500);
+
+    const job_id_str = new URLSearchParams(window.location.search).get("job_id");
+    const job_id = Utils.Is_Empty(job_id_str) ? null : parseInt(job_id_str);
+    cv.prospective_job = await ctx.Job.Select_By_Id(ctx, job_id);
+
+    info_elem.Info("Generating profile...");
+    cv.summ_text = await ctx.ai.Generate_Summary(cv.prospective_job, cv.profile);
+
+    info_elem.Info("Generating skills list...");
+    cv.career_jobs = await ctx.Profile.Job_Select(ctx);
+    cv.skills = await ctx.ai.Generate_Skills(cv.prospective_job, cv.career_jobs, cv.profile);
+
+    info_elem.Info("Selecting jobs...");
+    const best_job_ids = await ctx.ai.Select_Best_Jobs(cv.career_jobs, cv.prospective_job);
+    if (best_job_ids)
+    {
+      cv.best_jobs = cv.career_jobs.filter(j => best_job_ids.includes(j.id));
+      for (const job of cv.best_jobs)
+      {
+        info_elem.Info("Generating " + job.company_name + " job title...");
+        job.role_title = await ctx.ai.Generate_Job_Title(job, cv.prospective_job);
+
+        info_elem.Info("Generating " + job.company_name + " job description...");
+        job.tailored_job = await ctx.ai.Generate_Job_Description(job, cv.prospective_job);
+      }
+    }
+
+    info_elem.Info("Adding previous jobs...");
+    cv.legacy_jobs = await ctx.Profile.Job_Select_Legacy(ctx, best_job_ids);
+
+    info_elem.Info("Adding education...");
+    cv.edu_items = await ctx.Profile.Edu_Select(ctx);
+
+    info_elem.Info();
+  }
+
+  return cv;
+}
 
 function Get_Next_Job(job, all_jobs)
 {
@@ -167,6 +229,70 @@ function Render_Education_Item(event)
 }
 
 // rendering ======================================================================
+
+function Render_CV(cv)
+{
+  prof_name.innerText = cv.profile.name;
+  Render_Field(prof_email_field, cv.profile.email);
+  Render_Field(prof_phone_field, cv.profile.phone);
+  Render_Field(prof_address_field, cv.profile.address);
+  Render_Field(prof_residency_field, cv.profile.residency_status);
+  Render_Field(prof_website_field, cv.profile.url);
+
+  const seek_html = `<a href="${cv.profile.seek_url}" target="_blank">Seek Profile</a>`;
+  const linkedin_html = `<a href="${cv.profile.linkedin_url}" target="_blank">LinkedIn</a>`;
+  //const links_html = Utils.Append_Str(seek_html, linkedin_html, " | ");
+  //Render_Field(prof_links_field, links_html);
+  Render_Field(prof_links_field, null);
+
+  summ_value.innerText = cv.summ_text || "Unable to generate.";
+
+  skills_value.innerHTML = Render_List(cv.skills);
+
+  if (cv.best_jobs)
+  {
+    jobs_list.addEventListener("render", e => Render_Job_Item2(e, cv.best_jobs));
+    jobs_list.value = cv.best_jobs;
+
+    const job_elems = jobs_list.querySelectorAll("[slot=item]");
+    job_elems[0].style.padding = "0";
+  }
+
+  if (cv.legacy_jobs)
+  {
+    legacy_jobs_list.addEventListener("render", e => Render_Legacy_Job_Item(e, cv.legacy_jobs));
+    legacy_jobs_list.value = cv.legacy_jobs;
+  }
+
+  education_list.addEventListener("render", Render_Education_Item);
+  education_list.value = cv.edu_items;
+}
+
+async function Render_Job_Item2(event, all_jobs)
+{
+  const item_elem = event.detail.item_elem;
+  const job = item_elem.item_obj;
+
+  const date_info = Render_Date_Strs(job, all_jobs);
+  item_elem.dates.innerText =
+    date_info.start_date_str; // + " (" + date_info.duration_str + ")";
+
+  item_elem.job_title.value =
+  {
+    text: job.role_title?.suggested_title || job.role_titles,
+    original_text: job.role_titles
+  };
+
+  item_elem.job_description.innerText = job.tailored_job.summary;
+  const html = Render_List(job.tailored_job.bullet_points);
+  if (html)
+    item_elem.job_points.innerHTML = html;
+  else
+    item_elem.job_points.style.display = "none";
+
+  item_elem.job_company.innerText = job.company_name;
+  item_elem.job_tech.innerText = job.tech;
+}
 
 function Render_Date_Strs(job, all_jobs)
 {
