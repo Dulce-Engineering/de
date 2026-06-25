@@ -170,7 +170,7 @@
       const query = seek_queries[random_index];
       console.log("query =", query);
       const query_id = query.id;
-      const one_week_ago = Date.now() - Utils.MILLIS_WEEK;
+      const one_week_ago = Date.now() - (Utils.MILLIS_WEEK * 4);
       const data = await Stats.Trend.Select_By_Query_Id(query_id);
       const recent_data = data.filter(item => item.datetime >= one_week_ago);
       if (recent_data && recent_data.length > 0)
