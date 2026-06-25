@@ -130,7 +130,8 @@ class Job
         agency_id: parseInt(form_data.agency_id) || null,
         contact_id: parseInt(form_data.contact_id) || null,
         status: form_data.status || null,
-        cv: form_data.cv || null
+        cv: form_data.cv || null,
+        cl: form_data.cl?.trim() || null
       };
 
       res = await ctx.db.Save(Job.table_name, job);

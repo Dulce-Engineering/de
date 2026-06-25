@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <script async src="/lib/ga.js"></script>
+  <link rel="manifest" href="/app/jopr/manifest.json">
+  <title>JOPR: Generate Cover Letter</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+  <meta name="author" content="Dulce Engineering Pty. Ltd.">
+  <meta name="robots" content="index, follow">
+  <meta property="og:title" content="JOPR">
+  <meta property="og:description" content="">
+  <meta property="og:image" content="https://dulceeng.com.au/app/jopr/image/screenshot-landscape.png">
+  <meta property="og:url" content="https://dulceeng.com.au/app/jopr">
+  <meta property="og:type" content="website">
+  <link rel="shortcut icon" href="./image/favicon.ico">
+
+  <link rel="stylesheet" href="./component/de-info/style.css">
+  <link rel="stylesheet" href="./component/de-edit-text/style.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Website",
+    "name": "JOPR",
+    "url": "https://dulceeng.com.au/app/jopr",
+    "description": "",
+    "image": "https://dulceeng.com.au/app/jopr/image/screenshot-landscape.png"
+  }
+  </script>
+  <script type="importmap">
+  {
+    "imports": 
+    {
+      "firebase/app":       "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js",
+      "firebase/functions": "https://www.gstatic.com/firebasejs/12.12.1/firebase-functions.js",
+      "firebase/firestore": "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js",
+      "firebase/auth":      "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js",
+      "firebase-analytics": "https://www.gstatic.com/firebasejs/12.12.1/firebase-analytics.js",
+      "firebase/ai":        "https://www.gstatic.com/firebasejs/12.12.1/firebase-ai.js"
+    }
+  }
+  </script>
+  <script type="module">
+    import "../../dedial/dedial.js";
+    import "../../component/DeInputList/index3.js";
+    import "../../component/DeForm/index.js";
+    import "../../component/DeDialogForm/index.js";
+    import "../../component/DeDialogAlert/index.js";
+    import "../../component/DeDialogConfirm/index.js";
+    import "./component/DeToolbarMenu/index.js";
+    import "./component/de-info/index.js";
+    import "./component/de-edit-text/index.js";
+
+    import * as fb_app from "firebase/app";
+    import * as fb_ai from "firebase/ai";
+    import DB_SCHEMA from "./db/schema.js";
+    import Utils from "../../lib/Utils.js";
+    import JUtils from "./lib/Utils.js";
+    import Db from "./lib/Db.js";
+    import AI from "./lib/AI.js";
+    import Profile from "./lib/Profile.js";
+    import Job from "./lib/Job.js";
+
+    Main();
+    async function Main()
+    {
+      const ctx =
+      {
+        ai: await AI.New(fb_app, fb_ai),
+        db: await Db.New(DB_SCHEMA),
+        db2: await Db.New(DB_SCHEMA),
+        Profile, Utils, Job
+      };
+
+      const url_params = new URLSearchParams(window.location.search);
+      const gen = url_params.has("gen", "true");
+
+      const job_id_str = url_params.get("job_id");
+      const job_id = Utils.Is_Empty(job_id_str) ? null : parseInt(job_id_str);
+      const job = await ctx.Job.Select_By_Id(ctx, job_id);
+  
+      const profile = await ctx.Profile.Select(ctx);
+      profile.work_history = await ctx.Profile.Job_Select(ctx);
+      profile.education = await ctx.Profile.Edu_Select(ctx);
+
+      if (gen || !job.cl)
+      {
+        info_elem.Info("Generating Cover Letter...");
+        await Utils.sleep(1500);
+
+        job.cl = await ctx.ai.Generate_Cover_Letter(profile, job);
+        await ctx.Job.Save(ctx, job);
+        info_elem.Info();
+      }
+
+      name_elem.innerText = profile.name;
+      phone_elem.innerText = profile.phone;
+      email_elem.innerText = profile.email;
+      linkedin_elem.innerText = profile.linkedin_url;
+      seek_elem.innerText = profile.seek_url;
+
+      role_elem.innerText = job.role_title;
+      company_elem.innerText = job.company;
+      link_elem.innerText = job.link;
+
+      cover_letter.innerText = job.cl;
+
+      signature_elem.innerText = profile.name;
+    }
+  </script>
+
+  <style>
+    @font-face 
+    {
+      font-family: roboto;
+      src: url("font/Roboto/Roboto-VariableFont_wdth-wght.ttf");
+    }
+    @font-face 
+    {
+      font-family: roboto-condensed;
+      src: url("font/Roboto_Condensed/RobotoCondensed-VariableFont_wght.ttf");
+    }
+    @font-face 
+    {
+      font-family: mr-de-haviland;
+      src: url("font/Mr_De_Haviland/MrDeHaviland-Regular.ttf");
+    }
+
+    :root 
+    {
+      background-color: #fff;
+      font-family: roboto;
+      font-size: 14px;
+    }
+    body 
+    {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      margin: 0;
+    }
+    @media screen
+    {
+      body
+      {
+        padding: 80px;
+        gap: 60px;
+      }
+      h1
+      {
+        font-size: 3rem;
+      }
+    }
+    @media print
+    {
+      body
+      {
+        padding: 30px 10px 0 10px;
+        gap: 30px;
+      }
+      h1
+      {
+        font-size: 3rem;
+      }
+    }
+
+    #cover_letter
+    {
+    }
+    #signature_elem
+    {
+      font-family: mr-de-haviland;
+      font-size: 4rem;
+    }
+
+    header
+    {
+      display: flex;
+      border-bottom: 1px solid #000;
+      padding: 0 0 10px 0;
+      margin: 0 0 20px 0;
+
+      .contact-info
+      {
+        display: flex;
+        flex-direction: column;
+      }
+    }
+    article
+    {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      xalign-items: center;
+      align-items: stretch;
+
+      &.compact
+      {
+        flex-direction: row;
+      }
+    }
+    h1
+    {
+      margin-block-start: 0;
+      margin-block-end: 0;
+      margin-inline-start: 0;
+      margin-inline-end: 0;
+      font-weight: normal;
+      flex-grow: 1;
+    }
+    h2
+    {
+      font-size: 1.5rem;
+      margin-block-start: 0;
+      margin-block-end: 0;
+      margin-inline-start: 0;
+      margin-inline-end: 0;
+      font-weight: normal;
+      margin: 0 0 3px 0;
+    }
+    h3, .h3
+    {
+      font-size: 1.6rem;
+      margin-block-start: 0;
+      margin-block-end: 0;
+      margin-inline-start: 0;
+      margin-inline-end: 0;
+      font-weight: normal;
+      margin: 0 0 6px 0;
+    }
+    p
+    {
+      line-height: 1.4rem;
+      display: block;
+      margin-block-start: 0;
+      margin-block-end: 0;
+      margin-inline-start: 0;
+      margin-inline-end: 0;
+    }
+    footer
+    {
+      display: block;
+      font-size: 1.2rem;
+      opacity: 0.6;
+      margin: 0;
+      padding: 0;
+    }
+    de-info
+    {
+      [cid=info_elem]
+      {
+        color: #000;
+        background-color: #fffe;
+        padding: 10px 20px;
+      }
+    }
+
+    .no-break
+    {
+      break-inside: avoid;
+      padding: 40px 0 0 0;
+    }
+    .separate
+    {
+      margin: 10px 0 0 0;
+    }
+    .subheading
+    {
+      display: inline-block;
+      font-size: 1.2rem;
+      opacity: 0.6;
+      margin: 0 0 5px 0;
+    }
+    .highlight
+    {
+      font-weight: bold;
+      font-size: 1.2rem;
+    }
+    .coloured
+    {
+      xbackground-color: #44a;
+      xcolor: #fff;
+
+      de-input-list main
+      {
+        gap: 30px;
+      }
+      de-input-list main, dl
+      {
+        margin: 0 20px 0 0;
+      }
+    }
+    .sidebar
+    {
+      width: 30%;
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+      margin: 40px 0 40px 30px;
+      padding: 0 30px 0 0;
+      border-right: 1px solid #000;
+    }
+    .main
+    {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      gap: 40px;
+      padding: 40px 30px 40px 30px;
+
+      h2
+      {
+        border-bottom: 1px solid #000;
+      }
+    }
+  </style>
+
+</head>
+
+<body>
+
+  <article>
+    <header>
+      <h1 id="name_elem"></h1>
+      <div class="contact-info">
+        <span id="phone_elem"></span>
+        <span id="email_elem"></span>
+        <span id="linkedin_elem"></span>
+        <span id="seek_elem"></span>
+      </div>
+    </header>
+
+    <div>
+      <h2>Regarding: <span id="role_elem"></span></h2>
+      <div id="" hidden>@ <span id="company_elem"></span></div>
+      <div id="link_elem"></div>
+    </div>
+
+    <h2>Dear Hiring Manager,</h2>
+    <div id="cover_letter"></div>
+    <h2>Sincerely,</h2>
+    <span id="signature_elem"></span>
+  </article>
+
+  <de-info id="info_elem"></de-info>
+
+</body>
+
+</html>

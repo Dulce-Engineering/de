@@ -31,7 +31,7 @@ async function Main2()
     await ctx.Job.Save(ctx, job);
   }
 
-  Render_CV(job.cv);
+  Render_CV(job);
 }
 
 async function Main()
@@ -105,6 +105,11 @@ async function Main()
 }
 
 // events =========================================================================
+
+async function On_Change_Job_Title(event)
+{
+  //const job = job.cv.best_jobs[].role_titles = x;
+}
 
 // business logic =================================================================
 
@@ -227,6 +232,36 @@ async function Render_Job_Item(event, ctx, target_job, all_jobs)
   if (ctx.item_count < 1) info_elem.Info();
 }
 
+async function Render_Job_Item2(event, target_job)
+{
+  const all_jobs = target_job.cv.best_jobs;
+  const item_elem = event.detail.item_elem;
+  const job = item_elem.item_obj;
+
+  const date_info = Render_Date_Strs(job, all_jobs);
+  item_elem.dates.innerText =
+    date_info.start_date_str; // + " (" + date_info.duration_str + ")";
+
+  item_elem.job_title.addEventListener("change", On_Change_Job_Title);
+  item_elem.job_title.value =
+  {
+    target_job,
+    previous_job: job,
+    text: job.role_title?.suggested_title || job.role_titles,
+    original_text: job.role_titles
+  };
+
+  item_elem.job_description.innerText = job.tailored_job.summary;
+  const html = Render_List(job.tailored_job.bullet_points);
+  if (html)
+    item_elem.job_points.innerHTML = html;
+  else
+    item_elem.job_points.style.display = "none";
+
+  item_elem.job_company.innerText = job.company_name;
+  item_elem.job_tech.innerText = job.tech;
+}
+
 function Render_Education_Item(event)
 {
   const item_elem = event.detail.item_elem;
@@ -238,8 +273,10 @@ function Render_Education_Item(event)
 
 // rendering ======================================================================
 
-function Render_CV(cv)
+function Render_CV(job)
 {
+  const cv = job.cv;
+
   prof_name.innerText = cv.profile.name;
   Render_Field(prof_email_field, cv.profile.email);
   Render_Field(prof_phone_field, cv.profile.phone);
@@ -259,7 +296,7 @@ function Render_CV(cv)
 
   if (cv.best_jobs)
   {
-    jobs_list.addEventListener("render", e => Render_Job_Item2(e, cv.best_jobs));
+    jobs_list.addEventListener("render", e => Render_Job_Item2(e, job));
     jobs_list.value = cv.best_jobs;
 
     const job_elems = jobs_list.querySelectorAll("[slot=item]");
@@ -274,32 +311,6 @@ function Render_CV(cv)
 
   education_list.addEventListener("render", Render_Education_Item);
   education_list.value = cv.edu_items;
-}
-
-async function Render_Job_Item2(event, all_jobs)
-{
-  const item_elem = event.detail.item_elem;
-  const job = item_elem.item_obj;
-
-  const date_info = Render_Date_Strs(job, all_jobs);
-  item_elem.dates.innerText =
-    date_info.start_date_str; // + " (" + date_info.duration_str + ")";
-
-  item_elem.job_title.value =
-  {
-    text: job.role_title?.suggested_title || job.role_titles,
-    original_text: job.role_titles
-  };
-
-  item_elem.job_description.innerText = job.tailored_job.summary;
-  const html = Render_List(job.tailored_job.bullet_points);
-  if (html)
-    item_elem.job_points.innerHTML = html;
-  else
-    item_elem.job_points.style.display = "none";
-
-  item_elem.job_company.innerText = job.company_name;
-  item_elem.job_tech.innerText = job.tech;
 }
 
 function Render_Date_Strs(job, all_jobs)

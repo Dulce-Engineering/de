@@ -429,6 +429,43 @@ class AI
     return res;
   }
 
+  async Generate_Cover_Letter(profile, job)
+  {
+    let res = null;
+
+    if (this.ai && job && profile)
+    {
+      const prompt = `
+        Please generate a tailored cover letter using the following datasets.
+        
+        ### APPLICANT PROFILE & WORK HISTORY (JSON Data):
+        \`\`\`json
+        ${JSON.stringify(profile, null, 2)}
+        \`\`\`
+        
+        ### TARGET JOB DESCRIPTION (Pasted Text):
+        \`\`\`text
+        ${job.description}
+        \`\`\`
+        
+        Output only the completed text of the cover letter.
+      `;
+      const sys_instruction = `
+        You are an expert career coach and professional copywriter. 
+        Your task is to write a compelling, tailored cover letter based on a user's JSON resume and the target JSON job details.
+        
+        Guidelines:
+        1. Highlight specific matches between the applicant's experience and the job's core requirements.
+        2. Maintain a professional, confident, yet authentic tone. Avoid buzzwords like "synergy" or "rockstar".
+        3. Only generate the cover letter's main body text. Do not include a header with the applicant's details or company details.
+        4. Only use facts present in the provided JSON resume. Do not invent metrics or roles.
+      `;
+      res = await this.Prompt(prompt, null, null, sys_instruction);
+    }
+
+    return res;
+  }
+
   async Generate_Summary(job, profile)
   {
     let res = null;
@@ -436,31 +473,31 @@ class AI
     if (this.ai && job && profile)
     {
       const sys_instruction = `
-            You are an expert resume writer and career coach. Your task is to craft a highly 
-            tailored, impactful "Professional Summary" for a CV (approximately 3-4 sentences). 
-            The summary must directly align the applicant's real work history and skills 
-            with the core requirements found in the provided job description. Maintain a 
-            confident, professional, and sophisticated tone. Avoid generic buzzwords.
-          `;
+        You are an expert resume writer and career coach. Your task is to craft a highly 
+        tailored, impactful "Professional Summary" for a CV (approximately 3-4 sentences). 
+        The summary must directly align the applicant's real work history and skills 
+        with the core requirements found in the provided job description. Maintain a 
+        confident, professional, and sophisticated tone. Avoid generic buzzwords.
+      `;
       const prompt = `
-            Please write a tailored CV Professional Summary based on the two data sources provided below.
+        Please write a tailored CV Professional Summary based on the two data sources provided below.
 
-            ### TARGET JOB DESCRIPTION (Pasted Text):
-            \`\`\`text
-            ${job.description}
-            \`\`\`
+        ### TARGET JOB DESCRIPTION (Pasted Text):
+        \`\`\`text
+        ${job.description}
+        \`\`\`
 
-            ### APPLICANT PROFILE & WORK HISTORY (JSON Data):
-            \`\`\`json
-            ${JSON.stringify(profile, null, 2)}
-            \`\`\`
+        ### APPLICANT PROFILE & WORK HISTORY (JSON Data):
+        \`\`\`json
+        ${JSON.stringify(profile, null, 2)}
+        \`\`\`
 
-            ### OUTPUT INSTRUCTIONS:
-            - Write a cohesive 3-4 sentence paragraph.
-            - Synthesize the applicant's experience to highlight the specific metrics, languages, or architectural preferences demanded by the job description.
-            - Do not invent any historical achievements or technologies not explicitly listed in the profile JSON data.
-            - Output only the final paragraph text.
-          `;
+        ### OUTPUT INSTRUCTIONS:
+        - Write a cohesive 3-4 sentence paragraph.
+        - Synthesize the applicant's experience to highlight the specific metrics, languages, or architectural preferences demanded by the job description.
+        - Do not invent any historical achievements or technologies not explicitly listed in the profile JSON data.
+        - Output only the final paragraph text.
+      `;
       res = await this.Prompt(prompt, null, null, sys_instruction);
     }
     else if (profile)
