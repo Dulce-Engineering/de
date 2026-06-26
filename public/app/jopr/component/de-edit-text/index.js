@@ -29,6 +29,7 @@ class DeEditText extends HTMLElement
   On_Click_Ok_Btn()
   {
     this.text_elem.textContent = this.input_elem.value;
+    this.dispatchEvent(new Event("change"));
   }
 
   Render()

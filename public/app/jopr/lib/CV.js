@@ -32,6 +32,7 @@ async function Main2()
   }
 
   Render_CV(job);
+  document.body.style.opacity = "1";
 }
 
 async function Main()

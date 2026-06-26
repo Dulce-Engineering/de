@@ -86,7 +86,7 @@ class DeToolbarMenu extends HTMLElement
     const render_compact = this.hasAttribute("compact");
     if (render_compact)
     {
-      const menu_id = "menu_" + Date.now();
+      const menu_id = "menu_" + crypto.randomUUID();
 
       const dlg_html = `
         <button type="button" popovertarget="${menu_id}" title="Menu" class="img">
