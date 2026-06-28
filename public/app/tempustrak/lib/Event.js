@@ -288,7 +288,7 @@ class Event
       events = [];
     }
 
-    event.id = Date.now();
+    event.id = crypto.randomUUID();
     events.push(event);
 
     Event.Save_All(events);

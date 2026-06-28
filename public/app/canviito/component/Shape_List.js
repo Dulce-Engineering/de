@@ -229,7 +229,7 @@ class Shape_List extends HTMLElement
 
   Add(shape)
   {
-    shape.id = Date.now();
+    shape.id = crypto.randomUUID();
     if (this.shapes.length>0)
     {
       shape.prev_shape = this.shapes[this.shapes.length-1];

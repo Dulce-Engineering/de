@@ -980,7 +980,7 @@
       function On_Click_Ok()
       {
         const timer = Dlg_Get_Value();
-        timer.id = Date.now();
+        timer.id = crypto.randomUUID();
 
         Save_Timer(timer);
 

@@ -250,7 +250,7 @@
         const drink_summary = button.value;
         const drink =
         {
-          id: Date.now(),
+          id: crypto.randomUUID(),
           type_id: drink_summary.type_id,
           size_id: drink_summary.size_id,
           size_ml: drink_summary.size_ml,

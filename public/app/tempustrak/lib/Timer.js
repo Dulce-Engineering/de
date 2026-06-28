@@ -103,7 +103,7 @@ class Timer
       timers = [];
     }
 
-    timer.id = Date.now();
+    timer.id = crypto.randomUUID();
     timers.push(timer);
 
     Timer.Save_All(timers);
