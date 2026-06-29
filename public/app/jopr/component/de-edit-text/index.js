@@ -17,8 +17,15 @@ class DeEditText extends HTMLElement
 
   set value(data)
   {
+    this.original_value = data;
     this.text_elem.textContent = data.text;
     this.orig_elem.textContent = data.original_text
+  }
+
+  get value()
+  {
+    this.original_value.text = this.input_elem.value;
+    return this.original_value;
   }
 
   On_Click_Edit_Btn()

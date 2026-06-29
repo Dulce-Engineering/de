@@ -19,7 +19,7 @@ async function Main2()
   };
 
   const url_params = new URLSearchParams(window.location.search);
-  const gen = url_params.has("gen", "true");
+  const gen = url_params.has("gen", true);
 
   const job_id_str = url_params.get("job_id");
   const job_id = Utils.Is_Empty(job_id_str) ? null : parseInt(job_id_str);
@@ -31,89 +31,29 @@ async function Main2()
     await ctx.Job.Save(ctx, job);
   }
 
-  Render_CV(job);
+  Render_CV(job, ctx);
   document.body.style.opacity = "1";
-}
-
-async function Main()
-{
-  const ctx =
-  {
-    ai: await AI.New(fb_app, fb_ai),
-    db: await Db.New(DB_SCHEMA),
-    db2: await Db.New(DB_SCHEMA),
-    Profile, Utils, Job
-  };
-
-  const profile = await ctx.Profile.Select(ctx);
-  if (profile && ctx.ai)
-  {
-    info_elem.Info("Generating CV...");
-    await Utils.sleep(1500);
-
-    prof_name.innerText = profile.name;
-    Render_Field(prof_email_field, profile.email);
-    Render_Field(prof_phone_field, profile.phone);
-    Render_Field(prof_address_field, profile.address);
-    Render_Field(prof_residency_field, profile.residency_status);
-    Render_Field(prof_website_field, profile.url);
-
-    const seek_html = `<a href="${profile.seek_url}" target="_blank">Seek Profile</a>`;
-    const linkedin_html = `<a href="${profile.linkedin_url}" target="_blank">LinkedIn</a>`;
-    const links_html = Utils.Append_Str(seek_html, linkedin_html, " | ");
-    //Render_Field(prof_links_field, links_html);
-    Render_Field(prof_links_field, null);
-
-    const job_id_str = new URLSearchParams(window.location.search).get("job_id");
-    const job_id = Utils.Is_Empty(job_id_str) ? null : parseInt(job_id_str);
-    const prospective_job = await ctx.Job.Select_By_Id(ctx, job_id);
-
-    info_elem.Info("Generating profile...");
-    const summ_text = await ctx.ai.Generate_Summary(prospective_job, profile);
-    summ_value.innerText = summ_text || "Unable to generate.";
-
-    info_elem.Info("Generating skills list...");
-    const career_jobs = await ctx.Profile.Job_Select(ctx);
-    const skills = await ctx.ai.Generate_Skills(prospective_job, career_jobs, profile);
-    skills_value.innerHTML = Render_List(skills);
-
-    info_elem.Info("Selecting jobs...");
-    const best_job_ids = await ctx.ai.Select_Best_Jobs(career_jobs, prospective_job);
-    if (best_job_ids)
-    {
-      const best_jobs = career_jobs.filter(j => best_job_ids.includes(j.id));
-      jobs_list.addEventListener("render", e => Render_Job_Item(e, ctx, prospective_job, best_jobs));
-      jobs_list.value = best_jobs;
-
-      const job_elems = jobs_list.querySelectorAll("[slot=item]");
-      job_elems[0].style.padding = "0";
-    }
-
-    info_elem.Info("Adding previous jobs...");
-    const legacy_jobs = 
-      await ctx.Profile.Job_Select_Legacy(ctx, best_job_ids);
-    if (legacy_jobs)
-    {
-      legacy_jobs_list.addEventListener
-        ("render", e => Render_Legacy_Job_Item(e, legacy_jobs));
-      legacy_jobs_list.value = legacy_jobs;
-    }
-
-    info_elem.Info("Adding education...");
-    education_list.addEventListener("render", Render_Education_Item);
-    education_list.value = await ctx.Profile.Edu_Select(ctx);
-  }
 }
 
 // events =========================================================================
 
-async function On_Change_Job_Title(event)
+function On_Change_Job_Title(event)
 {
-  //const job = job.cv.best_jobs[].role_titles = x;
+  const edit_elem = event.currentTarget;
+  const edit_value = edit_elem.value;
+  const ctx = edit_value.ctx;
+  edit_value.cv_job.role_titles = edit_value.text;
+  edit_value.cv_job.role_title = null;
+
+  ctx.Job.Save(ctx, edit_value.target_job);
 }
 
 // business logic =================================================================
 
+/**
+ * @param {Context} ctx
+ * @param {object} prospective_job
+ */
 async function Generate_CV(ctx, prospective_job)
 {
   let cv = {};
@@ -198,42 +138,7 @@ function Render_Legacy_Job_Item(event, all_jobs)
   item_elem.dates.innerText = date_info.start_date_str;
 }
 
-async function Render_Job_Item(event, ctx, target_job, all_jobs)
-{
-  ctx.item_count = ctx.item_count === undefined ? 1 : ctx.item_count + 1;
-
-  const item_elem = event.detail.item_elem;
-  const job = item_elem.item_obj;
-
-  const date_info = Render_Date_Strs(job, all_jobs);
-  item_elem.dates.innerText = 
-    date_info.start_date_str; // + " (" + date_info.duration_str + ")";
-
-  info_elem.Info("Generating " + job.company_name + " job title...");
-  const role_title = await ctx.ai.Generate_Job_Title(job, target_job);
-  item_elem.job_title.value = 
-  {
-    text: role_title?.suggested_title || job.role_titles, 
-    original_text: job.role_titles
-  };
-
-  info_elem.Info("Generating " + job.company_name + " job description...");
-  const tailored_job = await ctx.ai.Generate_Job_Description(job, target_job);
-  item_elem.job_description.innerText = tailored_job.summary;
-  const html = Render_List(tailored_job.bullet_points);
-  if (html)
-    item_elem.job_points.innerHTML = html;
-  else
-    item_elem.job_points.style.display = "none";
-
-  item_elem.job_company.innerText = job.company_name;
-  item_elem.job_tech.innerText = job.tech;
-
-  ctx.item_count--;
-  if (ctx.item_count < 1) info_elem.Info();
-}
-
-async function Render_Job_Item2(event, target_job)
+async function Render_Job_Item2(event, target_job, ctx)
 {
   const all_jobs = target_job.cv.best_jobs;
   const item_elem = event.detail.item_elem;
@@ -244,13 +149,15 @@ async function Render_Job_Item2(event, target_job)
     date_info.start_date_str; // + " (" + date_info.duration_str + ")";
 
   item_elem.job_title.addEventListener("change", On_Change_Job_Title);
-  item_elem.job_title.value =
+  const value =
   {
+    ctx,
     target_job,
-    previous_job: job,
+    cv_job: job,
     text: job.role_title?.suggested_title || job.role_titles,
     original_text: job.role_titles
   };
+  item_elem.job_title.value = value;
 
   item_elem.job_description.innerText = job.tailored_job.summary;
   const html = Render_List(job.tailored_job.bullet_points);
@@ -274,7 +181,7 @@ function Render_Education_Item(event)
 
 // rendering ======================================================================
 
-function Render_CV(job)
+function Render_CV(job, ctx)
 {
   const cv = job.cv;
 
@@ -297,7 +204,7 @@ function Render_CV(job)
 
   if (cv.best_jobs)
   {
-    jobs_list.addEventListener("render", e => Render_Job_Item2(e, job));
+    jobs_list.addEventListener("render", e => Render_Job_Item2(e, job, ctx));
     jobs_list.value = cv.best_jobs;
 
     const job_elems = jobs_list.querySelectorAll("[slot=item]");

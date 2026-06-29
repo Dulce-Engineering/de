@@ -108,15 +108,20 @@ class Profile
     return jobs;
   }
 
+  /**
+   * @param {Context} ctx
+   */
   static async Job_Select_Legacy(ctx, exclude_ids)
   {
     const exclude_jobs = 
       await Profile.Job_Select(ctx, j => exclude_ids.includes(j.id));
     const last_job = exclude_jobs[exclude_jobs.length - 1];
-    // last_job.start_date
-
-    const legacy_jobs =
+    const older_jobs =
       await Profile.Job_Select(ctx, j => j.start_date < last_job.start_date);
+
+    const now = Date.now();
+    const twenty_yrs_ago = now - (ctx.Utils.MILLIS_YEAR * 20);
+    const legacy_jobs = older_jobs.filter(j => j.start_date >= twenty_yrs_ago);
 
     return legacy_jobs;
   }

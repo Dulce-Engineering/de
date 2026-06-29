@@ -33,7 +33,7 @@
       "name": "Server",
       "type": "node-terminal",
       "request": "launch",
-      "command": "npm run startem",
+      "command": "cmd /c npm run startem",
       "cwd": "${workspaceFolder}"
     },
   ]
