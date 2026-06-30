@@ -478,6 +478,15 @@ de-input-list, #profile_elem
   {
     display: none;
   }
+  &[cid="attachment_list"]
+  {
+    gap: 4px; 
+    
+    [cid="items_elem"]
+    {
+      gap: 4px;
+    }
+  }
 }
 
 de-input-tree {
