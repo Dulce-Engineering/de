@@ -62,361 +62,67 @@
 
 <body>
 
-  <header id="hdr_elem">
-    <div class="chart">
-      <de-line-chart id="chart_elem" hide-labels chart-type="smooth">
-      </de-line-chart>
-      <div class="b1"></div>
-      <div class="b2"></div>
-    </div>
-    <h1 class="title">JOPR&nbsp;&nbsp;&nbsp;</h1>
-    <de-clock-2 id="clock_elem"></de-clock-2>
-    <nav>
-      <button id="import_btn" class="img" title="Upload">
-        <img src="image/upload.svg">
-      </button>
-      <button id="export_btn" class="img" title="Download">
-        <img src="image/download.svg">
-      </button>
-      <button id="jobs_btn" class="img" title="Jobs">
-        <img src="image/paid.svg">
-      </button>
-      <button id="companies_btn" class="img" title="Companies">
-        <img src="image/factory.svg">
-      </button>
-      <button id="contacts_btn" class="img" title="Contacts">
-        <img src="image/contacts.svg">
-      </button>
-      <button id="profile_btn" class="img" title="Profile">
-        <img src="image/person.svg">
-      </button>
-      <a id="analysis_btn" class="btn img" href="../job-woper" title="Market Analysis">
-        <img src="image/chart-4.svg">
-      </a>
-    </nav>
-    <output id="alert_elem" role="status"></output>
+  <header>
+    <h1 class="title">JOPR&nbsp;&nbsp;&nbsp;&nbsp;</h1>
   </header>
 
-  <main id="items">
+  <main>
+    <section id="hero_section">
+      <p>JOPR is a free, privacy focused, job tracker and AI-powered CV 
+      generator designed to turn your career history into devastatingly 
+      targeted application nukes. No signups. No cloud databases. Just raw 
+      tactical advantage.</p>
 
-    <de-input-list id="jobs_list">
-      <header slot="header">
-        <h2>Jobs</h2>
-        <de-toolbar-menu id="jobs_menu" show-add show-ai></de-toolbar-menu>
-      </header>
-      <details slot="item" class="job-item">
-        <summary>
-          <div>
-            <h2 cid="role_title_elem"></h2>
-            <span cid="contact_elem"></span>
-          </div>
-          <div cid="status_elem"></div>
-          <de-toolbar-menu cid="job_menu" compact
-            show-status label-status="Update Status"
-            show-attach label-attach="Attach Files"
-            show-view label-view="View Details"
-            show-edit label-edit="Edit Job"
-            show-delete label-delete="Delete Job"
-            show-download label-download="Download Job Details"
-            show-gencv label-gencv="Generate CV"
-            show-genletter label-genletter="Generate Cover Letter"
-          >
-          </de-toolbar-menu>
-        </summary>
-        <div class="body">
-          <p cid="role_type_elem"></p>
-          <a cid="link_elem" class="link" target="_blank"></a>
-          <p cid="note_elem"></p>
-          <de-input-list cid="attachment_list" class="attachment-list">
-            <strong slot="header">Attachments:</strong>
-            <div slot="item">
-              <a cid="link2_btn" class="link"></a>
-              <button cid="del2_btn" class="img-sml">
-                <img src="./image/delete.svg" title="Delete Attachment">
-              </button>
-            </div>
-          </de-input-list>
-        </div>
-      </details>
-    </de-input-list>
+      <button>TELL ME MORE</button>
+    </section>
 
-    <de-input-list id="contacts_list" class="hidden">
-      <header slot="header">
-        <h2>Contacts</h2>
-        <button id="add_contact_btn" class="img">
-          <img src="image/add.svg" alt="Add Contact">
-        </button>
-      </header>
-      <details slot="item" class="contact-item">
-        <summary>
-          <b cid="contact_name_elem"></b>
-          <div>
-            <span cid="contact_agency_elem"></span>
-          </div>
-          <de-toolbar-menu cid="contact_menu" 
-            show-edit label-edit="Edit Contact" 
-            show-delete label-delete="Delete Contact"
-          >
-          </de-toolbar-menu>
-        </summary>
-        <p>Email: <span cid="contact_email_elem"></span></p>
-        <p>Phone: <span cid="contact_phone_elem"></span></p>
-        <p>Position: <span cid="contact_position_elem"></span></p>
-      </details>
-    </de-input-list>
+    <section id="core_section">
+      <p>The enemy? Armies of middle managers, faceless HR departments, and 
+      black-box ATS algorithms. If you send them a generic resume, you 
+      are marching your career into an ambush. To survive, you need a 
+      custom-tailored counter-strike for *every single application*</p>
+      
+      <p>THE ONLY WINNING MOVE IS TO OUT-GUN THEM.</p>
 
-    <de-input-list id="companies_list" class="hidden">
-      <header slot="header">
-        <h2>Agencies & Companies</h2>
-        <button id="add_company_btn" class="img">
-          <img src="image/add.svg" alt="Add Company">
-        </button>
-      </header>
-      <details slot="item" class="company-item">
-        <summary>
-          <h2 cid="agency_name_elem"></h2>
-          <div cid="agency_industry_field">Industry: <span cid="agency_industry_elem"></span></div>
-          <div class="menu">
-            <button cid="edit_company_btn" class="img">
-              <img src="image/edit.svg" title="Edit Company">
-            </button>
-            <button cid="del_company_btn" class="img">
-              <img src="image/delete.svg" alt="" title="Delete Company">
-            </button>
-          </div>
-        </summary>
-        <p>Website: <a cid="agency_url_elem" href="#" target="_blank" rel="noopener"></a></p>
-        <p>Email: <span cid="agency_email_elem"></span></p>
-        <p>Phone: <span cid="agency_phone_elem"></span></p>
-        <p>Address: <span cid="agency_address_elem"></span></p>
-      </details>
-    </de-input-list>
+      <p>JOPR gives you the command center to orchestrate a hyper-targeted, 
+      high-frequency deployment of flawless resumes and cover letters, 
+      matching the enemy's language exactly.</p>
 
-    <div id="profile_elem" class="hidden">
+      <article>
+        <header>Air-Gapped Privacy</header>
+        All data is stored on your device.
+        No signups. No accounts. Full privacy.
+        Maximum security.
+      </article>
+      <article>
+        <header>Target Intelligence</header>
+        CVs to match each job. Cover letters too.
+        Highlights relevant work history.
+        Addresses job requirements.
+        Mirrors language used in job description.
+      </article>
+      <article>
+        <header>Theater Mapping</header>
+        Track individual applications.
+        Record interactions.
+        Analyze market trends.
+      </article>
+    </section>
 
-      <header slot="header">
-        <h2>Profile</h2>
-        <de-toolbar-menu id="profile_menu" show-ai show-edit show-download>
-        </de-toolbar-menu>
-      </header>
+    <section id="features_section"></section>
+            
+      <p>GREETINGS, JOB SEEKER. AWAITING DATA REQUEST...</p>
 
-      <div id="profile_details" class="details">
-        <h2 id="profile_name"></h2>
-        <p>Address: <span id="profile_address"></span></p>
-        <p>Seek URL: <span id="profile_seek_url"></span></p>
-        <p>LinkedIn URL: <span id="profile_linkedin_url"></span></p>
-        <p>Residency Status: <span id="profile_residency_status"></span></p>
-        <p>Personal Attributes<br><span id="profile_personal_summary"></span></p>
-        <p>Skills: <span id="profile_skills"></span></p>
-        <p>Interests: <span id="profile_interests"></span></p>
-      </div>
+    <section id="guarantee_section"></section>
 
-      <de-input-list id="edu_list">
-        <header slot="header">
-          <h2>Education</h2>
-          <de-toolbar-menu id="edu_list_menu" show-add></de-toolbar-menu>
-        </header>
-        <details slot="item" class="">
-          <summary>
-            <h2 cid="edu_title_elem"></h2>
-            <de-toolbar-menu cid="edu_item_menu" show-edit show-delete></de-toolbar-menu>
-          </summary>
-          <div cid="edu_det_elem"></div>
-        </details>
-      </de-input-list>
+    <section id="workflow_section"></section>
 
-      <de-input-list id="career_list">
-        <header slot="header">
-          <h2>Career</h2>
-          <de-toolbar-menu id="career_list_menu" show-add></de-toolbar-menu>
-        </header>
-        <details slot="item" class="">
-          <summary>
-            <h2 cid="career_company_elem"></h2>
-            <de-toolbar-menu cid="career_item_menu" show-edit show-delete></de-toolbar-menu>
-          </summary>
-          <div cid="career_title_elem" class="det_item"></div>
-          <div cid="career_time_elem" class="det_item"></div>
-          <div cid="career_tech_elem" class="det_item"></div>
-          <div class="det_item">Responsibilities<br><span cid="career_resp_elem"></span></div>
-          <div class="det_item">Projects<br><span cid="career_proj_elem"></span></div>
-        </details>
-      </de-input-list>
-
-    </div>
-
-  </main>
-
-  <main id="docs">
-    <ul>
-      <li>No Signup required</li>
-      <li>Free</li>
-      <li>Track job applications</li>
-      <li>Generate job-customised CVs & cover letters</li>
-      <li>Monitor job statistics</li>
-    </ul>
+    <section id="cta_section"></section>
   </main>
 
   <footer>
     © Copyright Dulce Engineering 2025. All rights reserved. v1
   </footer>
-  
-  <de-dialog-form id="profile_form" hide-clr>
-    <label slot="fields">Name</label>
-    <input slot="fields" name="name" type="text" placeholder="Full name">
-    <label slot="fields">Phone</label>
-    <input slot="fields" name="phone" type="tel">
-    <label slot="fields">Website</label>
-    <input slot="fields" name="url" type="url">
-    <label slot="fields">Residency Status</label>
-    <input slot="fields" name="residency_status" type="text" placeholder="e.g., Permanent Resident">
-    <label slot="fields">E-Mail</label>
-    <input slot="fields" name="email" type="email">
-    <label slot="fields">Address</label>
-    <input slot="fields" name="address" type="text" placeholder="Street address">
-    <label slot="fields">Seek URL</label>
-    <input slot="fields" name="seek_url" type="url" placeholder="https://seek.com.au/profile/...">
-    <label cid="linkedin_url_label" slot="fields">LinkedIn URL</label>
-    <input slot="fields" name="linkedin_url" type="url" placeholder="https://linkedin.com/in/...">
-    <label cid="personal_summary_label" slot="fields">Personal Summary</label>
-    <textarea slot="fields" name="personal_summary" placeholder="Tell us about yourself..." rows="4"></textarea>
-    <label cid="skills_label" slot="fields">Skills</label>
-    <textarea slot="fields" name="skills" placeholder="List your skills..." rows="4"></textarea>
-    <label cid="interests_label" slot="fields">Interests</label>
-    <textarea slot="fields" name="interests" placeholder="What are you interested in?" rows="4"></textarea>
-  </de-dialog-form>
-
-  <de-dialog-form id="job_dialog">
-    <h2 slot="header">Add Job</h2>
-    <label slot="fields">Role Title</label>
-    <input slot="fields" type="text" name="role_title">
-    <label slot="fields">Role Type</label>
-    <input slot="fields" type="text" name="role_type">
-    <label slot="fields">Company</label>
-    <input slot="fields" type="text" name="company">
-    <label slot="fields">Duration</label>
-    <input slot="fields" type="text" name="duration">
-    <label slot="fields">Source</label>
-    <input slot="fields" type="text" name="source">
-    <label slot="fields">Remuneration</label>
-    <input slot="fields" type="number" name="remuneration" step="0.01">
-    <label slot="fields">Remuneration Unit</label>
-    <input slot="fields" type="text" name="remuneration_unit" placeholder="e.g., AUD/year, $/hour">
-    <label slot="fields">Status</label>
-    <select id="job_status_select" slot="fields" name="status"></select>
-    <label slot="fields">Link</label>
-    <input slot="fields" type="text" name="link">
-    <label slot="fields">Location</label>
-    <input slot="fields" type="text" name="location">
-    <label cid="description_label" slot="fields">Description</label>
-    <textarea slot="fields" name="description" rows="4"></textarea>
-    <label cid="agency_id_label" slot="fields">Agency</label>
-    <select slot="fields" id="job_agency_select" name="agency_id"></select>
-    <label cid="agency_name_label" slot="fields" id="new_agency_label" hidden>Agency Name</label>
-    <input slot="fields" id="new_agency_input" hidden type="text" name="agency_name">
-    <label slot="fields">Contact</label>
-    <select id="job_contact_select" slot="fields" name="contact_id"></select>
-    <label cid="contact_name_label" slot="fields" id="contact_name_label" hidden>Contact Name</label>
-    <input slot="fields" id="contact_name_input" hidden type="text" name="contact_name">
-    <label cid="contact_phone_label" slot="fields" id="contact_phone_label" hidden>Contact Phone</label>
-    <input slot="fields" id="contact_phone_input" hidden type="tel" name="contact_phone">
-    <label cid="contact_email_label" slot="fields" id="contact_email_label" hidden>Contact E-Mail</label>
-    <input slot="fields" id="contact_email_input" hidden type="email" name="contact_email">
-  </de-dialog-form>
-
-  <de-dialog-form id="note_dialog">
-    <h2 slot="header">Add Job Note</h2>
-    <label cid="note_label" slot="fields">Note</label>
-    <textarea slot="fields" name="note" rows="5"></textarea>
-    <label slot="fields">Status</label>
-    <select id="note_status_select" slot="fields" name="status"></select>
-  </de-dialog-form>
-
-  <de-dialog-form id="contact_dialog">
-    <h2 slot="header">Add Contact</h2>
-    <label slot="fields">Name</label>
-    <input slot="fields" type="text" name="name">
-    <label slot="fields">Phone</label>
-    <input slot="fields" type="tel" name="phone">
-    <label slot="fields">Position</label>
-    <input slot="fields" type="text" name="position">
-    <label slot="fields">Agency</label>
-    <select id="contact_agency_select" slot="fields" name="agency_id"></select>
-    <label cid="email_label" slot="fields">Email</label>
-    <input slot="fields" type="email" name="email">
-    <label cid="linkedin_label" slot="fields">LinkedIn</label>
-    <input slot="fields" type="text" name="linkedin">
-  </de-dialog-form>
-
-  <de-dialog-form id="company_dialog">
-    <h2 slot="header">Add Agency / Company</h2>
-    <label slot="fields">Name</label>
-    <input slot="fields" type="text" name="name">
-    <label slot="fields">Phone</label>
-    <input slot="fields" type="tel" name="phone">
-    <label slot="fields">Industry</label>
-    <input slot="fields" type="text" name="industry">
-    <label cid="address_label" slot="fields">Address</label>
-    <input slot="fields" type="text" name="address">
-    <label cid="url_label" slot="fields">URL</label>
-    <input slot="fields" type="url" name="url">
-    <label cid="email_label" slot="fields">Email</label>
-    <input slot="fields" type="email" name="email">
-  </de-dialog-form>
-
-  <de-dialog-form id="career_dialog">
-    <h2 slot="header">Add Career Experience</h2>
-    <label slot="fields">Company</label>
-    <input slot="fields" type="text" name="company_name">
-    <label slot="fields">Title</label>
-    <input slot="fields" type="text" name="role_titles">
-    <label slot="fields">Work Type</label>
-    <select id="career_work_type_select" slot="fields" name="work_type"></select>
-    <label slot="fields">Location</label>
-    <input slot="fields" type="text" name="location">
-    <label slot="fields">Start Time</label>
-    <input slot="fields" type="date" name="start_date">
-    <label slot="fields">End Time</label>
-    <input slot="fields" type="date" name="end_date">
-
-    <label cid="tech_label" slot="fields">Technologies</label>
-    <textarea slot="fields" name="tech" rows="4"></textarea>
-    <label cid="responsibilities_label" slot="fields">Responsibilities</label>
-    <textarea slot="fields" name="responsibilities" rows="4"></textarea>
-    <label cid="projects_label" slot="fields">Projects</label>
-    <textarea slot="fields" name="projects" rows="4"></textarea>
-  </de-dialog-form>
-
-  <de-dialog-form id="email_dialog">
-    <h2 slot="header">Extract Job from Text</h2>
-    <textarea slot="fields" name="email_text" rows="10"></textarea>
-    <p cid="email_text_label" slot="fields">
-      AI will attempt to extract job details, contact info, and
-      agency details from the given text.</p>
-  </de-dialog-form>
-
-  <de-dialog-alert id="job_det_dialog">
-    <h2 cid="role_elem" slot="header">Job Details</h2>
-    <div slot="body">
-      <span cid="contact_name_elem"></span> @ 
-      <a cid="contact_agency_elem"></a>
-      <div class="contact">
-        <img cid="contact_phone_img" src="image/call.svg"><span cid="contact_phone_elem"></span>
-        <img cid="contact_email_img" src="image/mail.svg"><span cid="contact_email_elem"></span>
-      </div>
-    </div>
-    <span cid="des_elem" slot="body"></span>
-  </de-dialog-alert>
-
-  <de-dialog-form id="edu_dialog">
-    <h2 slot="header">Certificate Details</h2>
-    <label slot="fields">Title</label>
-    <input slot="fields" type="text" name="title">
-    <label slot="fields">Institution</label>
-    <input slot="fields" type="text" name="institution">
-    <label slot="fields">Year</label>
-    <input slot="fields" type="number" name="year" min="1900" max="3000" step="1">
-  </de-dialog-form>
 
   <de-info id="info_elem"></de-info>
 

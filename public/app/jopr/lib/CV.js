@@ -191,6 +191,7 @@ function Render_CV(job, ctx)
   Render_Field(prof_address_field, cv.profile.address);
   Render_Field(prof_residency_field, cv.profile.residency_status);
   Render_Field(prof_website_field, cv.profile.url);
+  Render_Field(prof_ref_field, job.id);
 
   const seek_html = `<a href="${cv.profile.seek_url}" target="_blank">Seek Profile</a>`;
   const linkedin_html = `<a href="${cv.profile.linkedin_url}" target="_blank">LinkedIn</a>`;
@@ -219,6 +220,8 @@ function Render_CV(job, ctx)
 
   education_list.addEventListener("render", Render_Education_Item);
   education_list.value = cv.edu_items;
+
+  footer_job_id.innerText = job.id;
 }
 
 function Render_Date_Strs(job, all_jobs)

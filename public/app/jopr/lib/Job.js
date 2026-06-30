@@ -3,14 +3,16 @@ class Job
   static table_name = "jobs";
   static job_status =
   [
+    { id: "accepted", label: "Accepted", type: -7 },
+    { id: "offered", label: "Offered", type: -6 },
+    { id: "negotiating", label: "Negotiating", type: -5 },
+
+    { id: "interviewing", label: "Interviewing", type: -4 },
+    { id: "screening", label: "Screening", type: -3 },
+    { id: "applied", label: "Applied", type: -2 },
+    { id: "applying", label: "Applying", type: -1 },
     { id: "bookmarked", label: "Bookmarked", type: 0 },
-    { id: "applying", label: "Applying", type: 0 },
-    { id: "applied", label: "Applied", type: 0 },
-    { id: "screening", label: "Screening", type: 0 },
-    { id: "interviewing", label: "Interviewing", type: 0 },
-    { id: "negotiating", label: "Negotiating", type: 0 },
-    { id: "offered", label: "Offered", type: 0 },
-    { id: "accepted", label: "Accepted", type: 0 },
+
     { id: "rejected", label: "Rejected", type: 1 },
     { id: "withdrawn", label: "Withdrawn", type: 1 },
     { id: "ghosted", label: "Ghosted", type: 1 },

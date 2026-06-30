@@ -71,7 +71,7 @@ class DeInfo extends HTMLElement
     }
   }
 
-  On_Cancel_Dlg()
+  On_Cancel_Dlg(event)
   {
     event.preventDefault();
   }
