@@ -790,6 +790,17 @@ de-toolbar-menu
   }
 }
 
+de-field
+{
+  display: flex;
+  gap: 5px;
+
+  dd
+  {
+    margin-inline-start: 0;
+  }
+}
+
 .contact
 {
   display: flex;

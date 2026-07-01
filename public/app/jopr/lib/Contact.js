@@ -46,6 +46,7 @@ class Contact
     const contacts = await ctx.db2.Get_All(Contact.table_name);
     if (contacts)
     {
+      contacts.sort((a, b) => Contact.Get_Name(a).localeCompare(Contact.Get_Name(b)));
       for (const contact of contacts)
       {
         contact.agency = await ctx.db2.Select_By_Id("agencies", contact.agency_id);

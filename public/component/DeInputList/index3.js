@@ -78,14 +78,16 @@ class DeInputList extends HTMLElement
   Add(obj)
   {
     //console.log("DeInputList.Add()");
-    const item_elem = this.Render_Item(obj);
-    if (item_elem)
+    let item_elem = this.Find(obj.id);
+    if (!item_elem)
     {
+      item_elem = this.Render_Item(obj);
       this.items_elem.append(item_elem);
-      const event = new CustomEvent("render", 
-        { detail: { obj, item_elem }, bubbles: false });
-      this.dispatchEvent(event);
     }
+
+    const event = new CustomEvent("render", 
+      { detail: { obj, item_elem }, bubbles: false });
+    this.dispatchEvent(event);
   }
 
   /**
@@ -95,8 +97,7 @@ class DeInputList extends HTMLElement
   Remove(obj_id)
   {
     //console.log("DeInputList.Remove()");
-    const item_elem = 
-      Array.from(this.items_elem.children).find(e => e.item_obj?.id == obj_id);
+    const item_elem = this.Find(obj_id);
     if (item_elem)
     {
       item_elem.remove();
@@ -110,6 +111,19 @@ class DeInputList extends HTMLElement
   {
     //console.log("DeInputList.Clear()");
     this.items_elem.replaceChildren();
+  }
+
+  Find(obj_id)
+  {
+    let item_elem = null;
+
+    if (obj_id)
+    {
+      item_elem = 
+        Array.from(this.items_elem.children).find(e => e.item_obj?.id == obj_id);
+    }
+
+    return item_elem;
   }
 
   // helpers =====================================================================

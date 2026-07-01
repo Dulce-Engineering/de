@@ -7,31 +7,34 @@
   <title>JOPR</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="">
-  <meta name="keywords" content="">
-  <meta name="author" content="Dulce Engineering Pty. Ltd.">
   <meta name="robots" content="index, follow">
+  <link rel="shortcut icon" href="./image/favicon.ico">
+  
+  <meta name="description" content="Free local-first job tracker & AI CV builder. Track applications, customize resumes, and manage contacts securely from your browser with no signups required.">
+  <meta name="keywords" content="job tracker, job application tracker, AI resume builder, AI CV generator, local-first app, private job tracker, custom CV, tailored cover letters, resume editor, career manager, retro terminal, no signup job tracker, client-side resume builder, PWA job tracker">
+  <meta name="author" content="Dulce Engineering Pty. Ltd.">
+
   <meta property="og:title" content="JOPR">
-  <meta property="og:description" content="">
+  <meta property="og:description" content="Free local-first job tracker & AI CV builder. Track applications, customize resumes, and manage contacts securely from your browser with no signups required.">
   <meta property="og:image" content="https://dulceeng.com.au/app/jopr/image/screenshot-landscape.png">
   <meta property="og:url" content="https://dulceeng.com.au/app/jopr">
   <meta property="og:type" content="website">
-  <link rel="shortcut icon" href="./image/favicon.ico">
 
-  <link rel="stylesheet" href="styles.css">
-  <link rel="stylesheet" href="./component/de-info/style.css">
-  <link rel="stylesheet" href="./component/de-clock-2/style.css">
-  <link rel="stylesheet" href="./component/jopr-chart/style.css">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "Website",
     "name": "JOPR",
     "url": "https://dulceeng.com.au/app/jopr",
-    "description": "",
+    "description": "Free local-first job tracker & AI CV builder. Track applications, customize resumes, and manage contacts securely from your browser with no signups required.",
     "image": "https://dulceeng.com.au/app/jopr/image/screenshot-landscape.png"
   }
   </script>
+
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="./component/de-info/style.css">
+  <link rel="stylesheet" href="./component/de-clock-2/style.css">
+  <link rel="stylesheet" href="./component/jopr-chart/style.css">
   <script type="importmap">
   {
     "imports": 
@@ -64,28 +67,14 @@
     import "../../component/DeDialogAlert/index.js";
     import "../../component/DeDialogConfirm/index.js";
     import "../../component/DeLineChart/index.js";
-    import "./component/DeToolbarMenu/index.js";
+    import "./component/de-toolbar-menu/index.js";
     import "./component/de-info/index.js";
     import "./component/de-clock-2/index.js";
+    import "./component/de-field/index.js";
+    import "./component/de-contact-form/index.js";
     import DB_SCHEMA from "./db/schema.js";
     import * as Stats from "../job-woper/lib/index.js";
 
-    const job_status =
-    [
-      { id: "bookmarked", label: "Bookmarked", type: 0 },
-      { id: "applying", label: "Applying", type: 0 },
-      { id: "applied", label: "Applied", type: 0 },
-      { id: "screening", label: "Screening", type: 0 },
-      { id: "interviewing", label: "Interviewing", type: 0 },
-      { id: "negotiating", label: "Negotiating", type: 0 },
-      { id: "offered", label: "Offered", type: 0 },
-      { id: "accepted", label: "Accepted", type: 0 },
-      { id: "rejected", label: "Rejected", type: 1 },
-      { id: "withdrawn", label: "Withdrawn", type: 1 },
-      { id: "ghosted", label: "Ghosted", type: 1 },
-      { id: "dismissed", label: "Not interested", type: 1 },
-      { id: "expired", label: "Expired", type: 1 },
-    ];
     const work_types =
     {
       "full-time": "Fulltime",
@@ -118,8 +107,8 @@
         Job, Contact, Agency, Utils, Profile
       };
 
-      Set_Options(note_status_select, job_status, s => s.id, s => s.label);
-      Set_Options(job_status_select, job_status, s => s.id, s => s.label);
+      Set_Options(note_status_select, ctx.Job.job_status, s => s.id, s => s.label);
+      Set_Options(job_status_select, ctx.Job.job_status, s => s.id, s => s.label);
       Set_Options(career_work_type_select, Object.keys(work_types), t => t, t => work_types[t]);
 
       import_btn.onclick = () => On_Click_Import_Btn(ctx);
@@ -161,57 +150,6 @@
     }
 
     // events =========================================================================
-
-    async function Update_Chart(ctx)
-    {
-      const queries = await Stats.Query.Select_All();
-      const seek_queries = queries.filter(q => q.src == "seek");
-      const random_index = Math.floor(Math.random() * seek_queries.length);
-      const query = seek_queries[random_index];
-      console.log("query =", query);
-      const query_id = query.id;
-      const one_week_ago = Date.now() - (Utils.MILLIS_WEEK * 4);
-      const data = await Stats.Trend.Select_By_Query_Id(query_id);
-      const recent_data = data.filter(item => item.datetime >= one_week_ago);
-      if (recent_data && recent_data.length > 0)
-      {
-        const chart_data = recent_data.map(t => { return { x: t.datetime, y: t.count } });
-        //console.log("chart_data =", chart_data);
-        chart_elem.items = {"items": chart_data};
-
-        const chart_data_by_time = chart_data.sort((a, b) => a.x - b.x);
-        const start_count = chart_data_by_time[0].y;
-        const end_count = chart_data_by_time[chart_data_by_time.length - 1].y;
-        const diff_count = end_count - start_count;
-        const percent_change = diff_count / start_count * 100;
-        let title_html = query.title + "<br>" + percent_change.toFixed(2) + "%";
-        chart_elem.svg.classList.remove("trend-up");
-        chart_elem.svg.classList.remove("trend-down");
-        chart_elem.svg.classList.remove("trend-flat");
-        if (percent_change > 0)
-        {
-          title_html += "<br><img src='./image/green/trending_up.svg' class='trend'>";
-          chart_elem.svg.classList.add("trend-up");
-        }
-        else if (percent_change < 0)
-        {
-          title_html += "<br><img src='./image/red/trending_down.svg' class='trend'>";
-          chart_elem.svg.classList.add("trend-down");
-        }
-        else
-        {
-          title_html += "<br><img src='./image/yellow/trending_flat.svg' class='trend'>";
-          chart_elem.svg.classList.add("trend-flat");
-        }
-        chart_elem.setAttribute("title", title_html);
-      }
-      else
-      {
-        chart_elem.items = null;
-      }
-
-      setTimeout(Update_Chart, 60000);
-    }
 
     async function On_Click_Import_Btn(ctx)
     {
@@ -554,6 +492,57 @@
 
     // rendering ======================================================================
 
+    async function Update_Chart(ctx)
+    {
+      const queries = await Stats.Query.Select_All();
+      const seek_queries = queries.filter(q => q.src == "seek");
+      const random_index = Math.floor(Math.random() * seek_queries.length);
+      const query = seek_queries[random_index];
+      //console.log("query =", query);
+      const query_id = query.id;
+      const one_week_ago = Date.now() - (Utils.MILLIS_WEEK * 4);
+      const data = await Stats.Trend.Select_By_Query_Id(query_id);
+      const recent_data = data.filter(item => item.datetime >= one_week_ago);
+      if (recent_data && recent_data.length > 0)
+      {
+        const chart_data = recent_data.map(t => { return { x: t.datetime, y: t.count } });
+        //console.log("chart_data =", chart_data);
+        chart_elem.items = {"items": chart_data};
+
+        const chart_data_by_time = chart_data.sort((a, b) => a.x - b.x);
+        const start_count = chart_data_by_time[0].y;
+        const end_count = chart_data_by_time[chart_data_by_time.length - 1].y;
+        const diff_count = end_count - start_count;
+        const percent_change = diff_count / start_count * 100;
+        let title_html = query.title + "<br>" + percent_change.toFixed(2) + "%";
+        chart_elem.svg.classList.remove("trend-up");
+        chart_elem.svg.classList.remove("trend-down");
+        chart_elem.svg.classList.remove("trend-flat");
+        if (percent_change > 0)
+        {
+          title_html += "<br><img src='./image/green/trending_up.svg' class='trend'>";
+          chart_elem.svg.classList.add("trend-up");
+        }
+        else if (percent_change < 0)
+        {
+          title_html += "<br><img src='./image/red/trending_down.svg' class='trend'>";
+          chart_elem.svg.classList.add("trend-down");
+        }
+        else
+        {
+          title_html += "<br><img src='./image/yellow/trending_flat.svg' class='trend'>";
+          chart_elem.svg.classList.add("trend-flat");
+        }
+        chart_elem.setAttribute("title", title_html);
+      }
+      else
+      {
+        chart_elem.items = null;
+      }
+
+      setTimeout(Update_Chart, 60000);
+    }
+
     function Toggle_Field(value, value_elem, label_elem)
     {
       if (value)
@@ -702,14 +691,17 @@
     function Render_Contact_Item(event, ctx)
     {
       const item_elem = event.detail.item_elem;
-      const contact = item_elem.item_obj;
+      const contact = event.detail.obj;
       const contact_id = contact.id;
 
-      item_elem.contact_name_elem.textContent = contact.name || contact.email || "N/A";
-      item_elem.contact_phone_elem.textContent = contact.phone || "N/A";
-      item_elem.contact_email_elem.textContent = contact.email || "N/A";
-      item_elem.contact_agency_elem.textContent = contact.agency?.name || "N/A";
-      item_elem.contact_position_elem.textContent = contact.position || "N/A";
+      const name = contact.name || contact.email || "N/A";
+      const title = Utils.Append_Str(name, contact.agency?.name, " @ ");
+      item_elem.contact_title_elem.textContent = title;
+
+      item_elem.contact_email_elem.value = contact.email;
+      item_elem.contact_phone_elem.value = contact.phone;
+      item_elem.contact_position_elem.value = contact.position;
+      item_elem.contact_linkedin_elem.value = contact.linkedin;
 
       item_elem.contact_menu.addEventListener("edit", e => On_Click_Edit_Contact(e, contact_id, ctx));
       item_elem.contact_menu.addEventListener("delete", e => On_Click_Delete_Contact(e, contact_id, ctx));
@@ -717,17 +709,19 @@
 
     async function On_Click_Edit_Contact(event, contact_id, ctx)
     {
-      contact_agency_select.innerHTML = await ctx.Agency.Get_Options(ctx);
+      contact_dialog.agency_select.innerHTML = 
+        await ctx.Agency.Get_Options(ctx);
 
       const curr_contact = await ctx.Contact.Select_By_Id(ctx, contact_id);
-      const form_data = await contact_dialog.Show_Async(curr_contact);
+      const form_data = await contact_dialog.Show(curr_contact);
       if (form_data)
       {
-        form_data.id = contact_id;
-        const is_saved = await ctx.Contact.Save(ctx, form_data);
-        if (is_saved)
+        const new_contact = {...curr_contact, ...form_data};
+        const new_contact_id = await ctx.Contact.Save(ctx, new_contact);
+        if (new_contact_id)
         {
-          await Render_Contacts(ctx);
+          new_contact.id = new_contact_id;
+          contacts_list.Add(new_contact);
           Alert("Contact saved successfully.");          
         }
         else
@@ -745,7 +739,8 @@
         const is_deleted = await ctx.Contact.Delete(ctx, contact_id);
         if (is_deleted)
         {
-          await Render_Contacts(ctx);
+          //await Render_Contacts(ctx);
+          contacts_list.Remove(contact_id);
           Alert("Contact deleted successfully.");
         }
         else
@@ -759,7 +754,7 @@
 
     async function Render_Job_Items(ctx)
     {
-      jobs_list.value = await Job.Select_All_Extended_Sorted(ctx);
+      jobs_list.value = await ctx.Job.Select_All_Extended_Sorted(ctx);
     }
 
     function Render_Job_Item(event, ctx)
@@ -769,7 +764,8 @@
       const job_id = job.id;
       //console.log("Render_Job_Item(): job =", job);
 
-      const title_text = Utils.Append_Str(job.role_title, job.company, " - ");
+      const role_title = "#" + job.id + " " + job.role_title;
+      const title_text = Utils.Append_Str(role_title, job.company, " - ");
       item_elem.role_title_elem.textContent = title_text;
 
       const contact_text = Utils.Append_Str(job.contact_name, job.agency_name, " @ ");
@@ -796,7 +792,7 @@
       }
       else
       {
-        item_elem.attachment_list.addEventListener("render", Render_Attachment_Item);
+        item_elem.attachment_list.addEventListener("render", e => Render_Attachment_Item(e, ctx));
         item_elem.attachment_list.value = job.attachments;
       }
 
@@ -1096,19 +1092,17 @@
       </header>
       <details slot="item" class="contact-item">
         <summary>
-          <b cid="contact_name_elem"></b>
-          <div>
-            <span cid="contact_agency_elem"></span>
-          </div>
+          <h2 cid="contact_title_elem"></h2>
           <de-toolbar-menu cid="contact_menu" 
             show-edit label-edit="Edit Contact" 
             show-delete label-delete="Delete Contact"
           >
           </de-toolbar-menu>
         </summary>
-        <p>Email: <span cid="contact_email_elem"></span></p>
-        <p>Phone: <span cid="contact_phone_elem"></span></p>
-        <p>Position: <span cid="contact_position_elem"></span></p>
+        <de-field cid="contact_email_elem" field-label="Email"></de-field>
+        <de-field cid="contact_phone_elem" field-label="Phone"></de-field>
+        <de-field cid="contact_position_elem" field-label="Position"></de-field>
+        <de-field cid="contact_linkedin_elem" field-label="LinkedIn" field-type="link"></de-field>
       </details>
     </de-input-list>
 
@@ -1279,21 +1273,8 @@
     <select id="note_status_select" slot="fields" name="status"></select>
   </de-dialog-form>
 
-  <de-dialog-form id="contact_dialog">
-    <h2 slot="header">Add Contact</h2>
-    <label slot="fields">Name</label>
-    <input slot="fields" type="text" name="name">
-    <label slot="fields">Phone</label>
-    <input slot="fields" type="tel" name="phone">
-    <label slot="fields">Position</label>
-    <input slot="fields" type="text" name="position">
-    <label slot="fields">Agency</label>
-    <select id="contact_agency_select" slot="fields" name="agency_id"></select>
-    <label cid="email_label" slot="fields">Email</label>
-    <input slot="fields" type="email" name="email">
-    <label cid="linkedin_label" slot="fields">LinkedIn</label>
-    <input slot="fields" type="text" name="linkedin">
-  </de-dialog-form>
+  <de-contact-form id="contact_dialog">
+  </de-contact-form>
 
   <de-dialog-form id="company_dialog">
     <h2 slot="header">Add Agency / Company</h2>

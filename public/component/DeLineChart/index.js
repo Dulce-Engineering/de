@@ -659,9 +659,10 @@ class DeLineChart extends HTMLElement
         }
       }
     }
-    else if (points.length === 1) 
+    else 
     {
-      pathData = `M ${points[0].x},${points[0].y}`;
+      //pathData = `M ${points[0].x},${points[0].y}`;
+      pathData = null;
     }
     path.setAttribute("d", pathData);
     path.classList.add("data-line");

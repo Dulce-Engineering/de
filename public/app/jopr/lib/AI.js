@@ -11,7 +11,7 @@ class AI
     if (response.ok)
     {
       const fb_config = await response.json();
-      console.info("Init_AI(): fb_config =", fb_config);
+      //console.info("AI.New(): fb_config =", fb_config);
       const app = fb_app.initializeApp(fb_config);
 
       res = new AI();
