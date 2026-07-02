@@ -72,6 +72,7 @@
     import "./component/de-clock-2/index.js";
     import "./component/de-field/index.js";
     import "./component/de-contact-form/index.js";
+    import "./component/de-contact-list/index.js";
     import DB_SCHEMA from "./db/schema.js";
     import * as Stats from "../job-woper/lib/index.js";
 
@@ -128,9 +129,11 @@
       Render_Companies(ctx);
 
       contacts_btn.onclick = () => Show_View(contacts_list);
-      add_contact_btn.onclick = (e) => On_Click_Edit_Contact(e, null, ctx);
-      contacts_list.addEventListener("render", e => Render_Contact_Item(e, ctx));
-      Render_Contacts(ctx);
+      contacts_list.addEventListener("edit", e => On_Click_Edit_Contact(e, ctx));
+      contacts_list.addEventListener("delete", e => On_Click_Delete_Contact(e, ctx));
+      contacts_list.addEventListener("add", e => On_Click_Edit_Contact(e, ctx));
+      const contacts = await ctx.Contact.Select_Extended(ctx);
+      contacts_list.value = contacts;
 
       profile_btn.onclick = () => Show_View(profile_elem);
       profile_menu.addEventListener("edit", () => On_Click_Edit_Profile(ctx));
@@ -682,33 +685,9 @@
 
     // contacts =======================================================================
 
-    async function Render_Contacts(ctx)
+    async function On_Click_Edit_Contact(event, ctx)
     {
-      const contacts = await ctx.Contact.Select_Extended(ctx);
-      contacts_list.value = contacts;
-    }
-
-    function Render_Contact_Item(event, ctx)
-    {
-      const item_elem = event.detail.item_elem;
-      const contact = event.detail.obj;
-      const contact_id = contact.id;
-
-      const name = contact.name || contact.email || "N/A";
-      const title = Utils.Append_Str(name, contact.agency?.name, " @ ");
-      item_elem.contact_title_elem.textContent = title;
-
-      item_elem.contact_email_elem.value = contact.email;
-      item_elem.contact_phone_elem.value = contact.phone;
-      item_elem.contact_position_elem.value = contact.position;
-      item_elem.contact_linkedin_elem.value = contact.linkedin;
-
-      item_elem.contact_menu.addEventListener("edit", e => On_Click_Edit_Contact(e, contact_id, ctx));
-      item_elem.contact_menu.addEventListener("delete", e => On_Click_Delete_Contact(e, contact_id, ctx));
-    }
-
-    async function On_Click_Edit_Contact(event, contact_id, ctx)
-    {
+      const contact_id = event.detail?.id;
       contact_dialog.agency_select.innerHTML = 
         await ctx.Agency.Get_Options(ctx);
 
@@ -731,15 +710,15 @@
       }
     }
 
-    async function On_Click_Delete_Contact(event, contact_id, ctx)
+    async function On_Click_Delete_Contact(event, ctx)
     {
+      const contact_id = event.detail.id;
       const confirmed = await warning_dlg.Confirm("Are you sure you want to delete this contact?");
       if (confirmed)
       {
         const is_deleted = await ctx.Contact.Delete(ctx, contact_id);
         if (is_deleted)
         {
-          //await Render_Contacts(ctx);
           contacts_list.Remove(contact_id);
           Alert("Contact deleted successfully.");
         }
@@ -1083,28 +1062,8 @@
       </details>
     </de-input-list>
 
-    <de-input-list id="contacts_list" class="hidden">
-      <header slot="header">
-        <h2>Contacts</h2>
-        <button id="add_contact_btn" class="img">
-          <img src="image/add.svg" alt="Add Contact">
-        </button>
-      </header>
-      <details slot="item" class="contact-item">
-        <summary>
-          <h2 cid="contact_title_elem"></h2>
-          <de-toolbar-menu cid="contact_menu" 
-            show-edit label-edit="Edit Contact" 
-            show-delete label-delete="Delete Contact"
-          >
-          </de-toolbar-menu>
-        </summary>
-        <de-field cid="contact_email_elem" field-label="Email"></de-field>
-        <de-field cid="contact_phone_elem" field-label="Phone"></de-field>
-        <de-field cid="contact_position_elem" field-label="Position"></de-field>
-        <de-field cid="contact_linkedin_elem" field-label="LinkedIn" field-type="link"></de-field>
-      </details>
-    </de-input-list>
+    <de-contact-list id="contacts_list" class="hidden"></de-contact-list>
+    <de-contact-form id="contact_dialog"></de-contact-form>
 
     <de-input-list id="companies_list" class="hidden">
       <header slot="header">
@@ -1272,9 +1231,6 @@
     <label slot="fields">Status</label>
     <select id="note_status_select" slot="fields" name="status"></select>
   </de-dialog-form>
-
-  <de-contact-form id="contact_dialog">
-  </de-contact-form>
 
   <de-dialog-form id="company_dialog">
     <h2 slot="header">Add Agency / Company</h2>

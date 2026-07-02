@@ -15,6 +15,8 @@ class DeComponent extends HTMLElement
     this.Render();
   }
 
+  // properties ===============================================================
+
   set value(obj)
   {
   }
@@ -23,6 +25,8 @@ class DeComponent extends HTMLElement
   {
   }
   
+  // attributes ===============================================================
+
   static observedAttributes = 
   [
     "attribute-name"
@@ -31,9 +35,15 @@ class DeComponent extends HTMLElement
   {
   }
 
+  // methods ==================================================================
+
+  // events ===================================================================
+
   On_Click_Btn()
   {
   }
+
+  // rendering ================================================================
 
   Render()
   {

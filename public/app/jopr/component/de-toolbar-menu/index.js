@@ -6,6 +6,7 @@ class DeToolbarMenu extends HTMLElement
 
   singular_title = null;
   plural_title = null;
+  event_data = null;
 
   constructor()
   {
@@ -38,7 +39,7 @@ class DeToolbarMenu extends HTMLElement
   {
     if (this.menu_elem)
       this.menu_elem.hidePopover();
-    this.dispatchEvent(new Event(event_name));
+    this.dispatchEvent(new CustomEvent(event_name, { detail: this.event_data, bubbles: true }));
   }
 
   Render_Title(title, title_type)
