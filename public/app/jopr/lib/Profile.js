@@ -126,6 +126,16 @@ class Profile
     return legacy_jobs;
   }
 
+  static async Job_Select_Recent(ctx)
+  {
+    const jobs = await Profile.Job_Select(ctx);
+    const now = Date.now();
+    const twenty_yrs_ago = now - (ctx.Utils.MILLIS_YEAR * 20);
+    const recent_jobs = jobs.filter(j => j.start_date >= twenty_yrs_ago);
+
+    return recent_jobs;
+  }
+
   static Select_By_Id(ctx, id)
   {
     return ctx.db2.Select_By_Id(Profile.table_name, id);

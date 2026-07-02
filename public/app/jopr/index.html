@@ -112,6 +112,9 @@
       Set_Options(job_status_select, ctx.Job.job_status, s => s.id, s => s.label);
       Set_Options(career_work_type_select, Object.keys(work_types), t => t, t => work_types[t]);
 
+      //const title_elem = document.querySelector("#hdr_elem>h1.title");
+      //title_elem.addEventListener("click", () => On_Click_Title(ctx));
+
       import_btn.onclick = () => On_Click_Import_Btn(ctx);
       export_btn.onclick = () => On_Click_Export_Btn(ctx);
 
@@ -121,6 +124,8 @@
       jobs_menu.addEventListener("add", (e) => On_Click_Edit_Job(e, null, ctx));
       jobs_menu.addEventListener("ai", () => On_Click_AI_Add_Job(ctx));
       jobs_list.addEventListener("render", e => Render_Job_Item(e, ctx));
+      job_contacts.addEventListener("add", On_Click_Add_Contact);
+      job_contacts.addEventListener("select", On_Click_Select_Contact);
       Render_Job_Items(ctx);
 
       companies_btn.onclick = () => Show_View(companies_list);
@@ -153,6 +158,20 @@
     }
 
     // events =========================================================================
+
+    async function On_Click_Title(ctx)
+    {
+      const jobs = await ctx.Job.Select(ctx);
+      for (const job of jobs)
+      {
+        if (job.cv)
+        {
+          console.log("On_Click_Title(): updated cv for job ", job.id);
+          job.cv.legacy_jobs = await ctx.Profile.Job_Select_Recent(ctx);
+          await ctx.Job.Save(ctx, job);
+        }
+      }
+    }
 
     async function On_Click_Import_Btn(ctx)
     {
@@ -978,6 +997,27 @@
       await Render_Job_Items(ctx);
     }
 
+    async function On_Click_Add_Contact(event)
+    {
+      const contact = await contact_dialog.Show();
+      if (contact)
+      {
+        const job = job_dialog.value;
+        if (job.contacts) 
+          job.contacts.push(contact);
+        else 
+          job.contacts = [contact];
+        job_dialog.value = job;
+      }
+    }
+
+    function On_Click_Select_Contact(event)
+    {
+      const job = job_dialog.value;
+
+      //const contacts = await ctx.Contact.Select_Extended(ctx);
+      //contacts_list.value = contacts;
+    }
   </script>
 
 </head>
@@ -1064,6 +1104,9 @@
 
     <de-contact-list id="contacts_list" class="hidden"></de-contact-list>
     <de-contact-form id="contact_dialog"></de-contact-form>
+    <de-dialog-form id="contact_list_dialog">
+      <de-contact-list id="dlg_contact_list"></de-contact-list>
+    </de-dialog-form>
 
     <de-input-list id="companies_list" class="hidden">
       <header slot="header">
@@ -1214,6 +1257,7 @@
     <select slot="fields" id="job_agency_select" name="agency_id"></select>
     <label cid="agency_name_label" slot="fields" id="new_agency_label" hidden>Agency Name</label>
     <input slot="fields" id="new_agency_input" hidden type="text" name="agency_name">
+
     <label slot="fields">Contact</label>
     <select id="job_contact_select" slot="fields" name="contact_id"></select>
     <label cid="contact_name_label" slot="fields" id="contact_name_label" hidden>Contact Name</label>
@@ -1222,6 +1266,12 @@
     <input slot="fields" id="contact_phone_input" hidden type="tel" name="contact_phone">
     <label cid="contact_email_label" slot="fields" id="contact_email_label" hidden>Contact E-Mail</label>
     <input slot="fields" id="contact_email_input" hidden type="email" name="contact_email">
+    <de-contact-list 
+      id="job_contacts" 
+      slot="fields" 
+      name="contacts"
+      show-list
+    ></de-contact-list>
   </de-dialog-form>
 
   <de-dialog-form id="note_dialog">

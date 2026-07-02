@@ -37,7 +37,6 @@ class DeContactList extends HTMLElement
   {
     const item_elem = event.detail.item_elem;
     const contact = event.detail.obj;
-    const contact_id = contact.id;
 
     const name = contact.name || contact.email || "N/A";
     const title = Utils.Append_Str(name, contact.agency?.name, " @ ");
@@ -55,6 +54,11 @@ class DeContactList extends HTMLElement
     this.dispatchEvent(new CustomEvent("add"));
   }
 
+  On_Click_Sel()
+  {
+    this.dispatchEvent(new CustomEvent("select"));
+  }
+
   // rendering ================================================================
 
   Render()
@@ -63,14 +67,18 @@ class DeContactList extends HTMLElement
       <de-input-list cid="contacts_list">
         <header slot="header">
           <h2>Contacts</h2>
-          <button cid="add_contact_btn" class="img">
+          <button cid="sel_contact_btn" class="img" type="button" style="display:none;">
+            <img src="image/list.svg" alt="Select Contact">
+          </button>
+          <button cid="add_contact_btn" class="img" type="button">
             <img src="image/add.svg" alt="Add Contact">
           </button>
         </header>
         <details slot="item" class="contact-item">
           <summary>
             <h2 cid="contact_title_elem"></h2>
-            <de-toolbar-menu cid="contact_menu" 
+            <de-toolbar-menu 
+              cid="contact_menu" 
               show-edit label-edit="Edit Contact" 
               show-delete label-delete="Delete Contact"
             >
@@ -90,6 +98,12 @@ class DeContactList extends HTMLElement
 
     this.contacts_list.addEventListener("render", this.On_Render_Item);
     this.add_contact_btn.addEventListener("click", this.On_Click_Add);
+
+    if (this.hasAttribute("show-list"))
+    {
+      this.sel_contact_btn.style.display = null;
+      this.sel_contact_btn.addEventListener("click", this.On_Click_Sel);
+    }
   }
 }
 

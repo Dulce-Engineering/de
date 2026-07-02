@@ -86,8 +86,8 @@ async function Generate_CV(ctx, prospective_job)
       }
     }
 
-    info_elem.Info("Adding previous jobs...");
-    cv.legacy_jobs = await ctx.Profile.Job_Select_Legacy(ctx, best_job_ids);
+    info_elem.Info("Adding other jobs...");
+    cv.legacy_jobs = await ctx.Profile.Job_Select_Recent(ctx);
 
     info_elem.Info("Adding education...");
     cv.edu_items = await ctx.Profile.Edu_Select(ctx);
@@ -126,48 +126,56 @@ function Get_Next_Job(job, all_jobs)
 
 // render list item ===============================================================
 
-function Render_Legacy_Job_Item(event, all_jobs)
+async function Render_Job_Item(event, target_job, ctx)
 {
+  const all_jobs = target_job.cv.legacy_jobs;
+  const best_jobs = target_job.cv.best_jobs;
   const item_elem = event.detail.item_elem;
-  const job = item_elem.item_obj;
+  let job = item_elem.item_obj;
 
-  const date_info = Render_Date_Strs(job, all_jobs);
-
-  item_elem.job_title.innerText = job.role_titles;
-  item_elem.job_company.innerText = job.company_name;
-  item_elem.dates.innerText = date_info.start_date_str;
-}
-
-async function Render_Job_Item2(event, target_job, ctx)
-{
-  const all_jobs = target_job.cv.best_jobs;
-  const item_elem = event.detail.item_elem;
-  const job = item_elem.item_obj;
-
-  const date_info = Render_Date_Strs(job, all_jobs);
-  item_elem.dates.innerText =
-    date_info.start_date_str; // + " (" + date_info.duration_str + ")";
-
-  item_elem.job_title.addEventListener("change", On_Change_Job_Title);
-  const value =
+  const best_job_index = best_jobs.findIndex(j => j.id == job.id);
+  if (best_job_index > -1)
   {
-    ctx,
-    target_job,
-    cv_job: job,
-    text: job.role_title?.suggested_title || job.role_titles,
-    original_text: job.role_titles
-  };
-  item_elem.job_title.value = value;
+    job = best_jobs[best_job_index];
+    const date_info = Render_Date_Strs(job, all_jobs);
+    item_elem.dates.innerText =
+      //date_info.start_date_str + " (" + date_info.duration_str + ")";
+      date_info.start_date_str + " - " + date_info.end_date_str;
 
-  item_elem.job_description.innerText = job.tailored_job.summary;
-  const html = Render_List(job.tailored_job.bullet_points);
-  if (html)
-    item_elem.job_points.innerHTML = html;
+    item_elem.job_title.addEventListener("change", On_Change_Job_Title);
+    const value =
+    {
+      ctx,
+      target_job,
+      cv_job: job,
+      text: job.role_title?.suggested_title || job.role_titles,
+      original_text: job.role_titles
+    };
+    item_elem.job_title.value = value;
+
+    item_elem.job_description.innerText = job.tailored_job.summary;
+    const html = Render_List(job.tailored_job.bullet_points);
+    if (html)
+      item_elem.job_points.innerHTML = html;
+    else
+      item_elem.job_points.style.display = "none";
+
+    item_elem.job_company.innerText = job.company_name;
+    item_elem.job_tech.innerText = job.tech;
+
+    item_elem.legacy_job.hidden = true;
+  }
   else
-    item_elem.job_points.style.display = "none";
+  {
+    const date_info = Render_Date_Strs(job, all_jobs);
+    item_elem.legacy_job_title.innerText = "*" + job.role_titles;
+    item_elem.legacy_job_company.innerText = job.company_name;
+    item_elem.legacy_dates.innerText = 
+      //date_info.start_date_str + " (" + date_info.duration_str + ")";
+      date_info.start_date_str + " - " + date_info.end_date_str;
 
-  item_elem.job_company.innerText = job.company_name;
-  item_elem.job_tech.innerText = job.tech;
+    item_elem.best_job.hidden = true;
+  }
 }
 
 function Render_Education_Item(event)
@@ -203,19 +211,13 @@ function Render_CV(job, ctx)
 
   skills_value.innerHTML = Render_List(cv.skills);
 
-  if (cv.best_jobs)
+  if (cv.legacy_jobs)
   {
-    jobs_list.addEventListener("render", e => Render_Job_Item2(e, job, ctx));
-    jobs_list.value = cv.best_jobs;
+    jobs_list.addEventListener("render", e => Render_Job_Item(e, job, ctx));
+    jobs_list.value = cv.legacy_jobs;
 
     const job_elems = jobs_list.querySelectorAll("[slot=item]");
     job_elems[0].style.padding = "0";
-  }
-
-  if (cv.legacy_jobs)
-  {
-    legacy_jobs_list.addEventListener("render", e => Render_Legacy_Job_Item(e, cv.legacy_jobs));
-    legacy_jobs_list.value = cv.legacy_jobs;
   }
 
   education_list.addEventListener("render", Render_Education_Item);
@@ -231,8 +233,9 @@ function Render_Date_Strs(job, all_jobs)
   const end_date = next_job ? next_job.start_date : job.end_date;
   const duration_str = Duration_Str(start_date, end_date);
   const start_date_str = Render_Date(start_date);
+  const end_date_str = Render_Date(end_date);
 
-  return { start_date_str, duration_str };
+  return { start_date_str, end_date_str, duration_str };
 }
 
 function Render_Date(date_ms)

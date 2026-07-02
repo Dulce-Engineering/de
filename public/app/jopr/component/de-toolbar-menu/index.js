@@ -106,6 +106,7 @@ class DeToolbarMenu extends HTMLElement
       this.append(...dlg_elems);
     }
 
+    this.Render_Btn("list", "./image/list.svg", dst_elem);
     this.Render_Btn("status", "./image/note-add.svg", dst_elem);
     this.Render_Btn("download", "./image/download.svg", dst_elem);
     this.Render_Btn("upload", "./image/upload.svg", dst_elem);

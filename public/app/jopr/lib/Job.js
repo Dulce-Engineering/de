@@ -18,11 +18,17 @@ class Job
     { id: "ghosted", label: "Ghosted", type: 1 },
     { id: "dismissed", label: "Not interested", type: 1 },
     { id: "expired", label: "Expired", type: 1 },
+    { id: "cancelled", label: "Cancelled", type: 1 },
   ];
 
   static async Select_By_Id(ctx, id)
   {
     return await ctx.db.Select_By_Id(Job.table_name, id);
+  }
+
+  static Select(ctx)
+  {
+    return ctx.db.Get_All(Job.table_name);
   }
 
   static async Select_All_Extended_Sorted(ctx)
@@ -53,7 +59,7 @@ class Job
         contact_name,
         latest_note,
         latest_note_time_formatted,
-        attachments: job_attachments
+        attachments: job_attachments,
       };
     }
 
