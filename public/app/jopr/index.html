@@ -542,17 +542,17 @@
         chart_elem.svg.classList.remove("trend-flat");
         if (percent_change > 0)
         {
-          title_html += "<br><img src='./image/green/trending_up.svg' class='trend'>";
+          //title_html += "<br><img src='./image/green/trending_up.svg' class='trend'>";
           chart_elem.svg.classList.add("trend-up");
         }
         else if (percent_change < 0)
         {
-          title_html += "<br><img src='./image/red/trending_down.svg' class='trend'>";
+          //title_html += "<br><img src='./image/red/trending_down.svg' class='trend'>";
           chart_elem.svg.classList.add("trend-down");
         }
         else
         {
-          title_html += "<br><img src='./image/yellow/trending_flat.svg' class='trend'>";
+          //title_html += "<br><img src='./image/yellow/trending_flat.svg' class='trend'>";
           chart_elem.svg.classList.add("trend-flat");
         }
         chart_elem.setAttribute("title", title_html);
