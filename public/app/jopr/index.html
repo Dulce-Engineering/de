@@ -838,8 +838,10 @@
       const size_text = size ? ` (${Math.round(size / 1024)} KB)` : '';
       item_elem.link2_btn.textContent = name + size_text;
 
-      item_elem.link2_btn.addEventListener("click", () => On_Click_Attachment(attachment));
+      //item_elem.link2_btn.addEventListener("click", () => On_Click_Attachment(attachment));
+      item_elem.open_btn.addEventListener("click", () => On_Click_Attachment(attachment));
       item_elem.del2_btn.addEventListener("click", () => On_Click_Delete_Attachment(ctx, attachment));
+      item_elem.download_btn.addEventListener("click", () => On_Click_Download_Attachment(ctx, attachment));
     }
 
     async function On_Click_AI_Add_Job(ctx)
@@ -857,6 +859,15 @@
     {
       const filename = attachment.filename || attachment.file?.name || 'Unnamed file';
       Utils.Show_File(attachment.file, filename);
+    }
+
+    function On_Click_Download_Attachment(ctx, attachment)
+    {
+      const filename = attachment.filename || attachment.file?.name || 'Unnamed file';
+      const blob = new Blob([attachment.file], { type: 'application/octet-stream' });
+      Utils.Download_File(blob, filename);
+
+      Alert("Attachment downloaded successfully!");
     }
 
     async function On_Click_Delete_Attachment(ctx, attachment)
@@ -1092,9 +1103,15 @@
           <de-input-list cid="attachment_list" class="attachment-list">
             <strong slot="header">Attachments:</strong>
             <div slot="item">
-              <a cid="link2_btn" class="link"></a>
+              <span cid="link2_btn" class="xlink"></span>
               <button cid="del2_btn" class="img-sml">
                 <img src="./image/delete.svg" title="Delete Attachment">
+              </button>
+              <button cid="download_btn" class="img-sml">
+                <img src="./image/download.svg" title="Download Attachment">
+              </button>
+              <button cid="open_btn" class="img-sml">
+                <img src="./image/open_in_new.svg" title="Open Attachment">
               </button>
             </div>
           </de-input-list>

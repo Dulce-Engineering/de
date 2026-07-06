@@ -484,7 +484,7 @@ de-input-list, #profile_elem
     
     [cid="items_elem"]
     {
-      gap: 4px;
+      gap: 0;
     }
   }
 }
@@ -867,7 +867,7 @@ de-field
   li div, main div
   {
     display: inline-flex;
-    gap: 0 5px;
+    gap: 0 2px;
     align-items: flex-start;
   }
 }
