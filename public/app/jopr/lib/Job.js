@@ -64,7 +64,7 @@ class Job
   {
     const jobs = await ctx.db2.Get_All(Job.table_name);
     const agencies = await ctx.db2.Get_All("agencies");
-    const contacts = await ctx.db2.Get_All("contacts");
+    const contacts = await ctx.Contact.Select_Extended(ctx);
     const actionLogs = await ctx.db2.Get_All("action_logs");
     const attachments = await ctx.db2.Get_All("attachments");
 

@@ -119,8 +119,9 @@ class DeInputList extends HTMLElement
 
     if (obj_id)
     {
-      item_elem = 
-        Array.from(this.items_elem.children).find(e => e.item_obj?.id == obj_id);
+      const children_array = Array.from(this.items_elem.children);
+      const Has_Same_Id_Or_Obj = e => e.item_obj?.id == obj_id || e.item_obj == obj_id;
+      item_elem = children_array.find(Has_Same_Id_Or_Obj);
     }
 
     return item_elem;

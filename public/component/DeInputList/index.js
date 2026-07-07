@@ -70,7 +70,7 @@ class DeInputList extends HTMLElement
 
   Remove(obj_id)
   {
-    const item_elem = this.Find_Item_Elem(obj_id);
+    let item_elem = this.Find_Item_Elem(obj_id);
     if (item_elem)
     {
       this.removeChild(item_elem);
@@ -88,7 +88,7 @@ class DeInputList extends HTMLElement
       for (const item_elem of item_elems)
       {
         const obj = item_elem.item_obj;
-        if (obj.id == obj_id)
+        if (obj.id == obj_id || obj == obj_id)
         {
           res = item_elem;
         }

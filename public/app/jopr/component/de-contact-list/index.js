@@ -19,6 +19,10 @@ class DeContactList extends HTMLElement
       {
         this.Render_Select();
       }
+      else if (view_type == "sublist")
+      {
+        this.Render_Sublist();
+      }
     }
     else
     {
@@ -35,7 +39,23 @@ class DeContactList extends HTMLElement
 
   get value()
   {
-    return this.contacts_list.value;
+    let contacts = null;
+
+    const view_type = this.getAttribute("view-type");
+    if (view_type == "select")
+    {
+      const selected_elements = 
+        this.contacts_list.items_elem.querySelectorAll("[name=selected_contact_id]:checked");
+      const selected_ids = Array.from(selected_elements).map(e => parseInt(e.value));
+      contacts = this.contacts_list.value.filter(c => selected_ids.includes(c.id));
+    }
+    else
+    {
+      contacts = this.contacts_list.value;
+    }
+
+    return contacts;
+
   }
 
   // attributes ===============================================================
@@ -53,10 +73,14 @@ class DeContactList extends HTMLElement
     const title = Utils.Append_Str(name, contact.agency?.name, " @ ");
     item_elem.contact_title_elem.textContent = title;
 
-    item_elem.contact_email_elem.value = contact.email;
-    item_elem.contact_phone_elem.value = contact.phone;
-    item_elem.contact_position_elem.value = contact.position;
-    item_elem.contact_linkedin_elem.value = contact.linkedin;
+    if (item_elem.contact_email_elem)
+      item_elem.contact_email_elem.value = contact.email;
+    if (item_elem.contact_phone_elem)
+      item_elem.contact_phone_elem.value = contact.phone;
+    if (item_elem.contact_position_elem)
+      item_elem.contact_position_elem.value = contact.position;
+    if (item_elem.contact_linkedin_elem)
+      item_elem.contact_linkedin_elem.value = contact.linkedin;
 
     if (item_elem.contact_menu)
       item_elem.contact_menu.event_data = contact;
@@ -98,15 +122,43 @@ class DeContactList extends HTMLElement
     this.contacts_list.addEventListener("render", this.On_Render_Item);
   }
 
+  Render_Sublist()
+  {
+    const html = `
+      <de-input-list cid="contacts_list">
+        <header slot="header">
+          <h2>Contacts</h2>
+          <button cid="sel_contact_btn" class="img" type="button">
+            <img src="image/list.svg" alt="Select Contact">
+          </button>
+          <button cid="add_contact_btn" class="img" type="button">
+            <img src="image/add.svg" alt="Add Contact">
+          </button>
+        </header>
+        <div slot="item" class="contact-item">
+          <h2 cid="contact_title_elem"></h2>
+          <de-toolbar-menu 
+            cid="contact_menu" 
+            show-delete label-delete="Delete Contact"
+          >
+          </de-toolbar-menu>
+        </div>
+      </de-input-list>
+    `;
+    this.innerHTML = html;
+    Utils.Set_Id_Shortcuts(this, this, "cid");
+
+    this.contacts_list.addEventListener("render", this.On_Render_Item);
+    this.add_contact_btn.addEventListener("click", this.On_Click_Add);
+    this.sel_contact_btn.addEventListener("click", this.On_Click_Sel);
+  }
+
   Render()
   {
     const html = `
       <de-input-list cid="contacts_list">
         <header slot="header">
           <h2>Contacts</h2>
-          <button cid="sel_contact_btn" class="img" type="button" style="display:none;">
-            <img src="image/list.svg" alt="Select Contact">
-          </button>
           <button cid="add_contact_btn" class="img" type="button">
             <img src="image/add.svg" alt="Add Contact">
           </button>
@@ -135,12 +187,6 @@ class DeContactList extends HTMLElement
 
     this.contacts_list.addEventListener("render", this.On_Render_Item);
     this.add_contact_btn.addEventListener("click", this.On_Click_Add);
-
-    if (this.hasAttribute("show-list"))
-    {
-      this.sel_contact_btn.style.display = null;
-      this.sel_contact_btn.addEventListener("click", this.On_Click_Sel);
-    }
   }
 }
 

@@ -97,8 +97,8 @@
       Set_Options(job_status_select, ctx.Job.job_status, s => s.id, s => s.label);
       Set_Options(career_work_type_select, Object.keys(work_types), t => t, t => work_types[t]);
 
-      //const title_elem = document.querySelector("#hdr_elem>h1.title");
-      //title_elem.addEventListener("click", () => On_Click_Title(ctx));
+      const title_elem = document.querySelector("#hdr_elem>h1.title");
+      title_elem.addEventListener("click", () => On_Click_Title(ctx));
 
       import_btn.onclick = () => On_Click_Import_Btn(ctx);
       export_btn.onclick = () => On_Click_Export_Btn(ctx);
@@ -111,6 +111,7 @@
       jobs_list.addEventListener("render", e => Render_Job_Item(e, ctx));
       job_contacts.addEventListener("add", On_Click_Add_Contact);
       job_contacts.addEventListener("select", e => On_Click_Select_Contact(e, ctx));
+      job_contacts.addEventListener("delete", e => On_Click_Delete_Job_Contact(e, ctx));
       Render_Job_Items(ctx);
 
       companies_btn.onclick = () => Show_View(companies_list);
@@ -149,12 +150,12 @@
       const jobs = await ctx.Job.Select(ctx);
       for (const job of jobs)
       {
-        if (job.cv)
+        /*if (job.cv)
         {
           console.log("On_Click_Title(): updated cv for job ", job.id);
           job.cv.legacy_jobs = await ctx.Profile.Job_Select_Recent(ctx);
           await ctx.Job.Save(ctx, job);
-        }
+        }*/
       }
     }
 
@@ -990,32 +991,29 @@
       await Render_Job_Items(ctx);
     }
 
+    async function On_Click_Delete_Job_Contact(event)
+    {
+      const contact = event.detail;
+      job_contacts.contacts_list.Remove(contact);
+    }
+
     async function On_Click_Add_Contact(event)
     {
       const contact = await contact_dialog.Show();
       if (contact)
       {
-        const job = job_dialog.value;
-        if (job.contacts) 
-          job.contacts.push(contact);
-        else 
-          job.contacts = [contact];
-        job_dialog.value = job;
+        job_contacts.contacts_list.Add(contact);
       }
     }
 
     async function On_Click_Select_Contact(event, ctx)
     {
-      const job = job_dialog.value;
-
       const contacts = await ctx.Contact.Select_Extended(ctx);
       const dlg_data = await contact_list_dialog.Show_Async({contacts});
-      if (dlg_data?.selected_contact_id)
+      if (!ctx.Utils.Is_Empty(dlg_data.contacts))
       {
-        const contact = contacts.find(c => c.id == dlg_data.selected_contact_id);
-        //job.contacts = job.contacts ? [...job.contacts, contact] : [contact];
+        const contact = dlg_data.contacts[0];
         job_contacts.contacts_list.Add(contact);
-        //job_dialog.value = job;
       }
     }
   </script>
@@ -1282,7 +1280,7 @@
       id="job_contacts" 
       slot="fields" 
       name="contacts"
-      show-list
+      view-type="sublist"
     ></de-contact-list>
   </de-dialog-form>
 

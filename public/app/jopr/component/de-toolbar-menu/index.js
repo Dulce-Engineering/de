@@ -68,7 +68,7 @@ class DeToolbarMenu extends HTMLElement
         `title="${this.getAttribute("label-" + id)}"` : "";
 
       const html = `
-        <button cid="${id}_btn" class="img" ${title}>
+        <button cid="${id}_btn" class="img" type="button" ${title}>
           <img src="${img_src}">
           <span class="label">${this.getAttribute("label-" + id)}</span>
         </button>
