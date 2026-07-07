@@ -48,96 +48,13 @@ class DeDialogForm extends HTMLElement
   set value(obj)
   {
     this.obj = obj;
-    this.Set_Inputs();
+    Utils.From_Obj_To_Elements(this.obj, this.main_elem);
   }
 
   get value()
   {
-    const obj = this.Set_Obj(this.obj);
+    const obj = Utils.From_Elements_To_Obj(this.obj, this.main_elem);
     return obj;
-  }
-
-  // internal methods ==============================================================
-
-  Set_Obj(obj)
-  {
-    const input_elements = this.main_elem.querySelectorAll("[name]");
-    for (const input_elem of input_elements)
-    {
-      const field_name = input_elem.getAttribute("name");
-      if (!obj)
-      {
-        obj = {};
-      }
-
-      const input_type = input_elem.getAttribute("type");
-      if (input_type == "radio")
-      {
-        if (input_elem.checked)
-        {
-          obj[field_name] = input_elem.value;
-        }
-      }
-      else if (!Utils.isEmpty(input_elem.value))
-      {
-        if (input_type == "number")
-        {
-          obj[field_name] = input_elem.valueAsNumber;
-        }
-        else if (input_type == "date")
-        {
-          const date_only = Utils.toDateOnly(input_elem.value);
-          obj[field_name] = date_only.getTime();
-        }
-        else if (input_type == "datetime-local")
-        {
-          const date = new Date(input_elem.value);
-          obj[field_name] = date.getTime();
-        }
-        else
-        {
-          obj[field_name] = input_elem.value;
-        }
-      }
-      else if (input_elem.tagName != "DETAILS")
-      {
-        obj[field_name] = null;
-      }
-    }
-
-    return obj;
-  }
-
-  Set_Inputs()
-  {
-    const input_elements = this.querySelectorAll("[name]");
-    for (const input_elem of input_elements)
-    {
-      const field_name = input_elem.getAttribute("name");
-      const field_val = this.obj ? this.obj[field_name] : null;
-      const input_type = input_elem.getAttribute("type");
-
-      if (input_type == "radio")
-      {
-        input_elem.checked = input_elem.value == field_val;
-      }
-      else if (input_type == "date" && field_val)
-      {
-        const date = new Date(field_val);
-        const date_str = Utils.toDateStr(date);
-        input_elem.value = date_str;
-      }
-      else if (input_type == "datetime-local" && field_val)
-      {
-        const date_str = 
-          Utils.Millis_To_ISO_String(field_val).substring(0, 16);
-        input_elem.value = date_str;
-      }
-      else
-      {
-        input_elem.value = field_val || null;
-      }
-    }
   }
 
   // events ========================================================================

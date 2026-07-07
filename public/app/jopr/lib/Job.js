@@ -21,6 +21,32 @@ class Job
     { id: "cancelled", label: "Cancelled", type: 1 },
   ];
 
+  static To_Job(form_data)
+  {
+    const job =
+    {
+      link: form_data.link?.trim() || null,
+      company: form_data.company?.trim() || null,
+      duration: form_data.duration?.trim() || null,
+      source: form_data.source?.trim() || null,
+      description: form_data.description?.trim() || null,
+      id: form_data.id,
+      role_title: form_data.role_title?.trim() || null,
+      role_type: form_data.role_type?.trim() || null,
+      location: form_data.location?.trim() || null,
+      remuneration: parseFloat(form_data.remuneration) || null,
+      remuneration_unit: form_data.remuneration_unit?.trim() || null,
+      agency_id: parseInt(form_data.agency_id) || null,
+      contact_id: parseInt(form_data.contact_id) || null,
+      contact_ids: form_data.contact_ids || null,
+      status: form_data.status || null,
+      cv: form_data.cv || null,
+      cl: form_data.cl?.trim() || null,
+      last_update: form_data.last_update || Date.now(),
+    };
+    return job;
+  }
+
   static async Select_By_Id(ctx, id)
   {
     return await ctx.db.Select_By_Id(Job.table_name, id);
@@ -31,6 +57,9 @@ class Job
     return ctx.db.Get_All(Job.table_name);
   }
 
+  /**
+   * @param {Context} ctx
+   */
   static async Select_All_Extended_Sorted(ctx)
   {
     const jobs = await ctx.db2.Get_All(Job.table_name);
@@ -48,9 +77,26 @@ class Job
         .sort((a, b) => b.timestamp - a.timestamp || b.id - a.id)[0];
       const agency_name = agencies?.find(a => a.id === job.agency_id)?.name;
       const contact_name = contacts?.find(c => c.id === job.contact_id)?.name;
-      const latest_note = latestLog?.note;
-      const latest_note_time_formatted = latestLog ? new Date(latestLog.timestamp).toLocaleString() : "";
       const job_attachments = attachments.filter(a => a.job_id === job.id);
+
+      let latest_note = null;
+      let latest_note_time_formatted = null;
+      if (latestLog)
+      {
+        latest_note = latestLog.note;
+        latest_note_time_formatted = new Date(latestLog.timestamp).toLocaleString();
+      }
+      else if (job.last_update)
+      {
+        latest_note = "Last activity.";
+        latest_note_time_formatted = new Date(job.last_update).toLocaleString();
+      }
+
+      let job_contacts = null;
+      if (!ctx.Utils.Is_Empty(job.contact_ids))
+      {
+        job_contacts = contacts.filter(c => job.contact_ids.includes(c.id));
+      }
 
       return {
         ...job,
@@ -60,6 +106,7 @@ class Job
         latest_note,
         latest_note_time_formatted,
         attachments: job_attachments,
+        contacts: job_contacts,
       };
     }
 
@@ -68,7 +115,8 @@ class Job
     {
       return a.status_type !== b.status_type ?
         a.status_type - b.status_type :
-        b.last_update - a.last_update;
+        b.id - a.id
+        //b.last_update - a.last_update;
     }
 
     return enrichedJobs;
@@ -96,9 +144,12 @@ class Job
     }
   }
 
+  /**
+   * @param {Context} ctx
+   */
   static async Save(ctx, form_data)
   {
-    let res = null;
+    let id = null;
 
     if (form_data)
     {
@@ -122,30 +173,29 @@ class Job
         form_data.contact_id = new_contact_id;
       }
 
-      const job =
+      if (!ctx.Utils.Is_Empty(form_data.contacts))
       {
-        link: form_data.link?.trim() || null,
-        company: form_data.company?.trim() || null,
-        duration: form_data.duration?.trim() || null,
-        source: form_data.source?.trim() || null,
-        description: form_data.description?.trim() || null,
-        id: form_data.id,
-        role_title: form_data.role_title?.trim() || null,
-        role_type: form_data.role_type?.trim() || null,
-        location: form_data.location?.trim() || null,
-        remuneration: parseFloat(form_data.remuneration) || null,
-        remuneration_unit: form_data.remuneration_unit?.trim() || null,
-        agency_id: parseInt(form_data.agency_id) || null,
-        contact_id: parseInt(form_data.contact_id) || null,
-        status: form_data.status || null,
-        cv: form_data.cv || null,
-        cl: form_data.cl?.trim() || null
-      };
+        const contact_ids = [];
+        for (const contact of form_data.contacts)
+        {
+          if (contact.id)
+          {
+            contact_ids.push(contact.id);
+          }
+          else
+          {
+            const new_contact = await ctx.Contact.Save(ctx, contact);
+            contact_ids.push(new_contact.id);
+          }
+        }
+        form_data.contact_ids = contact_ids;
+      }
 
-      res = await ctx.db.Save(Job.table_name, job);
+      const job = Job.To_Job(form_data);
+      id = await ctx.db.Save(Job.table_name, job);
     }
 
-    return res;
+    return id;
   }
 
   static async AI_Import(ctx, raw_text, notify_fn)

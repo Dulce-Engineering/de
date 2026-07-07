@@ -38,9 +38,9 @@ class DeInputList extends HTMLElement
   set value(objs)
   {
     //console.log("DeInputList.set value()");
+    this.Clear();
     if (objs && objs.length > 0)
     {
-      this.Clear();
       for (const obj of objs)
       {
         this.Add(obj)

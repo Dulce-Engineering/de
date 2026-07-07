@@ -50,16 +50,7 @@
   </script>
 
   <script type="module">
-    import * as fb_app from "firebase/app";
-    import * as fb_ai from "firebase/ai";
-    import Utils from "../../lib/Utils.js";
     import JOPR from "./lib/Utils.js";
-    import Db from "./lib/Db.js";
-    import AI from "./lib/AI.js";
-    import Job from "./lib/Job.js";
-    import Contact from "./lib/Contact.js";
-    import Agency from "./lib/Agency.js";
-    import Profile from "./lib/Profile.js";
     import "../../dedial/dedial.js";
     import "../../component/DeInputList/index3.js";
     import "../../component/DeForm/index.js";
@@ -73,8 +64,8 @@
     import "./component/de-field/index.js";
     import "./component/de-contact-form/index.js";
     import "./component/de-contact-list/index.js";
-    import DB_SCHEMA from "./db/schema.js";
     import * as Stats from "../job-woper/lib/index.js";
+    import New_Ctx from "./lib/ctx.js";
 
     const work_types =
     {
@@ -100,13 +91,7 @@
       const db_id = new URLSearchParams(window.location.search).get("db_id");
       if (db_id) DB_SCHEMA.name = db_id;
 
-      const ctx = 
-      { 
-        ai: await AI.New(fb_app, fb_ai),
-        db2: await Db.New(DB_SCHEMA),
-        db: await Db.New(DB_SCHEMA),
-        Job, Contact, Agency, Utils, Profile
-      };
+      const ctx = await New_Ctx();
 
       Set_Options(note_status_select, ctx.Job.job_status, s => s.id, s => s.label);
       Set_Options(job_status_select, ctx.Job.job_status, s => s.id, s => s.label);
@@ -125,7 +110,7 @@
       jobs_menu.addEventListener("ai", () => On_Click_AI_Add_Job(ctx));
       jobs_list.addEventListener("render", e => Render_Job_Item(e, ctx));
       job_contacts.addEventListener("add", On_Click_Add_Contact);
-      job_contacts.addEventListener("select", On_Click_Select_Contact);
+      job_contacts.addEventListener("select", e => On_Click_Select_Contact(e, ctx));
       Render_Job_Items(ctx);
 
       companies_btn.onclick = () => Show_View(companies_list);
@@ -194,7 +179,7 @@
           {
             if (attachment.file)
             {
-              attachment.file = await Utils.Deserialize_File(attachment.file);
+              attachment.file = await ctx.Utils.Deserialize_File(attachment.file);
             }
           }
         }
@@ -223,7 +208,7 @@
         {
           if (attachment.file)
           {
-            attachment.file = await Utils.Serialize_File(attachment.file);
+            attachment.file = await ctx.Utils.Serialize_File(attachment.file);
           }
         }
       }
@@ -232,7 +217,7 @@
       const blob = new Blob([json_string], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const filename = `jopr-data-${new Date().toISOString().split('T')[0]}.json`;
-      Utils.Download_File(blob, filename);
+      ctx.Utils.Download_File(blob, filename);
 
       Alert("Data exported successfully!");
     }
@@ -295,14 +280,14 @@
       const filename = `jopr-profile-${new Date().toISOString().split('T')[0]}.json`;
       const json_string = JSON.stringify(employee, null, 2);
       const blob = new Blob([json_string], { type: 'application/json' });
-      Utils.Download_File(blob, filename);
+      ctx.Utils.Download_File(blob, filename);
 
       Alert("Data exported successfully!");
     }
 
     async function On_Click_AI_Add_Profile(ctx)
     {
-      const files = await Utils.Select_Files();
+      const files = await ctx.Utils.Select_Files();
       if (files && files.length > 0) 
       {
         console.info("Processing CV...");
@@ -330,7 +315,7 @@
       const edu = item_elem.item_obj;
       const edu_id = edu.id;
 
-      const details = Utils.Append_Str(edu.institution, edu.year, " - ");
+      const details = ctx.Utils.Append_Str(edu.institution, edu.year, " - ");
       item_elem.edu_title_elem.textContent = edu.title || "Unnamed Education";
       item_elem.edu_det_elem.textContent = details;
 
@@ -389,14 +374,14 @@
       const job_id = job.id;
 
       const start_time = job.start_date ? new Date(job.start_date) : null;
-      const start_time_str = Utils.To_Date_Str(start_time);
+      const start_time_str = ctx.Utils.To_Date_Str(start_time);
       const end_time = job.end_date ? new Date(job.end_date) : null;
-      const end_time_str = Utils.To_Date_Str(end_time);
+      const end_time_str = ctx.Utils.To_Date_Str(end_time);
       const duration_str = Duration_Str(start_time, end_time);
-      let time_str = Utils.Append_Str(start_time_str, end_time_str, " - ");
-      time_str = Utils.Append_Str(time_str, "(" + duration_str + ")", " ");
-      const role = Utils.Append_Str(job.role_titles, Work_Type_Label(job.work_type), " - ");
-      const summ = Utils.Append_Str(role, job.location, " - ");
+      let time_str = ctx.Utils.Append_Str(start_time_str, end_time_str, " - ");
+      time_str = ctx.Utils.Append_Str(time_str, "(" + duration_str + ")", " ");
+      const role = ctx.Utils.Append_Str(job.role_titles, Work_Type_Label(job.work_type), " - ");
+      const summ = ctx.Utils.Append_Str(role, job.location, " - ");
 
       item_elem.career_company_elem.textContent = job.company_name || "N/A";
       item_elem.career_title_elem.textContent = summ || "N/A";
@@ -522,7 +507,7 @@
       const query = seek_queries[random_index];
       //console.log("query =", query);
       const query_id = query.id;
-      const one_week_ago = Date.now() - (Utils.MILLIS_WEEK * 4);
+      const one_week_ago = Date.now() - (ctx.Utils.MILLIS_WEEK * 4);
       const data = await Stats.Trend.Select_By_Query_Id(query_id);
       const recent_data = data.filter(item => item.datetime >= one_week_ago);
       if (recent_data && recent_data.length > 0)
@@ -562,7 +547,7 @@
         chart_elem.items = null;
       }
 
-      setTimeout(Update_Chart, 60000);
+      setTimeout(() => Update_Chart(ctx), 60000);
     }
 
     function Toggle_Field(value, value_elem, label_elem)
@@ -750,6 +735,9 @@
 
     // jobs ===========================================================================
 
+    /**
+     * @param {Context} ctx
+     */
     async function Render_Job_Items(ctx)
     {
       jobs_list.value = await ctx.Job.Select_All_Extended_Sorted(ctx);
@@ -763,15 +751,15 @@
       //console.log("Render_Job_Item(): job =", job);
 
       const role_title = "#" + job.id + " " + job.role_title;
-      const title_text = Utils.Append_Str(role_title, job.company, " - ");
+      const title_text = ctx.Utils.Append_Str(role_title, job.company, " - ");
       item_elem.role_title_elem.textContent = title_text;
 
-      const contact_text = Utils.Append_Str(job.contact_name, job.agency_name, " @ ");
+      const contact_text = ctx.Utils.Append_Str(job.contact_name, job.agency_name, " @ ");
       item_elem.contact_elem.textContent = contact_text;
 
-      const salary_text = Utils.Append_Str(job.remuneration, job.remuneration_unit, " ");
-      const type_text = Utils.Append_Str(job.role_type, job.duration, " - ");
-      const des_text = Utils.Append_Str(type_text, salary_text, " - ");
+      const salary_text = ctx.Utils.Append_Str(job.remuneration, job.remuneration_unit, " ");
+      const type_text = ctx.Utils.Append_Str(job.role_type, job.duration, " - ");
+      const des_text = ctx.Utils.Append_Str(type_text, salary_text, " - ");
       item_elem.role_type_elem.textContent = des_text;
 
       if (job.link)
@@ -784,7 +772,7 @@
         item_elem.link_elem.remove();
       }
 
-      if (Utils.Is_Empty(job.attachments))
+      if (ctx.Utils.Is_Empty(job.attachments))
       {
         item_elem.attachment_list.remove();
       }
@@ -810,7 +798,7 @@
 
       item_elem.job_menu.addEventListener("attach", e => On_Click_Attach_Files(e, job_id, ctx));
       item_elem.job_menu.addEventListener("view", e => On_Click_View_Job(e, job_id, ctx));
-      item_elem.job_menu.addEventListener("edit", e => On_Click_Edit_Job(e, job_id, ctx));
+      item_elem.job_menu.addEventListener("edit", e => On_Click_Edit_Job(e, job, ctx));
       item_elem.job_menu.addEventListener("delete", e => On_Click_Delete_Job(e, job_id, ctx));
       item_elem.job_menu.addEventListener("download", e => On_Click_Download_Job(e, job_id, ctx));
       item_elem.job_menu.addEventListener("status", e => On_Click_Add_Note(e, job_id, ctx));
@@ -839,7 +827,7 @@
       item_elem.link2_btn.textContent = name + size_text;
 
       //item_elem.link2_btn.addEventListener("click", () => On_Click_Attachment(attachment));
-      item_elem.open_btn.addEventListener("click", () => On_Click_Attachment(attachment));
+      item_elem.open_btn.addEventListener("click", () => On_Click_Attachment(ctx, attachment));
       item_elem.del2_btn.addEventListener("click", () => On_Click_Delete_Attachment(ctx, attachment));
       item_elem.download_btn.addEventListener("click", () => On_Click_Download_Attachment(ctx, attachment));
     }
@@ -855,17 +843,17 @@
       }
     }
 
-    function On_Click_Attachment(attachment)
+    function On_Click_Attachment(ctx, attachment)
     {
       const filename = attachment.filename || attachment.file?.name || 'Unnamed file';
-      Utils.Show_File(attachment.file, filename);
+      ctx.Utils.Show_File(attachment.file, filename);
     }
 
     function On_Click_Download_Attachment(ctx, attachment)
     {
       const filename = attachment.filename || attachment.file?.name || 'Unnamed file';
       const blob = new Blob([attachment.file], { type: 'application/octet-stream' });
-      Utils.Download_File(blob, filename);
+      ctx.Utils.Download_File(blob, filename);
 
       Alert("Attachment downloaded successfully!");
     }
@@ -887,23 +875,18 @@
       const filename = `jopr-${new Date().toISOString().split('T')[0]}.json`;
       const json_string = JSON.stringify(job, null, 2);
       const blob = new Blob([json_string], { type: 'application/json' });
-      Utils.Download_File(blob, filename);
+      ctx.Utils.Download_File(blob, filename);
 
       Alert("Job exported successfully!");
     }
 
     async function On_Click_Attach_Files(event, job_id, ctx)
     {
-      //event?.stopPropagation?.();
-      //event?.preventDefault?.();
-      const files = await Utils.Select_Files();
+      const files = await ctx.Utils.Select_Files();
       if (files && files.length > 0)
       {
         const attachments = files.map(file => ({
           job_id,
-          //filename: file.name,
-          //mime_type: file.type || 'application/octet-stream',
-          //size: file.size,
           file,
           timestamp: Date.now()
         }));
@@ -966,7 +949,7 @@
       job_det_dialog.Show();
     }
 
-    async function On_Click_Edit_Job(event, job_id, ctx)
+    async function On_Click_Edit_Job(event, job, ctx)
     {
       job_agency_select.innerHTML = await ctx.Agency.Get_Options(ctx);
       Toggle_New_Agency_Fields(false);
@@ -974,11 +957,10 @@
       job_contact_select.innerHTML = await ctx.Contact.Get_Options(ctx);
       Toggle_New_Contact_Fields(false);
 
-      const job = await ctx.db2.Select_By_Id("jobs", job_id);
       const form_data = await job_dialog.Show_Async(job);
       if (form_data)
       {
-        form_data.id = job_id;
+        form_data.id = job.id;
         await ctx.Job.Save(ctx, form_data);
         await Render_Job_Items(ctx);
       }
@@ -987,7 +969,7 @@
     async function On_Click_Add_Note(e, job_id, ctx)
     {
       const form_data = await note_dialog.Show_Async();
-      if (!Utils.Is_Empty(form_data?.note))
+      if (!ctx.Utils.Is_Empty(form_data?.note))
       {
         const now = new Date();
         const action =
@@ -1000,7 +982,7 @@
         await ctx.db2.Insert("action_logs", action);
       }
 
-      if (!Utils.Is_Empty(form_data?.status))
+      if (!ctx.Utils.Is_Empty(form_data?.status))
       {
         await ctx.db2.Update("jobs", { id: job_id, status: form_data.status });
       }
@@ -1022,12 +1004,19 @@
       }
     }
 
-    function On_Click_Select_Contact(event)
+    async function On_Click_Select_Contact(event, ctx)
     {
       const job = job_dialog.value;
 
-      //const contacts = await ctx.Contact.Select_Extended(ctx);
-      //contacts_list.value = contacts;
+      const contacts = await ctx.Contact.Select_Extended(ctx);
+      const dlg_data = await contact_list_dialog.Show_Async({contacts});
+      if (dlg_data?.selected_contact_id)
+      {
+        const contact = contacts.find(c => c.id == dlg_data.selected_contact_id);
+        //job.contacts = job.contacts ? [...job.contacts, contact] : [contact];
+        job_contacts.contacts_list.Add(contact);
+        //job_dialog.value = job;
+      }
     }
   </script>
 
@@ -1122,7 +1111,13 @@
     <de-contact-list id="contacts_list" class="hidden"></de-contact-list>
     <de-contact-form id="contact_dialog"></de-contact-form>
     <de-dialog-form id="contact_list_dialog">
-      <de-contact-list id="dlg_contact_list"></de-contact-list>
+      <de-contact-list 
+        id="dlg_contact_list" 
+        slot="fields" 
+        name="contacts"
+        view-type="select"
+      >
+      </de-contact-list>
     </de-dialog-form>
 
     <de-input-list id="companies_list" class="hidden">

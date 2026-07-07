@@ -12,7 +12,18 @@ class DeContactList extends HTMLElement
 
   connectedCallback()
   {
-    this.Render();
+    if (this.hasAttribute("view-type"))
+    {
+      const view_type = this.getAttribute("view-type");
+      if (view_type == "select")
+      {
+        this.Render_Select();
+      }
+    }
+    else
+    {
+      this.Render();
+    }
   }
 
   // properties ===============================================================
@@ -46,7 +57,11 @@ class DeContactList extends HTMLElement
     item_elem.contact_phone_elem.value = contact.phone;
     item_elem.contact_position_elem.value = contact.position;
     item_elem.contact_linkedin_elem.value = contact.linkedin;
-    item_elem.contact_menu.event_data = contact;
+
+    if (item_elem.contact_menu)
+      item_elem.contact_menu.event_data = contact;
+    if (item_elem.sel_contact_radio)
+      item_elem.sel_contact_radio.value = contact.id;
   }
 
   On_Click_Add()
@@ -60,6 +75,28 @@ class DeContactList extends HTMLElement
   }
 
   // rendering ================================================================
+
+  Render_Select()
+  {
+    const html = `
+      <de-input-list cid="contacts_list">
+        <details slot="item" class="contact-item">
+          <summary>
+            <input type="radio" name="selected_contact_id" cid="sel_contact_radio">
+            <h2 cid="contact_title_elem"></h2>
+          </summary>
+          <de-field cid="contact_email_elem" field-label="Email"></de-field>
+          <de-field cid="contact_phone_elem" field-label="Phone"></de-field>
+          <de-field cid="contact_position_elem" field-label="Position"></de-field>
+          <de-field cid="contact_linkedin_elem" field-label="LinkedIn" field-type="link"></de-field>
+        </details>
+      </de-input-list>
+    `;
+    this.innerHTML = html;
+    Utils.Set_Id_Shortcuts(this, this, "cid");
+
+    this.contacts_list.addEventListener("render", this.On_Render_Item);
+  }
 
   Render()
   {

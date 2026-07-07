@@ -185,18 +185,18 @@ class Db
 
   static Save(db, table_name, item)
   {
-    let res = null;
+    let id = null;
 
     if (item.id)
     {
-      res = Db.Update(db, table_name, item);
+      id = Db.Update(db, table_name, item);
     }
     else
     {
-      res = Db.Insert(db, table_name, item);
+      id = Db.Insert(db, table_name, item);
     }
 
-    return res;
+    return id;
   }
 
   static async Insert(db, table_name, item)
@@ -207,11 +207,11 @@ class Db
 
   static async Insert_Items(db, table_name, items)
   {
-    let res = null;
+    let ids = null;
 
     if (items && items.length > 0)
     {
-      res = [];
+      ids = [];
       const table = Db.Get_Table(db, table_name, false);
       if (table)
       {
@@ -222,27 +222,27 @@ class Db
             if (item.id == null || item.id == undefined)
               item.id = await Db.Next_Id(db, table);
             await Db.Get_Req_Res(table.add(item));
-            res.push(item.id);
+            ids.push(item.id);
           }
         }
       }
     }
 
-    return res;
+    return ids;
   }
 
   static async Update(db, table_name, new_item)
   {
-    let res = null;
+    let id = null;
 
     const existing_item = await Db.Select_By_Id(db, table_name, new_item.id);
     if (existing_item)
     {
       const combined_item = { ...existing_item, ...new_item };
-      res = Db.Put(db, table_name, combined_item);
+      id = Db.Put(db, table_name, combined_item);
     }
 
-    return res;
+    return id;
   }
 
   static async Exists_By_Id(db, table_name, id)

@@ -1,22 +1,10 @@
-import * as fb_app from "firebase/app";
-import * as fb_ai from "firebase/ai";
-import DB_SCHEMA from "../db/schema.js";
 import Utils from "../../../lib/Utils.js";
-import Db from "../lib/Db.js";
-import AI from "../lib/AI.js";
-import Profile from "../lib/Profile.js";
-import Job from "../lib/Job.js";
+import New_Ctx from "./ctx.js";
 
 Main2();
 async function Main2()
 {
-  const ctx =
-  {
-    ai: await AI.New(fb_app, fb_ai),
-    db: await Db.New(DB_SCHEMA),
-    db2: await Db.New(DB_SCHEMA),
-    Profile, Utils, Job
-  };
+  const ctx = New_Ctx();
 
   const url_params = new URLSearchParams(window.location.search);
   const gen = url_params.has("gen", true);
