@@ -37,7 +37,6 @@ class Job
       remuneration: parseFloat(form_data.remuneration) || null,
       remuneration_unit: form_data.remuneration_unit?.trim() || null,
       agency_id: parseInt(form_data.agency_id) || null,
-      contact_id: parseInt(form_data.contact_id) || null,
       contact_ids: form_data.contact_ids || null,
       status: form_data.status || null,
       cv: form_data.cv || null,
@@ -196,6 +195,11 @@ class Job
     }
 
     return id;
+  }
+
+  static Delete(ctx, job_id)
+  {
+    return ctx.db.Delete(Job.table_name, [job_id]);
   }
 
   static async AI_Import(ctx, raw_text, notify_fn)

@@ -241,6 +241,10 @@ class Db
       const combined_item = { ...existing_item, ...new_item };
       id = Db.Put(db, table_name, combined_item);
     }
+    else
+    {
+      id = Db.Add(db, table_name, new_item);
+    }
 
     return id;
   }

@@ -97,8 +97,8 @@
       Set_Options(job_status_select, ctx.Job.job_status, s => s.id, s => s.label);
       Set_Options(career_work_type_select, Object.keys(work_types), t => t, t => work_types[t]);
 
-      const title_elem = document.querySelector("#hdr_elem>h1.title");
-      title_elem.addEventListener("click", () => On_Click_Title(ctx));
+      //const title_elem = document.querySelector("#hdr_elem>h1.title");
+      //title_elem.addEventListener("click", () => On_Click_Title(ctx));
 
       import_btn.onclick = () => On_Click_Import_Btn(ctx);
       export_btn.onclick = () => On_Click_Export_Btn(ctx);
@@ -150,6 +150,21 @@
       const jobs = await ctx.Job.Select(ctx);
       for (const job of jobs)
       {
+        if (job.contact_id)
+        {
+          if (!ctx.Utils.Is_Empty(job.contact_ids) && !job.contact_ids.includes(job.contact_id))
+          {
+            job.contact_ids.push(job.contact_id);
+          }
+          else
+          {
+            job.contact_ids = [job.contact_id];
+          }
+          delete job.contact_id;
+
+          await ctx.Job.Delete(ctx, job.id);
+          await ctx.Job.Save(ctx, job);
+        }
         /*if (job.cv)
         {
           console.log("On_Click_Title(): updated cv for job ", job.id);
