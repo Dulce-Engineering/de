@@ -231,20 +231,16 @@ class Db
     return ids;
   }
 
-  static async Update(db, table_name, new_item)
+  static async Update(db, table_name, updated_item)
   {
-    let id = null;
+    let id = null, item = updated_item;
 
-    const existing_item = await Db.Select_By_Id(db, table_name, new_item.id);
+    const existing_item = await Db.Select_By_Id(db, table_name, updated_item.id);
     if (existing_item)
     {
-      const combined_item = { ...existing_item, ...new_item };
-      id = Db.Put(db, table_name, combined_item);
+      item = { ...existing_item, ...updated_item };
     }
-    else
-    {
-      id = Db.Add(db, table_name, new_item);
-    }
+    id = Db.Put(db, table_name, item);
 
     return id;
   }

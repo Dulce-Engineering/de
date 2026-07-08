@@ -472,5 +472,11 @@
     "datetime": 1783297747733,
     "id": "a51497ad-6f96-4d8e-a252-6c26bc406bbe",
     "query_id": "-spring-boot"
+  },
+  {
+    "count": 97,
+    "datetime": 1783480116004,
+    "id": "8a475f6c-495c-436d-880e-97a543e083a6",
+    "query_id": "-spring-boot"
   }
 ]

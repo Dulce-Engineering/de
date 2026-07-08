@@ -472,5 +472,11 @@
     "datetime": 1783297785825,
     "id": "1fecade9-821c-4412-a3cf-554d2285a315",
     "query_id": "-nextjs"
+  },
+  {
+    "count": 95,
+    "datetime": 1783480156268,
+    "id": "0cd80582-6a89-4207-8e1d-7d40ba6d82d2",
+    "query_id": "-nextjs"
   }
 ]
