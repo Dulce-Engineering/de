@@ -68,7 +68,7 @@
     Main();
     async function Main()
     {
-      const ctx = New_Ctx();
+      const ctx = await New_Ctx();
 
       const url_params = new URLSearchParams(window.location.search);
       const gen = url_params.has("gen", "true");

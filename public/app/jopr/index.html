@@ -105,7 +105,6 @@
 
       jobs_btn.onclick = () => Show_View(jobs_list);
       job_agency_select.addEventListener("change", Toggle_New_Agency_Fields);
-      job_contact_select.addEventListener("change", Toggle_New_Contact_Fields);
       jobs_menu.addEventListener("add", (e) => On_Click_Edit_Job(e, null, ctx));
       jobs_menu.addEventListener("ai", () => On_Click_AI_Add_Job(ctx));
       jobs_list.addEventListener("render", e => Render_Job_Item(e, ctx));
@@ -970,13 +969,10 @@
       job_agency_select.innerHTML = await ctx.Agency.Get_Options(ctx);
       Toggle_New_Agency_Fields(false);
 
-      job_contact_select.innerHTML = await ctx.Contact.Get_Options(ctx);
-      Toggle_New_Contact_Fields(false);
-
       const form_data = await job_dialog.Show_Async(job);
       if (form_data)
       {
-        form_data.id = job.id;
+        form_data.id = job?.id;
         await ctx.Job.Save(ctx, form_data);
         await Render_Job_Items(ctx);
       }
@@ -1025,7 +1021,7 @@
     {
       const contacts = await ctx.Contact.Select_Extended(ctx);
       const dlg_data = await contact_list_dialog.Show_Async({contacts});
-      if (!ctx.Utils.Is_Empty(dlg_data.contacts))
+      if (!ctx.Utils.Is_Empty(dlg_data?.contacts))
       {
         const contact = dlg_data.contacts[0];
         job_contacts.contacts_list.Add(contact);
@@ -1278,25 +1274,11 @@
     <input slot="fields" type="text" name="location">
     <label cid="description_label" slot="fields">Description</label>
     <textarea slot="fields" name="description" rows="4"></textarea>
+    <de-contact-list id="job_contacts" slot="fields" name="contacts" view-type="sublist"></de-contact-list>
     <label cid="agency_id_label" slot="fields">Agency</label>
     <select slot="fields" id="job_agency_select" name="agency_id"></select>
     <label cid="agency_name_label" slot="fields" id="new_agency_label" hidden>Agency Name</label>
     <input slot="fields" id="new_agency_input" hidden type="text" name="agency_name">
-
-    <label slot="fields">Contact</label>
-    <select id="job_contact_select" slot="fields" name="contact_id"></select>
-    <label cid="contact_name_label" slot="fields" id="contact_name_label" hidden>Contact Name</label>
-    <input slot="fields" id="contact_name_input" hidden type="text" name="contact_name">
-    <label cid="contact_phone_label" slot="fields" id="contact_phone_label" hidden>Contact Phone</label>
-    <input slot="fields" id="contact_phone_input" hidden type="tel" name="contact_phone">
-    <label cid="contact_email_label" slot="fields" id="contact_email_label" hidden>Contact E-Mail</label>
-    <input slot="fields" id="contact_email_input" hidden type="email" name="contact_email">
-    <de-contact-list 
-      id="job_contacts" 
-      slot="fields" 
-      name="contacts"
-      view-type="sublist"
-    ></de-contact-list>
   </de-dialog-form>
 
   <de-dialog-form id="note_dialog">

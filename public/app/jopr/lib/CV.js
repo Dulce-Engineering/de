@@ -4,7 +4,7 @@ import New_Ctx from "./ctx.js";
 Main2();
 async function Main2()
 {
-  const ctx = New_Ctx();
+  const ctx = await New_Ctx();
 
   const url_params = new URLSearchParams(window.location.search);
   const gen = url_params.has("gen", true);

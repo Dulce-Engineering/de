@@ -500,6 +500,7 @@ de-contact-list[view-type="sublist"], #job_contacts
       gap: 0;
       border: 1px solid var(--border);
       padding: 5px 10px;
+      align-items: stretch;
     }
   }
 
@@ -671,6 +672,7 @@ de-dialog-form, de-dialog-alert, de-form, de-toolbar-menu, de-dialog-confirm
 de-dialog-form main
 {
   display: grid;
+  align-items: center;
   grid-template-columns: auto auto auto auto;
   max-height: 75vh;
   padding: 5px 10px 5px 5px;
@@ -807,7 +809,7 @@ de-toolbar-menu
   {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
     gap: 0;
     padding: 0;
 
@@ -943,31 +945,20 @@ de-field
   {
     grid-column: span 4;
   }
+  [id="job_contacts"]
+  {
+    grid-column: span 2;
+    grid-row: span 2;
+  }
   [cid="agency_name_label"], [name="agency_name"]
   {
     grid-row: 10;
   }
-  [cid="contact_name_label"], [name="contact_name"]
-  {
-    grid-row: 10;
-  }
-  [cid="contact_phone_label"], [name="contact_phone"]
-  {
-    grid-row: 11;
-  }
-  [cid="contact_email_label"], [name="contact_email"]
-  {
-    grid-row: 12;
-  }
-  [cid="contact_name_label"],
-  [cid="contact_phone_label"],
-  [cid="contact_email_label"]
+  [cid="agency_name_label"]
   {
     grid-column: 3;
   }
-  [name="contact_name"],
-  [name="contact_phone"],
-  [name="contact_email"]
+  [name="agency_name"]
   {
     grid-column: 4;
   }
