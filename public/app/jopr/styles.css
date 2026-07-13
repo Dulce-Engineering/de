@@ -489,6 +489,62 @@ de-input-list, #profile_elem
   }
 }
 
+de-contact-list[view-type="sublist"], #job_contacts
+{
+  de-input-list
+  {
+    gap: 0;
+
+    [cid="items_elem"]
+    {
+      gap: 0;
+      border: 1px solid var(--border);
+      padding: 5px 10px;
+    }
+  }
+
+  h2
+  {
+    font-size: 1rem;
+  }
+
+  button.img
+  {
+    padding: 0;
+    border: none;
+
+    img
+    {
+      width: 24px;
+      height: 24px;
+    }
+  }
+
+  details
+  {
+    padding: 0;
+    border: none;
+  }
+
+  [cid="items_elem"]
+  {
+    min-height: 30px;
+  }
+
+  .contact-item
+  {
+    display: flex;
+    gap: 10px;
+    justify-content: space-between;
+    align-items: center;
+
+    h2
+    {
+      color: var(--input-text);
+    }
+  }
+}
+
 de-input-tree {
   max-height: 600px;
   overflow: hidden;
@@ -798,37 +854,6 @@ de-field
   dd
   {
     margin-inline-start: 0;
-  }
-}
-
-#job_dialog de-contact-list
-{
-  h2
-  {
-    font-size: 1rem;
-  }
-
-  button.img
-  {
-    padding: 0;
-    border: none;
-
-    img
-    {
-      width: 24px;
-      height: 24px;
-    }
-  }
-
-  [cid="items_elem"]
-  {
-    gap: 0;
-  }
-
-  details
-  {
-    padding: 0;
-    border: none;
   }
 }
 
