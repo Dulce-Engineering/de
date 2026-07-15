@@ -490,5 +490,11 @@
     "datetime": 1783905356597,
     "id": "41c3dff5-c3ee-4556-a69f-e6cafdce8ade",
     "query_id": "-woocommerce"
+  },
+  {
+    "count": 28,
+    "datetime": 1784116930450,
+    "id": "f6a6356c-3344-4ebe-8104-b4de36672600",
+    "query_id": "-woocommerce"
   }
 ]
