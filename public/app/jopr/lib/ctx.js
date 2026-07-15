@@ -11,6 +11,9 @@ import DB_SCHEMA from "../db/schema.js";
 
 async function New_Ctx()
 {
+  const db_id = new URLSearchParams(window.location.search).get("db_id");
+  if (db_id) DB_SCHEMA.name = db_id;
+
   const ctx =
   {
     ai: await AI.New(fb_app, fb_ai),

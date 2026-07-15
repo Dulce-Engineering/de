@@ -26,9 +26,9 @@ class Contact
     return ctx.db2.Delete(Contact.table_name, [id]);
   }
 
-  static async Select(ctx)
+  static async Select(ctx, where_fn)
   {
-    const contacts = await ctx.db2.Select(Contact.table_name);
+    const contacts = await ctx.db.Select(Contact.table_name, where_fn);
     if (contacts)
     {
       contacts.sort((a, b) => Contact.Get_Name(a).localeCompare(Contact.Get_Name(b)));

@@ -451,7 +451,7 @@ de-input-list, #profile_elem
     gap: 20px;
     align-items: center;
 
-    h2
+    h2, .h2
     {
       margin: 0;
     }
@@ -546,6 +546,41 @@ de-contact-list[view-type="sublist"], #job_contacts
   }
 }
 
+de-contact-list[view-type="select"], #dlg_contact_list
+{
+  padding: 0;
+  margin: 0;
+
+  de-input-list
+  {
+    gap: 0;
+    display: block;
+
+    [cid="items_elem"]
+    {
+      gap: 8px;
+      padding: 0;
+      margin: 0;
+      align-items: stretch;
+    }
+  }
+
+  .contact-item
+  {
+    border: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+
+    input, label
+    {
+      cursor: pointer;
+    }
+  }
+}
+
 de-input-tree {
   max-height: 600px;
   overflow: hidden;
@@ -611,9 +646,13 @@ de-dialog-form, de-dialog-alert, de-form, de-toolbar-menu, de-dialog-confirm
   {
     font-size: 2rem;
   }
-  h2
+  h2, .h2
   {
     margin: 0;
+    display: block;
+    font-size: 1.5em;
+    font-weight: bold;
+    unicode-bidi: isolate;
   }
   label 
   {
@@ -629,6 +668,11 @@ de-dialog-form, de-dialog-alert, de-form, de-toolbar-menu, de-dialog-confirm
     color: var(--input-text);
     border: 1px solid var(--border);
     color-scheme: dark;
+  }
+  input[type="radio"]
+  {
+    width: 25px;
+    height: 25px;
   }
   textarea
   {
@@ -1030,6 +1074,14 @@ de-field
   [name="title"], [name="institution"]
   {
     grid-column: span 3;
+  }
+}
+#contact_list_dialog
+{
+  main
+  {
+    display: block;
+    padding: 0;
   }
 }
 

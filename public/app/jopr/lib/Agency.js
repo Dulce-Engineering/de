@@ -26,9 +26,9 @@ class Agency
     return ctx.db2.Delete(Agency.table_name, [id]);
   }
 
-  static async Select(ctx)
+  static async Select(ctx, where_fn)
   {
-    const agencies = await ctx.db2.Select(Agency.table_name);
+    const agencies = await ctx.db2.Select(Agency.table_name, where_fn);
     if (agencies)
     {
       agencies.sort((a, b) => a.name.localeCompare(b.name));

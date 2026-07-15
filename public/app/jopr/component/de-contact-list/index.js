@@ -8,6 +8,7 @@ class DeContactList extends HTMLElement
   {
     super();
     Utils.Bind(this, "On_");
+    this.view_type = "list";
   }
 
   connectedCallback()
@@ -17,15 +18,18 @@ class DeContactList extends HTMLElement
       const view_type = this.getAttribute("view-type");
       if (view_type == "select")
       {
+        this.view_type = "select";
         this.Render_Select();
       }
       else if (view_type == "sublist")
       {
+        this.view_type = "sublist";
         this.Render_Sublist();
       }
     }
     else
     {
+      this.view_type = "list";
       this.Render();
     }
   }
@@ -72,6 +76,12 @@ class DeContactList extends HTMLElement
     const name = contact.name || contact.email || "N/A";
     const title = Utils.Append_Str(name, contact.agency?.name, " @ ");
     item_elem.contact_title_elem.textContent = title;
+    if (this.view_type == "select")
+    {
+      const radio_id = "scr_" + crypto.randomUUID();
+      item_elem.sel_contact_radio.id = radio_id;
+      item_elem.contact_title_elem.htmlFor = radio_id;
+    }
 
     if (item_elem.contact_email_elem)
       item_elem.contact_email_elem.value = contact.email;
@@ -104,16 +114,10 @@ class DeContactList extends HTMLElement
   {
     const html = `
       <de-input-list cid="contacts_list">
-        <details slot="item" class="contact-item">
-          <summary>
-            <input type="radio" name="selected_contact_id" cid="sel_contact_radio">
-            <h2 cid="contact_title_elem"></h2>
-          </summary>
-          <de-field cid="contact_email_elem" field-label="Email"></de-field>
-          <de-field cid="contact_phone_elem" field-label="Phone"></de-field>
-          <de-field cid="contact_position_elem" field-label="Position"></de-field>
-          <de-field cid="contact_linkedin_elem" field-label="LinkedIn" field-type="link"></de-field>
-        </details>
+        <div slot="item" class="contact-item">
+          <input type="radio" name="selected_contact_id" cid="sel_contact_radio">
+          <label cid="contact_title_elem" class="h2"></label>
+        </div>
       </de-input-list>
     `;
     this.innerHTML = html;
