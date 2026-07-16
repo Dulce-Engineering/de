@@ -20,6 +20,18 @@ class Job
     { id: "expired", label: "Expired", type: 1 },
     { id: "cancelled", label: "Cancelled", type: 1 },
   ];
+  static work_types =
+  {
+    "full-time": "Fulltime",
+    "part-time": "Part-time",
+    "contract": "Contract",
+    "temp": "Temporary",
+    "casual": "Casual",
+    "internship": "Internship",
+    "volunteer": "Volunteer",
+    "vacation": "Vacation",
+    "other": "Other"
+  };
 
   static To_Job(form_data)
   {
