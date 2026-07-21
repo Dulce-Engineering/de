@@ -490,5 +490,11 @@
     "datetime": 1784116880026,
     "id": "7a872299-b286-4d08-be52-41f20a258399",
     "query_id": "-kubernetes"
+  },
+  {
+    "count": 708,
+    "datetime": 1784604453923,
+    "id": "3589ee53-e609-4165-ac16-aea9ecf3909b",
+    "query_id": "-kubernetes"
   }
 ]

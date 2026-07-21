@@ -526,5 +526,11 @@
     "datetime": 1784116506753,
     "id": "a89140ed-9036-4674-a2f3-67521c4918aa",
     "query_id": "-angular"
+  },
+  {
+    "count": 303,
+    "datetime": 1784603998272,
+    "id": "1a02ac71-109f-4408-ade2-fda30e705ae5",
+    "query_id": "-angular"
   }
 ]
