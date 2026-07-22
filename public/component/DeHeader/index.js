@@ -195,13 +195,14 @@ class DeHeader extends HTMLElement
     this.innerHTML = `
       <ul cid="gNavItems" class="hamburger-navigation">
         <li><a href="/index.html">Home</a></li>
+        <li><a href="/dedial/index.html">DeDial Component</a></li>
+        <li><a href="/app/tempustoi">TempusToi</a></li>
+        <li><a href="/app/tempustrak">TempusTrak</a></li>
+        <li><a href="/app/magnihube">Magnihube</a></li>
+        <li><a href="/app/porottoz">Porottoz</a></li>
+
         <!--li><a href="/index.html#clients">Clients</a></li>
         <li><a href="/index.html#services">Services</a></li-->
-        <li><a href="/dedial/index.html">DeDial Component</a></li>
-        <li><a href="/tempustoi">TempusToi</a></li>
-        <li><a href="/tempustrak">TempusTrak</a></li>
-        <li><a href="/magnihube">Magnihube</a></li>
-        <li><a href="/porottoz">Porottoz</a></li>
       </ul>
 
       <svg cid="elmOverlay" class="shape-overlays" viewBox="0 0 100 100" preserveAspectRatio="none">
