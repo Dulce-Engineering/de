@@ -53,9 +53,9 @@ class Db
     return Db.Save_To_IndexedDB(this.db, db_data, schema);
   }
 
-  Select(table_name, fn)
+  Select(table_name, where_fn, order_by_fn)
   {
-    return Db.Select(this.db, table_name, fn);
+    return Db.Select(this.db, table_name, where_fn, order_by_fn);
   }
 
   Select_By_Id(table_name, id)
@@ -154,12 +154,13 @@ class Db
     return next_id;
   }
 
-  static async Select(db, table_name, fn)
+  static async Select(db, table_name, where_fn, order_by_fn)
   {
     const items = await Db.Get_All(db, table_name);
-    const res = fn ? items.filter(fn) : items;
+    const filtered_items = where_fn ? items.filter(where_fn) : items;
+    if (order_by_fn && filtered_items?.length > 0) filtered_items.sort(order_by_fn);
 
-    return res;
+    return filtered_items;
   }
 
   static async Select_Ids(db, table_name, fn)

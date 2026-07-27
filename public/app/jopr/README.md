@@ -62,10 +62,22 @@ https://www.youtube.com/watch?v=NHWjlCaIrQo
 https://www.youtube.com/watch?v=oVy-KKWsdNg&list=PLDTPrMoGHssBulfAaczSuk0f8luCiKYi3
 
 ## To Do
-- generate cover letter (done)
-- refactor cv page to show saved data (done)
+- sort jobs by last update
+- sort jobs by application time
+- sort jobs by interview time
+- sort jobs by create time
+- on jobs show contact details
+- show job logs
+- on jiob details check contact created
+- on jobs when job created show on list at corect position
+- on jobs show new jobs
+- filter jobs by agency
 - add marketing material
 - standardise db references
 - link to job woper
 - add error reporting
+
+## Done
+- generate cover letter (done)
+- refactor cv page to show saved data (done)
 - add usage reporting (done)

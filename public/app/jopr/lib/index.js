@@ -72,6 +72,11 @@ async function Main()
   career_list.addEventListener("render", (e) => Render_Career_Item(ctx, e));
   Render_Career(ctx);
 
+  project_list_menu.addEventListener("add", (e) => On_Click_Project_Edit(ctx, null));
+  const projects = await ctx.Project.Select(ctx);
+  project_list.addEventListener("render", (e) => Render_Project_Item(ctx, e));
+  project_list.value = projects;
+
   Update_Chart(ctx);
 }
 
@@ -463,11 +468,11 @@ async function Update_Chart(ctx)
   const seek_queries = queries.filter(q => q.src == "seek");
   const random_index = Math.floor(Math.random() * seek_queries.length);
   const query = seek_queries[random_index];
-  //console.log("query =", query);
+  console.log("query =", query);
   const query_id = query.id;
   const one_week_ago = Date.now() - (ctx.Utils.MILLIS_WEEK * 4);
   const data = await Stats.Trend.Select_By_Query_Id(query_id);
-  const recent_data = data.filter(item => item.datetime >= one_week_ago);
+  const recent_data = data.filter(d => d.datetime >= one_week_ago);
   if (recent_data && recent_data.length > 0)
   {
     const chart_data = recent_data.map(t => { return { x: t.datetime, y: t.count } });
@@ -587,17 +592,17 @@ function Duration_Str(start_time, end_time)
   return res;
 }
 
-function Set_Options(select_elem, items, value_fn, text_fn)
+function Set_Options(select_elem, options, value_fn, text_fn)
 {
   select_elem.innerHTML = '<option value="">None</option>';
-  if (items)
+  if (options)
   {
-    for (const item of items)
+    for (const option of options)
     {
-      const option = document.createElement("option");
-      option.value = value_fn(item);
-      option.textContent = text_fn(item);
-      select_elem.appendChild(option);
+      const option_elem = document.createElement("option");
+      option_elem.value = value_fn(option);
+      option_elem.textContent = text_fn(option);
+      select_elem.appendChild(option_elem);
     }
   }
 }

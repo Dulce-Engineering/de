@@ -49,12 +49,12 @@
   }
   </script>
 
+  <script src="../../dedial/dedial.js" type="module"></script>
+  <script src="../../component/DeInputList/index3.js" type="module"></script>
+  <script src="../../component/DeForm/index.js" type="module"></script>
+  <script src="../../component/DeDialogForm/index.js" type="module"></script>
+  <script src="../../component/DeDialogAlert/index.js" type="module"></script>
   <script type="module">
-    import "../../dedial/dedial.js";
-    import "../../component/DeInputList/index3.js";
-    import "../../component/DeForm/index.js";
-    import "../../component/DeDialogForm/index.js";
-    import "../../component/DeDialogAlert/index.js";
     import "../../component/DeDialogConfirm/index.js";
     import "../../component/DeLineChart/index.js";
     import "./component/de-toolbar-menu/index.js";
@@ -105,7 +105,7 @@
     <output id="alert_elem" role="status"></output>
   </header>
 
-  <main id="items">
+  <main>
 
     <de-input-list id="jobs_list">
       <header slot="header">
@@ -244,6 +244,21 @@
         </details>
       </de-input-list>
 
+      <de-input-list id="project_list">
+        <header slot="header">
+          <h2>Projects</h2>
+          <de-toolbar-menu id="project_list_menu" show-add></de-toolbar-menu>
+        </header>
+        <details slot="item" class="">
+          <summary>
+            <h2 cid="project_title_elem"></h2>
+            <de-toolbar-menu cid="project_item_menu" show-edit show-delete></de-toolbar-menu>
+          </summary>
+          <div cid="project_url_elem" class="det_item"></div>
+          <div cid="project_description_elem" class="det_item"></div>
+          <div cid="project_tech_elem" class="det_item"></div>
+        </details>
+      </de-input-list>
     </div>
 
   </main>
@@ -373,6 +388,16 @@
       agency details from the given text.</p>
   </de-dialog-form>
 
+  <de-dialog-form id="edu_dialog">
+    <h2 slot="header">Certificate Details</h2>
+    <label slot="fields">Title</label>
+    <input slot="fields" type="text" name="title">
+    <label slot="fields">Institution</label>
+    <input slot="fields" type="text" name="institution">
+    <label slot="fields">Year</label>
+    <input slot="fields" type="number" name="year" min="1900" max="3000" step="1">
+  </de-dialog-form>
+
   <de-dialog-alert id="job_det_dialog">
     <h2 cid="role_elem" slot="header">Job Details</h2>
     <div slot="body">
@@ -385,16 +410,6 @@
     </div>
     <span cid="des_elem" slot="body"></span>
   </de-dialog-alert>
-
-  <de-dialog-form id="edu_dialog">
-    <h2 slot="header">Certificate Details</h2>
-    <label slot="fields">Title</label>
-    <input slot="fields" type="text" name="title">
-    <label slot="fields">Institution</label>
-    <input slot="fields" type="text" name="institution">
-    <label slot="fields">Year</label>
-    <input slot="fields" type="number" name="year" min="1900" max="3000" step="1">
-  </de-dialog-form>
 
   <de-info id="info_elem"></de-info>
 

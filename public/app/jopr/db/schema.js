@@ -140,6 +140,19 @@ const DB_SCHEMA =
         responsibilities: "string",
         projects: "string"
       }
+    },
+    projects:
+    {
+      keyPath: 'id',
+      autoIncrement: false,
+      fields:
+      {
+        id: "int",
+        title: "string",
+        url: "string",
+        description: "string",
+        tech: "string",
+      }
     }
   }
 };

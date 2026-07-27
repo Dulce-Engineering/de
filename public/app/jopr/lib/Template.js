@@ -14,27 +14,24 @@ class Template
       url: form_data.url?.trim() || null,
     };
 
-    return ctx.db2.Save(Template.table_name, obj);
+    return ctx.db.Save(Template.table_name, obj);
   }
 
   static Delete(ctx, id)
   {
-    return ctx.db2.Delete(Template.table_name, [id]);
+    return ctx.db.Delete(Template.table_name, [id]);
   }
 
-  static async Select(ctx)
+  static async Select(ctx, where_fn, order_by_fn)
   {
-    const agencies = await ctx.db2.Select(Template.table_name);
-    if (agencies)
-    {
-      agencies.sort((a, b) => a.name.localeCompare(b.name));
-    }
-    return agencies;
+    const rows = await ctx.db.Select(Template.table_name, where_fn, order_by_fn);
+
+    return rows;
   }
 
   static Select_By_Id(ctx, id)
   {
-    return ctx.db2.Select_By_Id(Template.table_name, id);
+    return ctx.db.Select_By_Id(Template.table_name, id);
   }
 
   static async Get_Options(ctx)

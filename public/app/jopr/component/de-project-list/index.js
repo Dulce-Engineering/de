@@ -1,8 +1,8 @@
 import Utils from "../../../../lib/Utils.js";
 
-class DeContactList extends HTMLElement
+class DeProjectList extends HTMLElement
 {
-  static tname = "de-contact-list";
+  static tname = "de-project-list";
 
   constructor()
   {
@@ -204,5 +204,5 @@ class DeContactList extends HTMLElement
   }
 }
 
-Utils.Register_Element(DeContactList);
-export default DeContactList;
+Utils.Register_Element(DeProjectList);
+export default DeProjectList;

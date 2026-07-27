@@ -947,10 +947,6 @@ de-field
   display: none;
 }
 
-#items
-{
-  xopacity: 0.2;
-}
 #profile_form
 {
   [name="linkedin_url"],

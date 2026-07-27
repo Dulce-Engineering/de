@@ -5,6 +5,7 @@ import Job from "./Job.js";
 import Utils from "../../../lib/Utils.js";
 import Contact from "./Contact.js";
 import Agency from "./Agency.js";
+import Project from "./Project.js";
 import * as fb_app from "firebase/app";
 import * as fb_ai from "firebase/ai";
 import DB_SCHEMA from "../db/schema.js";
@@ -19,7 +20,7 @@ async function New_Ctx()
     ai: await AI.New(fb_app, fb_ai),
     db: await Db.New(DB_SCHEMA),
     db2: await Db.New(DB_SCHEMA),
-    Agency, Contact, Job, Profile, Utils
+    Agency, Contact, Job, Profile, Utils, Project
   };
   return ctx;
 }

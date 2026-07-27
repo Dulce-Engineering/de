@@ -664,6 +664,7 @@ class DeLineChart extends HTMLElement
       //pathData = `M ${points[0].x},${points[0].y}`;
       pathData = null;
     }
+
     path.setAttribute("d", pathData);
     path.classList.add("data-line");
     path.style.stroke = "var(--c" + this.color + ")";
