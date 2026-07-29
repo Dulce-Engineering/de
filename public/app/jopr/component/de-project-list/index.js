@@ -229,6 +229,7 @@ class DeProjectList extends HTMLElement
           <de-field cid="project_url_elem" field-label="Link" field-type="link"></de-field>
         </details>
       </de-input-list>
+
       <de-dialog-form cid="project_dialog">
         <h2 slot="header">Project Details</h2>
         <label slot="fields">Title</label>
@@ -240,6 +241,7 @@ class DeProjectList extends HTMLElement
         <label slot="fields">Tech</label>
         <input slot="fields" type="text" name="tech">
       </de-dialog-form>
+      
       <de-dialog-confirm cid="warning_dlg">
         <img src="image/red/warning.svg" slot="header">
       </de-dialog-confirm>
