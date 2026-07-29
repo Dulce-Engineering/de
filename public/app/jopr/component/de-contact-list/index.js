@@ -68,7 +68,7 @@ class DeContactList extends HTMLElement
 
   Add(obj)
   {
-    this.contacts_list.Add(obj_id);
+    this.contacts_list.Add(obj);
   }
 
   Remove(obj_id)
@@ -108,8 +108,9 @@ class DeContactList extends HTMLElement
       item_elem.sel_contact_radio.value = contact.id;
   }
 
-  On_Click_Add()
+  On_Click_Add(event)
   {
+    event.stopPropagation();
     this.dispatchEvent(new CustomEvent("add"));
   }
 

@@ -32,3 +32,7 @@
 ## Option 5 (Problem/Solution focused):
 
 "Do you struggle to keep track of upcoming events? TempusToi is the perfect solution. It displays upcoming events and timers in Chronological order, with days, hours, minutes, and seconds, so you will always know how long you have left. Try TempusToi today. [Link to TempusToi]"
+
+## Description
+
+TempusToi is a simple and efficient task scheduling tool that helps you stay on top of deadlines. It displays a sorted list of countdown timers, visually representing the time remaining for each task at a glance. Unlike cloud-based planners, TempusToi requires no online account or subscription—it runs entirely on your PC or mobile device, keeping your tasks private and accessible anytime.

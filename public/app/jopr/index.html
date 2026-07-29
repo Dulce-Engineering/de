@@ -54,6 +54,7 @@
   <script src="../../component/DeForm/index.js" type="module"></script>
   <script src="../../component/DeDialogForm/index.js" type="module"></script>
   <script src="../../component/DeDialogAlert/index.js" type="module"></script>
+  <script src="./component/de-project-list/index.js" type="module"></script>
   <script type="module">
     import "../../component/DeDialogConfirm/index.js";
     import "../../component/DeLineChart/index.js";
@@ -244,21 +245,8 @@
         </details>
       </de-input-list>
 
-      <de-input-list id="project_list">
-        <header slot="header">
-          <h2>Projects</h2>
-          <de-toolbar-menu id="project_list_menu" show-add></de-toolbar-menu>
-        </header>
-        <details slot="item" class="">
-          <summary>
-            <h2 cid="project_title_elem"></h2>
-            <de-toolbar-menu cid="project_item_menu" show-edit show-delete></de-toolbar-menu>
-          </summary>
-          <div cid="project_url_elem" class="det_item"></div>
-          <div cid="project_description_elem" class="det_item"></div>
-          <div cid="project_tech_elem" class="det_item"></div>
-        </details>
-      </de-input-list>
+      <de-project-list id="project_list"></de-project-list>
+
     </div>
 
   </main>

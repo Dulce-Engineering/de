@@ -127,18 +127,36 @@ class Db
   static On_Upgrade_Needed(event, schema)
   {
     const db = event.target.result;
-    for (const store_name in schema.stores)
+    switch (event.oldVersion) 
     {
-      if (!db.objectStoreNames.contains(store_name))
-      {
-        const store_schema = schema.stores[store_name];
-        const options = 
-        { 
-          keyPath: store_schema.keyPath, 
-          autoIncrement: store_schema.autoIncrement 
-        };
-        db.createObjectStore(store_name, options);
-      }
+      case 0:
+        Db.Create_Tables(db, schema);
+
+      case 5:
+        Db.Create_Table(db, schema, "projects");
+        break;
+    }
+  }
+
+  static Create_Tables(db, schema)
+  {
+    for (const table_name in schema.stores)
+    {
+      Db.Create_Table(db, schema, table_name);
+    }
+  }
+
+  static Create_Table(db, schema, table_name)
+  {
+    if (!db.objectStoreNames.contains(table_name))
+    {
+      const table_schema = schema.stores[table_name];
+      const options = 
+      { 
+        keyPath: table_schema.keyPath, 
+        autoIncrement: table_schema.autoIncrement 
+      };
+      db.createObjectStore(table_name, options);
     }
   }
 
