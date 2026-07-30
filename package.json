@@ -2,6 +2,7 @@
   "name": "dulce-engineering-components",
   "version": "1.0.0",
   "description": "Dulce Engineering custom web components",
+  "type": "module",
   "scripts": 
   {
     "startem": "firebase emulators:start --only hosting",
