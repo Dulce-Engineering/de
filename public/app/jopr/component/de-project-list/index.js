@@ -1,18 +1,51 @@
 import Utils from "../../../../lib/Utils.js";
 
+/**
+ * Custom HTML Element representing a list of projects.
+ * Renders a list of projects, allows editing, adding, and deleting projects,
+ * and manages associated dialog forms for these operations.
+ * 
+ * @extends HTMLElement
+ * @element de-project-list
+ */
 class DeProjectList extends HTMLElement
 {
+  /**
+   * Tag name of the custom element.
+   * @type {string}
+   */
   static tname = "de-project-list";
 
+  /**
+   * Creates an instance of DeProjectList.
+   */
   constructor()
   {
     super();
     Utils.Bind(this, "On_");
+    
+    /**
+     * The view mode of the project list.
+     * @type {string}
+     */
     this.view_type = "list";
+    
+    /**
+     * Callback function to save or update a project.
+     * @type {function(Object): Promise<number|string|null>|null}
+     */
     this.save_fn = null;
+    
+    /**
+     * Callback function to delete a project.
+     * @type {function(number|string): Promise<boolean>|null}
+     */
     this.delete_fn = null;
   }
 
+  /**
+   * Lifecycle callback invoked when the element is appended to the document.
+   */
   connectedCallback()
   {
     /*if (this.hasAttribute("view-type"))
@@ -38,11 +71,19 @@ class DeProjectList extends HTMLElement
 
   // properties ===============================================================
   
+  /**
+   * Sets the project list value.
+   * @param {Array<Object>} data - An array of project objects.
+   */
   set value(data)
   {
     this.project_list.value = data;
   }
 
+  /**
+   * Gets the list of projects.
+   * @returns {Array<Object>|null} The array of project objects, or null.
+   */
   get value()
   {
     let projects = null;
@@ -68,16 +109,29 @@ class DeProjectList extends HTMLElement
 
   // methods ==================================================================
 
+  /**
+   * Adds a project to the list.
+   * @param {Object} obj - The project object to add.
+   */
   Add(obj)
   {
     this.project_list.Add(obj);
   }
 
+  /**
+   * Removes a project from the list by its ID.
+   * @param {number|string} obj_id - The ID of the project to remove.
+   */
   Remove(obj_id)
   {
     this.project_list.Remove(obj_id);
   }
 
+  /**
+   * Asynchronously updates or saves a project and refreshes the list display.
+   * @param {Object} project - The project object to save.
+   * @returns {Promise<void>}
+   */
   async Update_Project(project)
   {
     const project_id = await this.save_fn(project);
@@ -93,6 +147,10 @@ class DeProjectList extends HTMLElement
     }
   }
 
+  /**
+   * Dispatches a custom alert event.
+   * @param {string} msg - The message payload.
+   */
   Alert(msg)
   {
     this.dispatchEvent(new CustomEvent("alert", { detail: msg, bubbles: true }));
@@ -100,6 +158,10 @@ class DeProjectList extends HTMLElement
 
   // events ===================================================================
 
+  /**
+   * Handles rendering of an individual project item within the input list.
+   * @param {CustomEvent} event - The custom render event containing item_elem and obj.
+   */
   On_Render_Item(event)
   {
     const item_elem = event.detail.item_elem;
@@ -126,6 +188,12 @@ class DeProjectList extends HTMLElement
       item_elem.sel_project_radio.value = project.id;
   }
 
+  /**
+   * Handles click/trigger events for editing a project.
+   * Opens the edit dialog form and saves updates upon submission.
+   * @param {CustomEvent} event - The event containing the project details.
+   * @returns {Promise<void>}
+   */
   async On_Click_Edit(event)
   {
     const project = event.detail;
@@ -137,6 +205,12 @@ class DeProjectList extends HTMLElement
     }
   }
 
+  /**
+   * Handles click/trigger events for deleting a project.
+   * Shows a confirmation warning, invokes the delete callback, and removes the project from list if confirmed.
+   * @param {CustomEvent} event - The event containing project data.
+   * @returns {Promise<void>}
+   */
   async On_Click_Delete(event)
   {
     const project_id = event.detail.id;
@@ -211,6 +285,9 @@ class DeProjectList extends HTMLElement
     this.sel_contact_btn.addEventListener("click", this.On_Click_Sel);
   }*/
 
+  /**
+   * Renders the custom element's inner HTML template and sets up its element shortcuts and event listeners.
+   */
   Render()
   {
     const html = `
