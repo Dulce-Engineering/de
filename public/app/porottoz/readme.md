@@ -21,3 +21,7 @@
 - add purchase
 - edit budget
 - delete budget
+
+## Description
+
+Take control of your spending with Porottoz, the colorful and easy-to-use budgeting app designed to show you exactly how much you can spend each day! Set your target date, enter your budget, and track reserved funds. Porottoz calculates your daily spending allowance and includes a countdown timer to keep you on track. Manage multiple budgets, easily adjust your balance as you make purchases or receive income, and enjoy a whimsical, animated interface. Porottoz is 100% free, requires no login, email, or credit card details, and stores your data safely on your device. Download Porottoz today and start budgeting smarter!

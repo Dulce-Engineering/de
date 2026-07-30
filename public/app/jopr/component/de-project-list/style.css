@@ -1,0 +1,7 @@
+de-project-list
+{
+  main[cid=main_elem]
+  {
+    grid-template-columns: auto auto;
+  }
+}

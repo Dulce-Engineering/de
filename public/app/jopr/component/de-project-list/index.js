@@ -237,7 +237,7 @@ class DeProjectList extends HTMLElement
         <label slot="fields">URL</label>
         <input slot="fields" type="url" name="url">
         <label slot="fields">Description</label>
-        <input slot="fields" type="text" name="description">
+        <textarea slot="fields" name="description"></textarea>
         <label slot="fields">Tech</label>
         <input slot="fields" type="text" name="tech">
       </de-dialog-form>
