@@ -198,8 +198,9 @@ header
   };
   output
   {
-    grid-column: 1 / 4;
-    grid-row: 3;
+    display: flex;
+    xgrid-column: 1 / 4;
+    xgrid-row: 3;
     justify-self: center;
     align-items: center;
     xoverflow-x: 80px;
@@ -207,7 +208,7 @@ header
     font-size: 2rem;
     color: var(--highlight);
     text-align: center;
-    height: 2.25rem;
+    min-height: 2.25rem;
   }
 
   de-clock-2
@@ -1122,6 +1123,7 @@ de-field
     }
     output
     {
+      font-size: 1.5rem;
     }
   }
   main
@@ -1139,6 +1141,11 @@ de-field
     }
   }
 
+  :focus-visible
+  {
+    outline: 1px solid #fff;;
+  }
+
   de-dialog-form 
   {
     dialog 
@@ -1147,21 +1154,52 @@ de-field
 
       header
       {
-        margin: 0px;
+        margin: 0 0 10px 0;
+
+        h2
+        {
+          font-size: 1.5rem;
+        }
       }
       main
       {
-        gap: 0;
-        padding: 0;
+        display: flex;
+        gap: 2px;
+        padding: 0 0 4px 0;
+        align-items: stretch;
 
         label
         {
-          margin: 10px 0 5px 0;
+          width: 100%;
+          margin: 8px 0 0 0;
+          text-align: left;
+        }
+        label[cid=contact_title_elem]
+        {
+          font-size: 1rem;
+        }
+        de-input-list header
+        {
+          margin: 0;
         }
       }
     }
   }
 
+  de-dialog-alert
+  {
+    dialog
+    {
+      padding: 10px;
+
+      main[cid=main_elem]
+      {
+        margin: 0;
+        padding: 0;
+      }
+    }
+  }
+  
   de-input-list, #profile_elem
   {
     padding: 0;
