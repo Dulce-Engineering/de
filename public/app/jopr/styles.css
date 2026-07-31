@@ -1089,42 +1089,54 @@ de-field
 {
   :root 
   {
-    font-size: 13px;
+    font-size: 15px;
   }
 
   body
   {
-    padding: 0 0 0 0;
-
-    &>header
-    {
-      position: sticky;
-      top: 0;
-      background-color: #000;
-      padding: 10px 0 0 0;
-      width: 100%;
-      box-shadow: 0 10px 10px #000;
-    }
+    padding: 10px;
   }
   header 
   {
-    h1 
+    display: block;
+
+    .chart, #clock_elem
     {
+      display: none;
+    }
+    h1.title
+    {
+      display: block;
       margin: 0 0 10px 0;
+      font-size: 4rem;
       letter-spacing: -10px;
+    }
+    nav
+    {
+      font-size: 0;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      gap: 4px;
+      align-items: flex-start;
     }
     output
     {
-      height: 30px;
     }
   }
   main
   {
-    padding: 0 10px 10px 10px;
-  }
-  h2
-  {
-    margin: 0;
+    padding: 0 0 0 0;
+
+    h2
+    {
+      margin: 0;
+      font-size: 3rem;
+    }
+    #jobs_list main[cid=items_elem] summary h2
+    {
+      font-size: 1.5rem;
+    }
   }
 
   de-dialog-form 

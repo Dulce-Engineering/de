@@ -539,10 +539,10 @@ class DeLineChart extends HTMLElement
         this.chart_elems.append(...yAxis);
 
         this.highlight = this.Render_Highlight();
-        this.chart_elems.appendChild(this.highlight);
+        if (this.highlight) this.chart_elems.appendChild(this.highlight);
 
         this.mask = this.Render_Input_Mask();
-        this.chart_elems.appendChild(this.mask);
+        if (this.mask) this.chart_elems.appendChild(this.mask);
       }
     }
   }
@@ -758,16 +758,21 @@ class DeLineChart extends HTMLElement
    */
   Render_Highlight()
   {
+    let rect = null;
+
     const x = 0;
     const y = 0 - this.padding_axis - this.overhang_axis;
     const w = this.plot_width;
     const h = this.plot_height + this.padding_axis + this.overhang_axis;
-    const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-    rect.setAttribute("x", x);
-    rect.setAttribute("y", y);
-    rect.setAttribute("width", w);
-    rect.setAttribute("height", h);
-    rect.classList.add("highlight");
+    if (w > 0 && h > 0)
+    {
+      rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+      rect.setAttribute("x", x);
+      rect.setAttribute("y", y);
+      rect.setAttribute("width", w);
+      rect.setAttribute("height", h);
+      rect.classList.add("highlight");
+    }
 
     return rect;
   }
@@ -781,16 +786,21 @@ class DeLineChart extends HTMLElement
    */
   Render_Input_Mask()
   {
+    let rect = null;
+    
     const x = 0;
     const y = 0;
     const w = this.plot_width;
     const h = this.plot_height;
-    const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-    rect.setAttribute("x", x);
-    rect.setAttribute("y", y);
-    rect.setAttribute("width", w);
-    rect.setAttribute("height", h);
-    rect.classList.add("input-mask");
+    if (w > 0 && h > 0)
+    {
+      rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+      rect.setAttribute("x", x);
+      rect.setAttribute("y", y);
+      rect.setAttribute("width", w);
+      rect.setAttribute("height", h);
+      rect.classList.add("input-mask");
+    }
 
     return rect;
   }

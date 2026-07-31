@@ -10,8 +10,8 @@ class Job
 
     { id: "interviewing", label: "Interviewing", type: -4 },
     { id: "screening", label: "Screening", type: -3 },
-    { id: "applied", label: "Applied", type: -2 },
-    { id: "applying", label: "Applying", type: -1 },
+    { id: "applying", label: "Applying", type: -2 },
+    { id: "applied", label: "Applied", type: -1 },
 
     { id: "rejected", label: "Rejected", type: 1 },
     { id: "withdrawn", label: "Withdrawn", type: 1 },

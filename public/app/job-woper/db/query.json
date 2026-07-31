@@ -63,6 +63,14 @@
     "src": "seek"
   },
   {
+    "id": "-rust",
+    "order": 8,
+    "parent_id": "-Ly2dHMN0mVIHgQF269I",
+    "terms": "rust",
+    "title": "Rust",
+    "src": "seek"
+  },
+  {
     "id": "-java",
     "order": 9,
     "parent_id": "-Ly2dHMN0mVIHgQF269I",

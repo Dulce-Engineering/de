@@ -62,6 +62,7 @@ https://www.youtube.com/watch?v=NHWjlCaIrQo
 https://www.youtube.com/watch?v=oVy-KKWsdNg&list=PLDTPrMoGHssBulfAaczSuk0f8luCiKYi3
 
 ## To Do
+- jobs single view to get details including contact details
 - edit cl recipient name and content
 - add job and gen cv/cl in one go
 - sort jobs by last update

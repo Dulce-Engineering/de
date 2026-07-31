@@ -9,3 +9,7 @@ interface Context {
   Utils: typeof import("../../lib/Utils.js").default;
   Project: typeof import("./lib/Project.js").default;
 }
+
+interface HTMLElementTagNameMap {
+  "de-project-list": import("./component/de-project-list/index.js").default;
+}
