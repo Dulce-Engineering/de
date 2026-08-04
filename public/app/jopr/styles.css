@@ -96,6 +96,7 @@
     transform: rotate(0deg);
   }
 }
+.details,
 button, 
 de-input-list details,
 de-dialog-form dialog,
@@ -109,6 +110,7 @@ de-dialog-alert dialog,
     linear-gradient(to bottom right, var(--border-color) var(--s1), #fff var(--s2), #000 var(--s3)) 1;
   animation: shift-colors 0.25s linear forwards;
 }
+.details:hover,
 button:hover,
 de-input-list details:hover,
 #profile_elem .details:hover,
@@ -399,6 +401,7 @@ de-input-list, #profile_elem
     {
       margin: 0;
       font-size: 2rem;
+      text-align: start;
     }
   }
   header > :first-child 
@@ -414,6 +417,15 @@ de-input-list, #profile_elem
     padding: 0;
     margin: 0;
     box-sizing: border-box;
+  }
+  [cid="no_items_elem"]
+  {
+    padding: 0;
+
+    h2
+    {
+      margin: 0;
+    }
   }
 
   details, .details, de-form
@@ -939,6 +951,10 @@ de-field
   }
 }
 
+.details h2
+{
+  margin: 0;
+}
 .contact
 {
   display: flex;

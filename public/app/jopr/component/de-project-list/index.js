@@ -305,6 +305,10 @@ class DeProjectList extends HTMLElement
           <de-field cid="project_description_elem" field-label="Description"></de-field>
           <de-field cid="project_url_elem" field-label="Link" field-type="link"></de-field>
         </details>
+        <span slot="no_items" class="details"><h2>
+          No projects to list.
+          Use the plus button to add some.</h2>
+        </span>
       </de-input-list>
 
       <de-dialog-form cid="project_dialog">

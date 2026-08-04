@@ -152,6 +152,10 @@
           </de-input-list>
         </div>
       </details>
+      <span slot="no_items" class="details"><h2>
+        No job applications to list.
+        Use the plus button to add some.</h2>
+      </span>
     </de-input-list>
 
     <de-contact-list id="contacts_list" class="hidden"></de-contact-list>
@@ -211,6 +215,9 @@
         <p>Skills: <span id="profile_skills"></span></p>
         <p>Interests: <span id="profile_interests"></span></p>
       </div>
+      <span id="no_profile_details" class="details">
+        <h2>No profile details available. Please use the profile edit button.</h2>
+      </span>
 
       <de-input-list id="edu_list">
         <header slot="header">
@@ -224,6 +231,10 @@
           </summary>
           <div cid="edu_det_elem"></div>
         </details>
+        <span slot="no_items" class="details"><h2>
+          No education to list.
+          Use the plus button to add some.</h2>
+        </span>
       </de-input-list>
 
       <de-input-list id="career_list">
@@ -242,9 +253,14 @@
           <div class="det_item">Responsibilities<br><span cid="career_resp_elem"></span></div>
           <div class="det_item">Projects<br><span cid="career_proj_elem"></span></div>
         </details>
+        <span slot="no_items" class="details"><h2>
+          No work history to list.
+          Use the plus button to add some.</h2>
+        </span>
       </de-input-list>
 
-      <de-project-list id="project_list"></de-project-list>
+      <de-project-list id="project_list">
+      </de-project-list>
 
     </div>
 

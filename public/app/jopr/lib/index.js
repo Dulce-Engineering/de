@@ -33,21 +33,25 @@ async function Main()
   }
   else
   {
-    Render_Marketing();
+    Render_Marketing(ctx);
   }
 
   Update_Chart(ctx);
 }
 
-function Render_Marketing()
+function Render_Marketing(ctx)
 {
-  launch_btn.addEventListener("click", On_Click_Launch_Btn);
+  launch_btn.addEventListener("click", e => On_Click_Launch_Btn(ctx));
 
+  app_body.classList.add("hidden");
   marketing_body.classList.remove("hidden");
 }
 
 async function Render_App(ctx)
 {
+  marketing_body.classList.add("hidden");
+  app_body.classList.remove("hidden");
+
   Set_Options(note_status_select, ctx.Job.job_status, s => s.id, s => s.label);
   Set_Options(job_status_select, ctx.Job.job_status, s => s.id, s => s.label);
   Set_Options(career_work_type_select, Object.keys(ctx.Job.work_types), t => t, t => work_types[t]);
@@ -103,9 +107,12 @@ async function Render_App(ctx)
 
 // events =========================================================================
 
-function On_Click_Launch_Btn()
+function On_Click_Launch_Btn(ctx)
 {
+  Render_App(ctx);
   Show_View(profile_elem);
+
+  Alert("Please add details regarding your work kistory.");
 }
 
 async function On_Click_Title(ctx)
@@ -226,6 +233,14 @@ async function Render_Profile(ctx)
     profile_personal_summary.innerHTML = Str_To_HTML(profile.personal_summary || "N/A");
     profile_skills.textContent = profile.skills || "N/A";
     profile_interests.innerHTML = Str_To_HTML(profile.interests || "N/A");
+
+    profile_details.style.display = null;
+    no_profile_details.style.display = "none";
+  }
+  else
+  {
+    profile_details.style.display = "none";
+    no_profile_details.style.display = null;
   }
 }
 
@@ -514,7 +529,14 @@ function Toggle_New_Contact_Fields()
 
 function Work_Type_Label(ctx, work_type)
 {
-  return ctx.Job.work_types[work_type?.toLowerCase()] || work_type["other"];
+  let res = null;
+
+  if (work_type)
+  {
+    res = ctx.Job.work_types[work_type?.toLowerCase()] || work_type["other"];
+  }
+
+  return res;
 }
 
 function Str_To_HTML(str)
@@ -530,10 +552,10 @@ function Show_View(view_elem)
   contacts_list.classList.add("hidden");
   companies_list.classList.add("hidden");
   profile_elem.classList.add("hidden");
-  marketing_body.classList.add("hidden");
+  //marketing_body.classList.add("hidden");
 
   view_elem.classList.remove("hidden");
-  app_body.classList.remove("hidden");
+  //app_body.classList.remove("hidden");
 }
 
 function Duration_Str(start_time, end_time)

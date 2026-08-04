@@ -83,6 +83,7 @@ class DeInputList extends HTMLElement
     {
       item_elem = this.Render_Item(obj);
       this.items_elem.append(item_elem);
+      this.Update_No_Items();
     }
 
     const event = new CustomEvent("render", 
@@ -101,6 +102,7 @@ class DeInputList extends HTMLElement
     if (item_elem)
     {
       item_elem.remove();
+      this.Update_No_Items();
     }
   }
 
@@ -111,6 +113,7 @@ class DeInputList extends HTMLElement
   {
     //console.log("DeInputList.Clear()");
     this.items_elem.replaceChildren();
+    this.Update_No_Items();
   }
 
   Find(obj_id)
@@ -131,6 +134,15 @@ class DeInputList extends HTMLElement
 
 
   // rendering ===================================================================
+
+  Update_No_Items()
+  {
+    const item_count = this.length;
+    const no_items_count = this.no_items_elem.children.length;
+
+    this.items_elem.style.display = item_count > 0 ? null : "none";
+    this.no_items_elem.style.display = !(item_count > 0) && no_items_count > 0 ? null : "none";
+  }
 
   /**
    * Internal method to clone the template and bind data to the new element.
@@ -185,12 +197,17 @@ class DeInputList extends HTMLElement
 
     const html = `
       <slot name="header"></slot>
-      <main cid="items_elem"></main>
+      <main cid="items_elem" style="display:none;"></main>
+      <main cid="no_items_elem" style="display:none;">
+        <slot name="no_items"></slot>
+      </main>
       <slot name="footer"></slot>
     `;
     const elems = Utils.To_Document(html, this);
     this.replaceChildren(elems);
     Utils.Set_Id_Shortcuts(this, this, "cid");
+
+    this.Update_No_Items();
   }
 }
 
