@@ -26,6 +26,28 @@ async function Main()
 
   const ctx = await New_Ctx();
 
+  const jobs_count = 0;
+  if (jobs_count > 0)
+  {
+    Render_App(ctx);
+  }
+  else
+  {
+    Render_Marketing();
+  }
+
+  Update_Chart(ctx);
+}
+
+function Render_Marketing()
+{
+  launch_btn.addEventListener("click", On_Click_Launch_Btn);
+
+  marketing_body.classList.remove("hidden");
+}
+
+async function Render_App(ctx)
+{
   Set_Options(note_status_select, ctx.Job.job_status, s => s.id, s => s.label);
   Set_Options(job_status_select, ctx.Job.job_status, s => s.id, s => s.label);
   Set_Options(career_work_type_select, Object.keys(ctx.Job.work_types), t => t, t => work_types[t]);
@@ -77,11 +99,14 @@ async function Main()
   project_list.addEventListener("alert", e => Alert(e.detail));
   const projects = await ctx.Project.Select(ctx);
   project_list.value = projects;
-
-  Update_Chart(ctx);
 }
 
 // events =========================================================================
+
+function On_Click_Launch_Btn()
+{
+  Show_View(profile_elem);
+}
 
 async function On_Click_Title(ctx)
 {
@@ -505,7 +530,10 @@ function Show_View(view_elem)
   contacts_list.classList.add("hidden");
   companies_list.classList.add("hidden");
   profile_elem.classList.add("hidden");
+  marketing_body.classList.add("hidden");
+
   view_elem.classList.remove("hidden");
+  app_body.classList.remove("hidden");
 }
 
 function Duration_Str(start_time, end_time)

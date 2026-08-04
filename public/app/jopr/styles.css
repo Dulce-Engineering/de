@@ -296,6 +296,11 @@ header
     grid-row: 1;
     justify-self: center;
   }
+  >h1.title
+  {
+    width: 320px;
+    text-align: center;
+  }
 }
 
 main
@@ -306,6 +311,28 @@ main
   gap: 20px;
   padding: 0 40px 40px 40px;
   box-sizing: border-box;
+
+  header
+  {
+    display: block;
+    text-align: center;
+  }
+  article
+  {
+    display: flex;
+    flex-direction: column;
+  }
+  section
+  {
+    img
+    {
+      width: 100%;
+    }
+    p
+    {
+      text-align: center;
+    }
+  }
 }
 
 button, .btn 
@@ -337,6 +364,13 @@ button, .btn
   {
     display: none;
   }
+}
+a.btn
+{
+  text-decoration: none;
+  text-underline-offset: 0;
+  margin: 0;
+  text-align: center;
 }
 
 footer {

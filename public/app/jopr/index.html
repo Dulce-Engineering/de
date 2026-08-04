@@ -89,14 +89,14 @@
       <button id="jobs_btn" class="img" title="Jobs">
         <img src="image/paid.svg">
       </button>
-      <button id="companies_btn" class="img" title="Companies">
-        <img src="image/factory.svg">
-      </button>
-      <button id="contacts_btn" class="img" title="Contacts">
-        <img src="image/contacts.svg">
-      </button>
       <button id="profile_btn" class="img" title="Profile">
         <img src="image/person.svg">
+      </button>
+      <button id="companies_btn" class="img hidden" title="Companies">
+        <img src="image/factory.svg">
+      </button>
+      <button id="contacts_btn" class="img hidden" title="Contacts">
+        <img src="image/contacts.svg">
       </button>
       <a id="analysis_btn" class="btn img" href="../job-woper" title="Market Analysis">
         <img src="image/chart-4.svg">
@@ -105,7 +105,7 @@
     <output id="alert_elem" role="status"></output>
   </header>
 
-  <main>
+  <main id="app_body" class="hidden">
 
     <de-input-list id="jobs_list">
       <header slot="header">
@@ -250,14 +250,99 @@
 
   </main>
 
-  <main id="docs">
-    <ul>
-      <li>No Signup required</li>
-      <li>Free</li>
-      <li>Track job applications</li>
-      <li>Generate job-customised CVs & cover letters</li>
-      <li>Monitor job statistics</li>
-    </ul>
+  <main id="marketing_body" class="hidden">
+
+    <!-- 1. The Hero Section (The Hook) -->
+    <article>
+      <header>
+        GLOBAL RECRUITMENT MANEUVERS: THE ONLY WINNING MOVE IS TO STRATEGICALLY 
+        OUT-GUN THEM.
+      </header>
+      <section>
+        <img src="image/hero-2.png">
+        <p>
+          JOPR is a free, local-first tactical job tracker and AI-powered CV generator 
+          designed to turn your career history into devastatingly targeted application 
+          nukes. No signups. No cloud databases. Just raw tactical advantage.
+        </p>
+      </section>
+      <button id="launch_btn">
+        LAUNCH JOPR
+      </button>
+    </article>
+
+    <!-- 2. The Tactical Problem (The "Why") -->
+    <article class="hidden">
+      <p>
+        The enemy? Armies of middle managers, faceless HR departments, and black-box 
+        ATS algorithms. If you send them a generic resume, you are marching your 
+        career into an ambush. To survive, you need a custom-tailored counter-strike 
+        for *every single application*.
+      </p>
+      <p>
+        JOPR gives you the command center to orchestrate a hyper-targeted, 
+        high-frequency deployment of flawless resumes and cover letters, matching the 
+        enemy's language exactly.
+      </p>
+      <img src="/image/why.png">
+    </article>
+    
+    <!--b3. Core Directives (The Key Pillars) -->
+    <article class="hidden">
+      <header>Air-Gapped Privacy</header>
+      <p>
+        No signups. No external tracking. All your profile data, work history, and 
+        target intelligence stay locked down locally on your device's browser.
+      </p>
+      <header>Target Acquisition (AI)</header>
+      <p>
+        Feed the terminal a raw text paste of any job description. JOPR's internal 
+        intelligence matrix automatically extracts the role, company, salary, and 
+        requirements instantly.
+      </p>
+      <header>Payload Customization</header>
+      <p>
+        Generate localized, job-specific CVs and cover letters that mirror the exact 
+        terminology, tech stack, and keywords of the target posting.
+      </p>
+      <header>Theater Mapping</header>
+      <p>
+        Track your active campaigns, map key enemy contacts (recruiters, hiring 
+        managers), and monitor emerging IT trends based on real-world battlefield 
+        data.
+      </p>
+    </article>
+
+    <!-- 4. The Command Center (Detailed Feature Grid) -->
+    <article class="hidden">
+      Threat Intelligence (Profile & History)
+      * **Legacy Ingestion:** Drop your existing resume straight into the terminal; JOPR parses and structures your history automatically.
+      * **Complete Arsenal:** Manage your deep dossier of skills, projects, responsibilities, and specific tech stacks in one master command post.
+      * **Data Sovereignty:** Export your entire system state or specific profiles as raw JSON strings at any moment to keep under your own lock and key.
+
+      Strike Operations (Job Tracker)
+      * **Campaign Ledger:** A centralized, chronological triage screen to filter open, pending, and secured roles.
+      * **Dossier Management:** Attach specific CV versions, cover letters, and logs of every communication/interaction with the target organization.
+      * **External AI Interop:** Don't want to use built-in AI? Instantly download specific job parameters as formatted JSON to pass to your own external LLM terminal.
+
+      Network Intercepts (Companies & Contacts)
+      * **Asset Tracking:** Maintain a deep rolodex of recruitment agencies, corporate targets, and individual field contacts (phone, email, secure URLs).
+    </article>
+    
+    <!-- 5. The "No-Cloud" Security Briefing -->
+    <article class="hidden">
+      <header>CLASSIFIED: SECURITY BRIEFING</header>
+      <p>
+        JOPR operates entirely client-side. We do not want your personal details, your 
+        work history, or your contact list. Your browser is your bunker. Back up your 
+        data by downloading your encrypted state file, and transfer it between devices 
+        manually. Total data sovereignty.
+      </p>
+    </article>
+    
+    <!-- 6. Footer / Final Call to Action -->
+    <button class="hidden">INITIALIZE JOPR SYSTEM</button>
+
   </main>
 
   <footer>

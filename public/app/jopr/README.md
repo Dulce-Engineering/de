@@ -48,9 +48,6 @@ The war against recruitment agencies and HR departments is merciless. Don't beco
 
 ### Job Statistics
 
-## Errors
-- set job chart to show "-joomla"
-
 ## Links
 - https://dulceengineering.com.au/app/jopr
 
@@ -60,6 +57,11 @@ https://www.youtube.com/watch?v=NHWjlCaIrQo
 
 ## Planet America
 https://www.youtube.com/watch?v=oVy-KKWsdNg&list=PLDTPrMoGHssBulfAaczSuk0f8luCiKYi3
+
+## Bugs
+- set job chart to show "-joomla"
+- on job details check contact created
+- on jobs when job created show on list at corect position
 
 ## To Do
 - jobs single view to get details including contact details
@@ -71,8 +73,6 @@ https://www.youtube.com/watch?v=oVy-KKWsdNg&list=PLDTPrMoGHssBulfAaczSuk0f8luCiK
 - sort jobs by create time
 - on jobs show contact details
 - show job logs
-- on jiob details check contact created
-- on jobs when job created show on list at corect position
 - on jobs show new jobs
 - filter jobs by agency
 - add marketing material
