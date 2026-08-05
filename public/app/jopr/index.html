@@ -159,16 +159,6 @@
     </de-input-list>
 
     <de-contact-list id="contacts_list" class="hidden"></de-contact-list>
-    <de-contact-form id="contact_dialog"></de-contact-form>
-    <de-dialog-form id="contact_list_dialog">
-      <de-contact-list 
-        id="dlg_contact_list" 
-        slot="fields" 
-        name="contacts"
-        view-type="select"
-      >
-      </de-contact-list>
-    </de-dialog-form>
 
     <de-input-list id="companies_list" class="hidden">
       <header slot="header">
@@ -364,6 +354,18 @@
   <footer>
     © Copyright Dulce Engineering 2025. All rights reserved. v1
   </footer>
+  
+  <de-dialog-form id="contact_list_dialog">
+    <de-contact-list 
+      id="dlg_contact_list" 
+      slot="fields" 
+      name="contacts"
+      view-type="select"
+    >
+    </de-contact-list>
+  </de-dialog-form>
+
+  <de-contact-form id="contact_dialog"></de-contact-form>
   
   <de-dialog-form id="profile_form" hide-clr>
     <label slot="fields">Name</label>

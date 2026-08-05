@@ -375,8 +375,10 @@ a.btn
   text-align: center;
 }
 
-footer {
-  margin: 0 0 20px 0;
+footer 
+{
+  margin: 20px 0 20px 0;
+  text-align: center;
 }
 
 de-input-list, #profile_elem
@@ -1148,7 +1150,7 @@ de-field
   {
     padding: 10px;
   }
-  header 
+  body > header 
   {
     display: block;
 
@@ -1162,6 +1164,7 @@ de-field
       margin: 0 0 10px 0;
       font-size: 4rem;
       letter-spacing: -10px;
+      width: min-content;
     }
     nav
     {
