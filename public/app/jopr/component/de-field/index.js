@@ -78,7 +78,7 @@ class DeField extends HTMLElement
   Render()
   {
     const html = `
-      <dt cid="label_elem"></dt>
+      <dt cid="label_elem" style="display:none;"></dt>
       <dd cid="value_elem"></dd>
     `;
     //const html_elements = Utils.To_Document(html, this);
@@ -86,7 +86,11 @@ class DeField extends HTMLElement
     this.innerHTML = html;
     Utils.Set_Id_Shortcuts(this, this, "cid");
 
-    this.label_elem.textContent = this.getAttribute("field-label") + ":";
+    if (this.hasAttribute("field-label"))
+    {
+      this.label_elem.textContent = this.getAttribute("field-label") + ":";
+      this.label_elem.style.display = null;
+    }
   }
 }
 

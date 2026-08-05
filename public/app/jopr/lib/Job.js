@@ -33,6 +33,11 @@ class Job
     "other": "Other"
   };
 
+  static Count(ctx)
+  {
+    return ctx.db.Count(Job.table_name);
+  }
+
   static To_Job(form_data)
   {
     const job =

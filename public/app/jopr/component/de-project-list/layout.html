@@ -1,0 +1,37 @@
+<de-input-list cid="project_list">
+  <header slot="header">
+    <h2>Projects</h2>
+    <de-toolbar-menu cid="project_list_menu" show-add></de-toolbar-menu>
+  </header>
+  <details slot="item" class="">
+    <summary>
+      <h2 cid="project_title_elem"></h2>
+      <de-toolbar-menu cid="project_item_menu" show-edit show-delete></de-toolbar-menu>
+    </summary>
+    <div class="fields">
+      <de-field cid="project_url_elem" field-type="link"></de-field>
+      <de-field cid="project_description_elem"></de-field>
+      <de-field cid="project_tech_elem" field-label="Tech"></de-field>
+    </div>
+  </details>
+  <span slot="no_items" class="details"><h2>
+    No projects to list.
+    Use the plus button to add some.</h2>
+  </span>
+</de-input-list>
+
+<de-dialog-form cid="project_dialog">
+  <h2 slot="header">Project Details</h2>
+  <label slot="fields">Title</label>
+  <input slot="fields" type="text" name="title">
+  <label slot="fields">URL</label>
+  <input slot="fields" type="url" name="url">
+  <label slot="fields">Description</label>
+  <textarea slot="fields" name="description"></textarea>
+  <label slot="fields">Tech</label>
+  <textarea slot="fields" name="tech"></textarea>
+</de-dialog-form>
+
+<de-dialog-confirm cid="warning_dlg">
+  <img src="image/red/warning.svg" slot="header">
+</de-dialog-confirm>

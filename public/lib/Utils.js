@@ -920,6 +920,14 @@ class Utils
 
   // HTML ===========================================================
 
+  static async Import_HTML(url)
+  {
+    const response = await fetch(url);
+    const response_text = await response.text();
+
+    return response_text;
+  }
+
   static Get_Slot_Content(src_elems, slot_name)
   {
     return src_elems.querySelector(`[slot='${slot_name}']`);

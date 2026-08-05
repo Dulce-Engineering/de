@@ -81,10 +81,7 @@
       grid-template-areas: 
         "personal skills"
         "experience experience"
-        "legacy-exp legacy-exp";
-      xflex-direction: column;
-      xalign-items: center;
-      xbox-sizing: border-box;
+        "projects projects";
       min-height: 100vh;
       margin: 0;
       transition: opacity 0.5s ease-in-out;
@@ -140,13 +137,18 @@
     {
       grid-area: experience;
     }
-    .legacy-exp
+    #projects_article
     {
-      grid-area: legacy-exp;
+      grid-area: projects;
 
-      div
+      main[cid="items_elem"]
       {
-        margin: 0 0 10px 0;
+        font-family: roboto-condensed;
+        gap: 20px;
+      }
+      div.no-break
+      {
+        padding: 0;
       }
     }
 
@@ -256,6 +258,11 @@
         flex-direction: column;
         xgap: 30px;
       }
+      footer
+      {
+        font-family: roboto-condensed;
+        font-size: 1rem;
+      }
     }
     de-info
     {
@@ -337,6 +344,13 @@
         p, div
         {
           font-family: roboto-condensed;
+        }
+      }
+      main 
+      {
+        div.legacy + div.legacy
+        {
+          padding: 0;
         }
       }
     }
@@ -426,10 +440,22 @@
           <span class="subheading" cid="legacy_dates"></span>
         </div>
       </div>
+      <footer slot="footer" class="no-break">*Role details and legacy jobs available on request.</footer>
     </de-input-list>
   </article>
 
-  <footer>*Role details and legacy jobs available on request (#<span id="footer_job_id"></span>).</footer>
+  <!-- projects -->
+  <article id="projects_article" style="display:none;">
+    <h2>Projects</h2>
+    <de-input-list id="projects_list">
+      <div slot="item" class="no-break">
+        <h3 cid="project_title"></h3>
+        <a cid="project_url" target="blank"></a><br>
+        <p class="separate" cid="project_description"></p>
+        <p class="separate">Tech: <span class="" cid="project_tech"></span></p>
+      </div>
+    </de-input-list>
+  </article>
 
   <de-info id="info_elem"></de-info>
 

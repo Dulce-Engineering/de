@@ -1,4 +1,5 @@
 import Utils from "../../../../lib/Utils.js";
+const html_url = "component/de-project-list/layout.html";
 
 /**
  * Custom HTML Element representing a list of projects.
@@ -288,9 +289,10 @@ class DeProjectList extends HTMLElement
   /**
    * Renders the custom element's inner HTML template and sets up its element shortcuts and event listeners.
    */
-  Render()
+  async Render()
   {
-    const html = `
+    const html = await Utils.Import_HTML(html_url);
+    /*const html = `
       <de-input-list cid="project_list">
         <header slot="header">
           <h2>Projects</h2>
@@ -326,7 +328,7 @@ class DeProjectList extends HTMLElement
       <de-dialog-confirm cid="warning_dlg">
         <img src="image/red/warning.svg" slot="header">
       </de-dialog-confirm>
-    `;
+    `;*/
     //const html_elements = Utils.To_Document(html, this);
     //this.replaceChildren(html_elements);
     this.innerHTML = html;

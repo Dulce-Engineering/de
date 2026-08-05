@@ -84,3 +84,18 @@ https://www.youtube.com/watch?v=oVy-KKWsdNg&list=PLDTPrMoGHssBulfAaczSuk0f8luCiK
 - generate cover letter (done)
 - refactor cv page to show saved data (done)
 - add usage reporting (done)
+
+### Competition
+- https://www.tealhq.com/tools/job-tracker
+- https://simplify.jobs
+- https://career.io
+- https://us.fitly.work
+- https://cvmate.com.au
+- https://aiapply.co
+- https://speechify.com
+- https://jobjetai.co
+- https://www.perplexity.ai
+- https://www.tryapt.ai
+- https://www.betterapply.co
+- https://quiz.shift.careers
+- https://enhancv.com

@@ -80,6 +80,9 @@ async function Generate_CV(ctx, prospective_job)
     info_elem.Info("Adding education...");
     cv.edu_items = await ctx.Profile.Edu_Select(ctx);
 
+    info_elem.Info("Adding projects...");
+    cv.projects = await ctx.Project.Select(ctx);
+
     info_elem.Info();
   }
 
@@ -155,12 +158,13 @@ async function Render_Job_Item(event, target_job, ctx)
   }
   else
   {
+    item_elem.classList.add("legacy");
     const date_info = Render_Date_Strs(job, all_jobs);
-    item_elem.legacy_job_title.innerText = "*" + job.role_titles;
+    item_elem.legacy_job_title.innerText = job.role_titles;
     item_elem.legacy_job_company.innerText = job.company_name;
     item_elem.legacy_dates.innerText = 
       //date_info.start_date_str + " (" + date_info.duration_str + ")";
-      date_info.start_date_str + " - " + date_info.end_date_str;
+      date_info.start_date_str + " - " + date_info.end_date_str + " *";
 
     item_elem.best_job.hidden = true;
   }
@@ -173,6 +177,18 @@ function Render_Education_Item(event)
 
   item_elem.edu_title.innerText = education.title;
   item_elem.edu_institution.innerText = education.institution;
+}
+
+function Render_Project_Item(event)
+{
+  const item_elem = event.detail.item_elem;
+  const project = item_elem.item_obj;
+
+  item_elem.project_title.innerText = project.title;
+  item_elem.project_description.innerText = project.description;
+  item_elem.project_tech.innerText = project.tech;
+  item_elem.project_url.innerText = project.url;
+  item_elem.project_url.href = project.url;
 }
 
 // rendering ======================================================================
@@ -208,10 +224,15 @@ function Render_CV(job, ctx)
     job_elems[0].style.padding = "0";
   }
 
+  if (cv.projects)
+  {
+    projects_article.style.display = null;
+    projects_list.addEventListener("render", Render_Project_Item);
+    projects_list.value = cv.projects;
+  }
+
   education_list.addEventListener("render", Render_Education_Item);
   education_list.value = cv.edu_items;
-
-  footer_job_id.innerText = job.id;
 }
 
 function Render_Date_Strs(job, all_jobs)

@@ -3,9 +3,21 @@ class Db
   db = null;
   schema = null;
 
-  async Clear()
+  Clear()
   {
     return Db.Clear(this.db, this.schema);
+  }
+
+  async Count(table_name)
+  {
+    let res = null;
+    const table = Db.Get_Table(this.db, table_name);
+    if (table)
+    {
+      const request = table.count();
+      res = await Db.Get_Req_Res(request);
+    }
+    return res || 0;
   }
 
   Delete(table_name, ids)

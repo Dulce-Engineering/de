@@ -26,7 +26,7 @@ async function Main()
 
   const ctx = await New_Ctx();
 
-  const jobs_count = 0;
+  const jobs_count = await ctx.Job.Count(ctx);
   if (jobs_count > 0)
   {
     Render_App(ctx);

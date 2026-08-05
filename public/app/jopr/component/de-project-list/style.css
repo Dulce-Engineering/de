@@ -4,4 +4,11 @@ de-project-list
   {
     grid-template-columns: auto auto;
   }
+
+  .fields
+  {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
 }
