@@ -70,7 +70,7 @@
 
 <body>
 
-  <header id="hdr_elem">
+  <header id="hdr_elem" class="">
     <div class="chart">
       <de-line-chart id="chart_elem" hide-labels chart-type="smooth">
       </de-line-chart>
@@ -108,11 +108,11 @@
   <main id="app_body" class="hidden">
 
     <de-input-list id="jobs_list">
-      <header slot="header">
+      <header slot="header" class="header">
         <h2>Jobs</h2>
         <de-toolbar-menu id="jobs_menu" show-add show-ai></de-toolbar-menu>
       </header>
-      <details slot="item" class="job-item">
+      <details slot="item" class="job-item fancy-border">
         <summary>
           <div>
             <h2 cid="role_title_elem"></h2>
@@ -161,7 +161,7 @@
     <de-contact-list id="contacts_list" class="hidden"></de-contact-list>
 
     <de-input-list id="companies_list" class="hidden">
-      <header slot="header">
+      <header slot="header" class="header">
         <h2>Agencies & Companies</h2>
         <button id="add_company_btn" class="img">
           <img src="image/add.svg" alt="Add Company">
@@ -189,13 +189,13 @@
 
     <div id="profile_elem" class="hidden">
 
-      <header slot="header">
+      <header slot="header" class="header">
         <h2>Profile</h2>
         <de-toolbar-menu id="profile_menu" show-ai show-edit show-download>
         </de-toolbar-menu>
       </header>
 
-      <div id="profile_details" class="details">
+      <div id="profile_details" class="details fancy-border">
         <h2 id="profile_name"></h2>
         <p>Address: <span id="profile_address"></span></p>
         <p>Seek URL: <span id="profile_seek_url"></span></p>
@@ -210,11 +210,11 @@
       </span>
 
       <de-input-list id="edu_list">
-        <header slot="header">
+        <header slot="header" class="header">
           <h2>Education</h2>
           <de-toolbar-menu id="edu_list_menu" show-add></de-toolbar-menu>
         </header>
-        <details slot="item" class="">
+        <details slot="item" class="fancy-border">
           <summary>
             <h2 cid="edu_title_elem"></h2>
             <de-toolbar-menu cid="edu_item_menu" show-edit show-delete></de-toolbar-menu>
@@ -228,11 +228,11 @@
       </de-input-list>
 
       <de-input-list id="career_list">
-        <header slot="header">
+        <header slot="header" class="header">
           <h2>Career</h2>
           <de-toolbar-menu id="career_list_menu" show-add></de-toolbar-menu>
         </header>
-        <details slot="item" class="">
+        <details slot="item" class="fancy-border">
           <summary>
             <h2 cid="career_company_elem"></h2>
             <de-toolbar-menu cid="career_item_menu" show-edit show-delete></de-toolbar-menu>
@@ -354,7 +354,7 @@
   <footer>
     © Copyright Dulce Engineering 2025. All rights reserved. v1
   </footer>
-  
+
   <de-dialog-form id="contact_list_dialog">
     <de-contact-list 
       id="dlg_contact_list" 
