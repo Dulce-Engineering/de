@@ -1,6 +1,20 @@
 
 import Utils from "../../../../lib/Utils.js";
 
+/**
+ * DeField is a custom element that displays a field containing a label and a value.
+ * It automatically manages its visibility: hiding itself when the value is empty,
+ * and showing itself when a value is provided.
+ *
+ * @customElement de-field
+ * 
+ * @attribute {string} [field-label] - The text label for the field. If provided, a colon (":") is automatically appended and the label is shown.
+ * @attribute {string} [field-type] - The type of field. If set to "link", the value will be rendered inside an external link (`<a target="_blank">`).
+ * @attribute {string} [hide-class] - CSS class used to hide the element (by adding/removing it) instead of toggling the inline `display` style.
+ * 
+ * @property {HTMLElement} label_elem - The DOM element representing the field's label (<dt>). Created dynamically by Render.
+ * @property {HTMLElement} value_elem - The DOM element representing the field's value (<dd>). Created dynamically by Render.
+ */
 class DeField extends HTMLElement
 {
   static tname = "de-field";
@@ -11,11 +25,22 @@ class DeField extends HTMLElement
     //Utils.Bind(this, "On_");
   }
 
+  /**
+   * Lifecycle callback invoked when the element is added to the document.
+   * Triggers the initial rendering of the component.
+   */
   connectedCallback()
   {
     this.Render();
   }
 
+  /**
+   * Sets the value of the field.
+   * If the provided value is empty (null, undefined, or empty string), clears the value element and hides the field.
+   * Otherwise, updates the value element (rendering it as a link if `field-type` is "link") and shows the field.
+   * 
+   * @param {*} obj - The value to set. Will be converted to string.
+   */
   set value(obj)
   {
     if (Utils.isEmpty(obj))
@@ -44,11 +69,21 @@ class DeField extends HTMLElement
     }
   }
 
+  /**
+   * Gets the text content of the value element.
+   * 
+   * @returns {string} The text content of the value.
+   */
   get value()
   {
     return this.value_elem.textContent;
   }
   
+  /**
+   * Shows the component.
+   * If the `hide-class` attribute is set, removes that class from the component.
+   * Otherwise, resets the inline `display` style to default.
+   */
   Show()
   {
     if (this.hasAttribute("hide-class"))
@@ -62,6 +97,11 @@ class DeField extends HTMLElement
     }
   }
 
+  /**
+   * Hides the component.
+   * If the `hide-class` attribute is set, adds that class to the component.
+   * Otherwise, sets the inline `display` style to "none".
+   */
   Hide()
   {
     if (this.hasAttribute("hide-class"))
@@ -75,6 +115,11 @@ class DeField extends HTMLElement
     }
   }
 
+  /**
+   * Renders the basic DOM structure of the field, sets up shortcut references
+   * to elements (like `label_elem` and `value_elem`), and configures the label
+   * if `field-label` is present.
+   */
   Render()
   {
     const html = `
