@@ -241,8 +241,8 @@ class Job
           }
           else
           {
-            const new_contact = await ctx.Contact.Save(ctx, contact);
-            contact_ids.push(new_contact.id);
+            const new_contact_id = await ctx.Contact.Save(ctx, contact);
+            contact_ids.push(new_contact_id);
           }
         }
         form_data.contact_ids = contact_ids;

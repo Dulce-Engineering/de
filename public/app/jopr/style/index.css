@@ -1,0 +1,101 @@
+@import url("large.css");
+@import url("small.css");
+
+@font-face {
+  font-family: hyperspace-bold;
+  src: url("../font/Hyperspace Bold.otf");
+}
+@font-face {
+  font-family: hyperspace;
+  src: url("../font/Hyperspace.otf");
+}
+@font-face {
+  font-family: octagonal-ultra-light;
+  src: url("../font/octaul-017.ttf");
+}
+@font-face {
+  font-family: octagonal-light;
+  src: url("../font/octal-017.ttf");
+}
+@font-face {
+  font-family: octagonal-regular;
+  src: url("../font/octar-017.ttf");
+}
+@font-face {
+  font-family: octagonal-bold;
+  src: url("../font/octab-017.ttf");
+}
+
+@property --s1 
+{
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 0%;
+}
+@property --s2 
+{
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 1%;
+}
+@property --s3
+{
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 2%;
+}
+@keyframes shift-colors 
+{
+  0% 
+  {
+    --s1: 0%;
+    --s2: 1%;
+    --s3: 2%;
+  }
+
+  100% 
+  {
+    --s1: 100%;
+    --s2: 101%;
+    --s3: 102%;  
+  }
+}
+@keyframes shift-colors-2
+{
+  0% 
+  {
+    --s1: 0%;
+    --s2: 1%;
+    --s3: 2%;
+  }
+
+  100% 
+  {
+    --s1: 100%;
+    --s2: 101%;
+    --s3: 102%;
+  }
+}
+@keyframes rotation 
+{
+  0% 
+  {
+    transform: rotate(0deg);
+  }
+  25%
+  {
+    transform: rotate(200deg);
+  }
+  50% 
+  {
+    transform: rotate(90deg);
+  }
+  25% 
+  {
+    transform: rotate(360deg);
+  }
+  100%
+  {
+    transform: rotate(0deg);
+  }
+}

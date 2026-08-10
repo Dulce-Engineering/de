@@ -75,6 +75,16 @@ class Db
     return Db.Select_By_Id(this.db, table_name, id);
   }
 
+  Select_By_Ids(table_name, ids)
+  {
+    let res = null;
+    
+    if (!Utils.Is_Empty(ids))
+    {
+
+    }
+  }
+
   Update(table_name, new_item)
   {
     return Db.Update(this.db, table_name, new_item);
@@ -203,15 +213,15 @@ class Db
 
   static Select_By_Id(db, table_name, id)
   {
-    let res = null;
+    let res_promise = null;
     if (id)
     {
       const table = Db.Get_Table(db, table_name,);
       const request = table.get(id);
-      res = Db.Get_Req_Res(request);
+      res_promise = Db.Get_Req_Res(request);
     }
 
-    return res;
+    return res_promise;
   }
 
   static Save(db, table_name, item)
