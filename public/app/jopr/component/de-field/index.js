@@ -59,6 +59,20 @@ class DeField extends HTMLElement
           this.value_elem.innerHTML = 
             `<a href="${value_str}" target="_blank">${value_str}</a>`;
         }
+        else if (field_type == "html")
+        {
+          this.value_elem.innerHTML = value_str;
+        }
+        else if (field_type == "phone")
+        {
+          this.value_elem.innerHTML = 
+            `<a href="tel:${value_str}">${value_str}</a>`;
+        }
+        else if (field_type == "email")
+        {
+          this.value_elem.innerHTML = 
+            `<a href="mailto:${value_str}">${value_str}</a>`;
+        }
       }
       else
       {

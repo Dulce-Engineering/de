@@ -405,6 +405,14 @@
       }
     }
   }
+  #jobs_list
+  {
+    main details .body hr
+    {
+      margin: 0;
+      border-color: var(--shade);
+    }
+  }
 
   .header
   {

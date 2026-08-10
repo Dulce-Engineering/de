@@ -788,23 +788,25 @@ function Render_Job_Item(event, ctx)
   const title_text = ctx.Utils.Append_Str(role_title, job.company, " - ");
   item_elem.role_title_elem.textContent = title_text;
 
-  const contact_text = ctx.Utils.Append_Str(job.contact_name, job.agency_name, " @ ");
+  const contact_text = ctx.Utils.Append_Str(job.contact?.name, job.agency_name, " @ ");
   item_elem.contact_elem.textContent = contact_text;
+
+  // name
+  // position
+  // agency name
+  let contact_name = ctx.Utils.Append_Str(job.contact?.name, job.contact?.position, " - ");
+  contact_name = ctx.Utils.Append_Str(contact_name, job.agency_name, " @ ");
+  item_elem.contact_name_elem.value = contact_name;
+  item_elem.contact_phone_elem.value = job.contact?.phone;
+  item_elem.contact_email_elem.value = job.contact?.email;
+  item_elem.contact_linkedin_elem.value = job.contact?.linkedin;
 
   const salary_text = ctx.Utils.Append_Str(job.remuneration, job.remuneration_unit, " ");
   const type_text = ctx.Utils.Append_Str(job.role_type, job.duration, " - ");
   const des_text = ctx.Utils.Append_Str(type_text, salary_text, " - ");
-  item_elem.role_type_elem.textContent = des_text;
+  item_elem.role_type_elem.value = des_text;
 
-  if (job.link)
-  {
-    item_elem.link_elem.href = job.link;
-    item_elem.link_elem.innerText = job.link;
-  }
-  else
-  {
-    item_elem.link_elem.remove();
-  }
+  item_elem.link_elem.value = job.link;
 
   if (ctx.Utils.Is_Empty(job.attachments))
   {
@@ -816,17 +818,9 @@ function Render_Job_Item(event, ctx)
     item_elem.attachment_list.value = job.attachments;
   }
 
-  if (job.latest_note)
-  {
-    const note_html = 
-      "Latest Note (" + job.latest_note_time_formatted + "):<br> " + 
-      job.latest_note;
-    item_elem.note_elem.innerHTML = note_html;
-  }
-  else
-  {
-    item_elem.note_elem.remove();
-  }
+  const note_html = job.latest_note ?
+    "Latest Note (" + job.latest_note_time_formatted + "):<br> " + job.latest_note : null;
+  item_elem.note_elem.value = note_html;
   
   item_elem.status_elem.textContent = job.status;
 

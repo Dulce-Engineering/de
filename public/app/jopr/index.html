@@ -65,7 +65,6 @@
   <script src="./component/de-contact-form/index.js" type="module"></script>
   <script src="./component/de-contact-list/index.js" type="module"></script>
   <script src="./lib/index.js" type="module"></script>
-
 </head>
 
 <body>
@@ -132,9 +131,14 @@
           </de-toolbar-menu>
         </summary>
         <div class="body">
-          <p cid="role_type_elem"></p>
-          <a cid="link_elem" class="link" target="_blank"></a>
-          <p cid="note_elem"></p>
+          <hr>
+          <de-field cid="role_type_elem" field-label="Role Type"></de-field>
+          <de-field cid="contact_name_elem" field-label="Contact Name"></de-field>
+          <de-field cid="contact_phone_elem" field-label="Contact Phone" field-type="phone"></de-field>
+          <de-field cid="contact_email_elem" field-label="Contact Email" field-type="email"></de-field>
+          <de-field cid="contact_linkedin_elem" field-label="Contact LinkedIn" field-type="link"></de-field>
+          <de-field cid="link_elem" field-type="link"></de-field>
+          <de-field cid="note_elem" field-type="html"></de-field>
           <de-input-list cid="attachment_list" class="attachment-list">
             <strong slot="header">Attachments:</strong>
             <div slot="item">

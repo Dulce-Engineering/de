@@ -117,6 +117,7 @@ class Job
       latest_note_time_formatted: latest?.time_str,
       attachments,
       contacts,
+      contact: !ctx.Utils.Is_Empty(contacts) ? contacts[0] : null,
       last_update
     };
   }
@@ -215,19 +216,6 @@ class Job
         const new_agency = { name: form_data.agency_name?.trim() || "New Agency" };
         const new_agency_id = await ctx.db.Insert("agencies", new_agency);
         form_data.agency_id = new_agency_id;
-      }
-
-      if (form_data.contact_id == "new")
-      {
-        const new_contact =
-        {
-          name: form_data.contact_name?.trim(),
-          phone: form_data.contact_phone?.trim(),
-          agency_id: parseInt(form_data.agency_id) || null,
-          email: form_data.contact_email?.trim(),
-        };
-        const new_contact_id = await ctx.db.Insert("contacts", new_contact);
-        form_data.contact_id = new_contact_id;
       }
 
       if (!ctx.Utils.Is_Empty(form_data.contacts))
