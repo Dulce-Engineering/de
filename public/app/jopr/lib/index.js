@@ -70,6 +70,7 @@ async function Render_App(ctx)
   job_contacts.addEventListener("add", On_Click_Add_Contact);
   job_contacts.addEventListener("select", e => On_Click_Select_Contact(e, ctx));
   job_contacts.addEventListener("delete", e => On_Click_Delete_Job_Contact(e, ctx));
+  job_contacts.addEventListener("edit", e => On_Click_Edit_Job_Contact(e, ctx));
   Render_Job_Items(ctx);
 
   companies_btn.onclick = () => Show_View(companies_list);
@@ -1016,6 +1017,24 @@ async function On_Click_Add_Contact(event)
 {
   const contact = await contact_dialog.Show();
   if (contact)
+  {
+    job_contacts.contacts_list.Add(contact);
+  }
+}
+
+async function On_Click_Edit_Job_Contact(event, ctx)
+{
+  const contact = event.detail;
+  contact_dialog.agency_select.innerHTML = 
+    await ctx.Agency.Get_Options(ctx);
+
+  const msg_success = "Contact saved successfully.";
+  const msg_fail = "Failed to save contact.";
+  const form_data = await contact_dialog.Show(contact);
+  const new_contact = 
+    await Save_Obj
+      (contact, form_data, c => ctx.Contact.Save(ctx, c), msg_success, msg_fail);
+  if (new_contact)
   {
     job_contacts.contacts_list.Add(contact);
   }
