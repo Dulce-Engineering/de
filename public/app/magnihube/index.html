@@ -12,7 +12,7 @@
       gtag('config', 'G-KMFPTFXKGX');
     </script>
 
-    <link rel="manifest" href="/magnihube/manifest.json">
+    <link rel="manifest" href="/app/magnihube/manifest.json">
     <title>Magnigube</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -22,8 +22,8 @@
     <meta name="robots" content="index, follow"> 
     <meta property="og:title" content="Magnigube">
     <meta property="og:description" content="Visualize File Growth Over Time with Magnihube. Unlock insights into your code's evolution with Magnihube, a free and privacy-focused Progressive Web App (PWA).">
-    <meta property="og:image" content="https://dulceeng.com.au/magnihube/image/screenshot-landscape.png">
-    <meta property="og:url" content="https://dulceeng.com.au/magnihube">
+    <meta property="og:image" content="https://dulceeng.com.au/app/magnihube/image/screenshot-landscape.png">
+    <meta property="og:url" content="https://dulceeng.com.au/app/magnihube">
     <meta property="og:type" content="website">
     <link rel="shortcut icon" href="./image/favicon.ico">
     
@@ -528,17 +528,17 @@
         "@context": "https://schema.org",
         "@type": "Website",
         "name": "Magnihube",
-        "url": "https://dulceeng.com.au/magnihube",
+        "url": "https://dulceeng.com.au/app/magnihube",
         "description": "Visualize File Growth Over Time with Magnihube. Unlock insights into your code's evolution with Magnihube, a free and privacy-focused Progressive Web App (PWA).",
-        "image": "https://dulceeng.com.au/magnihube/image/screenshot-landscape.png"
+        "image": "https://dulceeng.com.au/app/magnihube/image/screenshot-landscape.png"
       }
     </script>
 
     <script type="module">
-      import "../component/DeDialogForm/index.js";
-      import "../component/DeDialogAlert/index.js";
-      import "../component/DeLineChart/index.js";
-      import Utils from "../lib/Utils.js";
+      import "../../component/DeDialogForm/index.js";
+      import "../../component/DeDialogAlert/index.js";
+      import "../../component/DeLineChart/index.js";
+      import Utils from "../../lib/Utils.js";
 
       Main();
       async function Main()
@@ -548,9 +548,9 @@
           await navigator.serviceWorker.register("./lib/service-worker.js");
         }
 
-        const observer = new MutationObserver(On_Mutation);
-        On_Mutation.observer = observer;
-        observer.observe(document.documentElement, { childList: true, subtree: false });
+        //const observer = new MutationObserver(On_Mutation);
+        //On_Mutation.observer = observer;
+        //observer.observe(document.documentElement, { childList: true, subtree: false });
 
         add_file_btn.addEventListener("click", On_Click_Add_File_Btn);
         del_all_btn.addEventListener("click", On_Click_Del_All_Btn);
@@ -974,8 +974,6 @@
         summary_elem.d_size.innerText = d_size;
       }
     </script>
-
-    <script src="https://vemtoutcheeg.com/400/8903613"></script>
 
   </head>
 

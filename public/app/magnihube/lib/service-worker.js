@@ -8,8 +8,8 @@ async function Install_SW(event)
   await cache.addAll
   (
     [
-      "/magnihube/", 
-      "/magnihube/index.html", 
+      "/app/magnihube/", 
+      "/app/magnihube/index.html", 
     ]
   );
 }
