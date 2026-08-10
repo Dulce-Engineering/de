@@ -532,5 +532,11 @@
     "datetime": 1785834968164,
     "id": "c5559f2f-bd8a-46a3-975a-a6ebb3f1e181",
     "query_id": "-mariadb"
+  },
+  {
+    "count": 6,
+    "datetime": 1786337628278,
+    "id": "2c3b2f91-6b28-4fe5-a311-05dfff9e6b22",
+    "query_id": "-mariadb"
   }
 ]
