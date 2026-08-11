@@ -232,59 +232,7 @@ class DeProjectList extends HTMLElement
     }
   }
 
-  /*On_Click_Sel()
-  {
-    this.dispatchEvent(new CustomEvent("select"));
-  }*/
-
   // rendering ================================================================
-
-  /*Render_Select()
-  {
-    const html = `
-      <de-input-list cid="contacts_list">
-        <div slot="item" class="contact-item">
-          <input type="radio" name="selected_contact_id" cid="sel_contact_radio">
-          <label cid="contact_title_elem" class="h2"></label>
-        </div>
-      </de-input-list>
-    `;
-    this.innerHTML = html;
-    Utils.Set_Id_Shortcuts(this, this, "cid");
-
-    this.contacts_list.addEventListener("render", this.On_Render_Item);
-  }*/
-
-  /*Render_Sublist()
-  {
-    const html = `
-      <de-input-list cid="contacts_list">
-        <header slot="header">
-          <h2>Contacts</h2>
-          <button cid="sel_contact_btn" class="img" type="button">
-            <img src="image/list.svg" alt="Select Contact">
-          </button>
-          <button cid="add_contact_btn" class="img" type="button">
-            <img src="image/add.svg" alt="Add Contact">
-          </button>
-        </header>
-        <div slot="item" class="contact-item">
-          <h2 cid="contact_title_elem"></h2>
-          <de-toolbar-menu 
-            cid="contact_menu" 
-            show-delete label-delete="Delete Contact"
-          >
-          </de-toolbar-menu>
-        </div>
-      </de-input-list>
-    `;
-    this.innerHTML = html;
-    Utils.Set_Id_Shortcuts(this, this, "cid");
-
-    this.contacts_list.addEventListener("render", this.On_Render_Item);
-    this.add_contact_btn.addEventListener("click", this.On_Click_Add);
-    this.sel_contact_btn.addEventListener("click", this.On_Click_Sel);
-  }*/
 
   /**
    * Renders the custom element's inner HTML template and sets up its element shortcuts and event listeners.
@@ -292,45 +240,6 @@ class DeProjectList extends HTMLElement
   async Render()
   {
     const html = await Utils.Import_HTML(html_url);
-    /*const html = `
-      <de-input-list cid="project_list">
-        <header slot="header">
-          <h2>Projects</h2>
-          <de-toolbar-menu cid="project_list_menu" show-add></de-toolbar-menu>
-        </header>
-        <details slot="item" class="">
-          <summary>
-            <h2 cid="project_title_elem"></h2>
-            <de-toolbar-menu cid="project_item_menu" show-edit show-delete></de-toolbar-menu>
-          </summary>
-          <de-field cid="project_tech_elem" field-label="Tech"></de-field>
-          <de-field cid="project_description_elem" field-label="Description"></de-field>
-          <de-field cid="project_url_elem" field-label="Link" field-type="link"></de-field>
-        </details>
-        <span slot="no_items" class="details"><h2>
-          No projects to list.
-          Use the plus button to add some.</h2>
-        </span>
-      </de-input-list>
-
-      <de-dialog-form cid="project_dialog">
-        <h2 slot="header">Project Details</h2>
-        <label slot="fields">Title</label>
-        <input slot="fields" type="text" name="title">
-        <label slot="fields">URL</label>
-        <input slot="fields" type="url" name="url">
-        <label slot="fields">Description</label>
-        <textarea slot="fields" name="description"></textarea>
-        <label slot="fields">Tech</label>
-        <input slot="fields" type="text" name="tech">
-      </de-dialog-form>
-      
-      <de-dialog-confirm cid="warning_dlg">
-        <img src="image/red/warning.svg" slot="header">
-      </de-dialog-confirm>
-    `;*/
-    //const html_elements = Utils.To_Document(html, this);
-    //this.replaceChildren(html_elements);
     this.innerHTML = html;
     Utils.Set_Id_Shortcuts(this, this, "cid");
 

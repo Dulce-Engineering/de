@@ -60,6 +60,7 @@
   <script src="../../component/DeDialogAlert/index.js" type="module"></script>
   <script src="../../component/DeDialogConfirm/index.js" type="module"></script>
   <script src="../../component/DeLineChart/index.js" type="module"></script>
+  <script src="../../component/DeFilter/index.js" type="module"></script>
   <script src="./component/de-project-list/index.js" type="module"></script>
   <script src="./component/de-toolbar-menu/index.js" type="module"></script>
   <script src="./component/de-info/index.js" type="module"></script>
@@ -114,7 +115,9 @@
     <de-input-list id="jobs_list">
       <header slot="header" class="header">
         <h2>Jobs</h2>
-        <de-toolbar-menu id="jobs_menu" show-add show-ai></de-toolbar-menu>
+        <de-toolbar-menu id="jobs_menu" show-add show-ai>
+          <de-filter id="jobs_filter" view="min"></de-filter>
+        </de-toolbar-menu>
       </header>
       <details slot="item" class="job-item fancy-border">
         <summary>
