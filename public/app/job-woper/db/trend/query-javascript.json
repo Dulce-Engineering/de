@@ -544,5 +544,11 @@
     "datetime": 1786337378726,
     "id": "c4cea777-465b-40b5-9962-f95ecf1d98d1",
     "query_id": "-javascript"
+  },
+  {
+    "count": 650,
+    "datetime": 1786450564243,
+    "id": "fe4f0604-0b15-4a76-8fce-983e0b84a763",
+    "query_id": "-javascript"
   }
 ]
