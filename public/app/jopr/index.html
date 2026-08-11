@@ -38,6 +38,7 @@
   <link rel="stylesheet" href="./component/de-project-list/style.css">
   <link rel="stylesheet" href="./component/de-contact-details/style.css">
   <link rel="stylesheet" href="./component/de-contact-list/style.css">
+  <link rel="stylesheet" href="./component/de-job-details/style.css">
   
   <script type="importmap">
   {
@@ -67,6 +68,7 @@
   <script src="./component/de-contact-form/index.js" type="module"></script>
   <script src="./component/de-contact-list/index.js" type="module"></script>
   <script src="./component/de-contact-details/index.js" type="module"></script>
+  <script src="./component/de-job-details/index.js" type="module"></script>
   <script src="./lib/index.js" type="module"></script>
 </head>
 
@@ -133,11 +135,10 @@
           >
           </de-toolbar-menu>
         </summary>
-        <div class="body">
           <hr>
-          <de-field cid="role_type_elem" field-label="Role Type"></de-field>
+        <div class="body">
+          <de-job-details cid="job_details_elem"></de-job-details>
           <de-contact-details cid="contact_details_elem"></de-contact-details>
-          <de-field cid="link_elem" field-type="link"></de-field>
           <de-field cid="note_elem" field-type="html"></de-field>
           <de-input-list cid="attachment_list" class="attachment-list">
             <strong slot="header">Attachments:</strong>

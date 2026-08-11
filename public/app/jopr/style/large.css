@@ -335,9 +335,10 @@
       .body
       {
         display: flex;
-        flex-direction: column;
+        flex-direction: row;
         gap: 15px;
-        margin: 15px 0 0 0;
+        xmargin: 15px 0 0 0;
+        flex-wrap: wrap;
 
         p
         {
@@ -407,11 +408,14 @@
   }
   #jobs_list
   {
-    main details .body hr
-    {
-      margin: 0;
-      border-color: var(--shade);
-    }
+    main details
+    {      
+      .body hr
+      {
+        margin: 0;
+        border-color: var(--shade);
+      }
+    }  
   }
 
   .header

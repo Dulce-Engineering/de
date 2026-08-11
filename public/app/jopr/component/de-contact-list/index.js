@@ -76,14 +76,6 @@ class DeContactList extends HTMLElement
     this.contacts_list.Remove(obj_id);
   }
 
-  Set_Class(class_str)
-  {
-    this.classList.remove("type-select");
-    this.classList.remove("type-sublist");
-    this.classList.remove("type-list");
-    this.classList.add(class_str);
-  }
-
   // events ===================================================================
 
   On_Render_Item(event)
@@ -143,7 +135,6 @@ class DeContactList extends HTMLElement
     Utils.Set_Id_Shortcuts(this, this, "cid");
 
     this.contacts_list.addEventListener("render", this.On_Render_Item);
-    this.Set_Class("type-select");
   }
 
   Render_Sublist()
@@ -176,7 +167,6 @@ class DeContactList extends HTMLElement
     this.contacts_list.addEventListener("render", this.On_Render_Item);
     this.add_contact_btn.addEventListener("click", this.On_Click_Add);
     this.sel_contact_btn.addEventListener("click", this.On_Click_Sel);
-    this.Set_Class("type-sublist");
   }
 
   Render()
@@ -213,7 +203,6 @@ class DeContactList extends HTMLElement
 
     this.contacts_list.addEventListener("render", this.On_Render_Item);
     this.add_contact_btn.addEventListener("click", this.On_Click_Add);
-    this.Set_Class("type-list");
   }
 }
 

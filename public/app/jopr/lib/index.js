@@ -794,12 +794,7 @@ function Render_Job_Item(event, ctx)
   const contact = { ...job.contact, agency_name: job.agency_name };
   item_elem.contact_details_elem.value = contact;
 
-  const salary_text = ctx.Utils.Append_Str(job.remuneration, job.remuneration_unit, " ");
-  const type_text = ctx.Utils.Append_Str(job.role_type, job.duration, " - ");
-  const des_text = ctx.Utils.Append_Str(type_text, salary_text, " - ");
-  item_elem.role_type_elem.value = des_text;
-
-  item_elem.link_elem.value = job.link;
+  item_elem.job_details_elem.value = job;
 
   if (ctx.Utils.Is_Empty(job.attachments))
   {
