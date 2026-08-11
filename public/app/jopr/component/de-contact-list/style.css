@@ -1,0 +1,60 @@
+de-contact-list[view-type="sublist"]
+{
+  display: inline-block;
+  justify-self: flex-start;
+  border: 1px solid var(--border);
+  padding: 5px 5px 5px 10px;
+
+  de-input-list
+  {
+    header
+    {
+      display: flex;
+      margin: 0;
+      padding: 0;
+      gap: 5px;
+
+      h2
+      {
+        flex: stretch;
+        font-size: 1rem;
+      }
+    }
+
+    main[cid="items_elem"]
+    {
+      display: flex;
+      flex-direction: column;
+      margin: 0;
+      padding: 0;
+      min-height: 0;
+      gap: 0;
+      align-items: stretch;
+
+      h2
+      {
+        flex: stretch;
+        color: var(--input-text);
+        font-size: 1rem;
+      }
+      .contact-item
+      {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+    }
+
+    button.img
+    {
+      padding: 0;
+      border: none;
+
+      img
+      {
+        width: 24px;
+        height: 24px;
+      }
+    }
+  }
+}

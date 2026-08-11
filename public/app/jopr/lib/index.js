@@ -791,15 +791,8 @@ function Render_Job_Item(event, ctx)
   const contact_text = ctx.Utils.Append_Str(job.contact?.name, job.agency_name, " @ ");
   item_elem.contact_elem.textContent = contact_text;
 
-  // name
-  // position
-  // agency name
-  let contact_name = ctx.Utils.Append_Str(job.contact?.name, job.contact?.position, " - ");
-  contact_name = ctx.Utils.Append_Str(contact_name, job.agency_name, " @ ");
-  item_elem.contact_name_elem.value = contact_name;
-  item_elem.contact_phone_elem.value = job.contact?.phone;
-  item_elem.contact_email_elem.value = job.contact?.email;
-  item_elem.contact_linkedin_elem.value = job.contact?.linkedin;
+  const contact = { ...job.contact, agency_name: job.agency_name };
+  item_elem.contact_details_elem.value = contact;
 
   const salary_text = ctx.Utils.Append_Str(job.remuneration, job.remuneration_unit, " ");
   const type_text = ctx.Utils.Append_Str(job.role_type, job.duration, " - ");
