@@ -56,7 +56,7 @@ async function Render_App(ctx)
   Set_Options(job_status_select, ctx.Job.job_status, s => s.id, s => s.label);
   Set_Options(career_work_type_select, Object.keys(ctx.Job.work_types), t => t, t => work_types[t]);
 
-  //const title_elem = document.querySelector("#hdr_elem>h1.title");
+  const title_elem = document.querySelector("#hdr_elem>h1.title");
   //title_elem.addEventListener("click", () => On_Click_Title(ctx));
 
   import_btn.onclick = () => On_Click_Import_Btn(ctx);
@@ -67,6 +67,7 @@ async function Render_App(ctx)
   jobs_menu.addEventListener("add", (e) => On_Click_Edit_Job(e, null, ctx));
   jobs_menu.addEventListener("ai", () => On_Click_AI_Add_Job(ctx));
   jobs_list.addEventListener("render", e => Render_Job_Item(e, ctx));
+  jobs_filter.addEventListener("search", () => Render_Job_Items(ctx));
   job_contacts.addEventListener("add", On_Click_Add_Contact);
   job_contacts.addEventListener("select", e => On_Click_Select_Contact(e, ctx));
   job_contacts.addEventListener("delete", e => On_Click_Delete_Job_Contact(e, ctx));
@@ -122,13 +123,29 @@ async function On_Click_Title(ctx)
   for (const job of jobs)
   {
     const last_action = await ctx.Job.Get_Last_Update(ctx.db, job.id);
-    const last_action_time = last_action ? last_action.timestamp: null;
-    console.log("On_Click_Title():", 
-      "last_update:", job.last_update, 
-      "last_action_time:", last_action_time,
-      "id:", job.id, 
-      "title:", job.role_title, 
-    );
+    const last_action_time = last_action?.timestamp;
+
+    if (job.last_update == null || job.last_update == undefined)
+    {
+      job.last_update = last_action_time || 0;
+      await ctx.Job.Save(ctx, job);
+      console.log("On_Click_Title(): has no update ", job.id);
+    }
+    else if (last_action_time && last_action_time > job.last_update)
+    {
+      job.last_update = last_action_time;
+      await ctx.Job.Save(ctx, job);
+      console.log("On_Click_Title(): has old update ", job.id);
+    }
+
+    /*if (job.last_update == null || job.last_update == undefined)
+    {
+      console.log("On_Click_Title():", 
+        "last_update:", job.last_update, 
+        "id:", job.id, 
+        "title:", job.role_title, 
+      );
+    }*/
 
     /*if (job.contact_id)
     {
@@ -774,7 +791,7 @@ async function On_Click_Delete_Contact(event, ctx)
  */
 async function Render_Job_Items(ctx)
 {
-  jobs_list.value = await ctx.Job.Select_All_Extended_Sorted(ctx);
+  jobs_list.value = await ctx.Job.Select_All_Extended_Sorted(ctx, jobs_filter.value);
 }
 
 function Render_Job_Item(event, ctx)
@@ -823,12 +840,9 @@ function Render_Job_Item(event, ctx)
 
   item_elem.status_elem.classList.remove("old");
   item_elem.classList.remove("failed");
-  const now = Date.now();
-  const elapsed_time = now - job.last_update;
-  const two_weeks = 1209600000;
-  if (job.status_type > 0)
+  if (ctx.Job.Is_Failed(job))
     item_elem.classList.add("failed");
-  else if (elapsed_time > two_weeks)
+  else if (ctx.Job.Is_Old(job))
     item_elem.classList.add("old");
 }
 

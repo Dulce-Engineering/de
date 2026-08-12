@@ -1,4 +1,6 @@
 import Utils from "../../../../lib/Utils.js";
+const html_local_url = "./layout.html";
+const html_url = new URL(html_local_url, import.meta.url).href;
 
 class DeComponent extends HTMLElement
 {
@@ -45,11 +47,9 @@ class DeComponent extends HTMLElement
 
   // rendering ================================================================
 
-  Render()
+  async Render()
   {
-    const html = `
-      <div cid="some_elem">some html goes here</div>
-    `;
+    const html = await Utils.Import_HTML(html_url);
     const html_elements = Utils.To_Document(html, this);
     this.replaceChildren(html_elements);
     Utils.Set_Id_Shortcuts(this, this, "cid");

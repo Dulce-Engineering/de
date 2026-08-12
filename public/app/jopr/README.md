@@ -64,19 +64,20 @@ https://www.youtube.com/watch?v=oVy-KKWsdNg&list=PLDTPrMoGHssBulfAaczSuk0f8luCiK
 - on jobs when job created show on list at corect position
 
 ## To Do
-- jobs single view to get details including contact details
-- edit cl recipient name and content
-- add job and gen cv/cl in one go
 - sort jobs by last update
 - sort jobs by application time
 - sort jobs by interview time
 - sort jobs by create time
-- on jobs show contact details
-- show job logs
 - on jobs show new jobs
 - filter jobs by agency
+
+- jobs single view to get details including contact details
+- edit cl recipient name and content
+- add job and gen cv/cl in one go
+- on jobs show contact details
+- show job logs
 - add marketing material
-- standardise db references
+- standardise db references (db vs db2)
 - link to job woper
 - add error reporting
 

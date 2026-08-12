@@ -1,4 +1,30 @@
 import Utils from "../../lib/Utils.js";
+const html_url = "/component/DeFilter/layout.html";
+
+function Hide(elem, hidden)
+{
+  if (elem)
+  {
+    elem.style.display = hidden ? "none" : null;
+  }
+}
+
+function Is_Hidden(elem)
+{
+  return elem?.style?.display == "none";
+}
+
+function Has_Value(data)
+{
+  let res = true;
+  
+  if (data == undefined || data == null)
+  {
+    res = false;
+  }
+
+  return res;
+}
 
 class DeFilter extends HTMLElement 
 {
@@ -56,8 +82,8 @@ class DeFilter extends HTMLElement
   set filters(filter_defs)
   {
     this.filter_defs = this.Copy_Defs(filter_defs);
-    this.Render_View(this.mid_filter_defs, "mid_filters_div", "mid");
-    this.Render_View(this.filter_defs, "max_filters_div", "max");
+    this.Render_View(this.mid_filter_defs, this.mid_filters_div, "mid");
+    this.Render_View(this.filter_defs, this.max_filters_div, "max");
     this.Show_View();
   }
 
@@ -71,11 +97,11 @@ class DeFilter extends HTMLElement
   {
     let res;
 
-    if (!this.min_view_div.hidden)
+    if (!Is_Hidden(this.min_view_div))
     {
       res = "min";
     }
-    else if (!this.mid_view_div.hidden)
+    else if (!Is_Hidden(this.mid_view_div))
     {
       res = "mid";
     }
@@ -138,7 +164,14 @@ class DeFilter extends HTMLElement
   {
     this.return_view = "min";
     this.show_cancel_btn = true;
-    this.view = "max";
+
+    this.Get_View_Data();
+
+    Hide(this.min_view_div, true);
+    this.max_view_div.showModal();
+
+    this.Set_View_Data();
+    this.Render_Update_Summ();
   }
 
   OnClick_Mid_Add_Filter_Btn()
@@ -230,7 +263,7 @@ class DeFilter extends HTMLElement
 
     if (!Utils.Is_Empty(this.filter_defs))
     {
-      res = this.filter_defs.some(def => Utils.Has_Value(def.filter_class));
+      res = this.filter_defs.some(def => Has_Value(def.filter_class));
     }
 
     return res;
@@ -331,11 +364,6 @@ class DeFilter extends HTMLElement
     return defs;
   }
 
-  Get_Elem_By_Id(id)
-  {
-    return this.querySelector("[cid="+id+"]");
-  }
-
   // rendering ====================================================================================
 
   Show_View_With_Data(view_name)
@@ -350,8 +378,8 @@ class DeFilter extends HTMLElement
   {
     if (view_name)
     {
-      this.min_view_div.hidden = true;
-      this.mid_view_div.hidden = true;
+      Hide(this.min_view_div, true);
+      Hide(this.mid_view_div, true);
       this.max_view_div.close();
 
       if (view_name == "max")
@@ -360,7 +388,7 @@ class DeFilter extends HTMLElement
       }
       else
       {
-        this[view_name + "_view_div"].hidden = false;
+        Hide(this[view_name + "_view_div"], false);
       }
     }
     else
@@ -370,26 +398,26 @@ class DeFilter extends HTMLElement
 
     if (view_name == "min")
     {
-      Utils.Hide_Elem_If(this.min_view_div, "min_add_filter_btn", () => !this.Has_Filters());
-      Utils.Hide_Elem_If(this.min_view_div, "min_search_btn", () => !this.Has_Filter_Values());
+      Hide(this.min_add_filter_btn, !this.Has_Filters());
+      Hide(this.min_search_btn, !this.Has_Filter_Values());
     }
     else if (view_name == "mid")
     {
-      Utils.Hide_Elem_If(this.mid_view_div, "mid_add_filter_btn", () => !this.Has_Max_Filters());
-      //Utils.Hide_Elem_If(this, "mid_search_btn", () => !this.Has_Filter_Values());
+      Hide(this.mid_add_filter_btn, !this.Has_Max_Filters());
+      //Hide(this, "mid_search_btn", !this.Has_Filter_Values());
     }
     else if (view_name == "max")
     {
-      Utils.Hide_Elem_If(this.max_view_div, "max_clear_btn", () => !this.Has_Filters());
-      Utils.Hide_Elem_If(this.max_view_div, "max_search_btn", () => !this.Has_Filters());
-      Utils.Hide_Elem_If(this.max_view_div, "max_cancel_btn", () => !this.show_cancel_btn);
+      Hide(this.max_clear_btn, !this.Has_Filters());
+      Hide(this.max_search_btn, !this.Has_Filters());
+      Hide(this.max_cancel_btn, !this.show_cancel_btn);
     }
   }
 
   Render_Update_Summ()
   {
     const view = this.view;
-    const summ_div = this.Get_Elem_By_Id(view + "_summ_div");
+    const summ_div = this[view + "_summ_div"];
     if (summ_div)
     {
       const summary_elems = [];
@@ -446,7 +474,7 @@ class DeFilter extends HTMLElement
     return span;
   }
 
-  Render_View(filter_defs, filters_div_id, view)
+  Render_View(filter_defs, filters_div, view)
   {
     if (!Utils.Is_Empty(filter_defs))
     {
@@ -463,58 +491,19 @@ class DeFilter extends HTMLElement
         elems.push(filter_elem);
       }
       
-      const filters_div = this.Get_Elem_By_Id(filters_div_id);
       filters_div.replaceChildren(...elems.flat());
     }
   }
 
-  Render()
+  async Render()
   {
-    const html = `
-      <!--button cid="switch_view_btn">view</button>
-      <span cid="switch_view_list_placeholder"></span-->
-
-      <span cid="min_view_div" hidden>
-        <button cid="min_add_filter_btn" class="fb_filter_btn">
-          ${this.min_add_btn_html}
-          </button>
-        <ul cid="min_summ_div"></ul><button cid="min_search_btn">
-          ${this.search_btn_html}
-        </button>
-      </span>
-
-      <span cid="mid_view_div" hidden>
-        <span cid="mid_filters_div"></span>
-        <span cid="mid_btn_span">
-          <button cid="mid_add_filter_btn" class="fb_filter_btn">${this.mid_add_btn_html}</button>
-          <button cid="mid_search_btn">${this.search_btn_html}</button>
-        </span>
-        <div cid="mid_summ_div"></div>
-      </span>
-
-      <dialog cid="max_view_div">
-        <form method="dialog" novalidate>
-          <header>
-            <h2>Filters</h2>
-            <svg cid="max_close_btn" class="close-btn" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960">
-              <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"></path>
-            </svg>
-          </header>
-
-          <main cid="max_view_body">
-            <ul cid="max_filters_div" class="filter_list"></ul>
-          </main>
-
-          <footer cid="max_btn_div">
-            <button cid="max_search_btn" type="button">OK</button>
-            <button cid="max_clear_btn" type="button">Clear</button>
-            <button cid="max_cancel_btn" type="button">Cancel</button>
-          </footer>
-        </form>
-      </dialog>
-    `;
-    this.innerHTML = html;
+    this.innerHTML = await Utils.Import_HTML(html_url);
     Utils.Set_Id_Shortcuts(this, this, "cid");
+
+    this.min_add_filter_btn.innerHTML = this.min_add_btn_html;
+    this.min_search_btn.innerHTML = this.search_btn_html;
+    this.mid_add_filter_btn.innerHTML = this.mid_add_btn_html;
+    this.mid_search_btn.innerHTML = this.search_btn_html;
 
     this.min_search_btn.addEventListener("click", this.OnClick_Search_Btn);
     this.mid_search_btn.addEventListener("click", this.OnClick_Search_Btn);

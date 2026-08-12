@@ -1,0 +1,38 @@
+<!--button cid="switch_view_btn">view</button>
+<span cid="switch_view_list_placeholder"></span-->
+
+<span cid="min_view_div" style="display:none;">
+  <button cid="min_add_filter_btn" class="fb_filter_btn"></button>
+  <ul cid="min_summ_div"></ul>
+  <button cid="min_search_btn"></button>
+</span>
+
+<span cid="mid_view_div" style="display:none;">
+  <span cid="mid_filters_div"></span>
+  <span cid="mid_btn_span">
+    <button cid="mid_add_filter_btn" class="fb_filter_btn"></button>
+    <button cid="mid_search_btn"></button>
+  </span>
+  <div cid="mid_summ_div"></div>
+</span>
+
+<dialog cid="max_view_div">
+  <form method="dialog" novalidate>
+    <header>
+      <h2>Filters</h2>
+      <svg cid="max_close_btn" class="close-btn" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960">
+        <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"></path>
+      </svg>
+    </header>
+
+    <main cid="max_view_body">
+      <ul cid="max_filters_div" class="filter_list"></ul>
+    </main>
+
+    <footer cid="max_btn_div">
+      <button cid="max_search_btn" type="submit">OK</button>
+      <button cid="max_clear_btn" type="button">Clear</button>
+      <button cid="max_cancel_btn" type="submit">Cancel</button>
+    </footer>
+  </form>
+</dialog>

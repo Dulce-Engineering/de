@@ -1,0 +1,10 @@
+<button cid="sel_filters_btn" type="button" title="Select Filters" class="img">
+  <img src="./image/filter.svg">
+</button>
+<ul cid="summ_elem" style="display:none;">
+</ul>
+<de-dialog-form cid="filter_form">
+  <de-filter-bool name="is_active" label="Currently Active" slot="fields"></de-filter-bool>
+  <de-filter-str name="match_str" label="Matching" slot="fields"></de-filter-str>
+  <de-filter-select name="contact_name" label="Contact" slot="fields"></de-filter-select>
+</de-dialog-form>

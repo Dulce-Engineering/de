@@ -68,9 +68,9 @@ class Job
     return await ctx.db.Select_By_Id(Job.table_name, id);
   }
 
-  static Select(ctx)
+  static Select(ctx, where_fn, order_by_fn, pre_fn)
   {
-    return ctx.db.Get_All(Job.table_name);
+    return ctx.db.Select(Job.table_name, where_fn, order_by_fn, pre_fn);
   }
 
   static Attachment_Select_By_Job_Id(ctx, job_id)
@@ -81,74 +81,80 @@ class Job
   /**
    * @param {Context} ctx
    */
-  static async Select_All_Extended_Sorted(ctx)
+  static async Select_All_Extended_Sorted(ctx, filters)
   {
-    const jobs = await Job.Select(ctx);
+    const jobs = await Job.Select
+    (
+      ctx, 
+      j => Job.Apply_Filters(j, filters), 
+      Job.Order_By_Status_Update, 
+      j => Job.Add_Details(ctx, j)
+    );
 
-    let enriched_jobs = null;
-    if (!ctx.Utils.Is_Empty(jobs))
-    {
-      enriched_jobs = [];
-      for (const job of jobs)
-      {
-        const enriched_job = await Job.Add_Details(ctx, job);
-        enriched_jobs.push(enriched_job);
-      }
-      enriched_jobs.sort(Job.By_Status_Update);
-    }
-
-    return enriched_jobs;
+    return jobs;
   }
 
-  static async Add_Details(ctx, job)
+  static Apply_Filters(job, filters)
   {
-    const latest = await Job.Get_Last_Note(ctx, job);
-    const status_type = Job.job_status.find(s => s.id === job.status)?.type;
-    const agency = await ctx.Agency.Select_By_Id(ctx, job.agency_id);
-    const contacts = await ctx.Contact.Select
-      (ctx, c => job.contact_ids && job.contact_ids.includes(c.id));
-    const attachments = await Job.Attachment_Select_By_Job_Id(ctx, job.id);
-    const last_update = await Job.Calc_Update_Time(ctx, job);
-    return {
-      ...job,
-      status_type,
-      agency_name: agency?.name,
-      latest_note: latest?.note,
-      latest_note_time_formatted: latest?.time_str,
-      attachments,
-      contacts,
-      contact: !ctx.Utils.Is_Empty(contacts) ? contacts[0] : null,
-      last_update
-    };
-  }
+    let res = true;
 
-  static async Calc_Update_Time(ctx, job)
-  {
-    let res = 0;
-
-    if (job.last_update != null && job.last_update != undefined)
+    if (filters)
     {
-      res = job.last_update;
-    }
-    else
-    {
-      const last_log = await Job.Get_Last_Update(ctx.db, job.id);
-      if (last_log)
+      if (filters.is_active == true)
       {
-        res = last_log.timestamp;
+        res = !Job.Is_Old(job) && !Job.Is_Failed(job);
       }
     }
 
     return res;
   }
 
-  static By_Status_Update(a, b)
+  static Is_Old(job)
+  {
+    const now = Date.now();
+    const elapsed_time = now - job.last_update;
+    const two_weeks = 1209600000;
+    return elapsed_time > two_weeks;
+  }
+
+  static Get_Status_Type(job)
+  {
+    const status_type = Job.job_status.find(s => s.id === job.status)?.type;
+    return status_type;
+  }
+
+  static Is_Failed(job)
+  {
+    return Job.Get_Status_Type(job) > 0;
+  }
+
+  static async Add_Details(ctx, job)
+  {
+    const latest = await Job.Get_Last_Note(ctx, job);
+    const agency = await ctx.Agency.Select_By_Id(ctx, job.agency_id);
+    const contacts = await ctx.Contact.Select
+      (ctx, c => job.contact_ids && job.contact_ids.includes(c.id));
+    const attachments = await Job.Attachment_Select_By_Job_Id(ctx, job.id);
+    return {
+      ...job,
+      agency_name: agency?.name,
+      latest_note: latest?.note,
+      latest_note_time_formatted: latest?.time_str,
+      attachments,
+      contacts,
+      contact: !ctx.Utils.Is_Empty(contacts) ? contacts[0] : null,
+    };
+  }
+
+  static Order_By_Status_Update(a, b)
   {
     let res = 0;
 
-    if (a.status_type !== b.status_type)
+    const a_status_type = Job.Get_Status_Type(a);
+    const b_status_type = Job.Get_Status_Type(b);
+    if (a_status_type !== b_status_type)
     {
-      res = a.status_type - b.status_type
+      res = a_status_type - b_status_type
     }
     else
     {
@@ -237,6 +243,7 @@ class Job
       }
 
       const job = Job.To_Job(form_data);
+      job.last_update = Date.now();
       id = await ctx.db.Save(Job.table_name, job);
     }
 
