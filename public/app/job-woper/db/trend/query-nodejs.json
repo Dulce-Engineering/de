@@ -568,5 +568,11 @@
     "datetime": 1786450462654,
     "id": "ff41a7d2-41a5-4508-aaf5-1fbb29417bf1",
     "query_id": "-nodejs"
+  },
+  {
+    "count": 300,
+    "datetime": 1786539228729,
+    "id": "a962568f-82fa-4cf0-969b-aa2be8050a78",
+    "query_id": "-nodejs"
   }
 ]

@@ -8,6 +8,17 @@ function Has_Any_Data(obj)
   return Object.values(obj).some((val) => val != null);
 }
 
+function Show(elem, is_visible)
+{
+  elem.style.display = is_visible ? null : "none";
+}
+
+function Truncate(str, maxLength, suffix = "...") 
+{
+  if (!str || str.length <= maxLength) return str;
+  return str.slice(0, maxLength - suffix.length) + suffix;
+}
+
 class DeFilter extends HTMLElement
 {
   static tname = "de-filter";
@@ -29,12 +40,12 @@ class DeFilter extends HTMLElement
 
   set value(filters)
   {
-    this.filter_form.value = filters;
+    this.form_values = filters;
   }
 
   get value()
   {
-    return this.filter_form.value;
+    return this.form_values;
   }
   
   // attributes ===============================================================
@@ -55,14 +66,35 @@ class DeFilter extends HTMLElement
     console.log("DeFilter.On_Click_Select_Filters_Btn(): form_values =", this.form_values);
   }
 
+  On_Click_Delete_Btn(event)
+  {
+    const item_elem = event.currentTarget.parentElement;
+    const filter_name = item_elem.getAttribute("name");
+    this.form_values[filter_name] = null;
+    this.Update_Summary();
+    this.dispatchEvent(new Event("search"));
+  }
+
   // rendering ================================================================
 
   Update_Summary()
   {
-    const form_values = this.filter_form.value;
-    if (Has_Any_Data(form_values))
+    Show(this.summ_elem, Has_Any_Data(this.form_values));
+
+    const summ_elems = this.summ_elem.children;
+    for (const summ_elem of summ_elems)
     {
-      this.summ_elem.style.display = null;
+      const filter_name = summ_elem.getAttribute("name");
+      const filter_value = this.form_values[filter_name];
+      Show(summ_elem, filter_value != null);
+
+      const summ_field = summ_elem.querySelector("de-field");
+      summ_field.value = filter_value;
+      const filter_elem = this.filter_form.main_elem.querySelector("[name=" + filter_name + "]");
+      if (filter_elem.Get_Value_Label != undefined)
+      {
+        summ_field.value = filter_elem.Get_Value_Label(filter_value);
+      }
     }
   }
 
@@ -74,8 +106,12 @@ class DeFilter extends HTMLElement
     Utils.Set_Id_Shortcuts(this, this, "cid");
 
     this.sel_filters_btn.addEventListener("click", this.On_Click_Select_Filters_Btn);
+    const del_btns = this.summ_elem.querySelectorAll("button");
+    for (const del_btn of del_btns)
+      del_btn.addEventListener("click", this.On_Click_Delete_Btn);
   }
 }
+Utils.Register_Element(DeFilter);
 export default DeFilter;
 
 class DeFilterBool extends HTMLElement
@@ -84,12 +120,46 @@ class DeFilterBool extends HTMLElement
 
   get value()
   {
-    return this.input_elem.checked;
+    let res = null;
+    const input_value = this.input_elem.value;
+    if (input_value == "true")
+    {
+      res = true;
+    }
+    else if (input_value == "false")
+    {
+      res = false;
+    }
+
+    return res;
   }
 
   set value(v)
   {
-    this.input_elem.checked = v;
+    let value = null;
+    if (v === true)
+    {
+      value = "true";
+    }
+    else if (v === false)
+    {
+      value = "false";
+    }
+    this.input_elem.value = value;
+  }
+
+  Get_Value_Label(value)
+  {
+    let res = "";
+    if (value === true)
+    {
+      res = "Yes";
+    }
+    else if (value === false)
+    {
+      res = "No";
+    }
+    return res;
   }
 
   connectedCallback()
@@ -97,7 +167,11 @@ class DeFilterBool extends HTMLElement
     const input_id = "input-" + crypto.randomUUID();
     this.innerHTML = `
       <label cid="label_elem" for="${input_id}"></label>
-      <input cid="input_elem" id="${input_id}" type="checkbox">
+      <select cid="input_elem" id="${input_id}">
+        <option></option>
+        <option value="true">Yes</option>
+        <option value="false">No</option>
+      </select>
     `;
     Utils.Set_Id_Shortcuts(this, this, "cid");
 
@@ -105,7 +179,45 @@ class DeFilterBool extends HTMLElement
     this.label_elem.textContent = label_str;
   }
 }
-
-
 Utils.Register_Element(DeFilterBool);
-Utils.Register_Element(DeFilter);
+
+class DeFilterStr extends HTMLElement
+{
+  static tname = "de-filter-str";
+
+  get value()
+  {
+    return this.input_elem.value;
+  }
+
+  set value(v)
+  {
+    this.input_elem.value = v;
+  }
+
+  Get_Value_Label(value)
+  {
+    let res = "";
+
+    if (value != null)
+    {
+      res = Truncate(value, 20);
+    }
+
+    return res;
+  }
+
+  connectedCallback()
+  {
+    const input_id = "input-" + crypto.randomUUID();
+    this.innerHTML = `
+      <label cid="label_elem" for="${input_id}"></label>
+      <input cid="input_elem" id="${input_id}">
+    `;
+    Utils.Set_Id_Shortcuts(this, this, "cid");
+
+    const label_str = this.getAttribute("label");
+    this.label_elem.textContent = label_str;
+  }
+}
+Utils.Register_Element(DeFilterStr);

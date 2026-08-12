@@ -100,9 +100,13 @@ class Job
 
     if (filters)
     {
-      if (filters.is_active == true)
+      if (filters.is_active === true)
       {
         res = !Job.Is_Old(job) && !Job.Is_Failed(job);
+      }
+      else if (filters.is_active === false)
+      {
+        res = Job.Is_Old(job) || Job.Is_Failed(job);
       }
     }
 

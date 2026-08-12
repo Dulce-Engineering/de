@@ -377,7 +377,7 @@ class Utils
       }
       else
       {
-        input_elem.value = field_val || null;
+        input_elem.value = field_val == undefined ? null : field_val;
       }
     }
   }
