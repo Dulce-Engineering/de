@@ -396,15 +396,6 @@
     {
       display: none;
     }
-    &[cid="attachment_list"]
-    {
-      gap: 4px; 
-      
-      [cid="items_elem"]
-      {
-        gap: 0;
-      }
-    }
   }
   #jobs_list
   {
@@ -416,6 +407,29 @@
         border-color: var(--shade);
       }
     }  
+  }
+  de-input-list[cid="attachment_list"].attachment-list
+  {
+    h3
+    {
+      margin: 0;
+    }
+    main[cid=items_elem]
+    {
+      gap: 0 !important;
+
+      &>div
+      {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        span[cid=link2_btn]
+        {
+          flex: stretch;
+        }
+      }
+    }
   }
 
   .header
@@ -863,22 +877,6 @@
     &:visited
     {
       color: var(--main);
-    }
-  }
-  .attachment-list
-  {
-    margin: 0 0 0 0;
-
-    main
-    {
-      gap: 0;
-      margin: 0 0 0 20px;
-    }
-    li div, main div
-    {
-      display: inline-flex;
-      gap: 0 2px;
-      align-items: flex-start;
     }
   }
   .hidden 

@@ -915,13 +915,7 @@ async function On_Click_Attach_Files(event, job_id, ctx)
   const files = await ctx.Utils.Select_Files();
   if (files && files.length > 0)
   {
-    const attachments = files.map(file => ({
-      job_id,
-      file,
-      timestamp: Date.now()
-    }));
-
-    await ctx.db2.Insert_Items('attachments', attachments);
+    await ctx.Job.Attachment_Add_By_Job_Id(ctx, job_id, files);
     await Render_Job_Items(ctx);
     Alert(`${files.length} file${files.length === 1 ? '' : 's'} attached to the job.`);
   }
@@ -982,24 +976,7 @@ async function On_Click_View_Job(event, job_id, ctx)
 async function On_Click_Add_Note(e, job_id, ctx)
 {
   const form_data = await note_dialog.Show_Async();
-  if (!ctx.Utils.Is_Empty(form_data?.note))
-  {
-    const now = new Date();
-    const action =
-    {
-      job_id,
-      time_str: now.toISOString().split('T')[0],
-      timestamp: now.getTime(),
-      note: form_data.note
-    };
-    await ctx.db2.Insert("action_logs", action);
-  }
-
-  if (!ctx.Utils.Is_Empty(form_data?.status))
-  {
-    await ctx.db2.Update("jobs", { id: job_id, status: form_data.status });
-  }
-
+  await ctx.Job.Action_Add_By_Job_Id(ctx, job_id, form_data?.note, form_data?.status);
   await Render_Job_Items(ctx);
 }
 

@@ -78,6 +78,61 @@ class Job
     return ctx.db.Select("attachments", a => a.job_id === job_id);
   }
 
+  static async Attachment_Add_By_Job_Id(ctx, job_id, files)
+  {
+    const attachments = files.map(file => ({
+      job_id,
+      file,
+      timestamp: Date.now()
+    }));
+    const res = await ctx.db.Insert_Items('attachments', attachments);
+    if (res)
+    {
+      await Job.Update_Time(ctx, job_id);
+    }
+
+    return res;
+  }
+
+  static async Action_Add_By_Job_Id(ctx, job_id, note, status)
+  {
+    let res = null;
+
+    if (job_id && (!ctx.Utils.Is_Empty(note) || !ctx.Utils.Is_Empty(status)))
+    {
+      if (!ctx.Utils.Is_Empty(note))
+      {
+        const now = new Date();
+        const action =
+        {
+          job_id,
+          time_str: now.toISOString().split('T')[0],
+          timestamp: now.getTime(),
+          note
+        };
+        await ctx.db.Insert("action_logs", action);
+      }
+
+      if (!ctx.Utils.Is_Empty(status))
+      {
+        const job = { id: job_id, status };
+        await ctx.db.Update(Job.table_name, job);
+      }
+
+      res = await Job.Update_Time(ctx, job_id);
+    }
+
+    return res;
+  }
+
+  static async Update_Time(ctx, job_id)
+  {
+    const job = { id: job_id, last_update: Date.now() };
+    const res = await ctx.db.Update(Job.table_name, job);
+
+    return res;
+  }
+
   /**
    * @param {Context} ctx
    */

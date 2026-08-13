@@ -282,7 +282,8 @@ class Db
       }
     }
 
-    return ids;
+    const res = ids != null && ids.length > 0 ? ids : null;
+    return res;
   }
 
   static async Update(db, table_name, updated_item)
