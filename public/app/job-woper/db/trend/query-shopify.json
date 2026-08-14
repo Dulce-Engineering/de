@@ -556,5 +556,11 @@
     "datetime": 1786539548568,
     "id": "c5675f0b-3299-4921-88fc-7e8d5a6a4a04",
     "query_id": "-shopify"
+  },
+  {
+    "count": 35,
+    "datetime": 1786666442570,
+    "id": "cc705cc9-e4f3-490b-9f39-6d7f5228edce",
+    "query_id": "-shopify"
   }
 ]

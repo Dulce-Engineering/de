@@ -544,5 +544,11 @@
     "datetime": 1786539418619,
     "id": "dad90e6f-d149-4f3a-8e8f-a68a4337f248",
     "query_id": "-mongodb"
+  },
+  {
+    "count": 42,
+    "datetime": 1786666306463,
+    "id": "2c16b4da-7c9a-407a-9260-89d2b6ac6be2",
+    "query_id": "-mongodb"
   }
 ]

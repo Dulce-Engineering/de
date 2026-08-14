@@ -163,9 +163,51 @@ class Job
       {
         res = Job.Is_Old(job) || Job.Is_Failed(job);
       }
+
+      if (res && filters.match_str)
+      {
+        const search_term = filters.match_str.toLowerCase();
+        res = Job.Has_Str_Match(job, search_term);
+      }
     }
 
     return res;
+  }
+
+  static Has_Str_Match(val, search_term)
+  {
+    let res = false;
+
+    if (val !== null && val !== undefined) 
+    {
+      if (typeof val === 'object') 
+      {
+        res = Object.values(val).some(v => Job.Has_Str_Match(v, search_term));
+      }
+      else
+      {
+        res = String(val).toLowerCase().includes(search_term);
+      }
+    }
+
+    return res;
+  };
+
+  /**
+   * Recursively searches through all fields of objects in an array.
+   * @param {Array<Object>} list - Array of objects to search.
+   * @param {string} target - Query string to match against.
+   * @returns {Array<Object>} Filtered array containing matching objects.
+   */
+  searchObjects(list, target) 
+  {
+    if (!target || typeof target !== 'string') return list;
+
+    const searchTerm = target.toLowerCase();
+
+    // Helper function to check if a value contains the target string
+
+    return list.filter((item) => checkValue(item, searchTerm));
   }
 
   static Is_Old(job)

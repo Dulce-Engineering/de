@@ -1,0 +1,46 @@
+de-filter
+{
+  display: flex;
+  gap: 5px;
+
+  ul[cid=summ_elem]
+  {
+    display: flex;
+    margin: 0;
+    padding: 0;
+    gap: 5px;
+
+    li
+    {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      border: 1px solid var(--border);
+      padding: 0 5px 0 10px;
+    }
+  }
+
+  de-dialog-form
+  {
+    dialog
+    {
+      form
+      {
+        main[cid=main_elem]
+        {
+          gap: 5px;
+
+          & > :first-child
+          {
+            align-self: start;
+          }
+        }
+
+        footer
+        {
+          display: flex;
+        }
+      }
+    }
+  }
+}

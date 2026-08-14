@@ -556,5 +556,11 @@
     "datetime": 1786539477716,
     "id": "00a2e28f-e5d1-477d-b710-a1226c6c9cbe",
     "query_id": "-kafka"
+  },
+  {
+    "count": 246,
+    "datetime": 1786666367879,
+    "id": "4719fbe5-4931-41c8-bdb0-21c59b133b58",
+    "query_id": "-kafka"
   }
 ]
