@@ -9,6 +9,7 @@ de-filter
     margin: 0;
     padding: 0;
     gap: 5px;
+    flex-wrap: wrap;
 
     li
     {
@@ -24,11 +25,13 @@ de-filter
   {
     dialog
     {
+      padding: 15px 20px 20px 20px;
+
       form
       {
         main[cid=main_elem]
         {
-          gap: 5px;
+          gap: 10px;
 
           & > :first-child
           {
@@ -39,6 +42,12 @@ de-filter
         footer
         {
           display: flex;
+          gap: 5px;
+
+          button
+          {
+            --border-color: #ff0;
+          }
         }
       }
     }
