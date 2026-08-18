@@ -7,8 +7,8 @@ this.addEventListener("install", (event) => {
       .open("tempustoi")
       .then((cache) =>
         cache.addAll([
-          "/tempustoi/", 
-          "/tempustoi/index.html", 
+          "/app/tempustoi/", 
+          "/app/tempustoi/index.html", 
           "/dedial/dedial.js", 
           "/component/DeInputPeriod/index.js", 
           "/audio/alarm-1.wav",

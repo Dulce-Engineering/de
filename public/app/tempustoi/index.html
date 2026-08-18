@@ -205,6 +205,7 @@
         justify-content: center;
         flex-direction: row;
         align-items: center;
+        position: relative;
 
         svg
         {
@@ -661,6 +662,20 @@
       /* large screens */
       @media screen and (min-width: 768px)
       {
+        header .kofi-button
+        {
+          font-size: 0;
+          position: absolute;
+          top: 0;
+          right: 0;
+          border: 4px solid var(--orange);
+          border-radius: 1.4vw;
+
+          img
+          {
+            width: 12vw;
+          }
+        }
         dialog, .dialog
         {
           form
@@ -724,7 +739,20 @@
             grid-row: 2;
           }
         }
+        header .kofi-button
+        {
+          font-size: 0;
+          position: absolute;
+          top: 0;
+          right: 0;
+          border: 2px solid var(--orange);
+          border-radius: 1.4vw;
 
+          img
+          {
+            width: 17vw;
+          }
+        }
         header.timer
         {
           font-size: 2rem;
@@ -819,7 +847,7 @@
       {
         if ("serviceWorker" in navigator) 
         {
-          await navigator.serviceWorker.register("/lib/tempustoi-service-worker.js");
+          await navigator.serviceWorker.register("./lib/tempustoi-service-worker.js");
         }
 
         add_btn.addEventListener("click", On_Click_Add);
@@ -1572,6 +1600,15 @@
           </textPath>
         </text>
       </svg>
+      <a 
+        title="Support me on ko-fi.com" 
+        class="kofi-button" 
+        href="https://ko-fi.com/Q8R825A1ZQ" 
+        target="_blank"
+      > 
+        <img src="/images-de/ko-fi/red.webp" alt="Ko-fi support"/>
+      </a>
+
     </header>
 
     <nav>
