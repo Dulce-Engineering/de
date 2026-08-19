@@ -592,5 +592,11 @@
     "datetime": 1786946655976,
     "id": "c3a1c79f-55d0-4717-ba70-a0b5a76ea09d",
     "query_id": "-linq"
+  },
+  {
+    "count": 2,
+    "datetime": 1787123579747,
+    "id": "66ec44fe-9b26-4252-acf1-658ead8b55dd",
+    "query_id": "-linq"
   }
 ]
