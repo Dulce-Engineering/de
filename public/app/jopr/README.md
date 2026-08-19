@@ -100,3 +100,11 @@ https://www.youtube.com/watch?v=oVy-KKWsdNg&list=PLDTPrMoGHssBulfAaczSuk0f8luCiK
 - https://www.betterapply.co
 - https://quiz.shift.careers
 - https://enhancv.com
+
+### Notes
+given the attached curriculum vitae and job description, what are some technical questions i should study in preparation for a technical interview? please include the answers.
+
+those are good tips. what parts of my experience, as listed in the curriculum vitae, could i mention at the interview that would be relevant? 
+
+based on the curriculum vitae and job description, what can i say when asked to introduce myself at the technical interview?
+
