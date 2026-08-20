@@ -400,6 +400,20 @@
       {
         width: 12ch;
       }
+      #timer_view_dlg
+      {
+        de-field
+        {
+          display: block;
+          width: 100%;
+
+          dd
+          {
+            margin: 0;
+            overflow-wrap: break-word;
+          }
+        }
+      }
 
       de-sun-moon
       {
@@ -1014,6 +1028,7 @@
       <de-field name="title" slot="fields"></de-field>
       <de-field name="time" slot="fields"></de-field>
       <de-field field-label="Recurrence" name="recurrence" slot="fields"></de-field>
+      <de-field name="description" slot="fields" field-type="html"></de-field>
     </de-dialog-form>
 
     <dialog id="confirm_dlg">

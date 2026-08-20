@@ -3,8 +3,8 @@ import "../component/de-sun-moon/index.js?v=4";
 import "/component/DeInputPeriod/index.js?v=4";
 import "/component/DeInputRepeat/index.js?v=4";
 import "/component/DeDialogForm/index.js?v=4";
-//import "/component/de-text/index.js?v=4";
 import "/app/jopr/component/de-field/index.js?v=4";
+import ICAL from "https://unpkg.com/ical.js/dist/ical.min.js";
 
 /**
  * @typedef {object} Repeat
@@ -19,6 +19,7 @@ import "/app/jopr/component/de-field/index.js?v=4";
  * @property {number} id - The unique identifier for the timer (timestamp).
  * @property {string} title - The optional title of the timer.
  * @property {number} time - The target time in milliseconds since the epoch.
+ * @property {string} [description] - The optional description of the timer.
  * @property {Repeat} recurrence - Optional recurrence rules for the timer.
  */
 
@@ -131,6 +132,7 @@ function On_Click_Load_Btn()
             id: crypto.randomUUID(),
             title: ev.title || "Imported Event",
             time: ev.time,
+            description: ev.description || null,
             recurrence: { rate: 0 }
           };
           Save_Timer(timer);
@@ -636,6 +638,15 @@ function Parse_Ics(text)
       else if (key.startsWith("DTSTART"))
       {
         currentEvent.time = Parse_Ics_Date(value.trim());
+      }
+      else if (key.startsWith("DESCRIPTION"))
+      {
+        let desc = value
+          .replace(/\\,/g, ",")
+          .replace(/\\;/g, ";")
+          .replace(/\\\\/g, "\\")
+          .replace(/\\[nN]/g, "\n");
+        currentEvent.description = desc.trim();
       }
     }
   }

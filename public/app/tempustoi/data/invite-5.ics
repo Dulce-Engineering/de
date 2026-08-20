@@ -1,0 +1,131 @@
+BEGIN:VCALENDAR
+METHOD:REQUEST
+PRODID:Microsoft Exchange Server 2010
+VERSION:2.0
+BEGIN:VTIMEZONE
+TZID:AUS Eastern Standard Time
+BEGIN:STANDARD
+DTSTART:16010101T030000
+TZOFFSETFROM:+1100
+TZOFFSETTO:+1000
+RRULE:FREQ=YEARLY;INTERVAL=1;BYDAY=1SU;BYMONTH=4
+END:STANDARD
+BEGIN:DAYLIGHT
+DTSTART:16010101T020000
+TZOFFSETFROM:+1000
+TZOFFSETTO:+1100
+RRULE:FREQ=YEARLY;INTERVAL=1;BYDAY=1SU;BYMONTH=10
+END:DAYLIGHT
+END:VTIMEZONE
+BEGIN:VEVENT
+ORGANIZER:mailto:Darshan.Subbarao@rabobank.com
+ATTENDEE;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=TRUE:mailto:Gayath
+ ri.Sivaji@rabobank.com
+ATTENDEE;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=TRUE:mailto:Farhan
+ .Khan@rabobank.com
+ATTENDEE;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=TRUE:mailto:netssr
+ mrz@yahoo.com.au
+ATTACH:CID:5900552155091F47893B166E0094B5E0@ausprd01.prod.outlook.com
+DESCRIPTION;LANGUAGE=en-US:Hi Gayathri\, Hi Farhan\,\n\nSetting up this dis
+ cussion with Steven for the role of .Net API developer in our projects. Pl
+ s see attached Steven's profile.\n\n\nSteven Ramirez:\nSteven Ramirez is a
+  highly experienced Senior Full Stack and Application Architect with over 
+ 25 years in software development\, specializing in .NET API development an
+ d cloud-native enterprise solutions. He has extensive expertise in designi
+ ng scalable systems and leading Agile teams across various industries.\n\n
+   *\nSenior Full Stack / Application Architect with 20+ years of experienc
+ e delivering large-scale enterprise web and cloud-native solutions across 
+ financial services\, education\, and betting domains.\n  *\nStrong experti
+ se in .NET (C#)\, Java\, RESTful APIs\, SOAP\, GraphQL\, and microservices
+  architecture\, with deep experience designing scalable API-driven systems
+  and integration layers.\n  *\nExtensive hands-on experience with Azure cl
+ oud services including API Management\, Functions\, Logic Apps\, Web Apps\
+ , and CI/CD pipelines using Azure DevOps\, Jenkins\, and GitHub Actions.\n
+   *\nProven background in architecting and delivering enterprise web platf
+ orms using modern front-end technologies (React\, Angular\, Next.js\, Java
+ Script\, HTML/CSS) integrated with backend services.\n  *\nStrong database
+  and integration experience across SQL Server\, Oracle\, PostgreSQL\, and 
+ data migration/optimisation\, including performance tuning and large-scale
+  system modernisation.\n  *\nDemonstrated leadership in DevSecOps\, Agile 
+ delivery\, system architecture governance\, and cloud migration\, with add
+ itional exposure to AI/GenAI solutions using OpenAI\, LangChain\, and RAG-
+ based systems.\n\n\nRegards\,\nDarshan\n\n________________________________
+ ________________________________________________\nMicrosoft Teams meeting\
+ nJoin: https://teams.microsoft.com/meet/312546828908962?p=mLxrZVYsS9jWi4Bb
+ su\nMeeting ID: 312 546 828 908 962\nPasscode: Rs763rX7\n_________________
+ _______________\nNeed help?<https://aka.ms/JoinTeamsMeeting?omkt=en-US> | 
+ System reference<https://teams.microsoft.com/l/meetup-join/19%3ameeting_MG
+ Y1MjVkNjUtOWNkNi00Mjk4LTk0OGUtOTc0NjU3MmMxNjZi%40thread.v2/0?context=%7b%2
+ 2Tid%22%3a%226e93a626-8aca-4dc1-9191-ce291b4b75a1%22%2c%22Oid%22%3a%2236f3
+ 4df5-a3d9-4177-86a7-cb4dd76415e2%22%7d>\nDial in by phone\n+61 2 8318 0013
+ \,\,469285269#<tel:+61283180013\,\,469285269#> Australia\, Sydney\nFind a 
+ local number<https://dialin.teams.cloud.microsoft/372ab803-7497-4185-b0eb-
+ 312f92f11e4a?id=469285269>\nPhone conference ID: 469 285 269#\nFor organiz
+ ers: Meeting options<https://teams.microsoft.com/meetingOptions/?organizer
+ Id=36f34df5-a3d9-4177-86a7-cb4dd76415e2&tenantId=6e93a626-8aca-4dc1-9191-c
+ e291b4b75a1&threadId=19_meeting_MGY1MjVkNjUtOWNkNi00Mjk4LTk0OGUtOTc0NjU3Mm
+ MxNjZi@thread.v2&messageId=0&language=en-US> | Reset dial-in PIN<https://d
+ ialin.teams.cloud.microsoft/usp/pstnconferencing>\nPrivacy and security<ht
+ tps://www.rabobank.nl/privacy/check-privacy-statement>\n__________________
+ ______________________________________________________________\n\n________
+ ________________________\nThis email\, including any attachments\, may be 
+ confidential or privileged\, and is sent for the personal attention of the
+  intended recipient.  If you have received this email in error\, please de
+ lete it from your system immediately\, do not use or disclose the informat
+ ion in any way or store or copy the information in any medium\, and notify
+  the sender by email or telephone immediately.\nThe views expressed in thi
+ s email are those of the individual and are not necessarily those of the R
+ abobank Group.  No warranty is made that the email or attachment(s) are fr
+ ee from computer viruses and other defects. <#rbnl#1898i>\n\n_____________
+ ___________________\n
+UID:040000008200E00074C5B7101A82E00800000000227794733308DD01000000000000000
+ 01000000007FCF2A5852EFF48A39234EB9BE8666F
+SUMMARY;LANGUAGE=en-US:Interview - .Net API Developer - Steven Ramirez
+DTSTART;TZID=AUS Eastern Standard Time:20260703T110000
+DTEND;TZID=AUS Eastern Standard Time:20260703T112500
+CLASS:PUBLIC
+PRIORITY:5
+DTSTAMP:20260630T015509Z
+TRANSP:OPAQUE
+STATUS:CONFIRMED
+SEQUENCE:0
+LOCATION;LANGUAGE=en-US:Microsoft Teams Meeting
+X-MICROSOFT-CDO-APPT-SEQUENCE:0
+X-MICROSOFT-CDO-OWNERAPPTID:2124869707
+X-MICROSOFT-CDO-BUSYSTATUS:TENTATIVE
+X-MICROSOFT-CDO-INTENDEDSTATUS:BUSY
+X-MICROSOFT-CDO-ALLDAYEVENT:FALSE
+X-MICROSOFT-CDO-IMPORTANCE:1
+X-MICROSOFT-CDO-INSTTYPE:0
+X-MICROSOFT-ONLINEMEETINGINFORMATION:{"OnlineMeetingChannelId":null\,"Onlin
+ eMeetingProvider":3}
+X-MICROSOFT-ONLINEMEETINGTOLLNUMBER:+61 2 8318 0013
+X-MICROSOFT-ONLINEMEETINGCONFERENCEID:469285269
+X-MICROSOFT-SKYPETEAMSMEETINGURL:https://teams.microsoft.com/l/meetup-join/
+ 19%3ameeting_MGY1MjVkNjUtOWNkNi00Mjk4LTk0OGUtOTc0NjU3MmMxNjZi%40thread.v2/
+ 0?context=%7b%22Tid%22%3a%226e93a626-8aca-4dc1-9191-ce291b4b75a1%22%2c%22O
+ id%22%3a%2236f34df5-a3d9-4177-86a7-cb4dd76415e2%22%7d
+X-MICROSOFT-SCHEDULINGSERVICEUPDATEURL:https://api.scheduler.teams.microsof
+ t.com/teams/6e93a626-8aca-4dc1-9191-ce291b4b75a1/36f34df5-a3d9-4177-86a7-c
+ b4dd76415e2/19_meeting_MGY1MjVkNjUtOWNkNi00Mjk4LTk0OGUtOTc0NjU3MmMxNjZi@th
+ read.v2/0
+X-MICROSOFT-SKYPETEAMSPROPERTIES:{"cid":"19:meeting_MGY1MjVkNjUtOWNkNi00Mjk
+ 4LTk0OGUtOTc0NjU3MmMxNjZi@thread.v2"\,"rid":0\,"mid":0\,"uid":null\,"priva
+ te":true\,"type":0}
+X-MICROSOFT-DONOTFORWARDMEETING:FALSE
+X-MICROSOFT-DISALLOW-COUNTER:FALSE
+X-MICROSOFT-REQUESTEDATTENDANCEMODE:DEFAULT
+X-MICROSOFT-ISRESPONSEREQUESTED:TRUE
+X-MICROSOFT-LOCATIONDISPLAYNAME:Microsoft Teams Meeting
+X-MICROSOFT-LOCATIONSOURCE:None
+X-MICROSOFT-LOCATIONS:[{"DisplayName":"Microsoft Teams Meeting"\,"LocationA
+ nnotation":""\,"LocationUri":""\,"LocationStreet":""\,"LocationCity":""\,"
+ LocationState":""\,"LocationCountry":""\,"LocationPostalCode":""\,"Locatio
+ nFullAddress":""}]
+BEGIN:VALARM
+DESCRIPTION:REMINDER
+TRIGGER;RELATED=START:-PT15M
+ACTION:DISPLAY
+END:VALARM
+END:VEVENT
+END:VCALENDAR
