@@ -4,7 +4,8 @@ import "/component/DeInputPeriod/index.js?v=4";
 import "/component/DeInputRepeat/index.js?v=4";
 import "/component/DeDialogForm/index.js?v=4";
 import "/app/jopr/component/de-field/index.js?v=4";
-import ICAL from "https://unpkg.com/ical.js/dist/ical.min.js";
+//import ICAL from "https://unpkg.com/ical.js/dist/ical.min.js";
+import ICAL from "./ical.min.js";
 
 /**
  * @typedef {object} Repeat
@@ -585,6 +586,58 @@ function Format_Recurrence(recurrence)
 }
 
 function Parse_Ics(text)
+{
+  const events = [];
+
+  try
+  {
+    // Parse raw text into an ICAL Component tree
+    const jcalData = ICAL.parse(text);
+    const comp = new ICAL.Component(jcalData);
+    
+    // Retrieve all VEVENT subcomponents
+    const vevents = comp.getAllSubcomponents("vevent");
+
+    for (const veventComp of vevents)
+    {
+      const event = new ICAL.Event(veventComp);
+
+      // 1. Extract Summary / Title
+      const title = event.summary || "Imported Event";
+
+      // 2. Extract Description
+      const description = event.description || null;
+
+      // 3. Extract Start Time & convert to JavaScript epoch milliseconds
+      let time = null;
+      if (event.startDate)
+      {
+        const jsDate = event.startDate.toJSDate();
+        if (jsDate && !isNaN(jsDate.getTime()))
+        {
+          time = jsDate.getTime();
+        }
+      }
+
+      if (time)
+      {
+        events.push({
+          title,
+          time,
+          description
+        });
+      }
+    }
+  }
+  catch (e)
+  {
+    console.error("Failed to parse ICS file with ICAL.js:", e);
+  }
+
+  return events;
+}
+
+function Parse_Ics_1(text)
 {
   const rawLines = text.split(/\r?\n/);
   const lines = [];
