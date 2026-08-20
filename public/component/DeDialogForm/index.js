@@ -187,6 +187,10 @@ class DeDialogForm extends HTMLElement
     {
       this.clr_btn.hidden = true;
     }
+    if (this.hasAttribute("hide-cancel"))
+    {
+      this.cancel_btn.hidden = true;
+    }
 
     //this.addEventListener("keydown", this.On_KeyDown);
     this.ok_btn.addEventListener("click", this.On_Click_OK_Btn);

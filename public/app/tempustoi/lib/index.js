@@ -238,9 +238,17 @@ function On_Click_View_Btn(e)
   const btn_elem = e.target;
   const timer = btn_elem.timer;
 
-  timer.time = "";
-  timer.recurrence = "";
-  
+  const date_options = 
+  {
+    weekday: "long",
+    year: "numeric", month: "long", day: "numeric",
+    hour: "numeric", minute: "2-digit", second: "2-digit",
+    hour12: true
+  };
+  timer.time = 
+    timer.time ? new Date(timer.time).toLocaleString(undefined, date_options) : null;
+  timer.recurrence = Format_Recurrence(timer.recurrence);
+
   timer_view_dlg.Show_Modal(timer);
 }
 
@@ -508,6 +516,67 @@ function Alarm_Off(timer)
 }
 
 // misc =====================================================================================
+
+function Format_Recurrence(recurrence)
+{
+  if (!recurrence || !recurrence.rate || recurrence.rate <= 0)
+  {
+    return null;
+  }
+
+  const rate = recurrence.rate;
+  const scale = recurrence.scale;
+  let scaleStr = "";
+
+  switch (scale)
+  {
+    case "SCALE_DAY":
+      scaleStr = rate === 1 ? "day" : "days";
+      break;
+    case "SCALE_WEEK":
+      scaleStr = rate === 1 ? "week" : "weeks";
+      break;
+    case "SCALE_MONTH":
+      scaleStr = rate === 1 ? "month" : "months";
+      break;
+    case "SCALE_YEAR":
+      scaleStr = rate === 1 ? "year" : "years";
+      break;
+    default:
+      return null;
+  }
+
+  let text = rate === 1 ? "Every " + scaleStr : "Every " + rate + " " + scaleStr;
+
+  if (scale === "SCALE_WEEK" && recurrence.weekdays && recurrence.weekdays.length > 0)
+  {
+    const dayMap = {
+      "WEEKDAYS_MONDAY": "Monday",
+      "WEEKDAYS_TUESDAY": "Tuesday",
+      "WEEKDAYS_WEDNESDAY": "Wednesday",
+      "WEEKDAYS_THURSDAY": "Thursday",
+      "WEEKDAYS_FRIDAY": "Friday",
+      "WEEKDAYS_SATURDAY": "Saturday",
+      "WEEKDAYS_SUNDAY": "Sunday"
+    };
+    const days = recurrence.weekdays.map(d => dayMap[d] || d);
+    text += " on " + days.join(", ");
+  }
+
+  if (scale === "SCALE_MONTH" && recurrence.month)
+  {
+    if (recurrence.month === "MONTH_DAY")
+    {
+      text += " on the same day of the month";
+    }
+    else if (recurrence.month === "MONTH_WEEK")
+    {
+      text += " on the same day and week of the month";
+    }
+  }
+
+  return text;
+}
 
 function Parse_Ics(text)
 {
