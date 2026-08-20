@@ -36,8 +36,7 @@ async function Main()
   timer_date.addEventListener("change", On_Date_Change);
   about_btn.addEventListener("click", On_Click_About);
   save_btn.addEventListener("click", On_Click_Save);
-  load_btn.addEventListener("click", On_Click_Load);
-  ics_btn.addEventListener("click", On_Click_Ics);
+  load_btn.addEventListener("click", On_Click_Load_Btn);
   menu_close_btn.addEventListener("click", On_Click_Close_Menu);
 
   Increment_Timers();
@@ -87,13 +86,13 @@ function On_Click_About()
   about_panel.showPopover();
 }
 
-function On_Click_Load()
+function On_Click_Load_Btn()
 {
   menu_panel.hidePopover();
 
   const input = document.createElement("input");
   input.type = "file";
-  input.accept = ".json,.tt,application/json";
+  input.accept = ".json,.tt,.ics,application/json,text/calendar";
   input.onchange = On_Change_File;
   input.click();
 
@@ -103,167 +102,66 @@ function On_Click_Load()
     if (file)
     {
       const reader = new FileReader();
-      reader.onload = On_Load_File;
+      reader.onload = (e) => On_Load_File(e, file.name);
       reader.readAsText(file);
     }
   }
   
-  function On_Load_File(reader_event)
+  function On_Load_File(reader_event, filename)
   {
-    const timers = reader_event.target.result;
-    Save_Timers(timers);
-    Render_Timers(timers);
-    Update_Nav();
-  }
-}
-
-function On_Click_Ics()
-{
-  menu_panel.hidePopover();
-
-  const input = document.createElement("input");
-  input.type = "file";
-  input.accept = ".ics,text/calendar";
-  input.onchange = On_Change_File;
-  input.click();
-
-  function On_Change_File(event)
-  {
-    const file = event.target.files[0];
-    if (file)
+    const text = reader_event.target.result;
+    if (filename.toLowerCase().endsWith(".ics"))
     {
-      const reader = new FileReader();
-      reader.onload = On_Load_File;
-      reader.readAsText(file);
-    }
-  }
-  
-  function On_Load_File(reader_event)
-  {
-    const icsText = reader_event.target.result;
-    const events = Parse_Ics(icsText);
-    if (events.length === 0)
-    {
-      alert("No valid events found in the selected ICS file.");
-      return;
-    }
-
-    let importedCount = 0;
-    for (const ev of events)
-    {
-      if (ev.time)
+      const events = Parse_Ics(text);
+      if (events.length === 0)
       {
-        const timer = {
-          id: crypto.randomUUID(),
-          title: ev.title || "Imported Event",
-          time: ev.time,
-          recurrence: { rate: 0 }
-        };
-        Save_Timer(timer);
-        importedCount++;
+        alert("No valid events found in the selected ICS file.");
+        return;
       }
-    }
 
-    if (importedCount > 0)
-    {
-      const timers = Select_Timers();
-      Render_Timers(timers);
-      Update_Nav();
+      let importedCount = 0;
+      for (const ev of events)
+      {
+        if (ev.time)
+        {
+          const timer = {
+            id: crypto.randomUUID(),
+            title: ev.title || "Imported Event",
+            time: ev.time,
+            recurrence: { rate: 0 }
+          };
+          Save_Timer(timer);
+          importedCount++;
+        }
+      }
+
+      if (importedCount > 0)
+      {
+        const timers = Select_Timers();
+        Render_Timers(timers);
+        Update_Nav();
+      }
+      else
+      {
+        alert("No events with valid start dates were found.");
+      }
     }
     else
     {
-      alert("No events with valid start dates were found.");
-    }
-  }
-}
-
-function Parse_Ics(text)
-{
-  const rawLines = text.split(/\r?\n/);
-  const lines = [];
-  for (let i = 0; i < rawLines.length; i++)
-  {
-    let line = rawLines[i];
-    while (i + 1 < rawLines.length && (rawLines[i + 1].startsWith(" ") || rawLines[i + 1].startsWith("\t")))
-    {
-      line += rawLines[i + 1].slice(1);
-      i++;
-    }
-    lines.push(line);
-  }
-
-  const events = [];
-  let currentEvent = null;
-
-  for (const line of lines)
-  {
-    if (!line.trim()) continue;
-    
-    const colonIdx = line.indexOf(":");
-    if (colonIdx === -1) continue;
-    
-    const key = line.slice(0, colonIdx).trim().toUpperCase();
-    const value = line.slice(colonIdx + 1);
-
-    if (key === "BEGIN" && value.trim().toUpperCase() === "VEVENT")
-    {
-      currentEvent = {};
-    }
-    else if (key === "END" && value.trim().toUpperCase() === "VEVENT")
-    {
-      if (currentEvent)
+      try
       {
-        events.push(currentEvent);
-        currentEvent = null;
+        const timers = JSON.parse(text);
+        Save_Timers(timers);
+        Render_Timers(timers);
+        Update_Nav();
       }
-    }
-    else if (currentEvent)
-    {
-      if (key.startsWith("SUMMARY"))
+      catch (e)
       {
-        let summary = value
-          .replace(/\\,/g, ",")
-          .replace(/\\;/g, ";")
-          .replace(/\\\\/g, "\\")
-          .replace(/\\[nN]/g, "\n");
-        currentEvent.title = summary.trim();
-      }
-      else if (key.startsWith("DTSTART"))
-      {
-        currentEvent.time = Parse_Ics_Date(value.trim());
+        alert("Failed to parse the loaded file as JSON.");
+        console.error(e);
       }
     }
   }
-
-  return events;
-}
-
-function Parse_Ics_Date(value)
-{
-  const clean = value.replace(/[^0-9TZ]/g, "");
-  if (clean.length === 8)
-  {
-    const year = clean.slice(0, 4);
-    const month = clean.slice(4, 6);
-    const day = clean.slice(6, 8);
-    const timeVal = new Date(`${year}-${month}-${day}T00:00:00`).getTime();
-    return isNaN(timeVal) ? null : timeVal;
-  }
-  else if (clean.length >= 15)
-  {
-    const year = clean.slice(0, 4);
-    const month = clean.slice(4, 6);
-    const day = clean.slice(6, 8);
-    const hour = clean.slice(9, 11);
-    const min = clean.slice(11, 13);
-    const sec = clean.slice(13, 15);
-    const isUtc = clean.endsWith("Z");
-    
-    const dateStr = `${year}-${month}-${day}T${hour}:${min}:${sec}${isUtc ? "Z" : ""}`;
-    const timeVal = new Date(dateStr).getTime();
-    return isNaN(timeVal) ? null : timeVal;
-  }
-  return null;
 }
 
 function On_Click_Save()
@@ -588,6 +486,95 @@ function Alarm_Off(timer)
 }
 
 // misc =====================================================================================
+
+function Parse_Ics(text)
+{
+  const rawLines = text.split(/\r?\n/);
+  const lines = [];
+  for (let i = 0; i < rawLines.length; i++)
+  {
+    let line = rawLines[i];
+    while (i + 1 < rawLines.length && (rawLines[i + 1].startsWith(" ") || rawLines[i + 1].startsWith("\t")))
+    {
+      line += rawLines[i + 1].slice(1);
+      i++;
+    }
+    lines.push(line);
+  }
+
+  const events = [];
+  let currentEvent = null;
+
+  for (const line of lines)
+  {
+    if (!line.trim()) continue;
+    
+    const colonIdx = line.indexOf(":");
+    if (colonIdx === -1) continue;
+    
+    const key = line.slice(0, colonIdx).trim().toUpperCase();
+    const value = line.slice(colonIdx + 1);
+
+    if (key === "BEGIN" && value.trim().toUpperCase() === "VEVENT")
+    {
+      currentEvent = {};
+    }
+    else if (key === "END" && value.trim().toUpperCase() === "VEVENT")
+    {
+      if (currentEvent)
+      {
+        events.push(currentEvent);
+        currentEvent = null;
+      }
+    }
+    else if (currentEvent)
+    {
+      if (key.startsWith("SUMMARY"))
+      {
+        let summary = value
+          .replace(/\\,/g, ",")
+          .replace(/\\;/g, ";")
+          .replace(/\\\\/g, "\\")
+          .replace(/\\[nN]/g, "\n");
+        currentEvent.title = summary.trim();
+      }
+      else if (key.startsWith("DTSTART"))
+      {
+        currentEvent.time = Parse_Ics_Date(value.trim());
+      }
+    }
+  }
+
+  return events;
+}
+
+function Parse_Ics_Date(value)
+{
+  const clean = value.replace(/[^0-9TZ]/g, "");
+  if (clean.length === 8)
+  {
+    const year = clean.slice(0, 4);
+    const month = clean.slice(4, 6);
+    const day = clean.slice(6, 8);
+    const timeVal = new Date(`${year}-${month}-${day}T00:00:00`).getTime();
+    return isNaN(timeVal) ? null : timeVal;
+  }
+  else if (clean.length >= 15)
+  {
+    const year = clean.slice(0, 4);
+    const month = clean.slice(4, 6);
+    const day = clean.slice(6, 8);
+    const hour = clean.slice(9, 11);
+    const min = clean.slice(11, 13);
+    const sec = clean.slice(13, 15);
+    const isUtc = clean.endsWith("Z");
+    
+    const dateStr = `${year}-${month}-${day}T${hour}:${min}:${sec}${isUtc ? "Z" : ""}`;
+    const timeVal = new Date(dateStr).getTime();
+    return isNaN(timeVal) ? null : timeVal;
+  }
+  return null;
+}
 
 function Timer_Is_Overdue(timer)
 {
