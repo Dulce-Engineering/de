@@ -105,11 +105,12 @@ class DeDialogForm extends HTMLElement
    * Shows the modal dialog without any initial value or promise handling.
    * @public
    */
-  Show_Modal()
+  Show_Modal(value)
   {
     this.classList.add("hydrated");
     this.resolve = null;
     this.reject = null;
+    this.value = value;
     this.dlg.showModal();
   }
 

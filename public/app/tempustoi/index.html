@@ -903,7 +903,6 @@
           <img src="/images/about.svg" alt="about">
           About
         </button>
-
         <button id="load_btn">
           <img src="/images/upload.svg" alt="load">
           Load
@@ -949,11 +948,9 @@
 
     <main id="timers_elem"></main>
 
-    <dialog id="timer_dlg">
+    <dialog id="timer_edit_dlg">
       <form id="timer_form" method="dialog">
-        <header>
-          Create Timer
-        </header>
+        <header>Create Timer</header>
 
         <main>
           <!-- title -->
@@ -1011,6 +1008,13 @@
         </footer>
       </form>
     </dialog>
+
+    <de-dialog-form id="timer_view_dlg">
+      <span slot="header">View Timer</span>
+      <de-field name="title" slot="fields"></de-field>
+      <de-field name="time" slot="fields"></de-field>
+      <de-field field-label="Recurrence" name="recurrence" slot="fields"></de-field>
+    </de-dialog-form>
 
     <dialog id="confirm_dlg">
       <form method="dialog">

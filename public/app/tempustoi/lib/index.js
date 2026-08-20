@@ -1,7 +1,10 @@
 import DE from "/dedial/dedial.js?v=4";
-import "../DeSunMoon/index.js?v=4";
+import "../component/de-sun-moon/index.js?v=4";
 import "/component/DeInputPeriod/index.js?v=4";
 import "/component/DeInputRepeat/index.js?v=4";
+import "/component/DeDialogForm/index.js?v=4";
+//import "/component/de-text/index.js?v=4";
+import "/app/jopr/component/de-field/index.js?v=4";
 
 /**
  * @typedef {object} Repeat
@@ -184,7 +187,7 @@ function On_Click_Save()
 function On_Click_Add()
 {
   timer_form.reset();
-  timer_dlg.showModal();
+  timer_edit_dlg.showModal();
 }
 
 function On_Click_Del_All()
@@ -228,6 +231,17 @@ function On_Click_Delete_Ok(e)
   Update_Nav();
 
   Delete_Timer(timer_id);
+}
+
+function On_Click_View_Btn(e)
+{
+  const btn_elem = e.target;
+  const timer = btn_elem.timer;
+
+  timer.time = "";
+  timer.recurrence = "";
+  
+  timer_view_dlg.Show_Modal(timer);
 }
 
 function On_Click_Ok()
@@ -387,6 +401,7 @@ function Render_Timer(timer)
   const title_html = Render_Timer_Title(timer);
   const timer_elem_id = "timer_" + timer.id;
   const del_btn_id = "del_btn_" + timer.id;
+  const view_btn_id = "view_btn_" + timer.id;
   const stop_btn_id = "stop_btn_" + timer.id;
   const quiet_btn_id = "quiet_btn_" + timer.id;
   const panel_id = "panel_" + timer.id;
@@ -395,6 +410,9 @@ function Render_Timer(timer)
     <header class="timer">
       ${title_html}
       <button id="${quiet_btn_id}" hidden>Silence!</button>
+      <button id="${view_btn_id}" class="view-btn img">
+        <img src="./image/zoom.svg" alt="View">
+      </button>
       <button id="${stop_btn_id}" class="stop-btn img">
         <img src="/images/pause.svg" alt="Pause">
       </button>
@@ -426,6 +444,10 @@ function Render_Timer(timer)
   const del_btn_elem = document.getElementById(del_btn_id);
   del_btn_elem.timer = timer;
   del_btn_elem.addEventListener("click", On_Click_Delete);
+
+  const view_btn_elem = document.getElementById(view_btn_id);
+  view_btn_elem.timer = timer;
+  view_btn_elem.addEventListener("click", On_Click_View_Btn);
 
   Set_Animations(panel_elem);
 }
