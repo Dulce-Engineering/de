@@ -245,11 +245,15 @@ function On_Click_View_Btn(e)
     hour: "numeric", minute: "2-digit", second: "2-digit",
     hour12: true
   };
-  timer.time = 
-    timer.time ? new Date(timer.time).toLocaleString(undefined, date_options) : null;
-  timer.recurrence = Format_Recurrence(timer.recurrence);
+  const view_timer = 
+  {
+    ...timer,
+    time:
+      timer.time ? new Date(timer.time).toLocaleString(undefined, date_options) : null,
+    recurrence: Format_Recurrence(timer.recurrence),
+  }
 
-  timer_view_dlg.Show_Modal(timer);
+  timer_view_dlg.Show_Modal(view_timer);
 }
 
 function On_Click_Ok()
