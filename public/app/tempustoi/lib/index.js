@@ -31,6 +31,10 @@ async function Main()
   {
     await navigator.serviceWorker.register("./lib/tempustoi-service-worker.js");
   }
+  if ("launchQueue" in window) 
+  {
+    window.launchQueue.setConsumer(On_Consume_Launch_Queue);
+  }
 
   add_btn.addEventListener("click", On_Click_Add);
   add_timer_btn.addEventListener("click", On_Click_Add);
@@ -80,6 +84,56 @@ function Ads()
 }
 
 // events ===================================================================================
+
+async function On_Consume_Launch_Queue(launchParams)
+{
+  if (!launchParams.files || !launchParams.files.length) return;
+
+  for (const handle of launchParams.files) 
+  {
+    try 
+    {
+      // Obtain the native File object from the handle
+      const file = await handle.getFile();
+      
+      if (file.name.toLowerCase().endsWith(".ics")) 
+      {
+        const text = await file.text();
+        
+        // Re-use your updated parsing logic
+        const events = Parse_Ics(text); 
+        
+        if (events.length > 0) 
+        {
+          for (const ev of events) 
+          {
+            if (ev.time) 
+            {
+              const timer = 
+              {
+                id: crypto.randomUUID(),
+                title: ev.title || "Imported Event",
+                time: ev.time,
+                description: ev.description || null,
+                recurrence: { rate: 0 }
+              };
+              Save_Timer(timer);
+            }
+          }
+          
+          // Refresh UI
+          const timers = Select_Timers();
+          Render_Timers(timers);
+          Update_Nav();
+        }
+      }
+    } 
+    catch (err) 
+    {
+      console.error("Failed to read launched file:", err);
+    }
+  }
+}
 
 function On_Click_Close_Menu()
 {

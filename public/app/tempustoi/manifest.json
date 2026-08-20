@@ -30,5 +30,15 @@
       "type": "image/png",
       "form_factor": "wide"
     }
+  ],
+  "file_handlers": 
+  [
+    {
+      "action": "/app/tempustoi/",
+      "accept": 
+      {
+        "text/calendar": [".ics"]
+      }
+    }
   ]
 }
