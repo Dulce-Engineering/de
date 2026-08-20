@@ -801,14 +801,15 @@ function Render_Job_Item(event, ctx)
   const job_id = job.id;
   //console.log("Render_Job_Item(): job =", job);
 
-  const role_title = "#" + job.id + " " + job.role_title;
-  const title_text = ctx.Utils.Append_Str(role_title, job.company, " - ");
+  const title_text = ctx.Utils.Append_Str(job.role_title, job.company, " - ");
   item_elem.role_title_elem.textContent = title_text;
 
   let subtitle_text = 
     ctx.Utils.Append_Str(job.contact?.name, job.agency_name, " @ ");
   subtitle_text = 
     ctx.Utils.Append_Str(subtitle_text, ctx.Job.Time_Since_Last_Update(job), " - ");
+  subtitle_text = 
+    ctx.Utils.Append_Str("#" + job.id, subtitle_text, " - ");
   item_elem.contact_elem.textContent = subtitle_text;
 
   const contact = { ...job.contact, agency_name: job.agency_name };
