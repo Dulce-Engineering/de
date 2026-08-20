@@ -71,6 +71,9 @@ https://www.youtube.com/watch?v=oVy-KKWsdNg&list=PLDTPrMoGHssBulfAaczSuk0f8luCiK
 - on jobs show new jobs
 - filter jobs by agency
 
+- gen interview intro
+- gen interview study questions
+- gen interview talking points
 - jobs single view to get details including contact details
 - edit cl recipient name and content
 - add job and gen cv/cl in one go

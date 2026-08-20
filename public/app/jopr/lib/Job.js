@@ -1,3 +1,39 @@
+/**
+ * @typedef {Object} Job
+ * @property {number|string} id Unique identifier for the job[cite: 2].
+ * @property {string|null} role_title The title of the job role[cite: 2].
+ * @property {string|null} [company] Name of the hiring company[cite: 2].
+ * @property {string|null} [link] URL link to the job posting[cite: 2].
+ * @property {string|null} [description] Job description text[cite: 2].
+ * @property {string|null} [location] Job location (e.g., city, remote)[cite: 2].
+ * @property {string|null} [duration] Expected job duration[cite: 2].
+ * @property {string|null} [source] Origin of the job post (e.g., LinkedIn, Seek)[cite: 2].
+ * @property {string|null} [role_type] Work commitment type (e.g., 'full-time', 'contract')[cite: 2].
+ * @property {number|null} [remuneration] Salary or rate figure[cite: 2].
+ * @property {string|null} [remuneration_unit] Pay scale unit (e.g., 'per hour', 'per annum')[cite: 2].
+ * @property {number|null} [agency_id] ID of the associated recruitment agency[cite: 2].
+ * @property {Array<number|string>|null} [contact_ids] IDs of associated agency or company contacts[cite: 2].
+ * @property {'bookmarked'|'accepted'|'offered'|'negotiating'|'interviewing'|'screening'|'applying'|'applied'|'rejected'|'withdrawn'|'ghosted'|'dismissed'|'expired'|'cancelled'} status Current application status[cite: 2].
+ * @property {string|null} [cv] Reference or text for the resume used[cite: 2].
+ * @property {string|null} [cl] Reference or text for the cover letter used[cite: 2].
+ * @property {number} last_update Timestamp (in milliseconds) of the last activity[cite: 2].
+ */
+
+/**
+ * Extended Job entity decorated with joined database details.
+ * @typedef {Job & ExtendedJobDetails} ExtendedJob
+ */
+
+/**
+ * @typedef {Object} ExtendedJobDetails
+ * @property {string} [agency_name] Name of the joined agency[cite: 2].
+ * @property {string} [latest_note] The text content of the latest activity note[cite: 2].
+ * @property {string} [latest_note_time_formatted] Formatted string representation of the last note's date[cite: 2].
+ * @property {Array<Object>} [attachments] Array of attachment files associated with this job[cite: 2].
+ * @property {Array<Object>} [contacts] Full contact records corresponding to `contact_ids`[cite: 2].
+ * @property {Object|null} [contact] Primary contact object (first item of `contacts`)[cite: 2].
+ */
+
 class Job
 {
   static table_name = "jobs";
@@ -388,6 +424,46 @@ class Job
       if (notify_fn) await notify_fn();
     }
     return res;
+  }
+
+  /**
+   * Returns a user-friendly string indicating how long ago the job was updated.
+   * @param {Job} job 
+   * @returns {string} Human-readable relative time string (e.g., "2 days ago", "1 hour ago", "Just now").
+   */
+  static Time_Since_Last_Update(job)
+  {
+    if (!job || !job.last_update)
+    {
+      return null;
+    }
+
+    const elapsed_ms = Date.now() - job.last_update;
+
+    if (elapsed_ms < 0)
+    {
+      return "Updated now";
+    }
+
+    const seconds = Math.floor(elapsed_ms / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+
+    if (days > 0)
+    {
+      return `Updated ${days} ${days === 1 ? "day" : "days"} ago`;
+    }
+    if (hours > 0)
+    {
+      return `Updated ${hours} ${hours === 1 ? "hour" : "hours"} ago`;
+    }
+    if (minutes > 0)
+    {
+      return `Updated ${minutes} ${minutes === 1 ? "minute" : "minutes"} ago`;
+    }
+
+    return "Updated now";
   }
 }
 
