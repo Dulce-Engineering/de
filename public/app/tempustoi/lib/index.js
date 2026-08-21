@@ -6,6 +6,7 @@ import "/component/DeDialogForm/index.js?v=4";
 import "/app/jopr/component/de-field/index.js?v=4";
 //import ICAL from "https://unpkg.com/ical.js/dist/ical.min.js";
 import ICAL from "./ical.min.js";
+import Utils from "/lib/Utils.js";
 
 /**
  * @typedef {object} Repeat
@@ -430,9 +431,8 @@ function Render_Timers(timers)
   }
 }
 
-function Render_Timer_Title(timer)
+function Render_Timer_Title(panel_elem, timer)
 {
-  let date_str = "";
   if (timer.time)
   {
     const date = new Date(timer.time);
@@ -447,27 +447,28 @@ function Render_Timer_Title(timer)
       second: "2-digit",
       hour12: true
     };
-    date_str = 
-      "<span class=\"time\">" + 
-        date.toLocaleString(undefined, date_format) + 
-      "</span>";
+    const date_str = date.toLocaleString(undefined, date_format);
+    panel_elem.time_elem.textContent = date_str;
+
     if (Timer_Is_Overdue(timer))
     {
-      date_str +=
-        " <span class=\"time overdue\">(overdue)</span>";
+      panel_elem.overdue_elem.style.display = null;
     }
   }
 
-  const title_html = 
-    DE.Utils.Is_Empty(timer.title) && DE.Utils.Is_Empty(date_str) ? "" : 
-    `<label>${DE.Utils.Append_Str(date_str, timer.title, "<br>")}</label>`;
-  
-  return title_html;
+  if (timer.title)
+  {
+    panel_elem.title_text_elem.textContent = timer.title;
+  }
+
+  if (timer.time || timer.title)
+  {
+    panel_elem.title_elem.style.display = null;
+  }
 }
 
 function Render_Timer(timer)
 {
-  const title_html = Render_Timer_Title(timer);
   const timer_elem_id = "timer_" + timer.id;
   const del_btn_id = "del_btn_" + timer.id;
   const view_btn_id = "view_btn_" + timer.id;
@@ -477,22 +478,30 @@ function Render_Timer(timer)
 
   const html = `
     <header class="timer">
-      ${title_html}
-      <button id="${quiet_btn_id}" hidden>Silence!</button>
-      <button id="${view_btn_id}" class="view-btn img">
-        <img src="./image/zoom.svg" alt="View">
-      </button>
-      <button id="${stop_btn_id}" class="stop-btn img">
-        <img src="/images/pause.svg" alt="Pause">
-      </button>
-      <button id="${del_btn_id}" class="del-btn img">
-        <img src="/images/bin.svg" alt="Delete">
-      </button>
+      <label cid="title_elem" style="display:none;">
+        <span cid="time_elem" class="time"></span>
+        <span cid="overdue_elem" class="time overdue" style="display:none;">(overdue)</span>
+        <div cid="title_text_elem"></div>
+      </label>
+      <div class="btns">
+        <button id="${quiet_btn_id}" hidden>Silence!</button>
+        <button id="${view_btn_id}" class="view-btn img">
+          <img src="./image/zoom.svg" alt="View">
+        </button>
+        <button id="${stop_btn_id}" class="stop-btn img">
+          <img src="/images/pause.svg" alt="Pause">
+        </button>
+        <button id="${del_btn_id}" class="del-btn img">
+          <img src="/images/bin.svg" alt="Delete">
+        </button>
+      </div>
     </header>
     <de-timer id="${timer_elem_id}" show-labels></de-timer>
   `;
   const panel_elem = document.getElementById(panel_id);
   panel_elem.innerHTML = html;
+  Utils.Set_Id_Shortcuts(panel_elem, panel_elem, "cid");
+  Render_Timer_Title(panel_elem, timer);
 
   const timer_elem = document.getElementById(timer_elem_id);
   timer_elem.timer = timer;

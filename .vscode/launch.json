@@ -23,10 +23,10 @@
       "webRoot": "${workspaceFolder}"
     },
     {
-      "name": "JobTrak",
+      "name": "JOPR",
       "request": "launch",
       "type": "chrome",
-      "url": "http://127.0.0.1/app/job-trak/index.html",
+      "url": "http://127.0.0.1/app/jopr/index.html",
       "webRoot": "${workspaceFolder}"
     },
     {
