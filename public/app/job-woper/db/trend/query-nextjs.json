@@ -580,5 +580,11 @@
     "datetime": 1787279912942,
     "id": "7a373dd4-de74-434a-a0d3-7cd932eb973b",
     "query_id": "-nextjs"
+  },
+  {
+    "count": 80,
+    "datetime": 1787535630958,
+    "id": "4196c196-4fba-40dc-af1f-ce6c7ef10f58",
+    "query_id": "-nextjs"
   }
 ]

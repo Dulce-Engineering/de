@@ -580,5 +580,11 @@
     "datetime": 1787279972496,
     "id": "af2bee09-db60-4efe-914d-ff2253f64ca8",
     "query_id": "-magento"
+  },
+  {
+    "count": 6,
+    "datetime": 1787535705507,
+    "id": "f8585037-311a-4e27-860f-1da95d913205",
+    "query_id": "-magento"
   }
 ]
