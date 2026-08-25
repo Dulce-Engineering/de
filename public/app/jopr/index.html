@@ -40,6 +40,7 @@
   <link rel="stylesheet" href="./component/de-contact-list/style.css">
   <link rel="stylesheet" href="./component/de-job-details/style.css">
   <link rel="stylesheet" href="./component/de-filter/style.css">
+  <link rel="stylesheet" href="./component/de-select-status/style.css">
   
   <script type="importmap">
   {
@@ -71,6 +72,7 @@
   <script src="./component/de-contact-details/index.js" type="module"></script>
   <script src="./component/de-job-details/index.js" type="module"></script>
   <script src="./component/de-filter/index.js" type="module"></script>
+  <script src="./component/de-select-status/index.js" type="module"></script>
   <script src="./lib/index.js" type="module"></script>
 </head>
 
@@ -128,16 +130,17 @@
             <span cid="contact_elem"></span>
           </div>
           <div cid="status_elem"></div>
-          <de-toolbar-menu cid="job_menu" compact
-            show-status label-status="Update Status"
-            show-attach label-attach="Attach Files"
-            show-view label-view="View Description"
-            show-edit label-edit="Edit Job"
-            show-delete label-delete="Delete Job"
-            show-download label-download="Download Job Details"
-            show-gencv label-gencv="Generate CV"
-            show-genletter label-genletter="Generate Cover Letter"
-          >
+          <de-toolbar-menu cid="job_menu" compact>
+            <de-toolbar-btn event-id="status" btn-label="Update Status" btn-img="./image/note-add.svg"></de-toolbar-btn>
+            <de-toolbar-btn event-id="attach" btn-label="Attach Files" btn-img="./image/attach.svg"></de-toolbar-btn>
+            <de-toolbar-btn event-id="view" btn-label="View Description" btn-img="./image/zoom.svg"></de-toolbar-btn>
+            <de-toolbar-btn event-id="edit" btn-label="Edit Job" btn-img="./image/edit.svg"></de-toolbar-btn>
+            <de-toolbar-btn event-id="delete" btn-label="Delete Job" btn-img="./image/delete.svg"></de-toolbar-btn>
+            <de-toolbar-btn event-id="download" btn-label="Download Job Details" btn-img="./image/download.svg"></de-toolbar-btn>
+            <de-toolbar-btn event-id="gencv" btn-label="Generate CV" btn-img="./image/guide.svg"></de-toolbar-btn>
+            <de-toolbar-btn event-id="genletter" btn-label="Generate Cover Letter" btn-img="./image/mail.svg"></de-toolbar-btn>
+            <de-toolbar-btn event-id="genstudy" btn-label="Generate Study Questions" btn-img="./image/doc.svg"></de-toolbar-btn>
+            <de-toolbar-btn event-id="genintro" btn-label="Generate Interview Intro." btn-img="./image/doc.svg"></de-toolbar-btn>
           </de-toolbar-menu>
         </summary>
         <hr>
@@ -437,8 +440,8 @@
     <h2 slot="header">Add Job Note</h2>
     <label cid="note_label" slot="fields">Note</label>
     <textarea slot="fields" name="note" rows="5"></textarea>
-    <label slot="fields">Status</label>
-    <select id="note_status_select" slot="fields" name="status"></select>
+    <label slot="fields" class="status-label">Status</label>
+    <de-select-status id="note_status_select" slot="fields" name="status"></de-select-status>
   </de-dialog-form>
 
   <de-dialog-form id="company_dialog">

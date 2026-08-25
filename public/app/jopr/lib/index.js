@@ -2,6 +2,7 @@ import Utils from "../../../lib/Utils.js";
 import JOPR from "./Utils.js";
 import New_Ctx from "./ctx.js";
 import * as Stats from "../../job-woper/lib/index.js";
+import DB_SCHEMA from "../db/schema.js";
 
 const work_types =
 {
@@ -36,6 +37,8 @@ async function Main()
     Render_Marketing(ctx);
   }
 
+  import_btn.addEventListener("click", () => On_Click_Import_Btn(ctx));
+
   Update_Chart(ctx);
 }
 
@@ -52,14 +55,13 @@ async function Render_App(ctx)
   marketing_body.classList.add("hidden");
   app_body.classList.remove("hidden");
 
-  Set_Options(note_status_select, ctx.Job.job_status, s => s.id, s => s.label);
+  //Set_Options(note_status_select, ctx.Job.job_status, s => s.id, s => s.label);
   Set_Options(job_status_select, ctx.Job.job_status, s => s.id, s => s.label);
   Set_Options(career_work_type_select, Object.keys(ctx.Job.work_types), t => t, t => work_types[t]);
 
   const title_elem = document.querySelector("#hdr_elem>h1.title");
   //title_elem.addEventListener("click", () => On_Click_Title(ctx));
 
-  import_btn.onclick = () => On_Click_Import_Btn(ctx);
   export_btn.onclick = () => On_Click_Export_Btn(ctx);
 
   jobs_btn.onclick = () => Show_View(jobs_list);

@@ -1,0 +1,28 @@
+de-select-status
+{
+  div.options
+  {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 5px;
+  }
+
+  [cid="status_label"]
+  {
+    margin: 0 0 10px 0;
+  }
+
+  button.active
+  {
+    color: var(--input-text);
+  }
+  button.failed
+  {
+    color: #f88;
+  }
+  button.none
+  {
+    color: #aaa;
+  }
+}

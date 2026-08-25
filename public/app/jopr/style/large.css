@@ -600,7 +600,7 @@
     {
       margin: 10px 0 0 0;
     }
-    input, textarea, select, option
+    input, textarea, select, option, de-select-status
     {
       font-family: octagonal-bold;
       font-size: 1rem;
@@ -882,6 +882,11 @@
   .hidden 
   {
     display: none;
+  }
+  .status-label
+  {
+    align-self: start;
+    margin: 5px 0 0 0;
   }
 
   #profile_form

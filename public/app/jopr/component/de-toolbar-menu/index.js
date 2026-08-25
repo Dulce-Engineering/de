@@ -103,6 +103,7 @@ class DeToolbarMenu extends HTMLElement
       `;
       const dlg_elems = Utils.To_Elements(dlg_html);
       dst_elem = dlg_elems[2].querySelector("#" + menu_id + "_main");
+      if (this.childNodes.length > 0) dst_elem.append(...this.childNodes);
       this.append(...dlg_elems);
     }
 
@@ -120,10 +121,53 @@ class DeToolbarMenu extends HTMLElement
     this.Render_Btn("edit", "./image/edit.svg", dst_elem);
     this.Render_Btn("add", "./image/add.svg", dst_elem);
     this.Render_Btn("delete", "./image/delete.svg", dst_elem);
-
     Utils.Set_Id_Shortcuts(this, this, "cid");
   }
 }
 
 Utils.Register_Element(DeToolbarMenu);
 export default DeToolbarMenu;
+
+export class DeToolbarBtn extends HTMLElement
+{
+  static tname = "de-toolbar-btn";
+
+  constructor()
+  {
+    super();
+    Utils.Bind(this, "On_");
+  }
+
+  connectedCallback()
+  {
+    this.Render();
+  }
+
+  On_Click_Btn()
+  {
+    const event_id = this.getAttribute("event-id");
+    this.dispatchEvent(new CustomEvent(event_id, { bubbles: true }));
+  }
+
+  Render()
+  {
+    const event_id = this.getAttribute("event-id");
+    const btn_img = this.getAttribute("btn-img");
+    const btn_label = this.getAttribute("btn-label");
+    //const title = this.getAttribute("title");
+
+    const html = `
+      <button cid="${event_id}_btn" class="img" type="button" title="${btn_label}">
+        <img src="${btn_img}">
+        <span class="label">${btn_label}</span>
+      </button>
+    `;
+    this.innerHTML = html;
+    Utils.Set_Id_Shortcuts(this, this, "cid");
+    //const btn_elem = Utils.To_Element(html);
+
+    this[event_id + "_btn"].addEventListener("click", this.On_Click_Btn);
+  }
+}
+
+Utils.Register_Element(DeToolbarBtn);
