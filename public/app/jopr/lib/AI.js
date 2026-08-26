@@ -1,9 +1,32 @@
+/**
+ * Service class for interacting with Firebase AI (Gemini).
+ */
 class AI
 {
+  /**
+   * Firebase AI module reference.
+   * @type {any}
+   */
   fb_ai = null;
+
+  /**
+   * Firebase App instance.
+   * @type {any}
+   */
   fb_app = null;
+
+  /**
+   * Vertex AI client instance.
+   * @type {any}
+   */
   ai = null;
 
+  /**
+   * Creates and initializes a new instance of the AI class.
+   * @param {any} fb_app - The Firebase app module/SDK instance.
+   * @param {any} fb_ai - The Firebase AI module/SDK instance.
+   * @returns {Promise<AI | null>} A promise that resolves to the initialized AI instance, or null if initialization fails.
+   */
   static async New(fb_app, fb_ai)
   {
     let res = null;
@@ -23,6 +46,12 @@ class AI
     return res;
   }
 
+  /**
+   * Extracts contact, agency, and job details from raw text (e.g. email or job ad).
+   * @param {string} text - The raw text of the job description or email to analyze.
+   * @param {function(string): (void | Promise<void>)} [notify_fn] - Optional callback to receive progress updates.
+   * @returns {Promise<ExtractedJobResult>} A promise that resolves to the structured extracted data.
+   */
   async Extract_Job(text, notify_fn)
   {
     const contact_schema =
@@ -203,6 +232,12 @@ class AI
     return { agency, contact, job };
   }
 
+  /**
+   * Extracts detailed history for a specific career job from the CV document.
+   * @param {CareerJobInput} job - The job node to detail.
+   * @param {{ mime_type: string, data: string }} file - The base64 file data of the CV.
+   * @returns {Promise<CareerJobDetails | null>} The extracted job details, or null.
+   */
   async Extract_Career_Job(job, file)
   {
     console.info("Processing job " + job.role_titles + "...");
@@ -264,6 +299,11 @@ class AI
     return job_details && job_details.length > 0 ? job_details[0] : null;
   }
 
+  /**
+   * Extracts education history and full career history from a CV file blob.
+   * @param {Blob} cv_blob - The CV file blob (e.g. PDF).
+   * @returns {Promise<ExtractedCVResult>} The extracted education and career history.
+   */
   async Extract_CV(cv_blob)
   {
     const base64 = await Blob_To_Base64(cv_blob);
@@ -344,6 +384,12 @@ class AI
     return { educations, career };
   }
 
+  /**
+   * Compares the applicant's complete employment timeline against a target job and selects the most relevant roles.
+   * @param {Array<Object>} career_jobs - The applicant's career history records.
+   * @param {import("./Job.js").default} target_job - The target job description.
+   * @returns {Promise<number[] | null>} A promise that resolves to an array of selected career job IDs, or null.
+   */
   async Select_Best_Jobs(career_jobs, target_job)
   {
     let res = null;
@@ -429,6 +475,12 @@ class AI
     return res;
   }
 
+  /**
+   * Generates a tailored cover letter using the applicant's profile and target job details.
+   * @param {FullProfile} profile - The applicant's profile and work history.
+   * @param {import("./Job.js").default} job - The target job description.
+   * @returns {Promise<string | null>} The tailored cover letter text.
+   */
   async Generate_Cover_Letter(profile, job)
   {
     let res = null;
@@ -466,6 +518,12 @@ class AI
     return res;
   }
 
+  /**
+   * Crafts a tailored personal summary paragraph for a CV matching a target job.
+   * @param {import("./Job.js").default} job - The target job description.
+   * @param {FullProfile} profile - The applicant's profile.
+   * @returns {Promise<string | null>} The tailored personal summary.
+   */
   async Generate_Summary(job, profile)
   {
     let res = null;
@@ -508,6 +566,13 @@ class AI
     return res;
   }
 
+  /**
+   * Extracts a filtered, prioritized list of matching skills for a target job.
+   * @param {import("./Job.js").default} job - The target job.
+   * @param {Array<Object>} career_jobs - The historical jobs containing tech stacks.
+   * @param {FullProfile} profile - The user profile containing skills.
+   * @returns {Promise<string[] | null>} Array of matching skills.
+   */
   async Generate_Skills(job, career_jobs, profile)
   {
     let res = null;
@@ -587,6 +652,12 @@ class AI
     return res;
   }
 
+  /**
+   * Rewrites details of a single past job experience to align with a target job description.
+   * @param {Object} career_job - The historical job entry to rewrite.
+   * @param {import("./Job.js").default} target_job - The target job description.
+   * @returns {Promise<{ summary: string, bullet_points: string[] } | null>} The rewritten job summary and accomplishments.
+   */
   async Generate_Job_Description(career_job, target_job)
   {
     let res = null;
@@ -672,6 +743,12 @@ class AI
     return res;
   }
 
+  /**
+   * Suggests an alternate, tailored title for a historical job based on the target job requirements.
+   * @param {Object} career_job - The historical job entry.
+   * @param {import("./Job.js").default} target_job - The target job.
+   * @returns {Promise<{ suggested_title: string, reasoning: string } | null>} The suggested title and reasoning.
+   */
   async Generate_Job_Title(career_job, target_job)
   {
     let res = null;
@@ -730,11 +807,24 @@ class AI
     return res;
   }
 
+  /**
+   * Converts a millisecond timestamp to a standard YYYY-MM-DD date string.
+   * @param {number} ms - Millisecond timestamp.
+   * @returns {string} The formatted date string.
+   */
   static To_AI_Date(ms)
   {
     return new Date(ms).toISOString().split('T')[0];
   }
 
+  /**
+   * Sends a structured generation request to the AI model.
+   * @param {string} prompt - The user prompt.
+   * @param {Object | null} [schema] - Optional response schema for structured JSON output.
+   * @param {{ mime_type: string, data: string } | null} [file] - Optional inline file attachments.
+   * @param {string | null} [sys_instruction] - Optional system instructions.
+   * @returns {Promise<any>} The parsed JSON object response (if schema is specified) or raw text response.
+   */
   async Prompt(prompt, schema, file, sys_instruction)
   {
     //console.log("AI.Prompt(): entry");
