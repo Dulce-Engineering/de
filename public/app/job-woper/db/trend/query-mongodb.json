@@ -574,5 +574,11 @@
     "datetime": 1787535541908,
     "id": "a39a336f-8ef9-4085-8ae0-dab7cae27fbe",
     "query_id": "-mongodb"
+  },
+  {
+    "count": 45,
+    "datetime": 1787706185915,
+    "id": "4684e129-ab53-44ab-852e-8d6fcab17399",
+    "query_id": "-mongodb"
   }
 ]

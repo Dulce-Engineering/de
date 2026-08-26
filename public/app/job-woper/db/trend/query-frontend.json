@@ -520,5 +520,11 @@
     "datetime": 1787535724097,
     "id": "f00814d7-19a9-4fa9-abbb-73ec2db7af8c",
     "query_id": "-frontend"
+  },
+  {
+    "count": 489,
+    "datetime": 1787706376191,
+    "id": "766db146-21db-465e-b5af-1db7ed7510cf",
+    "query_id": "-frontend"
   }
 ]
