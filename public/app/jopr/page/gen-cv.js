@@ -27,12 +27,29 @@ async function Main2()
 
 function On_Change_Job_Title(event)
 {
-  const edit_elem = event.currentTarget;
-  const edit_value = edit_elem.value;
-  const ctx = edit_value.ctx;
+  const edit_value = event.currentTarget.value;
   edit_value.cv_job.role_titles = edit_value.text;
   edit_value.cv_job.role_title = null;
 
+  const ctx = edit_value.ctx;
+  ctx.Job.Save(ctx, edit_value.target_job);
+}
+
+function On_Change_Job_Summary(event)
+{
+  const edit_value = event.currentTarget.value;
+  edit_value.cv_job.tailored_job.summary = edit_value.text;
+
+  const ctx = edit_value.ctx;
+  ctx.Job.Save(ctx, edit_value.target_job);
+}
+
+function On_Change_Personal_Summary(event)
+{
+  const edit_value = event.currentTarget.value;
+  edit_value.target_job.cv.summ_text = edit_value.text;
+
+  const ctx = edit_value.ctx;
   ctx.Job.Save(ctx, edit_value.target_job);
 }
 
@@ -133,8 +150,7 @@ async function Render_Job_Item(event, target_job, ctx)
       //date_info.start_date_str + " (" + date_info.duration_str + ")";
       date_info.start_date_str + " - " + date_info.end_date_str;
 
-    item_elem.job_title.addEventListener("change", On_Change_Job_Title);
-    const value =
+    let value =
     {
       ctx,
       target_job,
@@ -143,8 +159,19 @@ async function Render_Job_Item(event, target_job, ctx)
       original_text: job.role_titles
     };
     item_elem.job_title.value = value;
+    item_elem.job_title.addEventListener("change", On_Change_Job_Title);
 
-    item_elem.job_description.innerText = job.tailored_job.summary;
+    value =
+    {
+      ctx,
+      target_job,
+      cv_job: job,
+      text: job.tailored_job.summary,
+      original_text: job.responsibilities
+    };
+    item_elem.job_description.value = value;
+    item_elem.job_description.addEventListener("change", On_Change_Job_Summary);
+
     const html = Render_List(job.tailored_job.bullet_points);
     if (html)
       item_elem.job_points.innerHTML = html;
@@ -213,7 +240,13 @@ async function Render_CV(job, ctx)
   //Render_Field(prof_links_field, links_html);
   Render_Field(prof_links_field, null);
 
-  const summ_data = { original_text: cv.summ_text, text: cv.summ_text };
+  summ_value.addEventListener("change", On_Change_Personal_Summary);
+  const summ_data = 
+  { 
+    ctx,
+    target_job: job,
+    text: cv.summ_text,
+  };
   summ_value.value = summ_data;
 
   skills_value.innerHTML = Render_List(cv.skills);

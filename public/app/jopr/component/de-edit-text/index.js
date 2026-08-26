@@ -18,8 +18,18 @@ class DeEditText extends HTMLElement
   set value(data)
   {
     this.original_value = data;
-    this.text_elem.textContent = data.text;
-    this.orig_elem.textContent = data.original_text
+
+    this.text_elem.textContent = data?.text;
+
+    if (Utils.Is_Empty(data?.original_text))
+    {
+      this.orig_field_elem.style.display = "none";
+    }
+    else
+    {
+      this.orig_field_elem.style.display = null;
+    }
+    this.orig_elem.textContent = data.original_text;
   }
 
   get value()
@@ -41,6 +51,16 @@ class DeEditText extends HTMLElement
 
   Render()
   {
+    let input_html = "<input type=\"text\" cid=\"input_elem\">";
+    if (this.hasAttribute("input-type"))
+    {
+      const input_type = this.getAttribute("input-type");
+      if (input_type == "textarea")
+      {
+        input_html = "<textarea cid=\"input_elem\"></textarea>";
+      }
+    }
+
     const dlg_id = "de_edit_text_dlg_" + crypto.randomUUID();
     const html = `
       <span cid="text_elem"></span>
@@ -50,8 +70,10 @@ class DeEditText extends HTMLElement
       <dialog id="${dlg_id}" popover>
         <header>Change Text</header>
         <main>
-          <div>Original Text: <span cid="orig_elem"></span></div>
-          <input type="text" cid="input_elem">
+          <div cid="orig_field_elem">
+            Original Text: <span cid="orig_elem"></span>
+          </div>
+          ${input_html}
         </main>
         <footer>
           <button cid="ok_btn" popovertarget="${dlg_id}" popovertargetaction="hide">OK</button>

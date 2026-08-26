@@ -1,7 +1,7 @@
 de-edit-text
 {
   display: flex;
-  align-items: center;
+  align-items: start;
   gap: 5px;
 
   dialog
@@ -18,14 +18,23 @@ de-edit-text
       padding: 0 0 10px 0;
       gap: 10px;
 
-      div
+      [cid="orig_field_elem"]
       {
         font-size: 1.3rem;
+        width: 50vw;
       }
       input
       {
         padding: 5px 10px;
         width: 50vw;
+        font-family: roboto-condensed;
+      }
+      textarea
+      {
+        padding: 5px 10px;
+        width: 50vw;
+        height: 50vw;
+        font-family: roboto-condensed;
       }
     }
     footer
