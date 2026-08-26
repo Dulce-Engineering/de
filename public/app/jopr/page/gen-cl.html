@@ -18,8 +18,9 @@
   <meta property="og:type" content="website">
   <link rel="shortcut icon" href="./image/favicon.ico">
 
-  <link rel="stylesheet" href="./component/de-info/style.css">
-  <link rel="stylesheet" href="./component/de-edit-text/style.css">
+  <link rel="stylesheet" href="../component/de-info/style.css">
+  <link rel="stylesheet" href="../component/de-edit-text/style.css">
+
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -43,27 +44,28 @@
     }
   }
   </script>
+  
   <script type="module">
-    import "../../dedial/dedial.js";
-    import "../../component/DeInputList/index3.js";
-    import "../../component/DeForm/index.js";
-    import "../../component/DeDialogForm/index.js";
-    import "../../component/DeDialogAlert/index.js";
-    import "../../component/DeDialogConfirm/index.js";
-    import "./component/de-toolbar-menu/index.js";
-    import "./component/de-info/index.js";
-    import "./component/de-edit-text/index.js";
+    import "/dedial/dedial.js";
+    import "/component/DeInputList/index3.js";
+    import "/component/DeForm/index.js";
+    import "/component/DeDialogForm/index.js";
+    import "/component/DeDialogAlert/index.js";
+    import "/component/DeDialogConfirm/index.js";
+    import "../component/de-toolbar-menu/index.js";
+    import "../component/de-info/index.js";
+    import "../component/de-edit-text/index.js";
 
     import * as fb_app from "firebase/app";
     import * as fb_ai from "firebase/ai";
-    import DB_SCHEMA from "./db/schema.js";
-    import Utils from "../../lib/Utils.js";
-    import JUtils from "./lib/Utils.js";
-    import Db from "./lib/Db.js";
-    import AI from "./lib/AI.js";
-    import Profile from "./lib/Profile.js";
-    import Job from "./lib/Job.js";
-    import New_Ctx from "./lib/ctx.js";
+    import DB_SCHEMA from "../db/schema.js";
+    import Utils from "/lib/Utils.js";
+    import JUtils from "../lib/Utils.js";
+    import Db from "../lib/Db.js";
+    import AI from "../lib/AI.js";
+    import Profile from "../lib/Profile.js";
+    import Job from "../lib/Job.js";
+    import New_Ctx from "../lib/ctx.js";
 
     Main();
     async function Main()
@@ -111,17 +113,17 @@
     @font-face 
     {
       font-family: roboto;
-      src: url("font/Roboto/Roboto-VariableFont_wdth-wght.ttf");
+      src: url("../font/Roboto/Roboto-VariableFont_wdth-wght.ttf");
     }
     @font-face 
     {
       font-family: roboto-condensed;
-      src: url("font/Roboto_Condensed/RobotoCondensed-VariableFont_wght.ttf");
+      src: url("../font/Roboto_Condensed/RobotoCondensed-VariableFont_wght.ttf");
     }
     @font-face 
     {
       font-family: mr-de-haviland;
-      src: url("font/Mr_De_Haviland/MrDeHaviland-Regular.ttf");
+      src: url("../font/Mr_De_Haviland/MrDeHaviland-Regular.ttf");
     }
 
     :root 

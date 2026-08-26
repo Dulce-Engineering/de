@@ -1,5 +1,5 @@
 import Utils from "../../../lib/Utils.js";
-import New_Ctx from "./ctx.js";
+import New_Ctx from "../lib/ctx.js";
 
 Main2();
 async function Main2()
@@ -213,7 +213,8 @@ async function Render_CV(job, ctx)
   //Render_Field(prof_links_field, links_html);
   Render_Field(prof_links_field, null);
 
-  summ_value.innerText = cv.summ_text || "Unable to generate.";
+  const summ_data = { original_text: cv.summ_text, text: cv.summ_text };
+  summ_value.value = summ_data;
 
   skills_value.innerHTML = Render_List(cv.skills);
 

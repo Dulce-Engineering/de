@@ -45,7 +45,7 @@ class DeEditText extends HTMLElement
     const html = `
       <span cid="text_elem"></span>
       <button cid="edit_btn" type="button" popovertarget="${dlg_id}" class="img-btn">
-        <img src="image/black/edit.svg">
+        <img src="/app/jopr/image/black/edit.svg">
       </button>
       <dialog id="${dlg_id}" popover>
         <header>Change Text</header>

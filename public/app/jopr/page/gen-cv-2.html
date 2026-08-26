@@ -4,29 +4,29 @@
 <head>
   <script async src="/lib/ga.js"></script>
   <link rel="manifest" href="/app/jopr/manifest.json">
-  <title>JOPR: Generate CV</title>
+  <title>JOPR: CV</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="">
-  <meta name="keywords" content="">
+  <meta name="description" content="Free local-first job tracker & AI CV builder. Track applications, customize resumes, and manage contacts securely from your browser with no signups required.">
+  <meta name="keywords" content="job tracker, job application tracker, AI resume builder, AI CV generator, local-first app, private job tracker, custom CV, tailored cover letters, resume editor, career manager, retro terminal, no signup job tracker, client-side resume builder, PWA job tracker">
   <meta name="author" content="Dulce Engineering Pty. Ltd.">
   <meta name="robots" content="index, follow">
   <meta property="og:title" content="JOPR">
-  <meta property="og:description" content="">
+  <meta property="og:description" content="Free local-first job tracker & AI CV builder. Track applications, customize resumes, and manage contacts securely from your browser with no signups required.">
   <meta property="og:image" content="https://dulceeng.com.au/app/jopr/image/screenshot-landscape.png">
   <meta property="og:url" content="https://dulceeng.com.au/app/jopr">
   <meta property="og:type" content="website">
-  <link rel="shortcut icon" href="./image/favicon.ico">
+  <link rel="shortcut icon" href="../image/favicon.ico">
 
-  <link rel="stylesheet" href="./component/de-info/style.css">
-  <link rel="stylesheet" href="./component/de-edit-text/style.css">
+  <link rel="stylesheet" href="../component/de-info/style.css">
+  <link rel="stylesheet" href="../component/de-edit-text/style.css">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "Website",
     "name": "JOPR",
     "url": "https://dulceeng.com.au/app/jopr",
-    "description": "",
+    "description": "Free local-first job tracker & AI CV builder. Track applications, customize resumes, and manage contacts securely from your browser with no signups required.",
     "image": "https://dulceeng.com.au/app/jopr/image/screenshot-landscape.png"
   }
   </script>
@@ -44,28 +44,28 @@
   }
   </script>
   <script type="module">
-    import "../../dedial/dedial.js";
-    import "../../component/DeInputList/index3.js";
-    import "../../component/DeForm/index.js";
-    import "../../component/DeDialogForm/index.js";
-    import "../../component/DeDialogAlert/index.js";
-    import "../../component/DeDialogConfirm/index.js";
-    import "./component/de-toolbar-menu/index.js";
-    import "./component/de-info/index.js";
-    import "./component/de-edit-text/index.js";
+    import "/dedial/dedial.js";
+    import "/component/DeInputList/index3.js";
+    import "/component/DeForm/index.js";
+    import "/component/DeDialogForm/index.js";
+    import "/component/DeDialogAlert/index.js";
+    import "/component/DeDialogConfirm/index.js";
+    import "../component/de-toolbar-menu/index.js";
+    import "../component/de-info/index.js";
+    import "../component/de-edit-text/index.js";
   </script>
-  <script src="./lib/gen-cv.js" type="module"></script>
+  <script src="./gen-cv.js" type="module"></script>
 
   <style>
     @font-face 
     {
       font-family: roboto;
-      src: url("font/Roboto/Roboto-VariableFont_wdth-wght.ttf");
+      src: url("../font/Roboto/Roboto-VariableFont_wdth-wght.ttf");
     }
     @font-face 
     {
       font-family: roboto-condensed;
-      src: url("font/Roboto_Condensed/RobotoCondensed-VariableFont_wght.ttf");
+      src: url("../font/Roboto_Condensed/RobotoCondensed-VariableFont_wght.ttf");
     }
 
     :root 
@@ -76,13 +76,80 @@
     }
     body 
     {
-      display: flex;
-      xflex-direction: column;
-      xalign-items: center;
+      display: grid;
+      grid-template-columns: 5fr 4fr;
+      grid-template-areas: 
+        "personal skills"
+        "experience experience"
+        "projects projects";
       min-height: 100vh;
       margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+      transition: opacity 0.5s ease-in-out;
+      opacity: 0;
+    }
+    @media screen
+    {
+      body
+      {
+        padding: 80px;
+        gap: 60px;
+      }
+      h1
+      {
+        font-size: 4rem;
+      }
+    }
+    @media print
+    {
+      body
+      {
+        padding: 30px 10px 0 10px;
+        gap: 30px;
+      }
+      h1
+      {
+        font-size: 3rem;
+      }
+    }
+
+    #about, #tech_skills
+    {
+      margin: 20px 0 0 0;
+    }
+    #personal
+    {
+      grid-area: personal;
+    }
+    #skills
+    {
+      grid-area: skills;
+
+      [cid="edu_title"]
+      {
+        margin: 0;
+      }
+      [cid="edu_institution"]
+      {
+        margin: 0 0 10px 0;
+      }
+    }
+    #experience
+    {
+      grid-area: experience;
+    }
+    #projects_article
+    {
+      grid-area: projects;
+
+      main[cid="items_elem"]
+      {
+        font-family: roboto-condensed;
+        gap: 20px;
+      }
+      div.no-break
+      {
+        padding: 0;
+      }
     }
 
     article
@@ -90,12 +157,19 @@
       display: flex;
       flex-direction: column;
       gap: 10px;
+      xalign-items: center;
+      align-items: stretch;
+
+      &.compact
+      {
+        flex-direction: row;
+      }
     }
     dl
     {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 4px;
       margin-block-start: 0;
       margin-block-end: 0;
     }
@@ -112,7 +186,6 @@
     h1
     {
       xdisplay: block;
-      font-size: 4rem;
       margin-block-start: 0;
       margin-block-end: 0;
       margin-inline-start: 0;
@@ -154,6 +227,12 @@
       margin-block-end: 0;
       padding-inline-start: 20px;
     }
+    #skills_value ul
+    {
+      display: block;
+      column-count: 2;
+      column-gap: 20px;
+    }
     p
     {
       line-height: 1.4rem;
@@ -179,6 +258,11 @@
         flex-direction: column;
         xgap: 30px;
       }
+      footer
+      {
+        font-family: roboto-condensed;
+        font-size: 1rem;
+      }
     }
     de-info
     {
@@ -193,7 +277,7 @@
     .no-break
     {
       break-inside: avoid;
-      padding: 40px 0 0 0;
+      padding: 30px 0 0 0;
     }
     .separate
     {
@@ -262,6 +346,13 @@
           font-family: roboto-condensed;
         }
       }
+      main 
+      {
+        div.legacy + div.legacy
+        {
+          padding: 0;
+        }
+      }
     }
   </style>
 
@@ -269,37 +360,50 @@
 
 <body>
 
-  <section class="sidebar coloured">
-
-    <!-- personal details -->
-    <article>
-      <h2>Contact</h2>
+  <section id="personal">
+    <header><h1 id="prof_name"></h1></header>
+    <article class="compact">
       <dl id="prof_email_field">
-        <dt><img src="image/black/mail.svg"></dt>
+        <dt><img src="../image/black/mail.svg"></dt>
         <dd></dd>
       </dl>
       <dl id="prof_phone_field">
-        <dt><img src="image/black/call.svg"></dt>
+        <dt><img src="../image/black/call.svg"></dt>
         <dd></dd>
       </dl>
+      <dl id="prof_ref_field">
+        <dt><img src="../image/black/info.svg"></dt>
+        <dd></dd>
+      </dl>
+    </article>
+    <article class="compact">
       <dl id="prof_address_field">
-        <dt><img src="image/black/home.svg"></dt>
-        <dd></dd>
-      </dl>
-      <dl id="prof_website_field">
-        <dt><img src="image/black/website.svg"></dt>
+        <dt><img src="../image/black/home.svg"></dt>
         <dd></dd>
       </dl>
       <dl id="prof_residency_field">
-        <dt><img src="image/black/passport.svg"></dt>
+        <dt><img src="../image/black/passport.svg"></dt>
+        <dd></dd>
+      </dl>
+    </article>
+    <article class="compact">
+      <dl id="prof_website_field">
+        <dt><img src="../image/black/website.svg"></dt>
         <dd></dd>
       </dl>
       <dl id="prof_links_field">
-        <dt><img src="image/black/link.svg"></dt>
+        <dt><img src="../image/black/link.svg"></dt>
         <dd id="prof_links_value"></dd>
       </dl>
     </article>
+    <!-- summary -->
+    <article id="about">
+      <h2>About Me</h2>
+      <de-edit-text id="summ_value"></de-edit-text>
+    </article>
+  </section>
 
+  <section id="skills">
     <!-- education -->
     <article>
       <h2>Education</h2>
@@ -310,29 +414,19 @@
         </div>
       </de-input-list>
     </article>
-
     <!-- skills -->
-    <article>
+    <article id="tech_skills">
       <h2>Technical Skills</h2>
       <div id="skills_value"></div>
     </article>
-
   </section>
 
-  <section class="main">
-    <header><h1 id="prof_name"></h1></header>
-
-    <!-- summary -->
-    <article>
-      <h2>About Me</h2>
-      <p id="summ_value"></p>
-    </article>
-
-    <!-- experience -->
-    <article>
-      <h2>Work Experience</h2>
-      <de-input-list id="jobs_list">
-        <div slot="item" class="no-break">
+  <!-- experience -->
+  <article id="experience">
+    <h2>Work Experience</h2>
+    <de-input-list id="jobs_list">
+      <div slot="item" class="no-break">
+        <div cid="best_job">
           <span class="subheading" cid="job_company"></span> | 
           <span class="subheading" cid="dates"></span>
           <de-edit-text cid="job_title" class="h3"></de-edit-text>
@@ -340,13 +434,30 @@
           <div class="separate" cid="job_points"></div>
           <div class="separate">Tech: <span cid="job_tech"></span></div>
         </div>
-      </de-input-list>
-    </article>
+        <div cid="legacy_job">
+          <span class="subheading" cid="legacy_job_title"></span> |
+          <span class="subheading" cid="legacy_job_company"></span> |
+          <span class="subheading" cid="legacy_dates"></span>
+        </div>
+      </div>
+      <footer slot="footer" class="no-break">*Role details and legacy jobs available on request.</footer>
+    </de-input-list>
+  </article>
 
-    <footer>Previous role details available on request.</footer>
-  </section>
+  <!-- projects -->
+  <article id="projects_article" style="display:none;">
+    <h2>Projects</h2>
+    <de-input-list id="projects_list">
+      <div slot="item" class="no-break">
+        <h3 cid="project_title"></h3>
+        <a cid="project_url" target="blank"></a><br>
+        <p class="separate" cid="project_description"></p>
+        <p class="separate">Tech: <span class="" cid="project_tech"></span></p>
+      </div>
+    </de-input-list>
+  </article>
 
-  <de-info id="info_elem" no-anim></de-info>
+  <de-info id="info_elem"></de-info>
 
 </body>
 

@@ -1,6 +1,4 @@
-import Utils from "../../../lib/Utils.js";
-import JOPR from "./Utils.js";
-import New_Ctx from "./ctx.js";
+import New_Ctx from "../lib/ctx.js";
 import * as Stats from "../../job-woper/lib/index.js";
 import DB_SCHEMA from "../db/schema.js";
 
@@ -947,13 +945,13 @@ async function On_Click_Delete_Job(event, job_id, ctx)
 
 function On_Click_Generate_CV(e, job_id, ctx)
 {
-  const url = "gen-cv-2.html?job_id=" + job_id;
+  const url = "page/gen-cv-2.html?job_id=" + job_id;
   window.open(url, "_blank");
 }
 
 function On_Click_Generate_Cover_Letter(e, job_id, ctx)
 {
-  const url = "gen-cl.html?job_id=" + job_id;
+  const url = "page/gen-cl.html?job_id=" + job_id;
   window.open(url, "_blank");
 }
 
