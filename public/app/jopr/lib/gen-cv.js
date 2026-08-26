@@ -19,7 +19,7 @@ async function Main2()
     await ctx.Job.Save(ctx, job);
   }
 
-  Render_CV(job, ctx);
+  await Render_CV(job, ctx);
   document.body.style.opacity = "1";
 }
 
@@ -193,9 +193,11 @@ function Render_Project_Item(event)
 
 // rendering ======================================================================
 
-function Render_CV(job, ctx)
+async function Render_CV(job, ctx)
 {
   const cv = job.cv;
+
+  document.title = "CV-" + await ctx.Job.Get_Org_Name(ctx, job);
 
   prof_name.innerText = cv.profile.name;
   Render_Field(prof_email_field, cv.profile.email);

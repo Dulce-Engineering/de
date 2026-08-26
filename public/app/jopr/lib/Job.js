@@ -465,6 +465,23 @@ class Job
 
     return "Updated now";
   }
+
+  static async Get_Org_Name(ctx, job)
+  {
+    let res = "";
+
+    if (job.company)
+    {
+      res = job.company;
+    }
+    else if (job.agency_id)
+    {
+      const agency = await ctx.Agency.Select_By_Id(ctx, job.agency_id);
+      res = agency?.name || "";
+    }
+
+    return res;
+  }
 }
 
 export default Job;
