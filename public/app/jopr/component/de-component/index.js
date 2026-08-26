@@ -10,6 +10,8 @@ class DeComponent extends HTMLElement
   {
     super();
     Utils.Bind(this, "On_");
+
+    this.rendered = false;
   }
 
   connectedCallback()
@@ -19,8 +21,16 @@ class DeComponent extends HTMLElement
 
   // properties ===============================================================
 
-  set value(obj)
+  set value(v)
   {
+    if (this.rendered)
+    {
+
+    }
+    else
+    {
+      this.pending_value = v;
+    }
   }
 
   get value()
@@ -55,6 +65,12 @@ class DeComponent extends HTMLElement
     Utils.Set_Id_Shortcuts(this, this, "cid");
 
     this.some_elem.addEventListener("click", this.On_Click_Btn);
+
+    this.rendered = true;
+    if (this.pending_value) 
+    {
+      this.value = this.pending_value;
+    }
   }
 }
 
