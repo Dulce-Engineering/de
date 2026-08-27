@@ -43,12 +43,35 @@ de-filter
         {
           display: flex;
           gap: 5px;
+          justify-content: center;
 
           button
           {
             --border-color: #ff0;
           }
         }
+      }
+    }
+  }
+
+  de-filter-bool
+  {
+    display: flex;
+    gap: 5px;
+
+    .options
+    {
+      display: flex;
+      gap: 5px;
+      border: 1px solid var(--border);
+      padding: 5px 10px;
+      color: var(--input-text);
+
+      label
+      {
+        display: flex;
+        align-items: center;
+        gap: 5px;
       }
     }
   }

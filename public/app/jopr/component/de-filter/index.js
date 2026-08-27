@@ -193,7 +193,7 @@ class DeFilterBool extends HTMLElement
     //console.log("DeFilterBool.connectedCallback()");
     this.innerHTML = `
       <label cid="label_elem"></label>
-      <span>
+      <span class="options">
         <label>
           <input cid="null_elem" type="radio" value="null" />
           Either
