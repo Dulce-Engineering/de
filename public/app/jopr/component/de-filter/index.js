@@ -63,7 +63,7 @@ class DeFilter extends HTMLElement
       this.dispatchEvent(new Event("search"));
     }
 
-    console.log("DeFilter.On_Click_Select_Filters_Btn(): form_values =", this.form_values);
+    //console.log("DeFilter.On_Click_Select_Filters_Btn(): form_values =", this.form_values);
   }
 
   On_Click_Delete_Btn(event)
@@ -118,17 +118,20 @@ class DeFilterBool extends HTMLElement
 {
   static tname = "de-filter-bool";
 
+  constructor()
+  {
+    super();
+    Utils.Bind(this, "On_");
+  }
+
   get value()
   {
+    //console.log("DeFilterBool.get value()");
     let res = null;
-    const input_value = this.input_elem.value;
-    if (input_value == "true")
+    const selected = this.querySelector('input[type="radio"]:checked');
+    if (selected)
     {
-      res = true;
-    }
-    else if (input_value == "false")
-    {
-      res = false;
+      res = selected.value === 'null' ? null : selected.value === 'true';
     }
 
     return res;
@@ -136,16 +139,24 @@ class DeFilterBool extends HTMLElement
 
   set value(v)
   {
-    let value = null;
-    if (v === true)
+    //console.log("DeFilterBool.set value():", v);
+
+    this.null_elem.checked = false;
+    this.true_elem.checked = false;
+    this.false_elem.checked = false;
+
+    if (v === null) 
     {
-      value = "true";
+      this.null_elem.checked = true;
     }
-    else if (v === false)
+    else if (v === true) 
     {
-      value = "false";
+      this.true_elem.checked = true;
     }
-    this.input_elem.value = value;
+    else if (v === false) 
+    {
+      this.false_elem.checked = true;
+    }
   }
 
   Get_Value_Label(value)
@@ -162,21 +173,49 @@ class DeFilterBool extends HTMLElement
     return res;
   }
 
+  Clear_Radios()
+  {
+
+  }
+
+  On_Change_Radio(event)
+  {
+    //console.log("DeFilterBool.On_Change_Radio()");
+    const changed_elem = event.target;
+
+    if (changed_elem != this.null_elem) this.null_elem.checked = false;
+    if (changed_elem != this.true_elem) this.true_elem.checked = false;
+    if (changed_elem != this.false_elem) this.false_elem.checked = false;
+  }
+
   connectedCallback()
   {
-    const input_id = "input-" + crypto.randomUUID();
+    //console.log("DeFilterBool.connectedCallback()");
     this.innerHTML = `
-      <label cid="label_elem" for="${input_id}"></label>
-      <select cid="input_elem" id="${input_id}">
-        <option></option>
-        <option value="true">Yes</option>
-        <option value="false">No</option>
-      </select>
+      <label cid="label_elem"></label>
+      <span>
+        <label>
+          <input cid="null_elem" type="radio" value="null" />
+          Either
+        </label>
+        <label>
+          <input cid="true_elem" type="radio" value="true" />
+          Yes
+        </label>
+        <label>
+          <input cid="false_elem" type="radio" value="false" />
+          No
+        </label>
+      </span>
     `;
     Utils.Set_Id_Shortcuts(this, this, "cid");
 
     const label_str = this.getAttribute("label");
     this.label_elem.textContent = label_str;
+
+    this.null_elem.addEventListener("change", this.On_Change_Radio);
+    this.true_elem.addEventListener("change", this.On_Change_Radio);
+    this.false_elem.addEventListener("change", this.On_Change_Radio);
   }
 }
 Utils.Register_Element(DeFilterBool);
