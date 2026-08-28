@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": 
   {
+    "deploy": "firebase deploy --only hosting",
     "startem": "firebase emulators:start --only hosting",
     "docs": "node script/generate-docs.js"
   },

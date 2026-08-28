@@ -6,9 +6,23 @@
   "configurations": 
   [
     {
+      "name": "Frontend",
+      "request": "launch",
+      "type": "chrome",
+      "url": "http://127.0.0.1/app/jopr/index.html",
+      "webRoot": "${workspaceFolder}"
+    },
+    {
+      "name": "Backend",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "cmd /c npm run startem",
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "name": "Scrape",
       "type": "node",
       "request": "launch",
-      "name": "Scrape",
       "skipFiles": [
         "<node_internals>/**"
       ],
@@ -16,24 +30,10 @@
       "cwd": "${workspaceFolder}\\public\\app\\job-woper"
     },
     {
-      "name": "Website",
-      "request": "launch",
-      "type": "chrome",
-      "url": "http://localhost/app/job-trak",
-      "webRoot": "${workspaceFolder}"
-    },
-    {
-      "name": "JOPR",
-      "request": "launch",
-      "type": "chrome",
-      "url": "http://127.0.0.1/app/jopr/index.html",
-      "webRoot": "${workspaceFolder}"
-    },
-    {
-      "name": "Server",
+      "name": "Deploy",
       "type": "node-terminal",
       "request": "launch",
-      "command": "cmd /c npm run startem",
+      "command": "cmd /c npm run deploy",
       "cwd": "${workspaceFolder}"
     },
   ]

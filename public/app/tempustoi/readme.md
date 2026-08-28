@@ -36,3 +36,15 @@
 ## Description
 
 TempusToi is a simple and efficient task scheduling tool that helps you stay on top of deadlines. It displays a sorted list of countdown timers, visually representing the time remaining for each task at a glance. Unlike cloud-based planners, TempusToi requires no online account or subscription—it runs entirely on your PC or mobile device, keeping your tasks private and accessible anytime.
+
+## To Do
+### Features
+- add tasks
+- edit events
+- cloud persistence
+- export events as .ics
+### UI/UX
+- group events by day
+- render event details /n as <br>
+### Bugs
+- play alarm for overdue timers not played before

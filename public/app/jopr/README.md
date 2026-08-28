@@ -64,30 +64,36 @@ https://www.youtube.com/watch?v=oVy-KKWsdNg&list=PLDTPrMoGHssBulfAaczSuk0f8luCiK
 - on jobs when job created show on list at corect position
 
 ## To Do
-- sort jobs by last update
-- sort jobs by application time
-- sort jobs by interview time
-- sort jobs by create time
-- on jobs show new jobs
+### Frontend
+- sort jobs by application time, interview time, create time
+- on jobs show new jobs label
 - filter jobs by agency
-
-- gen interview intro
-- gen interview study questions
-- gen interview talking points
-- jobs single view to get details including contact details
-- edit cl recipient name and content
 - add job and gen cv/cl in one go
-- on jobs show contact details
 - show job logs
-- add marketing material
+- display ai usage
+- show all contacts in jobs list
+- store ui filters and sorting
+### Backend
 - standardise db references (db vs db2)
 - link to job woper
 - add error reporting
+- move ai to backend
+- restrict and meter ai access
+### Features
+- gen interview intro
+- gen interview study questions
+- gen interview talking points
+- edit cl recipient name and content
+- pay for ai
+### Marketing
+- add marketing material
 
 ## Done
 - generate cover letter (done)
 - refactor cv page to show saved data (done)
 - add usage reporting (done)
+- sort jobs by last update
+- on jobs show contact details
 
 ### Competition
 - https://www.tealhq.com/tools/job-tracker
@@ -110,4 +116,3 @@ given the attached curriculum vitae and job description, what are some technical
 those are good tips. what parts of my experience, as listed in the curriculum vitae, could i mention at the interview that would be relevant? 
 
 based on the curriculum vitae and job description, what can i say when asked to introduce myself at the technical interview?
-
