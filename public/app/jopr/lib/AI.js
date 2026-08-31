@@ -430,39 +430,39 @@ class AI
           required: ["selected_job_ids", "justification"]
         });
       const sys_instruction = `
-            You are an expert technical recruiter and resume strategist. Your job is to select the 
-            most impactful and chronologically relevant professional roles from an applicant's history 
-            to tailor their CV for a specific target job opening.
-            
-            CRITICAL SELECTION MATRICES:
-            1. RECENCY CRITERIA: Always prioritize the applicant's current or most recent role 
-              to prevent major, unexplainable gaps at the top of the resume.
-            2. RELEVANCE CRITERIA: Select remaining roles based on technical overlap, 
-              architectural alignment, and scope of responsibility demanded by the job description.
-            3. EFFICIENCY: Select only the most meaningful positions (typically a maximum of 5 to 6 roles) 
-              that build a compelling narrative for this specific target position.
-            
-            Do not output conversational markdown text or text block wrappers outside the schema.
-          `;
+        You are an expert technical recruiter and resume strategist. Your job is to select the 
+        most impactful and chronologically relevant professional roles from an applicant's history 
+        to tailor their CV for a specific target job opening.
+        
+        CRITICAL SELECTION MATRICES:
+        1. RECENCY CRITERIA: Always prioritize the applicant's current or most recent role 
+          to prevent major, unexplainable gaps at the top of the resume. Select from the ten most recent roles.
+        2. RELEVANCE CRITERIA: Select remaining roles based on technical overlap, 
+          architectural alignment, and scope of responsibility demanded by the job description.
+        3. EFFICIENCY: Select only the most meaningful positions (typically a maximum of 5 to 6 roles) 
+          that build a compelling narrative for this specific target position.
+        
+        Do not output conversational markdown text or text block wrappers outside the schema.
+      `;
       const prompt = `
-            Analyze the applicant's complete employment timeline against the new target job description. 
-            Select the optimal historical roles to feature on a tailored CV.
+        Analyze the applicant's complete employment timeline against the new target job description. 
+        Select the optimal historical roles to feature on a tailored CV.
 
-            ### TARGET JOB DESCRIPTION:
-            - Title: ${target_job.role_title}
-            - Description Text:
-            \`\`\`text
-            ${target_job.description}
-            \`\`\`
+        ### TARGET JOB DESCRIPTION:
+        - Title: ${target_job.role_title}
+        - Description Text:
+        \`\`\`text
+        ${target_job.description}
+        \`\`\`
 
-            ### COMPLETE APPLICANT EMPLOYMENT HISTORY (JSON):
-            \`\`\`json
-            ${JSON.stringify(job_summaries, null, 2)}
-            \`\`\`
+        ### COMPLETE APPLICANT EMPLOYMENT HISTORY (JSON):
+        \`\`\`json
+        ${JSON.stringify(job_summaries, null, 2)}
+        \`\`\`
 
-            OUTPUT REQUIREMENT:
-            Return a structured JSON object matching the requested schema containing the selected IDs.
-          `;
+        OUTPUT REQUIREMENT:
+        Return a structured JSON object matching the requested schema containing the selected IDs.
+      `;
 
       const ai_res = await this.Prompt(prompt, schema, null, sys_instruction);
       res = ai_res?.selected_job_ids;
