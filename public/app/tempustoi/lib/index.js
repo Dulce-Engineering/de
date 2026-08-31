@@ -49,12 +49,18 @@ async function Main()
   load_btn.addEventListener("click", On_Click_Load_Btn);
   menu_close_btn.addEventListener("click", On_Click_Close_Menu);
 
-  Increment_Timers();
+  const alarmed_timers = Check_Startup_Alarms();
   const timers = Select_Timers();
   Render_Timers(timers);
   Update_Nav();
   date_elem.innerText = 
     new Date().toLocaleDateString(undefined, { dateStyle: "full" });
+
+  for (const timer of alarmed_timers)
+  {
+    Alarm_On(timer);
+    setTimeout(() => Alarm_Off(timer), 30000);
+  }
   
   //Ads();
 }
@@ -330,9 +336,14 @@ function On_Timer_Completed(e)
 {
   const timer_elem = e.target;
   const timer = timer_elem.timer;
-  if (timer.recurrence.rate > 0)
+  if (timer.recurrence && timer.recurrence.rate > 0)
   {
     Increment_Timer(timer);
+    Save_Timer(timer);
+  }
+  else
+  {
+    timer.triggered = true;
     Save_Timer(timer);
   }
 
@@ -904,19 +915,36 @@ function Delete_Timer(id)
   }
 }
 
-function Increment_Timers()
+function Check_Startup_Alarms()
 {
-  let is_incremented = false;
+  let is_changed = false;
+  let alarmed_timers = [];
   let timers = Select_Timers() || [];
   for (const timer of timers)
   {
-    is_incremented = is_incremented || Increment_Timer(timer);
+    if (timer.time && timer.time <= Date.now())
+    {
+      if (timer.recurrence && timer.recurrence.rate > 0)
+      {
+        alarmed_timers.push({ id: timer.id });
+        Increment_Timer(timer);
+        is_changed = true;
+      }
+      else if (!timer.triggered)
+      {
+        alarmed_timers.push({ id: timer.id });
+        timer.triggered = true;
+        is_changed = true;
+      }
+    }
   }
 
-  if (is_incremented)
+  if (is_changed)
   {
     Save_Timers(timers);
   }
+
+  return alarmed_timers;
 }
 
 function Increment_Timer(timer)
