@@ -1,5 +1,5 @@
-import Utils from "../../../lib/Utils.js";
-import New_Ctx from "../lib/ctx.js";
+import Utils from "../../../lib/Utils.js?v=2";
+import New_Ctx from "../lib/ctx.js?v=2";
 
 Main2();
 async function Main2()

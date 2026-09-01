@@ -1,4 +1,4 @@
-import Utils from "../../../lib/Utils.js";
+import Utils from "../../../lib/Utils.js?v=2";
 
 /**
  * Service class for interacting with Firebase AI (Gemini).

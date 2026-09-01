@@ -1,6 +1,6 @@
-import New_Ctx from "../lib/ctx.js";
-import * as Stats from "../../job-woper/lib/index.js";
-import DB_SCHEMA from "../db/schema.js";
+import New_Ctx from "../lib/ctx.js?v=2";
+import * as Stats from "../../job-woper/lib/index.js?v=2";
+import DB_SCHEMA from "../db/schema.js?v=2";
 
 const work_types =
 {
