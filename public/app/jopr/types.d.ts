@@ -94,6 +94,7 @@ interface UserProfile {
 }
 
 interface ExtractedCVResult {
+  profile?: UserProfile | null;
   educations: EducationDetails[];
   career: Array<CareerJobInput & CareerJobDetails>;
 }

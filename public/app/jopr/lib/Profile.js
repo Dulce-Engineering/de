@@ -328,6 +328,12 @@ class Profile
 
     return html;
   }
+
+  static async Is_Blank_Install(ctx)
+  {
+    const profile_count = await  ctx.db.Count(Profile.table_name);
+    return profile_count > 0;
+  }
 }
 
 export default Profile;

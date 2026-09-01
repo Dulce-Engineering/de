@@ -316,13 +316,95 @@ class AI
   }
 
   /**
-   * Extracts education history and full career history from a CV file blob.
+   * Extracts user profile data, education history, and full career history from a CV file blob.
    * @param {Blob} cv_blob - The CV file blob (e.g. PDF).
-   * @returns {Promise<ExtractedCVResult>} The extracted education and career history.
+   * @param {Function} [notify_fn=console.info] - Progress callback function.
+   * @returns {Promise<ExtractedCVResult>} The extracted profile, education, and career history.
    */
   async Extract_CV(cv_blob, notify_fn = console.info)
   {
     const base64 = await Utils.Blob_To_Base64(cv_blob);
+    const file = { mime_type: cv_blob.type, data: base64 };
+
+    notify_fn("Processing profile...");
+    const profile_schema =
+    {
+      type: "object",
+      properties:
+      {
+        name:
+        {
+          type: "string",
+          nullable: true,
+          description: "The full name of the candidate."
+        },
+        email:
+        {
+          type: "string",
+          nullable: true,
+          description: "The candidate's contact email address."
+        },
+        phone:
+        {
+          type: "string",
+          nullable: true,
+          description: "The candidate's contact phone number."
+        },
+        address:
+        {
+          type: "string",
+          nullable: true,
+          description: "The candidate's address, city, state, or location."
+        },
+        url:
+        {
+          type: "string",
+          nullable: true,
+          description: "The candidate's personal portfolio or website URL."
+        },
+        residency_status:
+        {
+          type: "string",
+          nullable: true,
+          description: "The candidate's residency or work authorization status if stated (e.g., Citizen, Permanent Resident, Visa)."
+        },
+        seek_url:
+        {
+          type: "string",
+          nullable: true,
+          description: "The candidate's Seek profile URL if mentioned."
+        },
+        linkedin_url:
+        {
+          type: "string",
+          nullable: true,
+          description: "The candidate's LinkedIn profile URL if mentioned."
+        },
+        personal_summary:
+        {
+          type: "string",
+          nullable: true,
+          description: "A summary, professional profile statement, or objective from the CV."
+        },
+        skills:
+        {
+          type: "string",
+          nullable: true,
+          description: "A summary list of core skills, technical competencies, and abilities from the CV."
+        },
+        interests:
+        {
+          type: "string",
+          nullable: true,
+          description: "Personal interests, hobbies, or activities mentioned in the CV."
+        }
+      }
+    };
+    const profile_prompt =
+      "Extract the candidate's personal profile information from the following CV document. " +
+      "Return an object with name, email, phone, address, url, residency_status, seek_url, linkedin_url, personal_summary, skills, and interests.";
+    const profile = await this.Prompt(profile_prompt, profile_schema, file);
+    AI.Clean_Empty_Fields(profile);
 
     notify_fn("Processing education...");
     const education_schema =
@@ -355,7 +437,6 @@ class AI
     let prompt =
       "Extract the education history from the following CV document. " +
       "Return a list of education objects, each with title, institution, and year.";
-    const file = { mime_type: cv_blob.type, data: base64 };
     const educations = await this.Prompt(prompt, education_schema, file);
 
     notify_fn("Processing career...");
@@ -394,7 +475,7 @@ class AI
       Object.assign(job, job_data);
     }
 
-    return { educations, career };
+    return { profile, educations, career };
   }
 
   /**

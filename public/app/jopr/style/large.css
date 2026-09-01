@@ -196,6 +196,13 @@
     }
   }
 
+  main#marketing_body
+  {
+    header
+    {
+      text-align: center;
+    }
+  }
   main
   {
     width: 100%;

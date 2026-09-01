@@ -24,15 +24,14 @@ async function Main()
   }
 
   const ctx = await New_Ctx();
-
-  const jobs_count = await ctx.Job.Count(ctx);
-  if (jobs_count > 0)
+  const new_install = await ctx.Profile.Is_Blank_Install(ctx);
+  if (new_install)
   {
-    Render_App(ctx);
+    Render_Marketing(ctx);
   }
   else
   {
-    Render_Marketing(ctx);
+    Render_App(ctx);
   }
 
   import_btn.addEventListener("click", () => On_Click_Import_Btn(ctx));
@@ -44,6 +43,7 @@ function Render_Marketing(ctx)
 {
   launch_btn.addEventListener("click", e => On_Click_Launch_Btn(ctx));
 
+  nav_elem.classList.add("hidden");
   app_body.classList.add("hidden");
   marketing_body.classList.remove("hidden");
 }
@@ -51,6 +51,7 @@ function Render_Marketing(ctx)
 async function Render_App(ctx)
 {
   marketing_body.classList.add("hidden");
+  nav_elem.classList.remove("hidden");
   app_body.classList.remove("hidden");
 
   //Set_Options(note_status_select, ctx.Job.job_status, s => s.id, s => s.label);
@@ -114,7 +115,7 @@ function On_Click_Launch_Btn(ctx)
   Render_App(ctx);
   Show_View(profile_elem);
 
-  Alert("Please add details regarding your work kistory.");
+  On_Click_AI_Add_Profile(ctx);
 }
 
 async function On_Click_Title(ctx)
@@ -312,18 +313,24 @@ async function On_Click_AI_Add_Profile(ctx)
   const files = await ctx.Utils.Select_Files();
   if (files && files.length > 0) 
   {
-    info_elem.Info("Processing CV...");
+    info_elem.Info("Reading CV...");
     const cv_blob = files[0];
     const cv_data = await ctx.ai.Extract_CV(cv_blob, info_elem.Info);
 
     info_elem.Info("Saving CV data...");
-    await ctx.db2.Delete_All("education");
-    await ctx.db2.Insert_Items("education", cv_data.educations);
-    await ctx.db2.Delete_All("career");
-    await ctx.db2.Insert_Items("career", cv_data.career);
+    if (cv_data.profile)
+    {
+      await ctx.db2.Delete_All(ctx.Profile.table_name);
+      await ctx.Profile.Save(ctx, cv_data.profile);
+    }
+    await ctx.db2.Delete_All(ctx.Profile.edu_table_name);
+    await ctx.db2.Insert_Items(ctx.Profile.edu_table_name, cv_data.educations);
+    await ctx.db2.Delete_All(ctx.Profile.job_table_name);
+    await ctx.db2.Insert_Items(ctx.Profile.job_table_name, cv_data.career);
 
     info_elem.Info();
     Alert("CV extracted successfully!");
+    Render_Profile(ctx);
     Render_Education(ctx);
     Render_Career(ctx);
   }
