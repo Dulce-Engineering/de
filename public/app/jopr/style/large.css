@@ -618,7 +618,7 @@
     }
     textarea
     {
-      min-height: 200px;
+      min-height: 100px;
       min-width: 50vw;
     }
     option
@@ -989,13 +989,17 @@
   {
     [cid="tech_label"],
     [cid="responsibilities_label"],
-    [cid="projects_label"]
+    [cid="projects_label"],
+    [cid="summary_label"],
+    [cid="company_label"]
     {
       justify-self: start;
     }
     [cid="tech_label"], [name="tech"],
     [cid="responsibilities_label"], [name="responsibilities"],
-    [cid="projects_label"], [name="projects"]
+    [cid="projects_label"], [name="projects"],
+    [cid="summary_label"], [name="summary"],
+    [cid="company_label"], [name="company_description"]
     {
       grid-column: span 4;
     }

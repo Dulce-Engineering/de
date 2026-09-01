@@ -474,11 +474,20 @@
     <input slot="fields" type="date" name="start_date">
     <label slot="fields">End Time</label>
     <input slot="fields" type="date" name="end_date">
-    <label cid="tech_label" slot="fields">Technologies</label>
-    <textarea slot="fields" name="tech" rows="4"></textarea>
-    <label cid="responsibilities_label" slot="fields">Summary Description</label>
+
+    <label cid="summary_label" slot="fields">Role Summary</label>
+    <textarea slot="fields" name="summary" rows="4"></textarea>
+
+    <label cid="company_label" slot="fields">Company Description</label>
+    <textarea slot="fields" name="company_description" rows="4"></textarea>
+
+    <label cid="tech_label" slot="fields">Technologies / Software</label>
+    <textarea slot="fields" name="tech" rows="2"></textarea>
+
+    <label cid="responsibilities_label" slot="fields">Role Description / Responsibilities / Duties</label>
     <textarea slot="fields" name="responsibilities" rows="4"></textarea>
-    <label cid="projects_label" slot="fields">Projects</label>
+    
+    <label cid="projects_label" slot="fields">Projects / Achievements / Accomplishments</label>
     <textarea slot="fields" name="projects" rows="4"></textarea>
   </de-dialog-form>
 

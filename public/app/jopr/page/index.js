@@ -312,16 +312,20 @@ async function On_Click_AI_Add_Profile(ctx)
   const files = await ctx.Utils.Select_Files();
   if (files && files.length > 0) 
   {
-    console.info("Processing CV...");
+    info_elem.Info("Processing CV...");
     const cv_blob = files[0];
-    const cv_data = await ctx.ai.Extract_CV(ctx.ai, cv_blob);
+    const cv_data = await ctx.ai.Extract_CV(cv_blob, info_elem.Info);
 
+    info_elem.Info("Saving CV data...");
     await ctx.db2.Delete_All("education");
     await ctx.db2.Insert_Items("education", cv_data.educations);
     await ctx.db2.Delete_All("career");
     await ctx.db2.Insert_Items("career", cv_data.career);
 
+    info_elem.Info();
     Alert("CV extracted successfully!");
+    Render_Education(ctx);
+    Render_Career(ctx);
   }
 }
 

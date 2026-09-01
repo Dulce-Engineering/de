@@ -65,6 +65,7 @@ https://www.youtube.com/watch?v=oVy-KKWsdNg&list=PLDTPrMoGHssBulfAaczSuk0f8luCiK
 
 ## To Do
 ### Frontend
+- complete ai cv import progress indication
 - sort jobs by application time, interview time, create time
 - on jobs show new jobs label
 - filter jobs by agency

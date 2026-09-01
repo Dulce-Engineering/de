@@ -1,3 +1,5 @@
+import Utils from "../../../lib/Utils.js";
+
 /**
  * Service class for interacting with Firebase AI (Gemini).
  */
@@ -240,63 +242,77 @@ class AI
    */
   async Extract_Career_Job(job, file)
   {
-    console.info("Processing job " + job.role_titles + "...");
-    const career_schema =
+    const job_schema =
     {
-      type: "array",
-      items:
+      type: "object",
+      properties:
       {
-        type: "object",
-        properties:
+        start_date:
         {
-          start_date:
-          {
-            type: "string",
-            description: "The starting date of the role in ISO format (YYYY-MM-DD) if available, or just the year (YYYY) if the full date cannot be determined."
-          },
-          end_date:
-          {
-            type: "string",
-            description: "The ending date of the role in ISO format (YYYY-MM-DD) if available, or just the year (YYYY) if the full date cannot be determined."
-          },
-          work_type:
-          {
-            type: "string",
-            description: "The type of work performed (e.g., full-time, part-time, contract).",
-            enum: ["full-time", "part-time", "contract", "temp", "casual", "internship", "volunteer", "vacation", "other"],
-          },
-          location:
-          {
-            type: "string",
-            description: "The location of the role. This could be a city, state, or country depending on the level of detail available in the CV."
-          },
-          tech:
-          {
-            type: "string",
-            description: "The technologies or tools used in the role. This could include programming languages, software, methodologies, or any other relevant technical skills mentioned in the CV."
-          },
-          responsibilities:
-          {
-            type: "string",
-            description: "The responsibilities and achievements in the role."
-          },
-          projects:
-          {
-            type: "string",
-            description: "The projects worked on in the role."
-          },
+          type: "string",
+          nullable: true,
+          description: "The starting date of the role in ISO format (YYYY-MM-DD) if available, or just the year (YYYY) if the full date cannot be determined."
         },
-      }
-      //required: ["role_titles", "company_name"]
+        end_date:
+        {
+          type: "string",
+          nullable: true,
+          description: "The ending date of the role in ISO format (YYYY-MM-DD) if available, or just the year (YYYY) if the full date cannot be determined."
+        },
+        work_type:
+        {
+          type: "string",
+          nullable: true,
+          description: "The type of work performed (e.g., full-time, part-time, contract).",
+          enum: ["full-time", "part-time", "contract", "temp", "casual", "internship", "volunteer", "vacation", "other"],
+        },
+        location:
+        {
+          type: "string",
+          nullable: true,
+          description: "The location of the role. This could be a city, state, or country depending on the level of detail available in the CV."
+        },
+        company_description:
+        {
+          type: "string",
+          nullable: true,
+          description: "An optional description of the company at which the role took place."
+        },
+        tech:
+        {
+          type: "string",
+          nullable: true,
+          description: "The technologies or tools used in the role. This could include programming languages, software, methodologies, or any other relevant technical skills mentioned in the CV."
+        },
+        responsibilities:
+        {
+          type: "string",
+          nullable: true,
+          description: "The responsibilities and duties undertaken in the role."
+        },
+        projects:
+        {
+          type: "string",
+          nullable: true,
+          description: "The projects worked on in the role, accomplishments, or achievements."
+        },
+        summary:
+        {
+          type: "string",
+          nullable: true,
+          description: "Any additional information provided about the job or summary data that may be available."
+        },
+      },
     };
     const prompt =
-      "From the given CV document extract the deatils of the job titled " + job.role_titles + " at company " + job.company + ". " +
-      "Return a job object with start_date, end_date, work_type, location, tech, responsibilities, and projects.";
-    const job_details = await this.Prompt(prompt, career_schema, file);
-    console.log("Extract_Career_Job(): Extracted job_details:", job_details);
-    console.info("...Finished.");
+      "From the given CV document extract the deatils of the job titled " + job.role_titles + 
+      " at company " + job.company + ". Return a single job object with start_date, " +
+      "end_date, work_type, location, company description, tech, responsibilities, " +
+      "projects, and any role summary details.";
+    const job_details = await this.Prompt(prompt, job_schema, file);
+    AI.Clean_Empty_Fields(job_details);
 
-    return job_details && job_details.length > 0 ? job_details[0] : null;
+    return job_details || null;
   }
 
   /**
@@ -304,11 +320,11 @@ class AI
    * @param {Blob} cv_blob - The CV file blob (e.g. PDF).
    * @returns {Promise<ExtractedCVResult>} The extracted education and career history.
    */
-  async Extract_CV(cv_blob)
+  async Extract_CV(cv_blob, notify_fn = console.info)
   {
-    const base64 = await Blob_To_Base64(cv_blob);
+    const base64 = await Utils.Blob_To_Base64(cv_blob);
 
-    console.info("Processing educations...");
+    notify_fn("Processing education...");
     const education_schema =
     {
       type: "array",
@@ -341,10 +357,8 @@ class AI
       "Return a list of education objects, each with title, institution, and year.";
     const file = { mime_type: cv_blob.type, data: base64 };
     const educations = await this.Prompt(prompt, education_schema, file);
-    console.log("Extract_CV(): Extracted educations:", educations);
-    console.info("...Finished.");
 
-    console.info("Processing career...");
+    notify_fn("Processing career...");
     const career_schema =
     {
       type: "array",
@@ -372,11 +386,10 @@ class AI
       //"Return a list of job objects, each with role_titles, company_name, start_date, end_date, work_type, location, tech, responsibilities, and projects.";
       "Return a list of job objects, each with role_titles and company_name.";
     const career = await this.Prompt(prompt, career_schema, file);
-    console.log("Extract_CV(): Extracted career:", career);
-    console.info("...Finished.");
 
     for (const job of career)
     {
+      notify_fn("Processing job " + job.role_titles + "...");
       const job_data = await this.Extract_Career_Job(job, file);
       Object.assign(job, job_data);
     }
@@ -894,6 +907,25 @@ class AI
     }
 
     return prompt_res;
+  }
+
+  static Clean_Empty_Fields(obj)
+  {
+    if (obj)
+    {
+      // Post-processing cleanup to guarantee no "null" or "undefined" strings leak through
+      for (const [key, value] of Object.entries(obj))
+      {
+        if (typeof value === "string")
+        {
+          const trimmed = value.trim().toLowerCase();
+          if (trimmed === "null" || trimmed === "undefined" || trimmed === "n/a" || trimmed === "")
+          {
+            obj[key] = null;
+          }
+        }
+      }
+    }
   }
 }
 
