@@ -6,8 +6,8 @@ import Utils from "../../../lib/Utils.js?v=2";
 import Contact from "./Contact.js?v=2";
 import Agency from "./Agency.js?v=2";
 import Project from "./Project.js?v=2";
-import * as fb_app from "firebase/app?v=2";
-import * as fb_ai from "firebase/ai?v=2";
+import * as fb_app from "firebase/app";
+import * as fb_ai from "firebase/ai";
 import DB_SCHEMA from "../db/schema.js?v=2";
 
 async function New_Ctx()
