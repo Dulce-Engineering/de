@@ -48,25 +48,49 @@ interface ExtractedJobResult {
 }
 
 interface CareerJobDetails {
-  start_date?: string;
-  end_date?: string;
-  work_type?: string;
-  location?: string;
-  tech?: string;
-  responsibilities?: string;
-  projects?: string;
+  start_date?: number | string | null;
+  end_date?: number | string | null;
+  work_type?: 'full-time' | 'part-time' | 'contract' | 'temp' | 'casual' | 'internship' | 'volunteer' | 'vacation' | 'other' | string | null;
+  location?: string | null;
+  summary?: string | null;
+  company_description?: string | null;
+  tech?: string | null;
+  responsibilities?: string | null;
+  projects?: string | null;
 }
 
 interface CareerJobInput {
-  role_titles: string;
-  company?: string;
-  company_name?: string;
+  role_titles: string | null;
+  company?: string | null;
+  company_name?: string | null;
+}
+
+interface CareerJobRecord extends CareerJobInput, CareerJobDetails {
+  id?: number | string;
 }
 
 interface EducationDetails {
-  title: string;
-  institution: string;
-  year: number | null;
+  id?: number | string;
+  title: string | null;
+  institution: string | null;
+  year: number | string | null;
+}
+
+type EducationRecord = EducationDetails;
+
+interface UserProfile {
+  id?: number | string;
+  name?: string | null;
+  email?: string | null;
+  phone?: string | null;
+  address?: string | null;
+  url?: string | null;
+  residency_status?: string | null;
+  seek_url?: string | null;
+  linkedin_url?: string | null;
+  personal_summary?: string | string[] | null;
+  skills?: string | string[] | null;
+  interests?: string | string[] | null;
 }
 
 interface ExtractedCVResult {
@@ -74,15 +98,8 @@ interface ExtractedCVResult {
   career: Array<CareerJobInput & CareerJobDetails>;
 }
 
-interface FullProfile {
-  id: number | string;
-  name: string;
-  email?: string;
-  phone?: string;
-  linkedin_url?: string;
-  seek_url?: string;
-  personal_summary?: string;
-  skills?: string;
-  work_history?: Array<any>;
-  education?: Array<any>;
+interface FullProfile extends UserProfile {
+  work_history?: Array<CareerJobRecord>;
+  job_history?: Array<CareerJobRecord>;
+  education?: Array<EducationRecord>;
 }
