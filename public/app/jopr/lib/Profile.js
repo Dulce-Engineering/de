@@ -332,7 +332,7 @@ class Profile
   static async Is_Blank_Install(ctx)
   {
     const profile_count = await  ctx.db.Count(Profile.table_name);
-    return profile_count > 0;
+    return profile_count < 1;
   }
 }
 

@@ -384,8 +384,13 @@ class Utils
 
   static Get_Attr_Def(elem, name, def)
   {
-    const attr_val = elem.getAttribute(name);
-    return Utils.hasValue(attr_val) ? attr_val : def;
+    let res = def;
+    if (elem?.hasAttribute(name))
+    {
+      const attr_val = elem.getAttribute(name);
+      if (Utils.hasValue(attr_val)) res = attr_val;
+    }
+    return res;
   }
 
   static getFromLocalStorge(key, defaultValue)

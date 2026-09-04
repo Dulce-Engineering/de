@@ -13,23 +13,21 @@ class DeContactList extends HTMLElement
 
   connectedCallback()
   {
-    if (this.hasAttribute("view-type"))
+    this.view_type = Utils.Get_Attr_Def(this, "view-type", "list");
+    if (this.view_type == "select")
     {
-      const view_type = this.getAttribute("view-type");
-      if (view_type == "select")
-      {
-        this.view_type = "select";
-        this.Render_Select();
-      }
-      else if (view_type == "sublist")
-      {
-        this.view_type = "sublist";
-        this.Render_Sublist();
-      }
+      this.Render_Select();
+    }
+    else if (this.view_type == "sublist")
+    {
+      this.Render_Sublist();
+    }
+    else if (this.view_type == "compact")
+    {
+      this.Render_Sublist();
     }
     else
     {
-      this.view_type = "list";
       this.Render();
     }
   }
@@ -121,6 +119,23 @@ class DeContactList extends HTMLElement
 
   // rendering ================================================================
 
+  // read-only compact list
+  Render_Compact()
+  {
+    const html = `
+      <de-input-list cid="contacts_list">
+        <div slot="item" class="contact-item">
+          <label cid="contact_title_elem"></label>
+        </div>
+      </de-input-list>
+    `;
+    this.innerHTML = html;
+    Utils.Set_Id_Shortcuts(this, this, "cid");
+
+    this.contacts_list.addEventListener("render", this.On_Render_Item);
+  }
+
+  // simple list for selecting a contact
   Render_Select()
   {
     const html = `
@@ -137,6 +152,7 @@ class DeContactList extends HTMLElement
     this.contacts_list.addEventListener("render", this.On_Render_Item);
   }
 
+  // compact list with editing options
   Render_Sublist()
   {
     const html = `
@@ -169,6 +185,7 @@ class DeContactList extends HTMLElement
     this.sel_contact_btn.addEventListener("click", this.On_Click_Sel);
   }
 
+  // default large list with all editing options
   Render()
   {
     const html = `
