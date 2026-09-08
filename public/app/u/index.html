@@ -1,13 +1,31 @@
 <html>
   <head>
+    <script type="importmap">
+    {
+      "imports": 
+      {
+        "firebase/app": "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js",
+        "firebase/storage": "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js"
+      }
+    }
+    </script>
+
     <script type="module">
       import { initializeApp } from "firebase/app";
-      import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+      import { 
+        getStorage, 
+        ref, 
+        uploadBytesResumable, 
+        getDownloadURL, connectStorageEmulator } from "firebase/storage";
 
       const firebaseConfig = await fetch("/__/firebase/init.json").then((res) => res.json());
 
       const app = initializeApp(firebaseConfig);
       const storage = getStorage(app);
+      if (location.hostname === "localhost" || location.hostname === "127.0.0.1") 
+      {
+        connectStorageEmulator(storage, "127.0.0.1", 9199);
+      }
 
       uploadBtn_elem.addEventListener("click", On_Click);
 
