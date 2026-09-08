@@ -24,7 +24,7 @@ class DeContactList extends HTMLElement
     }
     else if (this.view_type == "compact")
     {
-      this.Render_Sublist();
+      this.Render_Compact();
     }
     else
     {
@@ -81,16 +81,18 @@ class DeContactList extends HTMLElement
     const item_elem = event.detail.item_elem;
     const contact = event.detail.obj;
 
-    const name = contact.name || contact.email || "N/A";
-    const title = Utils.Append_Str(name, contact.agency?.name, " @ ");
-    item_elem.contact_title_elem.textContent = title;
-    if (this.view_type == "select")
+    if (item_elem.contact_title_elem)
+    {
+      const name = contact.name || contact.email || "N/A";
+      const title = Utils.Append_Str(name, contact.agency?.name, " @ ");
+      item_elem.contact_title_elem.textContent = title;
+    }
+    if (item_elem.sel_contact_radio)
     {
       const radio_id = "scr_" + crypto.randomUUID();
       item_elem.sel_contact_radio.id = radio_id;
       item_elem.contact_title_elem.htmlFor = radio_id;
     }
-
     if (item_elem.contact_email_elem)
       item_elem.contact_email_elem.value = contact.email;
     if (item_elem.contact_phone_elem)
@@ -99,6 +101,10 @@ class DeContactList extends HTMLElement
       item_elem.contact_position_elem.value = contact.position;
     if (item_elem.contact_linkedin_elem)
       item_elem.contact_linkedin_elem.value = contact.linkedin;
+    if (item_elem.contact_xxx_elem)
+    {
+      // name - position 
+    }
 
     if (item_elem.contact_menu)
       item_elem.contact_menu.event_data = contact;

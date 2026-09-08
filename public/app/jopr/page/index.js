@@ -825,6 +825,7 @@ function Render_Job_Item(event, ctx)
 
   const contact = { ...job.contact, agency_name: job.agency_name };
   item_elem.contact_details_elem.value = contact;
+  item_elem.contacts_elem.value = job.contacts;
 
   item_elem.job_details_elem.value = job;
 
