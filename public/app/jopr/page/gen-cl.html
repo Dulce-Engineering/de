@@ -56,8 +56,8 @@
     import "../component/de-info/index.js?v=2";
     import "../component/de-edit-text/index.js?v=2";
 
-    import * as fb_app from "firebase/app?v=2";
-    import * as fb_ai from "firebase/ai?v=2";
+    import * as fb_app from "firebase/app";
+    import * as fb_ai from "firebase/ai";
     import DB_SCHEMA from "../db/schema.js?v=2";
     import Utils from "/lib/Utils.js?v=2";
     import JUtils from "../lib/Utils.js?v=2";
@@ -103,6 +103,7 @@
       company_elem.innerText = job.company;
       link_elem.innerText = job.link;
 
+      document.title = "CL-" + await ctx.Job.Get_Org_Name(ctx, job);
       cover_letter.innerText = job.cl;
 
       signature_elem.innerText = profile.name;
