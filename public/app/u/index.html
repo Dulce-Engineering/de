@@ -1,0 +1,56 @@
+<html>
+  <head>
+    <script type="module">
+      import { initializeApp } from "firebase/app";
+      import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+
+      const firebaseConfig = await fetch("/__/firebase/init.json").then((res) => res.json());
+
+      const app = initializeApp(firebaseConfig);
+      const storage = getStorage(app);
+
+      uploadBtn_elem.addEventListener("click", On_Click);
+
+      async function On_Click()
+      {
+        const files = fileInput_elem.files;
+        if (!files.length) return alert("Select at least one file!");
+
+        for (const file of files) {
+          // Specify target path in storage bucket (e.g., backups/filename)
+          const storageRef = ref(storage, `backups/${Date.now()}_${file.name}`);
+          
+          // uploadBytesResumable handles progress tracking & larger backup files safely
+          const uploadTask = uploadBytesResumable(storageRef, file);
+
+          progressBar_elem.style.display = "block";
+
+          uploadTask.on(
+            "state_changed",
+            (snapshot) => {
+              const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+              progressBar_elem.value = progress;
+              status_elem.innerText = `Uploading ${file.name}: ${Math.round(progress)}%`;
+            },
+            (error) => {
+              console.error("Upload failed:", error);
+              status_elem.innerText = `Error uploading ${file.name}`;
+            },
+            async () => {
+              const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+              status_elem.innerText = `Backup uploaded successfully: ${file.name}`;
+              console.log("File available at:", downloadURL);
+            }
+          );
+        }
+      }
+    </script>
+  </head>
+
+  <body>
+    <input id="fileInput_elem" type="file" multiple />
+    <button id="uploadBtn_elem">Upload to Backup</button>
+    <progress id="progressBar_elem" value="0" max="100" style="display:none;"></progress>
+    <div id="status_elem"></div>
+  </body>
+</html>
