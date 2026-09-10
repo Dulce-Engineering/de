@@ -336,12 +336,7 @@ function On_Timer_Completed(e)
 {
   const timer_elem = e.target;
   const timer = timer_elem.timer;
-  if (timer.recurrence && timer.recurrence.rate > 0)
-  {
-    Increment_Timer(timer);
-    Save_Timer(timer);
-  }
-  else
+  if (!timer.recurrence || !timer.recurrence.rate || timer.recurrence.rate <= 0)
   {
     timer.triggered = true;
     Save_Timer(timer);
@@ -591,8 +586,14 @@ function Alarm_Off(timer)
     panel_elem.classList.remove("alarm");
   }
 
-  //Render_Timer(timer);
-  const timers = Select_Timers();
+  const timers = Select_Timers() || [];
+  const current_timer = timers.find(t => t.id == timer.id);
+  if (current_timer && current_timer.recurrence && current_timer.recurrence.rate > 0 && current_timer.time <= Date.now())
+  {
+    Increment_Timer(current_timer);
+    Save_Timers(timers);
+  }
+
   Render_Timers(timers);
 }
 
@@ -811,7 +812,7 @@ function Parse_Ics_Date(value)
 
 function Timer_Is_Overdue(timer)
 {
-  return timer.time < Date.now();
+  return timer.time <= Date.now();
 }
 
 function To_Elements(html_str)
@@ -859,11 +860,17 @@ function Sort_Timers(timers)
     timers.sort(By_Now);
     function By_Now(t1, t2)
     {
-      if (t1.time > now && t2.time > now) return t1.time - t2.time;
-      else if (t1.time < now && t2.time < now) return t2.time - t1.time;
-      else if (t1.time > now) return -1;
-      else if (t2.time > now) return 1;
-      else return 0;
+      if (!t1.time && !t2.time) return 0;
+      if (!t1.time) return 1;
+      if (!t2.time) return -1;
+
+      const t1_overdue = t1.time <= now;
+      const t2_overdue = t2.time <= now;
+
+      if (t1_overdue && !t2_overdue) return -1;
+      if (!t1_overdue && t2_overdue) return 1;
+      if (t1_overdue && t2_overdue) return t2.time - t1.time;
+      return t1.time - t2.time;
     }
   }
 }
@@ -927,8 +934,6 @@ function Check_Startup_Alarms()
       if (timer.recurrence && timer.recurrence.rate > 0)
       {
         alarmed_timers.push({ id: timer.id });
-        Increment_Timer(timer);
-        is_changed = true;
       }
       else if (!timer.triggered)
       {
