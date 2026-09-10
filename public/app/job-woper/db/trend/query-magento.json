@@ -622,5 +622,11 @@
     "datetime": 1788752067707,
     "id": "0a5cac74-eea5-4230-a926-32f84d1f52e2",
     "query_id": "-magento"
+  },
+  {
+    "count": 7,
+    "datetime": 1789003738911,
+    "id": "571e941f-97a4-42e1-97c5-01de6ceca206",
+    "query_id": "-magento"
   }
 ]
