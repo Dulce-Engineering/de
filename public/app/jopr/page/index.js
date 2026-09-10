@@ -64,7 +64,7 @@ async function Render_App(ctx)
   export_btn.onclick = () => On_Click_Export_Btn(ctx);
 
   jobs_btn.onclick = () => Show_View(jobs_list);
-  job_agency_select.addEventListener("change", Toggle_New_Agency_Fields);
+  job_agency_select.addEventListener("add", On_Click_Add_Agency);
   jobs_menu.addEventListener("add", (e) => On_Click_Edit_Job(e, null, ctx));
   jobs_menu.addEventListener("ai", () => On_Click_AI_Add_Job(ctx));
   jobs_list.addEventListener("render", e => Render_Job_Item(e, ctx));
@@ -701,10 +701,16 @@ function Render_Company_Item(event, ctx)
 async function On_Click_Edit_Job(event, job, ctx)
 {
   job_agency_select.items = await ctx.Agency.Get_Items(ctx);
+  job_agency_select.job = job;
   const form_data = await job_dialog.Show_Async(job);
   if (form_data)
   {
     form_data.id = job?.id;
+    if (form_data.agency_id == "new")
+    {
+      form_data.agency = job_agency_select.selected_item;
+    }
+
     const is_saved = await ctx.Job.Save(ctx, form_data);
     if (is_saved)
     {
@@ -735,6 +741,17 @@ async function On_Click_Add_Company(event, id, ctx)
     {
       Alert("Failed to save company.");
     }
+  }
+}
+
+async function On_Click_Add_Agency()
+{
+  const form_data = await company_dialog.Show_Async();
+  if (form_data)
+  {
+    form_data.title = form_data.name;
+    form_data.value = "new";
+    job_agency_select.selected_item = form_data;
   }
 }
 

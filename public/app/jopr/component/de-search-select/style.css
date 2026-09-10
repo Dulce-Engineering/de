@@ -1,8 +1,15 @@
+
 de-search-select
 {
+  display: flex;
+  border: 1px solid var(--border);
+  padding: 5px 5px 5px 10px;
+
   [cid="input_elem"]
   {
     anchor-name: --input-elem;
+    border: none;
+    padding: 0;
   }
 
   [cid="items_list"]
@@ -12,5 +19,15 @@ de-search-select
     left: anchor(left);
     margin: 0;
     max-height: 300px;
+    background-color: #000;
+    color: var(--input-text);
+    border-color: var(--border);
+  }
+
+  [cid="add_btn"]
+  {
+    padding: 0;
+    border: none;
+    font-size: 0;
   }
 }

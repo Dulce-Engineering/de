@@ -8,6 +8,9 @@ class DeSearchSelect extends HTMLElement
   {
     super();
     Utils.Bind(this, "On_");
+
+    this.items_array = null;
+    this.active_item = null;
   }
 
   connectedCallback()
@@ -19,26 +22,47 @@ class DeSearchSelect extends HTMLElement
 
   set value(item_value)
   {
-    this.selected_item = this.items_array.find(i => i.value == item_value);
-    if (this.selected_item)
+    const list_item = this.Find_Item(item_value);
+    if (list_item)
     {
-      this.input_elem.value = this.selected_item.title;
+      this.selected_item = list_item;
     }
     else
     {
-      this.input_elem.value = "";
+      this.selected_item = {value: item_value};
     }
   }
 
   get value()
   {
-    return this.selected_item?.value ?? null;
+    return this.selected_item?.value;
   }
   
   set items(items_array)
   {
     this.items_array = items_array;
     this.Render_Options(this.items_array);
+  }
+
+  set selected_item(item)
+  {
+    this.active_item = item;
+    this.input_elem.value = this.active_item?.title || "";
+  }
+
+  get selected_item()
+  {
+    return this.active_item;
+  }
+
+  Find_Item(value)
+  {
+    let res = null;
+
+    if (this.items_array && value)
+      res = this.items_array.find(i => i.value == value);
+
+    return res;
   }
 
   // attributes ===============================================================
@@ -74,6 +98,11 @@ class DeSearchSelect extends HTMLElement
     const match_items = this.items_array.filter
       (i => i.title.toLowerCase().includes(search_str));
     this.Render_Options(match_items);
+  }
+
+  On_Click_Add_Btn()
+  {
+    this.dispatchEvent(new Event("add"));
   }
 
   // rendering ================================================================
@@ -129,7 +158,7 @@ class DeSearchSelect extends HTMLElement
         autocomplete="off"
       />
 
-      <button cid="" type="button" class="img">
+      <button cid="add_btn" type="button">
         <img src="image/add.svg">
       </button>
 
@@ -141,6 +170,7 @@ class DeSearchSelect extends HTMLElement
     this.input_elem.addEventListener('click', this.On_Click_Input);
     this.input_elem.addEventListener('input', this.On_Input);
     this.items_list.addEventListener('click', this.On_Click_Items);
+    this.add_btn.addEventListener('click', this.On_Click_Add_Btn);
   }
 }
 

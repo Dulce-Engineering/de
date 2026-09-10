@@ -356,8 +356,7 @@ class Job
     {
       if (form_data.agency_id == "new")
       {
-        const new_agency = { name: form_data.agency_name?.trim() || "New Agency" };
-        const new_agency_id = await ctx.db.Insert("agencies", new_agency);
+        const new_agency_id = await ctx.db.Insert("agencies", form_data.agency);
         form_data.agency_id = new_agency_id;
       }
 
