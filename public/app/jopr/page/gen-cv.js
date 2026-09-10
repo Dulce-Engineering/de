@@ -192,6 +192,7 @@ async function Render_Job_Item(event, target_job, ctx)
     item_elem.legacy_dates.innerText = 
       //date_info.start_date_str + " (" + date_info.duration_str + ")";
       date_info.start_date_str + " - " + date_info.end_date_str + " *";
+    item_elem.legacy_tech.innerText = "Tech: " + job.tech;
 
     item_elem.best_job.hidden = true;
   }

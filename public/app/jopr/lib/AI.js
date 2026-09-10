@@ -530,10 +530,11 @@ class AI
         
         CRITICAL SELECTION MATRICES:
         1. RECENCY CRITERIA: Always prioritize the applicant's current or most recent role 
-          to prevent major, unexplainable gaps at the top of the resume. Select from the ten most recent roles.
+          to prevent major, unexplainable gaps at the top of the resume. Select from roles 
+          in the last 15 years.
         2. RELEVANCE CRITERIA: Select remaining roles based on technical overlap, 
           architectural alignment, and scope of responsibility demanded by the job description.
-        3. EFFICIENCY: Select only the most meaningful positions (typically a maximum of 5 to 6 roles) 
+        3. EFFICIENCY: Select only the most meaningful positions (typically a maximum of 6 roles) 
           that build a compelling narrative for this specific target position.
         
         Do not output conversational markdown text or text block wrappers outside the schema.

@@ -67,6 +67,41 @@
       font-family: roboto-condensed;
       src: url("../font/Roboto_Condensed/RobotoCondensed-VariableFont_wght.ttf");
     }
+    @font-face 
+    {
+      font-family: fleur-de-leah;
+      src: url("../font/Fleur_De_leah/FleurDeLeah-Regular.ttf");
+    }
+    @font-face 
+    {
+      font-family: mea-culpa;
+      src: url("../font/Mea_Culpa/MeaCulpa-Regular.ttf");
+    }
+    @font-face 
+    {
+      font-family: arvo;
+      src: url("../font/Arvo/Arvo-Regular.ttf");
+    }
+    @font-face 
+    {
+      font-family: fugaz-one;
+      src: url("../font/Fugaz_One/FugazOne-Regular.ttf");
+    }
+    @font-face 
+    {
+      font-family: miss-fajardose;
+      src: url("../font/Miss_Fajardose/MissFajardose-Regular.ttf");
+    }
+    @font-face 
+    {
+      font-family: playfair-display;
+      src: url("../font/Playfair_Display/PlayfairDisplay-VariableFont_wght.ttf");
+    }
+    @font-face 
+    {
+      font-family: monoton;
+      src: url("../font/Monoton/Monoton-Regular.ttf");
+    }
 
     :root 
     {
@@ -92,11 +127,12 @@
       body
       {
         padding: 80px;
-        gap: 60px;
+        gap: 30px 60px;
       }
       h1
       {
-        font-size: 4rem;
+        font-size: 5rem;
+        line-height: 5.5rem;
       }
     }
     @media print
@@ -108,7 +144,8 @@
       }
       h1
       {
-        font-size: 3rem;
+        font-size: 4rem;
+        line-height: 4.5rem;
       }
     }
 
@@ -185,27 +222,32 @@
     }
     h1
     {
-      xdisplay: block;
       margin-block-start: 0;
       margin-block-end: 0;
       margin-inline-start: 0;
       margin-inline-end: 0;
-      font-weight: bold;
+      xfont-weight: bold;
+      font-weight: normal;
+      xfont-family: fugaz-one;
+      xfont-family: playfair-display;
+      font-family: monoton;
+      color: #f00;
     }
     h2
     {
-      xdisplay: block;
       font-size: 1.8rem;
-      xletter-spacing: 1px;
+      font-family: roboto-condensed;
+      font-weight: bold;
       margin-block-start: 0;
       margin-block-end: 0;
       margin-inline-start: 0;
       margin-inline-end: 0;
-      font-weight: bold;
-      xborder-bottom: 1px solid #fff;
-      border-bottom: 1px solid #000;
-      padding: 0 0 12px 0;
-      margin: 0 0 4px 0;
+      padding: 5px 10px 5px 10px;
+      margin: 0;
+      background-color: #f00;
+      color: #fff;
+      border-radius: 0 15px;
+      opacity: 0.7;
     }
     h3, .h3
     {
@@ -274,10 +316,10 @@
       }
     }
 
-    .no-break
+    .no-break:not(:first-child)
     {
       break-inside: avoid;
-      padding: 30px 0 0 0;
+      margin: 30px 0 0 0;
     }
     .separate
     {
@@ -332,6 +374,10 @@
         border-bottom: 1px solid #000;
       }
     }
+    .project-tech
+    {
+      display: none;
+    }
 
     #summ_value
     {
@@ -339,19 +385,45 @@
     }
     #jobs_list
     {
-      main div
-      {
-        p, div
-        {
-          font-family: roboto-condensed;
-        }
-      }
       main 
       {
+        & > div:not(:first-child)
+        {
+          border-top: #f008 2px solid;
+          padding: 10px 0 0 0;
+        }
+        div
+        {
+          p, div
+          {
+            font-family: roboto-condensed;
+          }
+        }
         div.legacy + div.legacy
         {
-          padding: 0;
+          xpadding: 0;
         }
+
+        [cid="legacy_tech"]
+        {
+          display: block;
+        }
+      }
+    }
+    #projects_article
+    {
+      h3
+      {
+        display: inline-block;
+        margin: 0;
+      }
+      p
+      {
+        margin: 0;
+      }
+      .no-break:not(:first-child) 
+      {
+        margin: 0;
       }
     }
   </style>
@@ -438,6 +510,7 @@
           <span class="subheading" cid="legacy_job_title"></span> |
           <span class="subheading" cid="legacy_job_company"></span> |
           <span class="subheading" cid="legacy_dates"></span>
+          <span class="" cid="legacy_tech"></span>
         </div>
       </div>
       <footer slot="footer" class="no-break">*Role details and legacy jobs available on request.</footer>
@@ -449,10 +522,10 @@
     <h2>Personal Projects</h2>
     <de-input-list id="projects_list">
       <div slot="item" class="no-break">
-        <h3 cid="project_title"></h3>
+        <h3 cid="project_title"></h3> - 
         <a cid="project_url" target="blank"></a><br>
         <p class="separate" cid="project_description"></p>
-        <p class="separate">Tech: <span class="" cid="project_tech"></span></p>
+        <p class="separate project-tech">Tech: <span class="" cid="project_tech"></span></p>
       </div>
     </de-input-list>
   </article>
