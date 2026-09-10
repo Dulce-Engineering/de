@@ -53,6 +53,27 @@ function On_Change_Personal_Summary(event)
   ctx.Job.Save(ctx, edit_value.target_job);
 }
 
+function On_Click_Vis_Btn(event)
+{
+  const vis_btn = event.currentTarget;
+  const vis_on_img = vis_btn.querySelector("[cid=vis_on_img]");
+  const vis_off_img = vis_btn.querySelector("[cid=vis_off_img]");
+  const item_elem = vis_btn.item_elem;
+
+  if (item_elem.style.display == "")
+  {
+    item_elem.style.display = "none";
+    vis_on_img.style.display = "";
+    vis_off_img.style.display = "none";
+  }
+  else
+  {
+    item_elem.style.display = "";
+    vis_on_img.style.display = "none";
+    vis_off_img.style.display = "";
+  }
+}
+
 // business logic =================================================================
 
 /**
@@ -141,6 +162,8 @@ async function Render_Job_Item(event, target_job, ctx)
   const item_elem = event.detail.item_elem;
   let job = item_elem.item_obj;
 
+  Render_Vis_Buttons(item_elem);
+
   const best_job_index = best_jobs.findIndex(j => j.id == job.id);
   if (best_job_index > -1)
   {
@@ -196,6 +219,20 @@ async function Render_Job_Item(event, target_job, ctx)
 
     item_elem.best_job.hidden = true;
   }
+}
+
+function Render_Vis_Buttons(item_elem)
+{
+  const vis_btn_html = `
+    <button type="button" class="vis-btn">
+      <img cid="vis_on_img" src="/app/jopr/image/black/visibility.svg" style="display:none;">
+      <img cid="vis_off_img" src="/app/jopr/image/black/visibility-off.svg">
+    </button>
+  `;
+  item_elem.insertAdjacentHTML('afterend', vis_btn_html);
+  const vis_btn = item_elem.nextElementSibling;
+  vis_btn.item_elem = item_elem;
+  vis_btn.addEventListener("click", On_Click_Vis_Btn);
 }
 
 function Render_Education_Item(event)
