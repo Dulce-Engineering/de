@@ -12,11 +12,15 @@
 
     <script type="module">
       import { initializeApp } from "firebase/app";
-      import { 
+      import 
+      { 
         getStorage, 
         ref, 
         uploadBytesResumable, 
-        getDownloadURL, connectStorageEmulator } from "firebase/storage";
+        getDownloadURL, 
+        listAll,
+        connectStorageEmulator 
+      } from "firebase/storage";
 
       const firebaseConfig = await fetch("/__/firebase/init.json").then((res) => res.json());
 
@@ -27,37 +31,80 @@
         connectStorageEmulator(storage, "127.0.0.1", 9199);
       }
 
+      loadFileList();
       uploadBtn_elem.addEventListener("click", On_Click);
+
+      async function loadFileList() 
+      {
+        fileList_elem.innerHTML = "<li>Loading backups...</li>";
+        const folderRef = ref(storage, "backups");
+
+        try 
+        {
+          const res = await listAll(folderRef);
+          fileList_elem.innerHTML = "";
+
+          if (res.items.length === 0) 
+          {
+            fileList_elem.innerHTML = "<li>No backup files found.</li>";
+            return;
+          }
+
+          // Fetch download URLs for each file in parallel
+          for (const itemRef of res.items) 
+          {
+            const url = await getDownloadURL(itemRef);
+            
+            const li = document.createElement("li");
+            const a = document.createElement("a");
+            a.href = url;
+            a.textContent = itemRef.name;
+            a.target = "_blank";
+            
+            li.appendChild(a);
+            fileList_elem.appendChild(li);
+          }
+        } 
+        catch (error) 
+        {
+          console.error("Error fetching file list:", error);
+          fileList_elem.innerHTML = "<li>Error loading backup files.</li>";
+        }
+      }
 
       async function On_Click()
       {
         const files = fileInput_elem.files;
         if (!files.length) return alert("Select at least one file!");
 
-        for (const file of files) {
-          // Specify target path in storage bucket (e.g., backups/filename)
-          const storageRef = ref(storage, `backups/${Date.now()}_${file.name}`);
+        for (const file of files) 
+        {
+          const folder = "backups";
+          const storageRef = ref(storage, `${folder}/${Date.now()}_${file.name}`);
           
-          // uploadBytesResumable handles progress tracking & larger backup files safely
           const uploadTask = uploadBytesResumable(storageRef, file);
 
           progressBar_elem.style.display = "block";
 
           uploadTask.on(
             "state_changed",
-            (snapshot) => {
+            (snapshot) => 
+            {
               const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
               progressBar_elem.value = progress;
               status_elem.innerText = `Uploading ${file.name}: ${Math.round(progress)}%`;
             },
-            (error) => {
+            (error) => 
+            {
               console.error("Upload failed:", error);
               status_elem.innerText = `Error uploading ${file.name}`;
             },
-            async () => {
+            async () => 
+            {
               const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
               status_elem.innerText = `Backup uploaded successfully: ${file.name}`;
               console.log("File available at:", downloadURL);
+              loadFileList();
             }
           );
         }
@@ -70,5 +117,8 @@
     <button id="uploadBtn_elem">Upload to Backup</button>
     <progress id="progressBar_elem" value="0" max="100" style="display:none;"></progress>
     <div id="status_elem"></div>
+
+    <h3>Backup Files</h3>
+    <ul id="fileList_elem"></ul>
   </body>
 </html>
