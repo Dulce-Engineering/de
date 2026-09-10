@@ -696,19 +696,25 @@ function Render_Company_Item(event, ctx)
   item_elem.del_company_btn.addEventListener("click", e => On_Click_Delete_Company(e, agency_id, ctx));
 }
 
-// contacts =======================================================================
+// on click edit ==================================================================
 
 async function On_Click_Edit_Job(event, job, ctx)
 {
-  job_agency_select.innerHTML = await ctx.Agency.Get_Options(ctx);
-  Toggle_New_Agency_Fields(false);
-
+  job_agency_select.items = await ctx.Agency.Get_Items(ctx);
   const form_data = await job_dialog.Show_Async(job);
   if (form_data)
   {
     form_data.id = job?.id;
-    await ctx.Job.Save(ctx, form_data);
-    await Render_Job_Items(ctx);
+    const is_saved = await ctx.Job.Save(ctx, form_data);
+    if (is_saved)
+    {
+      await Render_Job_Items(ctx);
+      Alert("Job saved successfully.");
+    }
+    else
+    {
+      Alert("Failed to save job.");
+    }
   }
 }
 

@@ -41,6 +41,7 @@
   <link rel="stylesheet" href="./component/de-job-details/style.css?v=2">
   <link rel="stylesheet" href="./component/de-filter/style.css?v=2">
   <link rel="stylesheet" href="./component/de-select-status/style.css?v=2">
+  <link rel="stylesheet" href="./component/de-search-select/style.css?v=2">
   
   <script type="importmap">
   {
@@ -73,6 +74,7 @@
   <script src="./component/de-job-details/index.js?v=2" type="module"></script>
   <script src="./component/de-filter/index.js?v=2" type="module"></script>
   <script src="./component/de-select-status/index.js?v=2" type="module"></script>
+  <script src="./component/de-search-select/index.js?v=2" type="module"></script>
   <script src="./page/index.js?v=2" type="module"></script>
 </head>
 
@@ -431,8 +433,11 @@
     <label cid="description_label" slot="fields">Description</label>
     <textarea slot="fields" name="description" rows="4"></textarea>
     <de-contact-list id="job_contacts" slot="fields" name="contacts" view-type="sublist"></de-contact-list>
+    
     <label cid="agency_id_label" slot="fields">Agency</label>
-    <select slot="fields" id="job_agency_select" name="agency_id"></select>
+    <select slot="fields" id="xjob_agency_select" name="xagency_id"></select>
+    <de-search-select slot="fields" id="job_agency_select" name="agency_id"></de-search-select>
+    
     <label cid="agency_name_label" slot="fields" id="new_agency_label" hidden>Agency Name</label>
     <input slot="fields" id="new_agency_input" hidden type="text" name="agency_name">
   </de-dialog-form>

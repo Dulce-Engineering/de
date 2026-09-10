@@ -85,6 +85,19 @@ class Agency
 
     return html;
   }
+
+  static async Get_Items(ctx)
+  {
+    let items = null;
+
+    const agencies = await Agency.Select(ctx);
+    if (agencies)
+    {
+      items = agencies.map(a => ({value: a.id, title: a.name}));
+    }
+
+    return items;
+  }
 }
 
 export default Agency;

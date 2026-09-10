@@ -1,0 +1,16 @@
+de-search-select
+{
+  [cid="input_elem"]
+  {
+    anchor-name: --input-elem;
+  }
+
+  [cid="items_list"]
+  {
+    position-anchor: --input-elem;
+    top: anchor(bottom);
+    left: anchor(left);
+    margin: 0;
+    max-height: 300px;
+  }
+}

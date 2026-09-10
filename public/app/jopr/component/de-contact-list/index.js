@@ -57,7 +57,6 @@ class DeContactList extends HTMLElement
     }
 
     return contacts;
-
   }
 
   // attributes ===============================================================
