@@ -35,6 +35,16 @@ function On_Change_Job_Title(event)
   ctx.Job.Save(ctx, edit_value.target_job);
 }
 
+function On_Change_Job_Date(event)
+{
+  const edit_value = event.currentTarget.value;
+  // update cv job with new entered date string
+  edit_value.cv_job.tailored_date_str = edit_value.text;
+
+  const ctx = edit_value.ctx;
+  ctx.Job.Save(ctx, edit_value.target_job);
+}
+
 function On_Change_Job_Summary(event)
 {
   const edit_value = event.currentTarget.value;
@@ -64,27 +74,7 @@ function On_Click_Vis_Btn(event)
   ctx.Job.Save(ctx, vis_btn.target_job);
 }
 
-function Render_Vis_State(vis_btn, is_visible)
-{
-  const vis_on_img = vis_btn.querySelector("[cid=vis_on_img]");
-  const vis_off_img = vis_btn.querySelector("[cid=vis_off_img]");
-  const item_elem = vis_btn.item_elem;
-
-  if (!is_visible)
-  {
-    item_elem.style.display = "none";
-    vis_on_img.style.display = "";
-    vis_off_img.style.display = "none";
-    vis_btn.classList.add("vis-on");
-  }
-  else
-  {
-    item_elem.style.display = "";
-    vis_on_img.style.display = "none";
-    vis_off_img.style.display = "";
-    vis_btn.classList.remove("vis-on");
-  }
-}
+// business logic =================================================================
 
 function CV_Job_Is_Visible(cv_job)
 {
@@ -92,8 +82,6 @@ function CV_Job_Is_Visible(cv_job)
     cv_job.is_visible === undefined || 
     cv_job.is_visible === true;
 }
-
-// business logic =================================================================
 
 /**
  * @param {Context} ctx
@@ -133,6 +121,13 @@ async function Generate_CV(ctx, prospective_job)
 
     info_elem.Info("Adding other jobs...");
     cv.legacy_jobs = await ctx.Profile.Job_Select_Recent(ctx);
+    if (cv.legacy_jobs)
+    {
+      for (const cv_job of cv.legacy_jobs)
+      {
+        Render_Date_Strs(cv_job, cv.legacy_jobs);
+      }
+    }
 
     info_elem.Info("Adding education...");
     cv.edu_items = await ctx.Profile.Edu_Select(ctx);
@@ -182,60 +177,56 @@ async function Render_Job_Item(event, target_job, ctx)
   let job = item_elem.item_obj;
 
   Render_Vis_Buttons(ctx, item_elem, target_job);
+  Render_Date_Strs(job, all_jobs);
 
   const best_job_index = best_jobs.findIndex(j => j.id == job.id);
   if (best_job_index > -1)
   {
-    job = best_jobs[best_job_index];
-    const date_info = Render_Date_Strs(job, all_jobs);
+    const cv_job = best_jobs[best_job_index];
     item_elem.dates.value =
     {
-      text: date_info.start_date_str + " - " + date_info.end_date_str
+      ctx, target_job, cv_job,
+      text: cv_job.tailored_date_str || job.date_info.range_str,
+      original_text: job.date_info.range_str
     };
+    item_elem.dates.addEventListener("change", On_Change_Job_Date);
 
     let value =
     {
-      ctx,
-      target_job,
-      cv_job: job,
-      text: job.role_title?.suggested_title || job.role_titles,
-      original_text: job.role_titles
+      ctx, target_job, cv_job,
+      text: cv_job.role_title?.suggested_title || cv_job.role_titles,
+      original_text: cv_job.role_titles
     };
     item_elem.job_title.value = value;
     item_elem.job_title.addEventListener("change", On_Change_Job_Title);
 
     value =
     {
-      ctx,
-      target_job,
-      cv_job: job,
-      text: job.tailored_job.summary,
-      original_text: job.responsibilities
+      ctx, target_job, cv_job,
+      text: cv_job.tailored_job.summary,
+      original_text: cv_job.responsibilities
     };
     item_elem.job_description.value = value;
     item_elem.job_description.addEventListener("change", On_Change_Job_Summary);
 
-    const html = Render_List(job.tailored_job.bullet_points);
+    const html = Render_List(cv_job.tailored_job.bullet_points);
     if (html)
       item_elem.job_points.innerHTML = html;
     else
       item_elem.job_points.style.display = "none";
 
-    item_elem.job_company.innerText = job.company_name;
-    item_elem.job_tech.innerText = job.tech;
+    item_elem.job_company.innerText = cv_job.company_name;
+    item_elem.job_tech.innerText = cv_job.tech;
 
     item_elem.legacy_job.hidden = true;
   }
   else
   {
     item_elem.classList.add("legacy");
-    const date_info = Render_Date_Strs(job, all_jobs);
     item_elem.legacy_job_title.innerText = job.role_titles;
     item_elem.legacy_job_company.innerText = job.company_name;
-    item_elem.legacy_dates.innerText = 
-      //date_info.start_date_str + " (" + date_info.duration_str + ")";
-      date_info.start_date_str + " - " + date_info.end_date_str + " *";
     item_elem.legacy_tech.innerText = "Tech: " + job.tech;
+    item_elem.legacy_dates.innerText = job.date_info.range_str + " *";
 
     item_elem.best_job.hidden = true;
   }
@@ -282,6 +273,28 @@ function Render_Project_Item(event)
 }
 
 // rendering ======================================================================
+
+function Render_Vis_State(vis_btn, is_visible)
+{
+  const vis_on_img = vis_btn.querySelector("[cid=vis_on_img]");
+  const vis_off_img = vis_btn.querySelector("[cid=vis_off_img]");
+  const item_elem = vis_btn.item_elem;
+
+  if (!is_visible)
+  {
+    item_elem.style.display = "none";
+    vis_on_img.style.display = "";
+    vis_off_img.style.display = "none";
+    vis_btn.classList.add("vis-on");
+  }
+  else
+  {
+    item_elem.style.display = "";
+    vis_on_img.style.display = "none";
+    vis_off_img.style.display = "";
+    vis_btn.classList.remove("vis-on");
+  }
+}
 
 async function Render_CV(job, ctx)
 {
@@ -336,14 +349,17 @@ async function Render_CV(job, ctx)
 
 function Render_Date_Strs(job, all_jobs)
 {
-  const start_date = job.start_date;
-  const next_job = Get_Next_Job(job, all_jobs);
-  const end_date = next_job ? next_job.start_date : job.end_date;
-  const duration_str = Duration_Str(start_date, end_date);
-  const start_date_str = Render_Date(start_date);
-  const end_date_str = Render_Date(end_date);
-
-  return { start_date_str, end_date_str, duration_str };
+  if (job.date_info === null || job.date_info === undefined)
+  {
+    const start_date = job.start_date;
+    const next_job = Get_Next_Job(job, all_jobs);
+    const end_date = next_job ? next_job.start_date : job.end_date;
+    const duration_str = Duration_Str(start_date, end_date);
+    const start_date_str = Render_Date(start_date);
+    const end_date_str = Render_Date(end_date);
+    const range_str = start_date_str + " - " + end_date_str;
+    job.date_info = { start_date_str, end_date_str, duration_str, range_str };
+  }
 }
 
 function Render_Date(date_ms)
