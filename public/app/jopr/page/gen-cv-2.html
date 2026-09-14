@@ -147,6 +147,10 @@
         font-size: 4rem;
         line-height: 4.5rem;
       }
+      .vis-btn
+      {
+        display: none;
+      }
     }
 
     #about, #tech_skills
@@ -327,7 +331,8 @@
     }
     .subheading
     {
-      display: inline-block;
+      display: inline-flex;
+      align-items: center;
       font-size: 1.2rem;
       opacity: 0.6;
       margin: 0 0 5px 0;
@@ -392,6 +397,12 @@
         opacity: 0.3;
         height: 24px;
         width: 24px;
+      }
+      &.vis-on
+      {
+        border-top: 1px solid #0004;
+        margin: 30px 0 0 0;
+        padding: 10px 0 0 0;
       }
     }
 
@@ -516,7 +527,7 @@
       <div slot="item" class="no-break">
         <div cid="best_job">
           <span class="subheading" cid="job_company"></span> | 
-          <span class="subheading" cid="dates"></span>
+          <de-edit-text cid="dates" class="subheading"></de-edit-text>
           <de-edit-text cid="job_title" class="h3"></de-edit-text>
           <de-edit-text cid="job_description" input-type="textarea"></de-edit-text>
           <div class="separate" cid="job_points"></div>

@@ -65,12 +65,14 @@ function On_Click_Vis_Btn(event)
     item_elem.style.display = "none";
     vis_on_img.style.display = "";
     vis_off_img.style.display = "none";
+    vis_btn.classList.add("vis-on");
   }
   else
   {
     item_elem.style.display = "";
     vis_on_img.style.display = "none";
     vis_off_img.style.display = "";
+    vis_btn.classList.remove("vis-on");
   }
 }
 
@@ -169,9 +171,10 @@ async function Render_Job_Item(event, target_job, ctx)
   {
     job = best_jobs[best_job_index];
     const date_info = Render_Date_Strs(job, all_jobs);
-    item_elem.dates.innerText =
-      //date_info.start_date_str + " (" + date_info.duration_str + ")";
-      date_info.start_date_str + " - " + date_info.end_date_str;
+    item_elem.dates.value =
+    {
+      text: date_info.start_date_str + " - " + date_info.end_date_str
+    };
 
     let value =
     {
