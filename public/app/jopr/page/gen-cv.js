@@ -56,11 +56,21 @@ function On_Change_Personal_Summary(event)
 function On_Click_Vis_Btn(event)
 {
   const vis_btn = event.currentTarget;
+  const cv_job = vis_btn.item_elem.item_obj;
+  cv_job.is_visible = !CV_Job_Is_Visible(cv_job);
+  Render_Vis_State(vis_btn, cv_job.is_visible);
+
+  const ctx = vis_btn.ctx;
+  ctx.Job.Save(ctx, vis_btn.target_job);
+}
+
+function Render_Vis_State(vis_btn, is_visible)
+{
   const vis_on_img = vis_btn.querySelector("[cid=vis_on_img]");
   const vis_off_img = vis_btn.querySelector("[cid=vis_off_img]");
   const item_elem = vis_btn.item_elem;
 
-  if (item_elem.style.display == "")
+  if (!is_visible)
   {
     item_elem.style.display = "none";
     vis_on_img.style.display = "";
@@ -74,6 +84,13 @@ function On_Click_Vis_Btn(event)
     vis_off_img.style.display = "";
     vis_btn.classList.remove("vis-on");
   }
+}
+
+function CV_Job_Is_Visible(cv_job)
+{
+  return cv_job.is_visible === null || 
+    cv_job.is_visible === undefined || 
+    cv_job.is_visible === true;
 }
 
 // business logic =================================================================
@@ -164,7 +181,7 @@ async function Render_Job_Item(event, target_job, ctx)
   const item_elem = event.detail.item_elem;
   let job = item_elem.item_obj;
 
-  Render_Vis_Buttons(item_elem);
+  Render_Vis_Buttons(ctx, item_elem, target_job);
 
   const best_job_index = best_jobs.findIndex(j => j.id == job.id);
   if (best_job_index > -1)
@@ -224,7 +241,7 @@ async function Render_Job_Item(event, target_job, ctx)
   }
 }
 
-function Render_Vis_Buttons(item_elem)
+function Render_Vis_Buttons(ctx, item_elem, target_job)
 {
   const vis_btn_html = `
     <button type="button" class="vis-btn">
@@ -234,8 +251,13 @@ function Render_Vis_Buttons(item_elem)
   `;
   item_elem.insertAdjacentHTML('afterend', vis_btn_html);
   const vis_btn = item_elem.nextElementSibling;
+  vis_btn.ctx = ctx;
   vis_btn.item_elem = item_elem;
+  vis_btn.target_job = target_job;
   vis_btn.addEventListener("click", On_Click_Vis_Btn);
+
+  const cv_job = vis_btn.item_elem.item_obj;
+  Render_Vis_State(vis_btn, CV_Job_Is_Visible(cv_job));
 }
 
 function Render_Education_Item(event)
