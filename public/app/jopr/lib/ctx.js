@@ -17,11 +17,16 @@ async function New_Ctx()
 
   const ctx =
   {
+
     ai: await AI.New(fb_app, fb_ai),
     db: await Db.New(DB_SCHEMA),
-    db2: await Db.New(DB_SCHEMA),
     Agency, Contact, Job, Profile, Utils, Project
   };
+  ctx.db2 = ctx.db;
+
+  const db_read_only = new URLSearchParams(window.location.search).get("db_read_only");
+  ctx.db.read_only = db_read_only == "true";
+
   return ctx;
 }
 

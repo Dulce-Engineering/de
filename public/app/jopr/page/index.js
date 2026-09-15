@@ -320,12 +320,12 @@ async function On_Click_AI_Add_Profile(ctx)
     info_elem.Info("Saving CV data...");
     if (cv_data.profile)
     {
-      await ctx.db2.Delete_All(ctx.Profile.table_name);
+      await ctx.db2.Clear_Table(ctx.Profile.table_name);
       await ctx.Profile.Save(ctx, cv_data.profile);
     }
-    await ctx.db2.Delete_All(ctx.Profile.edu_table_name);
+    await ctx.db2.Clear_Table(ctx.Profile.edu_table_name);
     await ctx.db2.Insert_Items(ctx.Profile.edu_table_name, cv_data.educations);
-    await ctx.db2.Delete_All(ctx.Profile.job_table_name);
+    await ctx.db2.Clear_Table(ctx.Profile.job_table_name);
     await ctx.db2.Insert_Items(ctx.Profile.job_table_name, cv_data.career);
 
     info_elem.Info();

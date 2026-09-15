@@ -871,6 +871,7 @@
   }
   .link, a
   {
+    display: inline-block;
     cursor: pointer;
     text-decoration: underline solid var(--link);
     text-underline-offset: 5px;

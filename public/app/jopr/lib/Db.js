@@ -2,6 +2,7 @@ class Db
 {
   db = null;
   schema = null;
+  read_only = false;
 
   Clear()
   {
@@ -25,9 +26,9 @@ class Db
     return Db.Delete(this.db, table_name, ids);
   }
 
-  Delete_All(table_name)
+  Clear_Table(table_name)
   {
-    return Db.Delete_All(this.db, table_name);
+    return Db.Clear_Table(this.db, table_name);
   }
 
   Get_All(table_name)
@@ -95,14 +96,15 @@ class Db
   static async Clear(db, schema)
   {
     const table_names = Object.keys(schema.stores);
-    const tx = db.transaction(table_names, "readwrite");
+    //const tx = db.transaction(table_names, "readwrite");
 
-    for (const storeName of table_names) 
+    for (const table_name of table_names) 
     {
-      tx.objectStore(storeName).clear();
+      //tx.objectStore(table_name).clear();
+      await Db.Clear_Table(db, table_name);
     }
 
-    return new Promise((resolve) => tx.oncomplete = resolve);
+    //return new Promise((resolve) => tx.oncomplete = resolve);
   }
 
   static async New(schema)
@@ -165,20 +167,6 @@ class Db
     for (const table_name in schema.stores)
     {
       Db.Create_Table(db, schema, table_name);
-    }
-  }
-
-  static Create_Table(db, schema, table_name)
-  {
-    if (!db.objectStoreNames.contains(table_name))
-    {
-      const table_schema = schema.stores[table_name];
-      const options = 
-      { 
-        keyPath: table_schema.keyPath, 
-        autoIncrement: table_schema.autoIncrement 
-      };
-      db.createObjectStore(table_name, options);
     }
   }
 
@@ -275,7 +263,10 @@ class Db
           {
             if (item.id == null || item.id == undefined)
               item.id = await Db.Next_Id(db, table);
-            await Db.Get_Req_Res(table.add(item));
+
+            //await Db.Get_Req_Res(table.add(item));
+            await Db.Add(db, table, item);
+            
             ids.push(item.id);
           }
         }
@@ -373,11 +364,80 @@ class Db
     return store;
   }
 
+  static Get_All(db, table_name)
+  {
+    let res = null;
+    const table = Db.Get_Table(db, table_name);
+    if (table)
+    {
+      const request = table.getAll();
+      res = Db.Get_Req_Res(request);
+    }
+    return res;
+  }
+
+  // write ====================================================================
+
+  static Create_Table(db, schema, table_name)
+  {
+    if (!db.objectStoreNames.contains(table_name))
+    {
+      const table_schema = schema.stores[table_name];
+      const options = 
+      { 
+        keyPath: table_schema.keyPath, 
+        autoIncrement: table_schema.autoIncrement 
+      };
+      db.createObjectStore(table_name, options);
+    }
+  }
+
+  static async Clear_Table(db, table_name)
+  {
+    let res = null;
+
+    if (!db.read_only)
+    {
+      const table = Db.Get_Table(db, table_name, false);
+      res = table ? Db.Get_Req_Res(table.clear()) : null;
+    }
+
+    return res;
+  }
+
+  static Add(db, table, item)
+  {
+    let res = null;
+
+    if (!db.read_only)
+    {
+      //const table = Db.Get_Table(db, table_name, false);
+      const request = table.add(item);
+      res = Db.Get_Req_Res(request);
+    }
+
+    return res;
+  }
+
+  static Put(db, table_name, item)
+  {
+    let res = null;
+
+    if (!db.read_only)
+    {
+      const table = Db.Get_Table(db, table_name, false);
+      const request = table.put(item);
+      res = Db.Get_Req_Res(request);
+    }
+
+    return res;
+  }
+
   static async Delete(db, table_name, ids)
   {
     let res = null;
 
-    if (ids?.length > 0)
+    if (!db.read_only && ids?.length > 0)
     {
       const table = Db.Get_Table(db, table_name, false);
       const req_res = [];
@@ -388,40 +448,6 @@ class Db
       res = Promise.all(req_res);
     }
 
-    return res;
-  }
-
-  static async Delete_All(db, table_name)
-  {
-    const table = Db.Get_Table(db, table_name, false);
-    const res = table ? Db.Get_Req_Res(table.clear()) : null;
-
-    return res;
-  }
-
-  static Add(db, table_name, item)
-  {
-    const table = Db.Get_Table(db, table_name, false);
-    const request = table.add(item);
-    return Db.Get_Req_Res(request);
-  }
-
-  static Put(db, table_name, item)
-  {
-    const table = Db.Get_Table(db, table_name, false);
-    const request = table.put(item);
-    return Db.Get_Req_Res(request);
-  }
-
-  static Get_All(db, table_name)
-  {
-    let res = null;
-    const table = Db.Get_Table(db, table_name);
-    if (table)
-    {
-      const request = table.getAll();
-      res = Db.Get_Req_Res(request);
-    }
     return res;
   }
 }

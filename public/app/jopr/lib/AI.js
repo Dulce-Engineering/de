@@ -761,7 +761,7 @@ class AI
     {
       const job_summary =
       {
-        role_titles: career_job.role_titles,
+        role_title: career_job.role_title?.suggested_title || career_job.role_titles,
         company_name: career_job.company_name,
         tech: career_job.tech,
         responsibilities: career_job.responsibilities,
@@ -822,7 +822,8 @@ class AI
             \`\`\`
 
             OUTPUT REQUIREMENT:
-            Return a structured JSON object adhering perfectly to the schema containing the rewritten summary and bullet points.
+            Return a structured JSON object adhering perfectly to the schema containing the rewritten summary 
+            and bullet points.
           `;
       res = await this.Prompt(prompt, schema, null, sys_instruction);
     }
