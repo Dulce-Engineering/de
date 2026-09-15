@@ -199,8 +199,8 @@ async function On_Click_Import_Btn(ctx)
       }
     }
 
-    await ctx.db2.Clear();
-    await ctx.db2.Save_To_IndexedDB(db_data, DB_SCHEMA);
+    await ctx.db.Clear();
+    await ctx.db.Save_To_IndexedDB(db_data, DB_SCHEMA);
     Render_Job_Items(ctx);
     Alert("Data imported from " + file.name + " to IndexedDB instance.");
   };
@@ -211,10 +211,10 @@ async function On_Click_Import_Btn(ctx)
 async function On_Click_Export_Btn(ctx)
 {
   const db_data = {};
-  const table_names = Array.from(ctx.db2.db.objectStoreNames);
+  const table_names = Array.from(ctx.db.db.objectStoreNames);
   for (const table_name of table_names)
   {
-    db_data[table_name] = await ctx.db2.Get_All(table_name);
+    db_data[table_name] = await ctx.db.Get_All(table_name);
   }
 
   if (Array.isArray(db_data.attachments) && db_data.attachments.length > 0)
@@ -320,13 +320,13 @@ async function On_Click_AI_Add_Profile(ctx)
     info_elem.Info("Saving CV data...");
     if (cv_data.profile)
     {
-      await ctx.db2.Clear_Table(ctx.Profile.table_name);
+      await ctx.db.Clear_Table(ctx.Profile.table_name);
       await ctx.Profile.Save(ctx, cv_data.profile);
     }
-    await ctx.db2.Clear_Table(ctx.Profile.edu_table_name);
-    await ctx.db2.Insert_Items(ctx.Profile.edu_table_name, cv_data.educations);
-    await ctx.db2.Clear_Table(ctx.Profile.job_table_name);
-    await ctx.db2.Insert_Items(ctx.Profile.job_table_name, cv_data.career);
+    await ctx.db.Clear_Table(ctx.Profile.edu_table_name);
+    await ctx.db.Insert_Items(ctx.Profile.edu_table_name, cv_data.educations);
+    await ctx.db.Clear_Table(ctx.Profile.job_table_name);
+    await ctx.db.Insert_Items(ctx.Profile.job_table_name, cv_data.career);
 
     info_elem.Info();
     Alert("CV extracted successfully!");
@@ -930,14 +930,14 @@ async function On_Click_Delete_Attachment(ctx, attachment)
   const confirmed = await warning_dlg.Confirm("Are you sure you want to delete this attachment?");
   if (confirmed)
   {
-    await ctx.db2.Delete("attachments", [attachment.id]);
+    await ctx.db.Delete("attachments", [attachment.id]);
     await Render_Job_Items(ctx);
   }
 }
 
 async function On_Click_Download_Job(e, job_id, ctx)
 {
-  const job = await ctx.db2.Select_By_Id("jobs", job_id);
+  const job = await ctx.db.Select_By_Id("jobs", job_id);
 
   const filename = `jopr-${new Date().toISOString().split('T')[0]}.json`;
   const json_string = JSON.stringify(job, null, 2);
@@ -963,13 +963,13 @@ async function On_Click_Delete_Job(event, job_id, ctx)
   const confirmed = await warning_dlg.Confirm("Are you sure you want to delete this job?");
   if (confirmed)
   {
-    await ctx.db2.Delete("jobs", [job_id]);
+    await ctx.db.Delete("jobs", [job_id]);
     const attachment_ids =
-      await ctx.db2.Select_Ids("attachments", a => a.job_id === job_id);
-    await ctx.db2.Delete("attachments", attachment_ids);
+      await ctx.db.Select_Ids("attachments", a => a.job_id === job_id);
+    await ctx.db.Delete("attachments", attachment_ids);
     const action_log_ids =
-      await ctx.db2.Select_Ids("action_logs", l => l.job_id === job_id);
-    await ctx.db2.Delete("action_logs", action_log_ids);
+      await ctx.db.Select_Ids("action_logs", l => l.job_id === job_id);
+    await ctx.db.Delete("action_logs", action_log_ids);
 
     await Render_Job_Items(ctx);
     Alert("Job deleted successfully.");
@@ -990,13 +990,13 @@ function On_Click_Generate_Cover_Letter(e, job_id, ctx)
 
 async function On_Click_View_Job(event, job_id, ctx)
 {
-  const curr_job = await ctx.db2.Select_By_Id("jobs", job_id);
+  const curr_job = await ctx.db.Select_By_Id("jobs", job_id);
 
   job_det_dialog.role_elem.innerText = curr_job.role_title;
   job_det_dialog.des_elem.innerText = curr_job.description || "No job description available.";
 
-  const contact = await ctx.db2.Select_By_Id("contacts", curr_job.contact_id);
-  const agency = await ctx.db2.Select_By_Id("agencies", curr_job.agency_id);
+  const contact = await ctx.db.Select_By_Id("contacts", curr_job.contact_id);
+  const agency = await ctx.db.Select_By_Id("agencies", curr_job.agency_id);
   job_det_dialog.contact_name_elem.textContent = contact?.name;
   job_det_dialog.contact_agency_elem.textContent = agency?.name;
   Toggle_Field(contact?.phone, job_det_dialog.contact_phone_elem, job_det_dialog.contact_phone_img);
