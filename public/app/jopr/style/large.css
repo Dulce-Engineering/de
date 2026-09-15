@@ -133,19 +133,6 @@
         grid-row: 1;
         width: 160px;
         height: 160px;
-
-        svg.trend-up .data-line
-        {
-          --c0: #080;
-        }
-        svg.trend-down .data-line
-        {
-          --c0: #a00;
-        }
-        svg.trend-flat .data-line
-        {
-          --c0: #880;
-        }
       }
       .b1
       {

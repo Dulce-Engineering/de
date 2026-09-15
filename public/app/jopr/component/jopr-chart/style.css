@@ -19,6 +19,18 @@ de-line-chart
     grid-column: 1 / 2;
     grid-row: 1 / 2;
   }
+  svg.trend-up .data-line
+  {
+    --c0: #080;
+  }
+  svg.trend-down .data-line
+  {
+    --c0: #a00;
+  }
+  svg.trend-flat .data-line
+  {
+    --c0: #880;
+  }
 
   .title
   {
