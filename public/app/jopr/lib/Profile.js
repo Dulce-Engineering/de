@@ -79,7 +79,7 @@ class Profile
 
   /**
    * Saves or updates a user profile record in the 'profiles' table.
-   * @param {Context} ctx - Application context containing db2.
+   * @param {Context} ctx - Application context containing db.
    * @param {UserProfile|Object} form_data - Profile form data to save.
    * @returns {Promise<boolean|number|string>} Result of the database save operation.
    */
@@ -92,12 +92,12 @@ class Profile
       url: form_data.url?.trim() || null,
     };*/
 
-    return ctx.db2.Save(Profile.table_name, form_data);
+    return ctx.db.Save(Profile.table_name, form_data);
   }
 
   /**
    * Saves or updates an education/certificate record in the 'education' table.
-   * @param {Context} ctx - Application context containing db2.
+   * @param {Context} ctx - Application context containing db.
    * @param {EducationRecord|Object} form_data - Education form data.
    * @returns {Promise<boolean|number|string>} Result of the database save operation.
    */
@@ -111,12 +111,12 @@ class Profile
       year: form_data.year || null,
     };
 
-    return ctx.db2.Save(Profile.edu_table_name, obj);
+    return ctx.db.Save(Profile.edu_table_name, obj);
   }
 
   /**
    * Saves or updates a career/job history record in the 'career' table.
-   * @param {Context} ctx - Application context containing db2.
+   * @param {Context} ctx - Application context containing db.
    * @param {CareerJobRecord|Object} form_data - Career job form data.
    * @returns {Promise<boolean|number|string>} Result of the database save operation.
    */
@@ -138,51 +138,51 @@ class Profile
       end_date: form_data.end_date || null
     };
 
-    return ctx.db2.Save(Profile.job_table_name, obj);
+    return ctx.db.Save(Profile.job_table_name, obj);
   }
 
   /**
    * Deletes a profile record by ID from the 'profiles' table.
-   * @param {Context} ctx - Application context containing db2.
+   * @param {Context} ctx - Application context containing db.
    * @param {number|string} id - The ID of the profile record to delete.
    * @returns {Promise<boolean>} Whether the record was deleted.
    */
   static Delete(ctx, id)
   {
-    return ctx.db2.Delete(Profile.table_name, [id]);
+    return ctx.db.Delete(Profile.table_name, [id]);
   }
 
   /**
    * Deletes an education record by ID from the 'education' table.
-   * @param {Context} ctx - Application context containing db2.
+   * @param {Context} ctx - Application context containing db.
    * @param {number|string} id - The ID of the education record to delete.
    * @returns {Promise<boolean>} Whether the record was deleted.
    */
   static Edu_Delete(ctx, id)
   {
-    return ctx.db2.Delete(Profile.edu_table_name, [id]);
+    return ctx.db.Delete(Profile.edu_table_name, [id]);
   }
 
   /**
    * Deletes a career job record by ID from the 'career' table.
-   * @param {Context} ctx - Application context containing db2.
+   * @param {Context} ctx - Application context containing db.
    * @param {number|string} id - The ID of the career record to delete.
    * @returns {Promise<boolean>} Whether the record was deleted.
    */
   static Job_Delete(ctx, id)
   {
-    return ctx.db2.Delete(Profile.job_table_name, [id]);
+    return ctx.db.Delete(Profile.job_table_name, [id]);
   }
 
   /**
    * Selects the first profile record from the 'profiles' table.
-   * @param {Context} ctx - Application context containing db2.
+   * @param {Context} ctx - Application context containing db.
    * @returns {Promise<UserProfile|null>} The first user profile or null if none exists.
    */
   static async Select_First(ctx)
   {
     let profile = null;
-    const profiles = await ctx.db2.Select(Profile.table_name);
+    const profiles = await ctx.db.Select(Profile.table_name);
     if (profiles)
     {
       profile = profiles[0];
@@ -192,12 +192,12 @@ class Profile
 
   /**
    * Selects all education records from the 'education' table, sorted by year ascending.
-   * @param {Context} ctx - Application context containing db2.
+   * @param {Context} ctx - Application context containing db.
    * @returns {Promise<EducationRecord[]|null>} Sorted array of education records.
    */
   static async Edu_Select(ctx)
   {
-    const certificates = await ctx.db2.Select(Profile.edu_table_name);
+    const certificates = await ctx.db.Select(Profile.edu_table_name);
     if (certificates)
     {
       certificates.sort((a, b) => (Number(a.year) || 0) - (Number(b.year) || 0));
@@ -207,13 +207,13 @@ class Profile
 
   /**
    * Selects the first non-empty profile record from the 'profiles' table.
-   * @param {Context} ctx - Application context containing db2 and Utils.
+   * @param {Context} ctx - Application context containing db and Utils.
    * @returns {Promise<UserProfile|null>} The user profile object or null.
    */
   static async Select(ctx)
   {
     let profile = null;
-    const profiles = await ctx.db2.Select(Profile.table_name);
+    const profiles = await ctx.db.Select(Profile.table_name);
     if (profiles)
     {
       profile = !ctx.Utils.Is_Empty(profiles) ? profiles[0] : null;
@@ -223,13 +223,13 @@ class Profile
 
   /**
    * Selects career job records matching an optional filter, sorted descending by start_date.
-   * @param {Context} ctx - Application context containing db2.
+   * @param {Context} ctx - Application context containing db.
    * @param {((job: CareerJobRecord) => boolean)} [where_fn] - Optional filter predicate function.
    * @returns {Promise<CareerJobRecord[]|null>} Array of career jobs sorted by start_date descending.
    */
   static async Job_Select(ctx, where_fn)
   {
-    const jobs = await ctx.db2.Select(Profile.job_table_name, where_fn);
+    const jobs = await ctx.db.Select(Profile.job_table_name, where_fn);
     if (jobs)
     {
       jobs.sort((a, b) => -(a.start_date - b.start_date));
@@ -239,7 +239,7 @@ class Profile
 
   /**
    * Selects legacy career roles older than a set of excluded jobs up to 20 years ago.
-   * @param {Context} ctx - Application context containing Utils and db2.
+   * @param {Context} ctx - Application context containing Utils and db.
    * @param {Array<number|string>} exclude_ids - IDs of current/featured jobs to exclude.
    * @returns {Promise<CareerJobRecord[]>} Array of legacy career records.
    */
@@ -260,7 +260,7 @@ class Profile
 
   /**
    * Selects recent career job records from the past 20 years.
-   * @param {Context} ctx - Application context containing Utils and db2.
+   * @param {Context} ctx - Application context containing Utils and db.
    * @returns {Promise<CareerJobRecord[]>} Array of recent career job records.
    */
   static async Job_Select_Recent(ctx)
@@ -275,35 +275,35 @@ class Profile
 
   /**
    * Selects a profile record by its ID from the 'profiles' table.
-   * @param {Context} ctx - Application context containing db2.
+   * @param {Context} ctx - Application context containing db.
    * @param {number|string} id - Profile record ID.
    * @returns {Promise<UserProfile|null>} The profile record or null.
    */
   static Select_By_Id(ctx, id)
   {
-    return ctx.db2.Select_By_Id(Profile.table_name, id);
+    return ctx.db.Select_By_Id(Profile.table_name, id);
   }
 
   /**
    * Selects an education record by ID from the 'education' table.
-   * @param {Context} ctx - Application context containing db2.
+   * @param {Context} ctx - Application context containing db.
    * @param {number|string} id - Education record ID.
    * @returns {Promise<EducationRecord|null>} The education record or null.
    */
   static Edu_Select_By_Id(ctx, id)
   {
-    return ctx.db2.Select_By_Id(Profile.edu_table_name, id);
+    return ctx.db.Select_By_Id(Profile.edu_table_name, id);
   }
 
   /**
    * Selects a career job record by ID from the 'career' table.
-   * @param {Context} ctx - Application context containing db2.
+   * @param {Context} ctx - Application context containing db.
    * @param {number|string} id - Career job ID.
    * @returns {Promise<CareerJobRecord|null>} The career record or null.
    */
   static Job_Select_By_Id(ctx, id)
   {
-    return ctx.db2.Select_By_Id(Profile.job_table_name, id);
+    return ctx.db.Select_By_Id(Profile.job_table_name, id);
   }
 
   /**
