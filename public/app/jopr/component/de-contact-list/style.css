@@ -58,3 +58,32 @@ de-contact-list[view-type="sublist"]
     }
   }
 }
+
+@layer de-components
+{
+  de-contact-list[view-type="compact"]
+  {
+    de-input-list
+    {
+      h3
+      {
+        margin: 0;
+      }
+
+      main
+      {
+        gap: 0;
+
+        de-contact-details
+        {
+          display: inline-block !important;
+
+          de-field
+          {
+            display: inline-block;
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,5 +1,7 @@
-@import url("large.css");
-@import url("small.css");
+@layer base, de-components;
+
+@import url("large.css") layer(base);
+@import url("small.css") layer(base);
 
 @font-face {
   font-family: hyperspace-bold;

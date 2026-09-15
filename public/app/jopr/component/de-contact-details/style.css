@@ -4,4 +4,9 @@ de-contact-details
   {
     margin: 0;
   }
+
+  &[view-type="compact"]
+  {
+    display: flex;
+  }
 }

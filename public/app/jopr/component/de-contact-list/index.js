@@ -100,10 +100,8 @@ class DeContactList extends HTMLElement
       item_elem.contact_position_elem.value = contact.position;
     if (item_elem.contact_linkedin_elem)
       item_elem.contact_linkedin_elem.value = contact.linkedin;
-    if (item_elem.contact_xxx_elem)
-    {
-      // name - position 
-    }
+    if (item_elem.localName == "de-contact-details")
+      item_elem.value = contact;
 
     if (item_elem.contact_menu)
       item_elem.contact_menu.event_data = contact;
@@ -128,10 +126,9 @@ class DeContactList extends HTMLElement
   Render_Compact()
   {
     const html = `
-      <de-input-list cid="contacts_list">
-        <div slot="item" class="contact-item">
-          <label cid="contact_title_elem"></label>
-        </div>
+      <de-input-list cid="contacts_list" hide-header>
+        <h3 slot="header">Contacts</h3>
+        <de-contact-details slot="item" view-type="compact" class="contact-item"></de-contact-details>
       </de-input-list>
     `;
     this.innerHTML = html;

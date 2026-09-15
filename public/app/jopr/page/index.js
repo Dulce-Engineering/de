@@ -846,8 +846,6 @@ function Render_Job_Item(event, ctx)
     ctx.Utils.Append_Str("#" + job.id, subtitle_text, " - ");
   item_elem.contact_elem.textContent = subtitle_text;
 
-  const contact = { ...job.contact, agency_name: job.agency_name };
-  item_elem.contact_details_elem.value = contact;
   item_elem.contacts_elem.value = job.contacts;
 
   item_elem.job_details_elem.value = job;

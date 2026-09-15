@@ -41,15 +41,14 @@ class Contact
     return ctx.db2.Select_By_Id(Contact.table_name, id);
   }
 
-  static async Select_Extended(ctx)
+  static async Select_Extended(ctx, where_fn)
   {
-    const contacts = await ctx.db2.Get_All(Contact.table_name);
+    const contacts = await Contact.Select(ctx, where_fn);
     if (contacts)
     {
-      contacts.sort((a, b) => Contact.Get_Name(a).localeCompare(Contact.Get_Name(b)));
       for (const contact of contacts)
       {
-        contact.agency = await ctx.db2.Select_By_Id("agencies", contact.agency_id);
+        contact.agency = await ctx.db.Select_By_Id("agencies", contact.agency_id);
       }
     }
 

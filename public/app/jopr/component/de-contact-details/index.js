@@ -48,12 +48,42 @@ class DeContactDetails extends HTMLElement
    */
   set value(contact)
   {
-    this.contact_name_elem.value = contact?.name;
-    this.contact_phone_elem.value = contact?.phone;
-    this.contact_email_elem.value = contact?.email;
-    this.contact_position_elem.value = contact?.position;
-    this.contact_agency_elem.value = contact?.agency_name;
-    this.contact_linkedin_elem.value = contact?.linkedin;
+    const view_type = Utils.Get_Attr_Def(this, "view-type", "panel");
+    if (view_type == "compact")
+    {
+      const name_html = contact?.name ?
+        `<de-field value="${contact.name}"></de-field>` : null;
+      const position_html = contact?.position ?
+        `<de-field value="${contact.position}"></de-field>` : null;
+      const company_html = contact?.agency?.name ?
+        `<de-field value="${contact.agency.name}"></de-field>` : null;
+      const phone_html = contact?.phone ?
+        `<de-field value="${contact.phone}" field-type="phone"></de-field>` : null;
+      const email_html = contact?.email ?
+        `<de-field value="${contact.email}" field-type="email"></de-field>` : null;
+      
+      let html = Utils.Append_Str(name_html, position_html, "-");
+      html = Utils.Append_Str(html, company_html, "&nbsp;@&nbsp;");
+      html = Utils.Append_Str(html, phone_html, ",&nbsp;");
+      html = Utils.Append_Str(html, email_html, ",&nbsp;");
+      this.innerHTML = html;
+    }
+    else
+    {
+      if (this.contact_name_elem) 
+        this.contact_name_elem.value = contact?.name;
+      if (this.contact_phone_elem) 
+        this.contact_phone_elem.value = contact?.phone;
+      if (this.contact_email_elem) 
+        this.contact_email_elem.value = contact?.email;
+      if (this.contact_position_elem) 
+        this.contact_position_elem.value = contact?.position;
+      if (this.contact_linkedin_elem) 
+        this.contact_agency_elem.value = contact?.agency_name;
+      if (this.contact_linkedin_elem) 
+        this.contact_linkedin_elem.value = contact?.linkedin;
+    }
+
     this.Update_Visibility(contact);
   }
 
@@ -85,15 +115,21 @@ class DeContactDetails extends HTMLElement
    */
   Render()
   {
-    const html = `
-      <h3 cid="contact_title">Contact Details</h3>
-      <de-field cid="contact_name_elem" field-label="Name"></de-field>
-      <de-field cid="contact_phone_elem" field-label="Phone" field-type="phone"></de-field>
-      <de-field cid="contact_email_elem" field-label="Email" field-type="email"></de-field>
-      <de-field cid="contact_position_elem" field-label="Position"></de-field>
-      <de-field cid="contact_agency_elem" field-label="Agency"></de-field>
-      <de-field cid="contact_linkedin_elem" field-label="LinkedIn" field-type="link"></de-field>
-    `;
+    let html = "";
+
+    const view_type = Utils.Get_Attr_Def(this, "view-type", "panel");
+    if (view_type == "panel")
+    {
+      html = `
+        <h3 cid="contact_title">Contact Details</h3>
+        <de-field cid="contact_name_elem" field-label="Name"></de-field>
+        <de-field cid="contact_phone_elem" field-label="Phone" field-type="phone"></de-field>
+        <de-field cid="contact_email_elem" field-label="Email" field-type="email"></de-field>
+        <de-field cid="contact_position_elem" field-label="Position"></de-field>
+        <de-field cid="contact_agency_elem" field-label="Agency"></de-field>
+        <de-field cid="contact_linkedin_elem" field-label="LinkedIn" field-type="link"></de-field>
+      `;
+    }
     this.innerHTML = html;
     Utils.Set_Id_Shortcuts(this, this, "cid");
   }

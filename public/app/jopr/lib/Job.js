@@ -269,7 +269,7 @@ class Job
   {
     const latest = await Job.Get_Last_Note(ctx, job);
     const agency = await ctx.Agency.Select_By_Id(ctx, job.agency_id);
-    const contacts = await ctx.Contact.Select
+    const contacts = await ctx.Contact.Select_Extended
       (ctx, c => job.contact_ids && job.contact_ids.includes(c.id));
     const attachments = await Job.Attachment_Select_By_Job_Id(ctx, job.id);
     return {

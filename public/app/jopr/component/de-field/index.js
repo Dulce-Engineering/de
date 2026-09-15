@@ -93,6 +93,16 @@ class DeField extends HTMLElement
     return this.value_elem.textContent;
   }
   
+  // attributes ===============================================================
+
+  /*static observedAttributes = 
+  [
+    "value"
+  ];
+  attributeChangedCallback(name, old_value, new_value)
+  {
+  }*/
+
   /**
    * Shows the component.
    * If the `hide-class` attribute is set, removes that class from the component.
@@ -149,6 +159,11 @@ class DeField extends HTMLElement
     {
       this.label_elem.textContent = this.getAttribute("field-label") + ":";
       this.label_elem.style.display = null;
+    }
+    if (this.hasAttribute("value"))
+    {
+      const value = this.getAttribute("value");
+      this.value = value;
     }
   }
 }

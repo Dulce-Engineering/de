@@ -142,6 +142,14 @@ class DeInputList extends HTMLElement
 
     this.items_elem.style.display = item_count > 0 ? null : "none";
     this.no_items_elem.style.display = !(item_count > 0) && no_items_count > 0 ? null : "none";
+  
+    const hide_header = "hide-header";
+    if (this.hasAttribute(hide_header))
+    {
+      const header_elems = this.querySelectorAll("[slot=header]");
+      if (header_elems)
+        header_elems.forEach(e => e.style.display = item_count > 0 ? null : "none");
+    }
   }
 
   /**
