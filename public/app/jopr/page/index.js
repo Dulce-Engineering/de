@@ -978,14 +978,12 @@ async function On_Click_Delete_Job(event, job_id, ctx)
 
 function On_Click_Generate_CV(e, job_id, ctx)
 {
-  const url = "page/gen-cv-2.html?job_id=" + job_id;
-  window.open(url, "_blank");
+  window.open(ctx.routes["gen-cv-2"](job_id), "_blank");
 }
 
 function On_Click_Generate_Cover_Letter(e, job_id, ctx)
 {
-  const url = "page/gen-cl.html?job_id=" + job_id;
-  window.open(url, "_blank");
+  window.open(ctx.routes["gen-cl"](job_id), "_blank");
 }
 
 async function On_Click_View_Job(event, job_id, ctx)
