@@ -118,5 +118,11 @@
     "datetime": 1789467240166,
     "id": "dcb792ce-328c-4dd8-a8b6-d2533dfec328",
     "query_id": "-rust"
+  },
+  {
+    "count": 22,
+    "datetime": 1789704015368,
+    "id": "9a45aead-2e18-489a-9b56-0f888ab5b0a6",
+    "query_id": "-rust"
   }
 ]
