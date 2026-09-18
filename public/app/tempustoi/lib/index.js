@@ -25,6 +25,8 @@ import Utils from "/lib/Utils.js";
  * @property {Repeat} recurrence - Optional recurrence rules for the timer.
  */
 
+const active_alarms = new Map();
+
 Main();
 async function Main()
 {
@@ -59,7 +61,6 @@ async function Main()
   for (const timer of alarmed_timers)
   {
     Alarm_On(timer);
-    setTimeout(() => Alarm_Off(timer), 30000);
   }
   
   //Ads();
@@ -286,11 +287,13 @@ function On_Click_Delete_Ok(e)
   const btn_elem = e.target;
   const timer_id = btn_elem.timer.id;
 
+  Alarm_Stop(timer_id);
+
   const timer_elem = document.getElementById("timer_" + timer_id);
-  timer_elem.stop();
+  if (timer_elem) timer_elem.stop();
 
   const panel_elem = document.getElementById("panel_" + timer_id);
-  panel_elem.remove();
+  if (panel_elem) panel_elem.remove();
   
   Update_Nav();
 
@@ -343,7 +346,6 @@ function On_Timer_Completed(e)
   }
 
   Alarm_On(timer);
-  setTimeout(() => Alarm_Off(timer), 30000);
 }
 
 function On_Click_Quiet(e) 
@@ -355,6 +357,8 @@ function On_Click_Quiet(e)
 // Function referenced by the confirm delete all dialog
 function On_Click_Del_All_Ok()
 {
+  Alarm_Stop_All();
+
   for (const timer_elem of document.querySelectorAll("de-timer"))
   {
     timer_elem.stop();
@@ -520,6 +524,11 @@ function Render_Timer(timer)
   const quiet_btn_elem = document.getElementById(quiet_btn_id);
   quiet_btn_elem.timer = timer;
   quiet_btn_elem.addEventListener("click", On_Click_Quiet);
+  if (active_alarms.has(timer.id))
+  {
+    quiet_btn_elem.hidden = false;
+    panel_elem.classList.add("alarm");
+  }
 
   const stop_btn_elem = document.getElementById(stop_btn_id);
   stop_btn_elem.timer = timer;
@@ -564,7 +573,28 @@ function Update_Nav()
 
 function Alarm_On(timer)
 {
-  alarm.play();
+  if (!timer || !timer.id) return;
+
+  if (active_alarms.has(timer.id))
+  {
+    clearTimeout(active_alarms.get(timer.id));
+  }
+
+  try
+  {
+    const playPromise = alarm.play();
+    if (playPromise !== undefined)
+    {
+      playPromise.catch((err) => console.warn("Alarm audio play error:", err));
+    }
+  }
+  catch (e)
+  {
+    console.warn("Alarm audio play error:", e);
+  }
+
+  const timeout_id = setTimeout(() => Alarm_Off(timer), 30000);
+  active_alarms.set(timer.id, timeout_id);
 
   const quiet_btn_elem = document.getElementById("quiet_btn_" + timer.id);
   const panel_elem = document.getElementById("panel_" + timer.id);
@@ -577,13 +607,30 @@ function Alarm_On(timer)
 
 function Alarm_Off(timer)
 {
-  alarm.pause();
-  alarm.currentTime = 0;
+  if (!timer || !timer.id) return;
+
+  if (active_alarms.has(timer.id))
+  {
+    clearTimeout(active_alarms.get(timer.id));
+    active_alarms.delete(timer.id);
+  }
+
+  if (active_alarms.size === 0)
+  {
+    alarm.pause();
+    alarm.currentTime = 0;
+  }
 
   const panel_elem = document.getElementById("panel_" + timer.id);
   if (panel_elem)
   {
     panel_elem.classList.remove("alarm");
+  }
+
+  const quiet_btn_elem = document.getElementById("quiet_btn_" + timer.id);
+  if (quiet_btn_elem)
+  {
+    quiet_btn_elem.hidden = true;
   }
 
   const timers = Select_Timers() || [];
@@ -595,6 +642,35 @@ function Alarm_Off(timer)
   }
 
   Render_Timers(timers);
+}
+
+function Alarm_Stop(timer_id)
+{
+  if (!timer_id) return;
+
+  if (active_alarms.has(timer_id))
+  {
+    clearTimeout(active_alarms.get(timer_id));
+    active_alarms.delete(timer_id);
+  }
+
+  if (active_alarms.size === 0)
+  {
+    alarm.pause();
+    alarm.currentTime = 0;
+  }
+}
+
+function Alarm_Stop_All()
+{
+  for (const timeout_id of active_alarms.values())
+  {
+    clearTimeout(timeout_id);
+  }
+  active_alarms.clear();
+
+  alarm.pause();
+  alarm.currentTime = 0;
 }
 
 // misc =====================================================================================
@@ -902,11 +978,13 @@ function Save_Timer(timer)
 
 function Delete_Timers()
 {
+  Alarm_Stop_All();
   localStorage.removeItem("tempustoi");
 }
 
 function Delete_Timer(id)
 {
+  Alarm_Stop(id);
   let timers = Select_Timers();
   if (timers)
   {
