@@ -1,58 +1,72 @@
 {
   "hosting": 
-  {
-    "public": "public",
-    "ignore": 
-    [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**",
-      "**/.sample-data/**"
-    ],
-    "redirects": 
-    [
-      {
-        "source": "/job-woper/:path*",
-        "destination": "/app/job-woper/:path*",
-        "type": 301
-      },
-      {
-        "source": "/blottolog/:path*",
-        "destination": "/app/blottolog/:path*",
-        "type": 301
-      },
-      {
-        "source": "/tempustoi/:path*",
-        "destination": "/app/tempustoi/:path*",
-        "type": 301
-      },
-      {
-        "source": "/tempustoi",
-        "destination": "/app/tempustoi/index.html",
-        "type": 301
-      },
-      {
-        "source": "/tempustrak/:path*",
-        "destination": "/app/tempustrak/:path*",
-        "type": 301
-      },
-      {
-        "source": "/tempustrak",
-        "destination": "/app/tempustrak/index.html",
-        "type": 301
-      },
-      {
-        "source": "/porottoz/:path*",
-        "destination": "/app/porottoz/:path*",
-        "type": 301
-      },
-      {
-        "source": "/porottoz",
-        "destination": "/app/porottoz/index.html",
-        "type": 301
-      }
-    ]
-  },
+  [
+    {
+      "target": "site-dulceeng",
+      "public": "public",
+      "ignore": 
+      [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**",
+        "**/.sample-data/**"
+      ],
+      "redirects": 
+      [
+        {
+          "source": "/job-woper/:path*",
+          "destination": "/app/job-woper/:path*",
+          "type": 301
+        },
+        {
+          "source": "/blottolog/:path*",
+          "destination": "/app/blottolog/:path*",
+          "type": 301
+        },
+        {
+          "source": "/tempustoi/:path*",
+          "destination": "/app/tempustoi/:path*",
+          "type": 301
+        },
+        {
+          "source": "/tempustoi",
+          "destination": "/app/tempustoi/index.html",
+          "type": 301
+        },
+        {
+          "source": "/tempustrak/:path*",
+          "destination": "/app/tempustrak/:path*",
+          "type": 301
+        },
+        {
+          "source": "/tempustrak",
+          "destination": "/app/tempustrak/index.html",
+          "type": 301
+        },
+        {
+          "source": "/porottoz/:path*",
+          "destination": "/app/porottoz/:path*",
+          "type": 301
+        },
+        {
+          "source": "/porottoz",
+          "destination": "/app/porottoz/index.html",
+          "type": 301
+        }
+      ]
+    },
+    {
+      "target": "site-ontherocks",
+      "public": "public-ontherocks",
+      "ignore": 
+      [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ]
+    }
+  ],
+
   "storage": 
   {
     "rules": "storage.rules"
