@@ -104,9 +104,9 @@ class Job
     return await ctx.db.Select_By_Id(Job.table_name, id);
   }
 
-  static Select(ctx, where_fn, order_by_fn, pre_fn)
+  static Select(ctx, where_fn, order_by_fn, limit, pre_fn)
   {
-    return ctx.db.Select(Job.table_name, where_fn, order_by_fn, pre_fn);
+    return ctx.db.Select(Job.table_name, where_fn, order_by_fn, limit, pre_fn);
   }
 
   static Attachment_Select_By_Job_Id(ctx, job_id)
@@ -172,20 +172,19 @@ class Job
   /**
    * @param {Context} ctx
    */
-  static async Select_All_Extended_Sorted(ctx, filters)
+  static Select_All_Extended_Sorted(ctx, filters)
   {
-    const jobs = await Job.Select
+    return Job.Select
     (
       ctx, 
-      j => Job.Apply_Filters(j, filters), 
-      Job.Order_By_Status_Update, 
+      j => Job.Where(j, filters),
+      Job.Order_By_Status_Update,
+      null, // limit
       j => Job.Add_Details(ctx, j)
     );
-
-    return jobs;
   }
 
-  static Apply_Filters(job, filters)
+  static Where(job, filters)
   {
     let res = true;
 

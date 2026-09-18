@@ -66,9 +66,9 @@ class Db
     return Db.Save_To_IndexedDB(this.db, db_data, schema);
   }
 
-  Select(table_name, where_fn, order_by_fn, pre_fn)
+  Select(table_name, where_fn, order_by_fn, limit, pre_fn)
   {
-    return Db.Select(this.db, table_name, where_fn, order_by_fn, pre_fn);
+    return Db.Select(this.db, table_name, where_fn, order_by_fn, limit, pre_fn);
   }
 
   Select_By_Id(table_name, id)
@@ -182,9 +182,9 @@ class Db
     return next_id;
   }
 
-  static async Select(db, table_name, where_fn, order_by_fn, pre_fn)
+  static async Select(db, table_name, where_fn, order_by_fn, limit, pre_fn)
   {
-    const all_items = await Db.Get_All(db, table_name);
+    const all_items = await Db.Get_All(db, table_name, limit);
 
     let pre_items = all_items;
     if (pre_fn && all_items?.length > 0)
@@ -364,13 +364,13 @@ class Db
     return store;
   }
 
-  static Get_All(db, table_name)
+  static Get_All(db, table_name, limit)
   {
     let res = null;
     const table = Db.Get_Table(db, table_name);
     if (table)
     {
-      const request = table.getAll();
+      const request = table.getAll(null, limit);
       res = Db.Get_Req_Res(request);
     }
     return res;

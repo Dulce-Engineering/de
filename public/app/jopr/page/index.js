@@ -64,28 +64,28 @@ async function Render_App(ctx)
   export_btn.onclick = () => On_Click_Export_Btn(ctx);
 
   jobs_btn.onclick = () => Show_View(jobs_list);
-  job_agency_select.addEventListener("add", On_Click_Add_Agency);
-  jobs_menu.addEventListener("add", (e) => On_Click_Edit_Job(e, null, ctx));
-  jobs_menu.addEventListener("ai", () => On_Click_AI_Add_Job(ctx));
+  job_agency_select?.addEventListener("add", On_Click_Add_Agency);
+  jobs_menu?.addEventListener("add", (e) => On_Click_Edit_Job(e, null, ctx));
+  jobs_menu?.addEventListener("ai", () => On_Click_AI_Add_Job(ctx));
   jobs_list.addEventListener("render", e => Render_Job_Item(e, ctx));
   jobs_filter.addEventListener("search", () => Render_Job_Items(ctx));
-  job_contacts.addEventListener("add", On_Click_Add_Contact);
-  job_contacts.addEventListener("select", e => On_Click_Select_Contact(e, ctx));
-  job_contacts.addEventListener("delete", e => On_Click_Delete_Job_Contact(e, ctx));
-  job_contacts.addEventListener("edit", e => On_Click_Edit_Job_Contact(e, ctx));
+  job_contacts?.addEventListener("add", On_Click_Add_Contact);
+  job_contacts?.addEventListener("select", e => On_Click_Select_Contact(e, ctx));
+  job_contacts?.addEventListener("delete", e => On_Click_Delete_Job_Contact(e, ctx));
+  job_contacts?.addEventListener("edit", e => On_Click_Edit_Job_Contact(e, ctx));
   Render_Job_Items(ctx);
 
-  companies_btn.onclick = () => Show_View(companies_list);
+  /*companies_btn.onclick = () => Show_View(companies_list);
   add_company_btn.onclick = (e) => On_Click_Add_Company(e, null, ctx);
   companies_list.addEventListener("render", e => Render_Company_Item(e, ctx));
-  Render_Companies(ctx);
+  Render_Companies(ctx);*/
 
-  contacts_btn.onclick = () => Show_View(contacts_list);
+  /*contacts_btn.onclick = () => Show_View(contacts_list);
   contacts_list.addEventListener("add", e => On_Click_Edit_Contact(e, ctx));
   contacts_list.addEventListener("edit", e => On_Click_Edit_Contact(e, ctx));
   contacts_list.addEventListener("delete", e => On_Click_Delete_Contact(e, ctx));
   const contacts = await ctx.Contact.Select_Extended(ctx);
-  contacts_list.value = contacts;
+  contacts_list.value = contacts;*/
 
   profile_btn.onclick = () => Show_View(profile_elem);
   profile_menu.addEventListener("edit", () => On_Click_Edit_Profile(ctx));
@@ -609,15 +609,18 @@ function Duration_Str(start_time, end_time)
 
 function Set_Options(select_elem, options, value_fn, text_fn)
 {
-  select_elem.innerHTML = '<option value="">None</option>';
-  if (options)
+  if (select_elem)
   {
-    for (const option of options)
+    select_elem.innerHTML = '<option value="">None</option>';
+    if (options)
     {
-      const option_elem = document.createElement("option");
-      option_elem.value = value_fn(option);
-      option_elem.textContent = text_fn(option);
-      select_elem.appendChild(option_elem);
+      for (const option of options)
+      {
+        const option_elem = document.createElement("option");
+        option_elem.value = value_fn(option);
+        option_elem.textContent = text_fn(option);
+        select_elem.appendChild(option_elem);
+      }
     }
   }
 }
@@ -825,7 +828,10 @@ async function On_Click_Delete_Contact(event, ctx)
  */
 async function Render_Job_Items(ctx)
 {
-  jobs_list.value = await ctx.Job.Select_All_Extended_Sorted(ctx, jobs_filter.value);
+  let jobs = 
+    await ctx.Job.Select_All_Extended_Sorted(ctx, jobs_filter.value);
+
+  jobs_list.value = jobs;
 }
 
 function Render_Job_Item(event, ctx)
