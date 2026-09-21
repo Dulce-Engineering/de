@@ -1,5 +1,6 @@
 import Utils from "../../../../lib/Utils.js";
-const html_url = "component/de-project-list/layout.html";
+const html_local_url = "./layout.html";
+const html_url = new URL(html_local_url, import.meta.url).href;
 
 /**
  * Custom HTML Element representing a list of projects.

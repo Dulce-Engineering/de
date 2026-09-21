@@ -99,9 +99,9 @@
       <button id="jobs_btn" class="img" title="Jobs">
         <img src="image/work.svg">
       </button>
-      <button id="profile_btn" class="img" title="Profile">
+      <a id="profile_btn" class="btn img" href="./page/profiles.html" title="Profile">
         <img src="image/person.svg">
-      </button>
+      </a>
       <button id="companies_btn" class="img hidden" title="Companies">
         <img src="image/factory.svg">
       </button>
@@ -202,72 +202,7 @@
       </details>
     </de-input-list>
 
-    <div id="profile_elem" class="hidden">
 
-      <header slot="header" class="header">
-        <h2>Profile</h2>
-        <de-toolbar-menu id="profile_menu" show-ai show-edit show-download>
-        </de-toolbar-menu>
-      </header>
-
-      <div id="profile_details" class="details fancy-border">
-        <h2 id="profile_name"></h2>
-        <p>Address: <span id="profile_address"></span></p>
-        <p>Seek URL: <span id="profile_seek_url"></span></p>
-        <p>LinkedIn URL: <span id="profile_linkedin_url"></span></p>
-        <p>Residency Status: <span id="profile_residency_status"></span></p>
-        <p>Personal Attributes<br><span id="profile_personal_summary"></span></p>
-        <p>Skills: <span id="profile_skills"></span></p>
-        <p>Interests: <span id="profile_interests"></span></p>
-      </div>
-      <span id="no_profile_details" class="details">
-        <h2>No profile details available. Please use the profile edit button.</h2>
-      </span>
-
-      <de-input-list id="edu_list">
-        <header slot="header" class="header">
-          <h2>Education</h2>
-          <de-toolbar-menu id="edu_list_menu" show-add></de-toolbar-menu>
-        </header>
-        <details slot="item" class="fancy-border">
-          <summary>
-            <h2 cid="edu_title_elem"></h2>
-            <de-toolbar-menu cid="edu_item_menu" show-edit show-delete></de-toolbar-menu>
-          </summary>
-          <div cid="edu_det_elem"></div>
-        </details>
-        <span slot="no_items" class="details"><h2>
-          No education to list.
-          Use the plus button to add some.</h2>
-        </span>
-      </de-input-list>
-
-      <de-input-list id="career_list">
-        <header slot="header" class="header">
-          <h2>Career</h2>
-          <de-toolbar-menu id="career_list_menu" show-add></de-toolbar-menu>
-        </header>
-        <details slot="item" class="fancy-border">
-          <summary>
-            <h2 cid="career_company_elem"></h2>
-            <de-toolbar-menu cid="career_item_menu" show-edit show-delete></de-toolbar-menu>
-          </summary>
-          <div cid="career_title_elem" class="det_item"></div>
-          <div cid="career_time_elem" class="det_item"></div>
-          <div cid="career_tech_elem" class="det_item"></div>
-          <div class="det_item">Responsibilities<br><span cid="career_resp_elem"></span></div>
-          <div class="det_item">Projects<br><span cid="career_proj_elem"></span></div>
-        </details>
-        <span slot="no_items" class="details"><h2>
-          No work history to list.
-          Use the plus button to add some.</h2>
-        </span>
-      </de-input-list>
-
-      <de-project-list id="project_list">
-      </de-project-list>
-
-    </div>
 
   </main>
 
@@ -382,30 +317,7 @@
 
   <de-contact-form id="contact_dialog"></de-contact-form>
   
-  <de-dialog-form id="profile_form" hide-clr>
-    <label slot="fields">Name</label>
-    <input slot="fields" name="name" type="text" placeholder="Full name">
-    <label slot="fields">Phone</label>
-    <input slot="fields" name="phone" type="tel">
-    <label slot="fields">Website</label>
-    <input slot="fields" name="url" type="url">
-    <label slot="fields">Residency Status</label>
-    <input slot="fields" name="residency_status" type="text" placeholder="e.g., Permanent Resident">
-    <label slot="fields">E-Mail</label>
-    <input slot="fields" name="email" type="email">
-    <label slot="fields">Address</label>
-    <input slot="fields" name="address" type="text" placeholder="Street address">
-    <label slot="fields">Seek URL</label>
-    <input slot="fields" name="seek_url" type="url" placeholder="https://seek.com.au/profile/...">
-    <label cid="linkedin_url_label" slot="fields">LinkedIn URL</label>
-    <input slot="fields" name="linkedin_url" type="url" placeholder="https://linkedin.com/in/...">
-    <label cid="personal_summary_label" slot="fields">Personal Summary</label>
-    <textarea slot="fields" name="personal_summary" placeholder="Tell us about yourself..." rows="4"></textarea>
-    <label cid="skills_label" slot="fields">Skills</label>
-    <textarea slot="fields" name="skills" placeholder="List your skills..." rows="4"></textarea>
-    <label cid="interests_label" slot="fields">Interests</label>
-    <textarea slot="fields" name="interests" placeholder="What are you interested in?" rows="4"></textarea>
-  </de-dialog-form>
+
 
   <de-dialog-form id="job_dialog">
     <h2 slot="header">Add Job</h2>
@@ -460,36 +372,7 @@
     <input slot="fields" type="email" name="email">
   </de-dialog-form>
 
-  <de-dialog-form id="career_dialog">
-    <h2 slot="header">Add Career Experience</h2>
-    <label slot="fields">Company</label>
-    <input slot="fields" type="text" name="company_name">
-    <label slot="fields">Title</label>
-    <input slot="fields" type="text" name="role_titles">
-    <label slot="fields">Work Type</label>
-    <select id="career_work_type_select" slot="fields" name="work_type"></select>
-    <label slot="fields">Location</label>
-    <input slot="fields" type="text" name="location">
-    <label slot="fields">Start Time</label>
-    <input slot="fields" type="date" name="start_date">
-    <label slot="fields">End Time</label>
-    <input slot="fields" type="date" name="end_date">
 
-    <label cid="summary_label" slot="fields">Role Summary</label>
-    <textarea slot="fields" name="summary" rows="4"></textarea>
-
-    <label cid="company_label" slot="fields">Company Description</label>
-    <textarea slot="fields" name="company_description" rows="4"></textarea>
-
-    <label cid="tech_label" slot="fields">Technologies / Software</label>
-    <textarea slot="fields" name="tech" rows="2"></textarea>
-
-    <label cid="responsibilities_label" slot="fields">Role Description / Responsibilities / Duties</label>
-    <textarea slot="fields" name="responsibilities" rows="4"></textarea>
-    
-    <label cid="projects_label" slot="fields">Projects / Achievements / Accomplishments</label>
-    <textarea slot="fields" name="projects" rows="4"></textarea>
-  </de-dialog-form>
 
   <de-dialog-form id="email_dialog">
     <h2 slot="header">Extract Job from Text</h2>
@@ -499,15 +382,7 @@
       agency details from the given text.</p>
   </de-dialog-form>
 
-  <de-dialog-form id="edu_dialog">
-    <h2 slot="header">Certificate Details</h2>
-    <label slot="fields">Title</label>
-    <input slot="fields" type="text" name="title">
-    <label slot="fields">Institution</label>
-    <input slot="fields" type="text" name="institution">
-    <label slot="fields">Year</label>
-    <input slot="fields" type="number" name="year" min="1900" max="3000" step="1">
-  </de-dialog-form>
+
 
   <de-dialog-alert id="job_det_dialog">
     <h2 cid="role_elem" slot="header">Job Details</h2>

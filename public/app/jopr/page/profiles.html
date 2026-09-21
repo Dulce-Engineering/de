@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <base href="../">
+  <script async src="/lib/ga.js"></script>
+  <link rel="manifest" href="/app/jopr/manifest.json">
+  <title>JOPR: Profiles</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="robots" content="index, follow">
+  <link rel="shortcut icon" href="./image/favicon.ico">
+  
+  <meta name="description" content="Free local-first job tracker & AI CV builder. Track applications, customize resumes, and manage contacts securely from your browser with no signups required.">
+  <meta name="keywords" content="job tracker, job application tracker, AI resume builder, AI CV generator, local-first app, private job tracker, custom CV, tailored cover letters, resume editor, career manager, retro terminal, no signup job tracker, client-side resume builder, PWA job tracker">
+  <meta name="author" content="Dulce Engineering Pty. Ltd.">
+
+  <meta property="og:title" content="JOPR">
+  <meta property="og:description" content="Free local-first job tracker & AI CV builder. Track applications, customize resumes, and manage contacts securely from your browser with no signups required.">
+  <meta property="og:image" content="https://dulceeng.com.au/app/jopr/image/screenshot-landscape.png">
+  <meta property="og:url" content="https://dulceeng.com.au/app/jopr">
+  <meta property="og:type" content="website">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Website",
+    "name": "JOPR",
+    "url": "https://dulceeng.com.au/app/jopr",
+    "description": "Free local-first job tracker & AI CV builder. Track applications, customize resumes, and manage contacts securely from your browser with no signups required.",
+    "image": "https://dulceeng.com.au/app/jopr/image/screenshot-landscape.png"
+  }
+  </script>
+
+  <link rel="stylesheet" href="./style/index.css?v=2">
+  <link rel="stylesheet" href="./component/de-info/style.css?v=2">
+  <link rel="stylesheet" href="./component/de-clock-2/style.css?v=2">
+  <link rel="stylesheet" href="./component/jopr-chart/style.css?v=2">
+  <link rel="stylesheet" href="./component/de-project-list/style.css?v=2">
+  
+  <script type="importmap">
+  {
+    "imports": 
+    {
+      "firebase/app":       "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js",
+      "firebase/functions": "https://www.gstatic.com/firebasejs/12.12.1/firebase-functions.js",
+      "firebase/firestore": "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js",
+      "firebase/auth":      "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js",
+      "firebase-analytics": "https://www.gstatic.com/firebasejs/12.12.1/firebase-analytics.js",
+      "firebase/ai":        "https://www.gstatic.com/firebasejs/12.12.1/firebase-ai.js"
+    }
+  }
+  </script>
+  <script src="../../dedial/dedial.js?v=2" type="module"></script>
+  <script src="../../component/DeInputList/index3.js?v=2" type="module"></script>
+  <script src="../../component/DeForm/index.js?v=2" type="module"></script>
+  <script src="../../component/DeDialogForm/index.js?v=2" type="module"></script>
+  <script src="../../component/DeDialogAlert/index.js?v=2" type="module"></script>
+  <script src="../../component/DeDialogConfirm/index.js?v=2" type="module"></script>
+  <script src="../../component/DeLineChart/index.js?v=2" type="module"></script>
+  <script src="./component/de-project-list/index.js?v=2" type="module"></script>
+  <script src="./component/de-toolbar-menu/index.js?v=2" type="module"></script>
+  <script src="./component/de-info/index.js?v=2" type="module"></script>
+  <script src="./component/de-clock-2/index.js?v=2" type="module"></script>
+  <script src="./component/de-field/index.js?v=2" type="module"></script>
+  <script src="./page/profiles.js?v=2" type="module"></script>
+</head>
+
+<body>
+
+  <header id="hdr_elem" class="">
+    <div class="chart">
+      <de-line-chart id="chart_elem" hide-labels chart-type="smooth">
+      </de-line-chart>
+      <div class="b1"></div>
+      <div class="b2"></div>
+    </div>
+    <h1 class="title">JOPR&nbsp;&nbsp;&nbsp;</h1>
+    <de-clock-2 id="clock_elem"></de-clock-2>
+    <nav id="nav_elem">
+      <button id="import_btn" class="img" title="Upload">
+        <img src="image/upload.svg">
+      </button>
+      <button id="export_btn" class="img" title="Download">
+        <img src="image/download.svg">
+      </button>
+      <a id="jobs_btn" class="btn img" href="index.html" title="Jobs">
+        <img src="image/work.svg">
+      </a>
+      <button id="profile_btn" class="img" title="Profile">
+        <img src="image/person.svg">
+      </button>
+      <button id="companies_btn" class="img hidden" title="Companies">
+        <img src="image/factory.svg">
+      </button>
+      <button id="contacts_btn" class="img hidden" title="Contacts">
+        <img src="image/contacts.svg">
+      </button>
+      <a id="analysis_btn" class="btn img" href="../job-woper" title="Market Analysis">
+        <img src="image/chart-4.svg">
+      </a>
+    </nav>
+    <output id="alert_elem" role="status"></output>
+  </header>
+
+  <main id="app_body">
+
+    <div id="profile_elem">
+
+      <header slot="header" class="header">
+        <h2>Profile</h2>
+        <de-toolbar-menu id="profile_menu" show-ai show-edit show-download>
+        </de-toolbar-menu>
+      </header>
+
+      <div id="profile_details" class="details fancy-border">
+        <h2 id="profile_name"></h2>
+        <p>Address: <span id="profile_address"></span></p>
+        <p>Seek URL: <span id="profile_seek_url"></span></p>
+        <p>LinkedIn URL: <span id="profile_linkedin_url"></span></p>
+        <p>Residency Status: <span id="profile_residency_status"></span></p>
+        <p>Personal Attributes<br><span id="profile_personal_summary"></span></p>
+        <p>Skills: <span id="profile_skills"></span></p>
+        <p>Interests: <span id="profile_interests"></span></p>
+      </div>
+      <span id="no_profile_details" class="details">
+        <h2>No profile details available. Please use the profile edit button.</h2>
+      </span>
+
+      <de-input-list id="edu_list">
+        <header slot="header" class="header">
+          <h2>Education</h2>
+          <de-toolbar-menu id="edu_list_menu" show-add></de-toolbar-menu>
+        </header>
+        <details slot="item" class="fancy-border">
+          <summary>
+            <h2 cid="edu_title_elem"></h2>
+            <de-toolbar-menu cid="edu_item_menu" show-edit show-delete></de-toolbar-menu>
+          </summary>
+          <div cid="edu_det_elem"></div>
+        </details>
+        <span slot="no_items" class="details"><h2>
+          No education to list.
+          Use the plus button to add some.</h2>
+        </span>
+      </de-input-list>
+
+      <de-input-list id="career_list">
+        <header slot="header" class="header">
+          <h2>Career</h2>
+          <de-toolbar-menu id="career_list_menu" show-add></de-toolbar-menu>
+        </header>
+        <details slot="item" class="fancy-border">
+          <summary>
+            <h2 cid="career_company_elem"></h2>
+            <de-toolbar-menu cid="career_item_menu" show-edit show-delete></de-toolbar-menu>
+          </summary>
+          <div cid="career_title_elem" class="det_item"></div>
+          <div cid="career_time_elem" class="det_item"></div>
+          <div cid="career_tech_elem" class="det_item"></div>
+          <div class="det_item">Responsibilities<br><span cid="career_resp_elem"></span></div>
+          <div class="det_item">Projects<br><span cid="career_proj_elem"></span></div>
+        </details>
+        <span slot="no_items" class="details"><h2>
+          No work history to list.
+          Use the plus button to add some.</h2>
+        </span>
+      </de-input-list>
+
+      <de-project-list id="project_list">
+      </de-project-list>
+
+    </div>
+
+  </main>
+
+  <footer>
+    © Copyright Dulce Engineering 2025. All rights reserved. v1
+  </footer>
+
+  <de-dialog-form id="profile_form" hide-clr>
+    <label slot="fields">Name</label>
+    <input slot="fields" name="name" type="text" placeholder="Full name">
+    <label slot="fields">Phone</label>
+    <input slot="fields" name="phone" type="tel">
+    <label slot="fields">Website</label>
+    <input slot="fields" name="url" type="url">
+    <label slot="fields">Residency Status</label>
+    <input slot="fields" name="residency_status" type="text" placeholder="e.g., Permanent Resident">
+    <label slot="fields">E-Mail</label>
+    <input slot="fields" name="email" type="email">
+    <label slot="fields">Address</label>
+    <input slot="fields" name="address" type="text" placeholder="Street address">
+    <label slot="fields">Seek URL</label>
+    <input slot="fields" name="seek_url" type="url" placeholder="https://seek.com.au/profile/...">
+    <label cid="linkedin_url_label" slot="fields">LinkedIn URL</label>
+    <input slot="fields" name="linkedin_url" type="url" placeholder="https://linkedin.com/in/...">
+    <label cid="personal_summary_label" slot="fields">Personal Summary</label>
+    <textarea slot="fields" name="personal_summary" placeholder="Tell us about yourself..." rows="4"></textarea>
+    <label cid="skills_label" slot="fields">Skills</label>
+    <textarea slot="fields" name="skills" placeholder="List your skills..." rows="4"></textarea>
+    <label cid="interests_label" slot="fields">Interests</label>
+    <textarea slot="fields" name="interests" placeholder="What are you interested in?" rows="4"></textarea>
+  </de-dialog-form>
+
+  <de-dialog-form id="career_dialog">
+    <h2 slot="header">Add Career Experience</h2>
+    <label slot="fields">Company</label>
+    <input slot="fields" type="text" name="company_name">
+    <label slot="fields">Title</label>
+    <input slot="fields" type="text" name="role_titles">
+    <label slot="fields">Work Type</label>
+    <select id="career_work_type_select" slot="fields" name="work_type"></select>
+    <label slot="fields">Location</label>
+    <input slot="fields" type="text" name="location">
+    <label slot="fields">Start Time</label>
+    <input slot="fields" type="date" name="start_date">
+    <label slot="fields">End Time</label>
+    <input slot="fields" type="date" name="end_date">
+
+    <label cid="summary_label" slot="fields">Role Summary</label>
+    <textarea slot="fields" name="summary" rows="4"></textarea>
+
+    <label cid="company_label" slot="fields">Company Description</label>
+    <textarea slot="fields" name="company_description" rows="4"></textarea>
+
+    <label cid="tech_label" slot="fields">Technologies / Software</label>
+    <textarea slot="fields" name="tech" rows="2"></textarea>
+
+    <label cid="responsibilities_label" slot="fields">Role Description / Responsibilities / Duties</label>
+    <textarea slot="fields" name="responsibilities" rows="4"></textarea>
+    
+    <label cid="projects_label" slot="fields">Projects / Achievements / Accomplishments</label>
+    <textarea slot="fields" name="projects" rows="4"></textarea>
+  </de-dialog-form>
+
+  <de-dialog-form id="edu_dialog">
+    <h2 slot="header">Certificate Details</h2>
+    <label slot="fields">Title</label>
+    <input slot="fields" type="text" name="title">
+    <label slot="fields">Institution</label>
+    <input slot="fields" type="text" name="institution">
+    <label slot="fields">Year</label>
+    <input slot="fields" type="number" name="year" min="1900" max="3000" step="1">
+  </de-dialog-form>
+
+  <de-info id="info_elem"></de-info>
+
+  <de-dialog-confirm id="warning_dlg">
+    <img src="image/red/warning.svg" slot="header">
+  </de-dialog-confirm>
+
+</body>
+
+</html>
