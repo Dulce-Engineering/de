@@ -151,15 +151,58 @@ class Db
   static On_Upgrade_Needed(event, schema)
   {
     const db = event.target.result;
+    const tx = event.target.transaction;
+
     switch (event.oldVersion) 
     {
       case 0:
         Db.Create_Tables(db, schema);
+        break;
 
       case 5:
         Db.Create_Table(db, schema, "projects");
+
+      case 6:
+        Db.Set_Default_Profile_Id(db, tx);
         break;
     }
+  }
+
+  static Set_Default_Profile_Id(db, tx)
+  {
+    if (!db.objectStoreNames.contains("profiles")) return;
+
+    const profiles_store = tx.objectStore("profiles");
+    const get_profiles_req = profiles_store.getAll();
+    get_profiles_req.onsuccess = () =>
+    {
+      const profiles = get_profiles_req.result;
+      if (profiles && profiles.length > 0)
+      {
+        const first_profile_id = profiles[0].id;
+        const tables = ["career", "education", "jobs"];
+        for (const table_name of tables)
+        {
+          if (db.objectStoreNames.contains(table_name))
+          {
+            const store = tx.objectStore(table_name);
+            const get_req = store.getAll();
+            get_req.onsuccess = () =>
+            {
+              const items = get_req.result || [];
+              for (const item of items)
+              {
+                if (item && (item.profile_id === undefined || item.profile_id === null))
+                {
+                  item.profile_id = first_profile_id;
+                  store.put(item);
+                }
+              }
+            };
+          }
+        }
+      }
+    };
   }
 
   static Create_Tables(db, schema)

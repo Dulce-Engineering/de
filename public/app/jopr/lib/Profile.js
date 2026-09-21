@@ -19,6 +19,7 @@
  * Education or certification record stored in the 'education' IndexedDB table.
  * @typedef {Object} EducationRecord
  * @property {number|string} [id] Unique identifier for the education entry.
+ * @property {number|string} [profile_id] ID of the associated profile.
  * @property {string|null} title Name of qualification, degree, or certificate.
  * @property {string|null} institution Educational institution or issuing organisation.
  * @property {number|string|null} [year] Year of completion or graduation.
@@ -28,6 +29,7 @@
  * Career role or work experience record stored in the 'career' IndexedDB table.
  * @typedef {Object} CareerJobRecord
  * @property {number|string} [id] Unique identifier for the career role.
+ * @property {number|string} [profile_id] ID of the associated profile.
  * @property {string|null} role_titles Job role title or designations.
  * @property {string|null} [company_name] Name of the employer or company.
  * @property {string|null} [company] Alternative company name property.

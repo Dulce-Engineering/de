@@ -31,6 +31,7 @@ interface AgencyDetails {
 }
 
 interface JobDetails {
+  profile_id?: number | string;
   company?: string;
   duration?: string;
   location?: string;
@@ -48,6 +49,7 @@ interface ExtractedJobResult {
 }
 
 interface CareerJobDetails {
+  profile_id?: number | string;
   start_date?: number | string | null;
   end_date?: number | string | null;
   work_type?: 'full-time' | 'part-time' | 'contract' | 'temp' | 'casual' | 'internship' | 'volunteer' | 'vacation' | 'other' | string | null;
@@ -71,6 +73,7 @@ interface CareerJobRecord extends CareerJobInput, CareerJobDetails {
 
 interface EducationDetails {
   id?: number | string;
+  profile_id?: number | string;
   title: string | null;
   institution: string | null;
   year: number | string | null;

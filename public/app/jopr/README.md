@@ -117,3 +117,39 @@ given the attached curriculum vitae and job description, what are some technical
 those are good tips. what parts of my experience, as listed in the curriculum vitae, could i mention at the interview that would be relevant? 
 
 based on the curriculum vitae and job description, what can i say when asked to introduce myself at the technical interview?
+
+### Work History
+
+#### 2025-05-01 - 2026-04-23 lead - SunSolve
+
+#### 2024-02-01 - 2025-01-01 lead - NSW Department of Eductaion
+
+#### 2020-11-01 - 2024-02-01 lead - PlayTravel
+2023-07-01 - 2024-02-01 Nexiate
+2022-01-01 - 2023-06-01 Services Australia
+2020-11-01 - 2021-12-01 PlayTravel
+
+#### 2017-04-01 - 2020-10-01 senior - Service NSW
+2019-03-01 - 2020-10-01 Service NSW
+2018-09-01 - 2019-02-01 PrimaryMarkets
+2017-11-01 - 2018-08-01 Computershare
+2017-04-01 - 2017-10-01 Wilmar Sugar
+
+#### 2011-03-01 - 2017-02-01 senior - ACE Insurance
+2016-06-01 - 2017-02-01 Palmerbet
+2013-06-01 - 2015-07-01 ACE Insurance
+2012-01-01 - 2013-01-01 Pillar Administration
+2011-03-01 - 2011-09-01 Capgemini
+
+#### 2005-05-01 - 2011-01-01 mid - Ord Minnettt
+
+#### 1999-04-01 - 2005-04-01 mid - ANZ Funds Management
+2002-02-01 - 2005-04-01 Korea
+2001-05-01 - 2002-01-01 APN Digital
+1999-04-01 - 2001-01-01 ANZ Funds Management
+1999-04-01 - 2001-01-01 Deutsche Bank
+
+#### 1995-07-01 - 1998-10-01 junior - Sybiz
+1997-04-01 - 1998-10-01 Brilliant Digital Entertainment
+1997-04-01 - 1998-10-01 Sybiz
+1995-07-01 - 1997-03-01 Uniloc
