@@ -97,11 +97,14 @@
         width: 60%;
         background: 
           radial-gradient(circle farthest-corner at 50% 10%, var(--green) 10%, rgb(from var(--green) calc(r / 2) calc( g / 2) calc(b / 2))) no-repeat;
-      
-        &[open]
+        transition: display 1s allow-discrete, overlay 1s allow-discrete;
+        animation: fall-anim 1s ease-out forwards;
+
+        &[open], &:popover-open, &:open
         {
-          transform-origin: 50% 0%;
+          animation: swing-in-anim 1.5s ease-out forwards;
         }
+
         &::backdrop
         {
           background: radial-gradient(circle farthest-corner at center, #000a, #0002);
@@ -143,16 +146,6 @@
           justify-content: center;
           gap: 10px;
           width: 100%;
-        }
-      }
-      dialog
-      {
-        transition: display 1s allow-discrete;
-        animation: fall 1s ease-out forwards;
-
-        &[open]
-        {
-          animation: swingIn 1.5s ease-out forwards;
         }
       }
 
@@ -649,8 +642,9 @@
           transform: rotate(360deg) translate(var(--d),var(--d));
         }
       }
-      @keyframes swingIn 
+      @keyframes swing-in-anim 
       {
+        0%, 100% { transform-origin: 50% 0%; }
         0%   { transform: perspective(1500px) rotateX(-90deg); }
         20%  { transform: perspective(1500px) rotateX( 60deg); }
         40%  { transform: perspective(1500px) rotateX(-30deg); }
@@ -658,7 +652,7 @@
         80%  { transform: perspective(1500px) rotateX( -5deg); }
         100% { transform: perspective(1500px) rotateX(  0deg); }
       }
-      @keyframes fall
+      @keyframes fall-anim
       {
         0%   
         { 
