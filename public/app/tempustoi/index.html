@@ -95,6 +95,9 @@
       dialog, .dialog
       {
         width: 60%;
+        max-height: calc(100vh - 70px);
+        box-sizing: border-box;
+        overflow: hidden;
         background: 
           radial-gradient(circle farthest-corner at 50% 10%, var(--green) 10%, rgb(from var(--green) calc(r / 2) calc( g / 2) calc(b / 2))) no-repeat;
         transition: display 1s allow-discrete, overlay 1s allow-discrete;
@@ -114,12 +117,26 @@
           display: flex;
           flex-direction: column;
           gap: 20px;
+          max-height: calc(100vh - 130px);
+          box-sizing: border-box;
+          overflow: hidden;
+        }
+        header
+        {
+          flex-shrink: 0;
         }
         main
         {
           display: flex;
           flex-direction: column;
           gap: 32px;
+          overflow-y: auto;
+          overflow-x: hidden;
+          min-height: 0;
+          flex: 1 1 auto;
+          box-sizing: border-box;
+          scrollbar-width: thin;
+          scrollbar-color: var(--orange) transparent;
         }
         .msg
         {
@@ -146,6 +163,7 @@
           justify-content: center;
           gap: 10px;
           width: 100%;
+          flex-shrink: 0;
         }
       }
 
@@ -405,6 +423,12 @@
       }
       #timer_view_dlg
       {
+        main
+        {
+          overflow-y: auto;
+          overflow-x: hidden;
+          min-height: 0;
+        }
         de-field
         {
           display: block;

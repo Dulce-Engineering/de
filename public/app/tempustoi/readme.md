@@ -48,5 +48,4 @@ TempusToi is a simple and efficient task scheduling tool that helps you stay on 
 - render event details /n as <br>
 - when loading events, show a dialog with details before saving
 ### Bugs
-- when viewing details, the dialog may exceed the page height and cannot click the ok button to close it
-
+- tba
