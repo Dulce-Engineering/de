@@ -192,6 +192,11 @@ class Profile
     return profile;
   }
 
+  static Select_By_Id(ctx, id)
+  {
+    return ctx.db.Select_By_Id(Profile.table_name, id);
+  }
+
   /**
    * Selects all education records from the 'education' table, sorted by year ascending.
    * @param {Context} ctx - Application context containing db.

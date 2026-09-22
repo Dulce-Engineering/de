@@ -30,6 +30,7 @@ async function Main()
   import_btn.addEventListener("click", () => On_Click_Import_Btn(ctx));
   export_btn.onclick = () => On_Click_Export_Btn(ctx);
 
+  profile_menu.addEventListener("add", () => On_Click_Edit_Profile(ctx, null));
   profile_menu.addEventListener("edit", () => On_Click_Edit_Profile(ctx));
   profile_menu.addEventListener("ai", () => On_Click_AI_Add_Profile(ctx));
   profile_menu.addEventListener("download", () => On_Click_Download_Profile(ctx));
@@ -151,13 +152,13 @@ async function Render_Profile(ctx)
   }
 }
 
-async function On_Click_Edit_Profile(ctx)
+async function On_Click_Edit_Profile(ctx, id)
 {
-  const profile = await ctx.Profile.Select_First(ctx);
+  const profile = id ? await ctx.Profile.Select_By_Id(ctx, id) : (id === null ? null : await ctx.Profile.Select_First(ctx));
   const form_data = await profile_form.Show_Async(profile);
   if (form_data)
   {
-    form_data.id = profile?.id;
+    form_data.id = id || (id === null ? undefined : profile?.id);
     const is_saved = await ctx.Profile.Save(ctx, form_data);
     if (is_saved)
     {
