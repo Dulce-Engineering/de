@@ -31,11 +31,7 @@ async function Main()
   export_btn.onclick = () => On_Click_Export_Btn(ctx);
 
   await Render_Profile(ctx);
-
   await Render_Education(ctx);
-
-  career_list_menu.addEventListener("add", (e) => On_Click_Career_Edit(ctx, null));
-  career_list.addEventListener("render", (e) => Render_Career_Item(ctx, e));
   await Render_Career(ctx);
 
   project_list.save_fn = project => ctx.Project.Save(ctx, project);
@@ -83,7 +79,7 @@ async function On_Click_Import_Btn(ctx)
     await ctx.db.Save_To_IndexedDB(db_data, DB_SCHEMA);
     await Update_Profile(ctx);
     await Update_Education(ctx);
-    await Render_Career(ctx);
+    await Update_Career(ctx);
     const projects = await ctx.Project.Select(ctx);
     project_list.value = projects;
     Alert("Data imported from " + file.name + " to IndexedDB instance.");
@@ -118,79 +114,6 @@ async function On_Click_Export_Btn(ctx)
   ctx.Utils.Download_File(blob, filename);
 
   Alert("Data exported successfully!");
-}
-
-// career & profile ===============================================================
-
-async function Render_Career(ctx)
-{
-  const jobs = await ctx.Profile.Job_Select(ctx);
-  career_list.value = jobs;
-}
-
-function Render_Career_Item(ctx, event)
-{
-  const item_elem = event.detail.item_elem;
-  const job = item_elem.item_obj;
-  const job_id = job.id;
-
-  const start_time = job.start_date ? new Date(job.start_date) : null;
-  const start_time_str = ctx.Utils.To_Date_Str(start_time);
-  const end_time = job.end_date ? new Date(job.end_date) : null;
-  const end_time_str = ctx.Utils.To_Date_Str(end_time);
-  const duration_str = Duration_Str(start_time, end_time);
-  let time_str = ctx.Utils.Append_Str(start_time_str, end_time_str, " - ");
-  time_str = ctx.Utils.Append_Str(time_str, "(" + duration_str + ")", " ");
-  const role = ctx.Utils.Append_Str(job.role_titles, Work_Type_Label(ctx, job.work_type), " - ");
-  const summ = ctx.Utils.Append_Str(role, job.location, " - ");
-
-  item_elem.career_company_elem.textContent = job.company_name || "N/A";
-  item_elem.career_title_elem.textContent = summ || "N/A";
-  item_elem.career_time_elem.textContent = time_str || "N/A";
-  item_elem.career_tech_elem.textContent = job.tech || "N/A";
-  item_elem.career_resp_elem.innerHTML = Str_To_HTML(job.responsibilities || "N/A");
-  item_elem.career_proj_elem.innerHTML = Str_To_HTML(job.projects || "N/A");
-
-  item_elem.career_item_menu.addEventListener("edit", () => On_Click_Career_Edit(ctx, job_id));
-  item_elem.career_item_menu.addEventListener("delete", (e) => On_Click_Delete_Career(e, job_id, ctx));
-}
-
-async function On_Click_Career_Edit(ctx, id)
-{
-  const curr_job = await ctx.Profile.Job_Select_By_Id(ctx, id);
-  const form_data = await career_dialog.Show_Async(curr_job);
-  if (form_data)
-  {
-    form_data.id = id;
-    const is_saved = await ctx.Profile.Job_Save(ctx, form_data);
-    if (is_saved)
-    {
-      await Render_Career(ctx);
-      Alert("Job saved successfully.");
-    }
-    else
-    {
-      Alert("Failed to save job.");
-    }
-  }
-}
-
-async function On_Click_Delete_Career(e, id, ctx)
-{
-  const confirmed = await warning_dlg.Confirm("Are you sure you want to delete this job?");
-  if (confirmed)
-  {
-    const is_deleted = await ctx.Profile.Job_Delete(ctx, id);
-    if (is_deleted)
-    {
-      await Render_Career(ctx);
-      Alert("Job deleted successfully.");
-    }
-    else
-    {
-      Alert("Failed to delete job.");
-    }
-  }
 }
 
 // rendering ======================================================================
@@ -393,6 +316,7 @@ async function On_Click_Edit_Profile(ctx, id)
     {
       await Update_Profile(ctx);
       await Update_Education(ctx);
+      await Update_Career(ctx);
       Alert("Profile saved successfully.");
     }
     else
@@ -428,7 +352,7 @@ async function On_Click_AI_Add_Profile(ctx)
     Alert("CV extracted successfully!");
     await Update_Profile(ctx);
     await Update_Education(ctx);
-    await Render_Career(ctx);
+    await Update_Career(ctx);
   }
 }
 
@@ -467,6 +391,7 @@ async function On_Click_Delete_Profile(ctx, id)
     {
       await Update_Profile(ctx);
       await Update_Education(ctx);
+      await Update_Career(ctx);
       Alert("Profile deleted successfully.");
     }
     else
@@ -539,6 +464,86 @@ async function On_Click_Delete_Edu(e, id, ctx)
     else
     {
       Alert("Failed to delete certificate.");
+    }
+  }
+}
+
+// career =========================================================================
+
+async function Render_Career(ctx)
+{
+  career_list_menu.addEventListener("add", (e) => On_Click_Career_Edit(ctx, null));
+  career_list.addEventListener("render", (e) => Render_Career_Item(ctx, e));
+  await Update_Career(ctx);
+}
+
+async function Update_Career(ctx)
+{
+  const jobs = await ctx.Profile.Job_Select_Active(ctx);
+  career_list.value = jobs;
+}
+
+function Render_Career_Item(ctx, event)
+{
+  const item_elem = event.detail.item_elem;
+  const job = item_elem.item_obj;
+  const job_id = job.id;
+
+  const start_time = job.start_date ? new Date(job.start_date) : null;
+  const start_time_str = ctx.Utils.To_Date_Str(start_time);
+  const end_time = job.end_date ? new Date(job.end_date) : null;
+  const end_time_str = ctx.Utils.To_Date_Str(end_time);
+  const duration_str = Duration_Str(start_time, end_time);
+  let time_str = ctx.Utils.Append_Str(start_time_str, end_time_str, " - ");
+  time_str = ctx.Utils.Append_Str(time_str, "(" + duration_str + ")", " ");
+  const role = ctx.Utils.Append_Str(job.role_titles, Work_Type_Label(ctx, job.work_type), " - ");
+  const summ = ctx.Utils.Append_Str(role, job.location, " - ");
+
+  item_elem.career_company_elem.textContent = job.company_name || "N/A";
+  item_elem.career_title_elem.textContent = summ || "N/A";
+  item_elem.career_time_elem.textContent = time_str || "N/A";
+  item_elem.career_tech_elem.textContent = job.tech || "N/A";
+  item_elem.career_resp_elem.innerHTML = Str_To_HTML(job.responsibilities || "N/A");
+  item_elem.career_proj_elem.innerHTML = Str_To_HTML(job.projects || "N/A");
+
+  item_elem.career_item_menu.addEventListener("edit", () => On_Click_Career_Edit(ctx, job_id));
+  item_elem.career_item_menu.addEventListener("delete", (e) => On_Click_Delete_Career(e, job_id, ctx));
+}
+
+async function On_Click_Career_Edit(ctx, id)
+{
+  const curr_job = await ctx.Profile.Job_Select_By_Id(ctx, id);
+  const form_data = await career_dialog.Show_Async(curr_job);
+  if (form_data)
+  {
+    form_data.id = id;
+    const is_saved = await ctx.Profile.Job_Save(ctx, form_data);
+    if (is_saved)
+    {
+      await Update_Career(ctx);
+      Alert("Job saved successfully.");
+    }
+    else
+    {
+      Alert("Failed to save job.");
+    }
+  }
+}
+
+async function On_Click_Delete_Career(e, id, ctx)
+{
+  const confirmed = await warning_dlg.Confirm("Are you sure you want to delete this job?");
+  if (confirmed)
+  {
+    const is_deleted = await ctx.Profile.Job_Delete(ctx, id);
+    if (is_deleted)
+    {
+      await Update_Career(ctx);
+      Alert("Job deleted successfully.");
+    }
+    else
+    {
+      Alert("Failed to delete job.");
     }
   }
 }

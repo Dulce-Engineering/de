@@ -286,6 +286,16 @@ class Profile
     return jobs;
   }
 
+  static async Job_Select_Active(ctx)
+  {
+    const active_profile = await Profile.Select_Active(ctx);
+    const where = j => j.profile_id == active_profile.id;
+    const order_by = (a, b) => -(a.start_date - b.start_date);
+    const jobs = ctx.db.Select(Profile.job_table_name, where, order_by);
+
+    return jobs;
+  }
+
   /**
    * Selects recent career job records from the past 20 years.
    * @param {Context} ctx - Application context containing Utils and db.
@@ -318,25 +328,40 @@ class Profile
    * @param {CareerJobRecord|Object} form_data - Career job form data.
    * @returns {Promise<boolean|number|string>} Result of the database save operation.
    */
-  static Job_Save(ctx, form_data)
+  static async Job_Save(ctx, form_data)
   {
-    const obj =
-    {
-      id: form_data.id,
-      company_name: form_data.company_name?.trim() || null,
-      role_titles: form_data.role_titles?.trim() || null,
-      work_type: form_data.work_type?.trim() || null,
-      location: form_data.location?.trim() || null,
-      summary: form_data.summary?.trim() || null,
-      company_description: form_data.company_description?.trim() || null,
-      tech: form_data.tech?.trim() || null,
-      responsibilities: form_data.responsibilities?.trim() || null,
-      projects: form_data.projects?.trim() || null,
-      start_date: form_data.start_date || null,
-      end_date: form_data.end_date || null
-    };
+    let res_id = null;
 
-    return ctx.db.Save(Profile.job_table_name, obj);
+    let profile_id = form_data.profile_id;
+    if (!profile_id)
+    {
+      const active_profile = await ctx.Profile.Select_Active(ctx);
+      profile_id = active_profile?.id;
+    }
+
+    if (profile_id)
+    {
+      const obj =
+      {
+        id: form_data.id,
+        profile_id,
+        company_name: form_data.company_name?.trim() || null,
+        role_titles: form_data.role_titles?.trim() || null,
+        work_type: form_data.work_type?.trim() || null,
+        location: form_data.location?.trim() || null,
+        summary: form_data.summary?.trim() || null,
+        company_description: form_data.company_description?.trim() || null,
+        tech: form_data.tech?.trim() || null,
+        responsibilities: form_data.responsibilities?.trim() || null,
+        projects: form_data.projects?.trim() || null,
+        start_date: form_data.start_date || null,
+        end_date: form_data.end_date || null
+      };
+
+      res_id = ctx.db.Save(Profile.job_table_name, obj);
+    }
+
+    return res_id;
   }
 
   /**
@@ -394,17 +419,32 @@ class Profile
    * @param {EducationRecord|Object} form_data - Education form data.
    * @returns {Promise<boolean|number|string>} Result of the database save operation.
    */
-  static Edu_Save(ctx, form_data)
+  static async Edu_Save(ctx, form_data)
   {
-    const obj =
-    {
-      id: form_data.id,
-      title: form_data.title?.trim() || null,
-      institution: form_data.institution?.trim() || null,
-      year: form_data.year || null,
-    };
+    let res_id = null;
 
-    return ctx.db.Save(Profile.edu_table_name, obj);
+    let profile_id = form_data.profile_id;
+    if (!profile_id)
+    {
+      const active_profile = await ctx.Profile.Select_Active(ctx);
+      profile_id = active_profile?.id;
+    }
+
+    if (profile_id)
+    {
+      const obj =
+      {
+        id: form_data.id,
+        profile_id,
+        title: form_data.title?.trim() || null,
+        institution: form_data.institution?.trim() || null,
+        year: form_data.year || null,
+      };
+
+      res_id = ctx.db.Save(Profile.edu_table_name, obj);
+    }
+
+    return res_id;
   }
 
   /**
