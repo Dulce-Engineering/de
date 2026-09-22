@@ -76,7 +76,9 @@ de-contact-list[view-type="sublist"]
 
         de-contact-details
         {
-          display: inline-block !important;
+          display: inline-flex !important;
+          align-items: center;
+          gap: 3px;
 
           de-field
           {

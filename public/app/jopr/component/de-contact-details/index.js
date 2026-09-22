@@ -61,11 +61,14 @@ class DeContactDetails extends HTMLElement
         `<de-field value="${contact.phone}" field-type="phone"></de-field>` : null;
       const email_html = contact?.email ?
         `<de-field value="${contact.email}" field-type="email"></de-field>` : null;
+      const linkedin_html = contact?.linkedin ?
+        `<de-field value="${contact.linkedin}" field-type="link-linkedin"></de-field>` : null;
       
       let html = Utils.Append_Str(name_html, position_html, "-");
       html = Utils.Append_Str(html, company_html, "&nbsp;@&nbsp;");
       html = Utils.Append_Str(html, phone_html, ",&nbsp;");
       html = Utils.Append_Str(html, email_html, ",&nbsp;");
+      html = Utils.Append_Str(html, linkedin_html, ",&nbsp;");
       this.innerHTML = html;
     }
     else
@@ -78,7 +81,7 @@ class DeContactDetails extends HTMLElement
         this.contact_email_elem.value = contact?.email;
       if (this.contact_position_elem) 
         this.contact_position_elem.value = contact?.position;
-      if (this.contact_linkedin_elem) 
+      if (this.contact_agency_elem) 
         this.contact_agency_elem.value = contact?.agency_name;
       if (this.contact_linkedin_elem) 
         this.contact_linkedin_elem.value = contact?.linkedin;

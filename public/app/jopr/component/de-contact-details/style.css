@@ -8,5 +8,18 @@ de-contact-details
   &[view-type="compact"]
   {
     display: flex;
+
+    de-field[field-type="link-linkedin"]
+    {
+      [cid="value_elem"]
+      {
+        font-size: 0;
+
+        a
+        {
+          margin: 0;
+        }
+      }
+    }
   }
 }

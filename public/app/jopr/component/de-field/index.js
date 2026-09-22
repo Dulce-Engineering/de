@@ -23,6 +23,7 @@ class DeField extends HTMLElement
   {
     super();
     //Utils.Bind(this, "On_");
+    this.value_str = null;
   }
 
   /**
@@ -50,33 +51,40 @@ class DeField extends HTMLElement
     }
     else
     {
-      const value_str = obj.toString();
+      this.value_str = obj.toString();
       if (this.hasAttribute("field-type"))
       {
         const field_type = this.getAttribute("field-type");
         if (field_type == "link")
         {
           this.value_elem.innerHTML = 
-            `<a href="${value_str}" target="_blank">${value_str}</a>`;
+            `<a href="${this.value_str}" target="_blank">${this.value_str}</a>`;
+        }
+        if (field_type == "link-linkedin")
+        {
+          this.value_elem.innerHTML = 
+            `<a href="${this.value_str}" target="_blank">
+              <img src="./image/linkedin.svg">
+            </a>`;
         }
         else if (field_type == "html")
         {
-          this.value_elem.innerHTML = value_str;
+          this.value_elem.innerHTML = this.value_str;
         }
         else if (field_type == "phone")
         {
           this.value_elem.innerHTML = 
-            `<a href="tel:${value_str}">${value_str}</a>`;
+            `<a href="tel:${this.value_str}">${this.value_str}</a>`;
         }
         else if (field_type == "email")
         {
           this.value_elem.innerHTML = 
-            `<a href="mailto:${value_str}">${value_str}</a>`;
+            `<a href="mailto:${this.value_str}">${this.value_str}</a>`;
         }
       }
       else
       {
-        this.value_elem.textContent = value_str;
+        this.value_elem.textContent = this.value_str;
       }
 
       this.Show();
@@ -90,7 +98,7 @@ class DeField extends HTMLElement
    */
   get value()
   {
-    return this.value_elem.textContent;
+    return this.value_str;
   }
   
   // attributes ===============================================================
