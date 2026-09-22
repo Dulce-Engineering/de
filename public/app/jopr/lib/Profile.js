@@ -78,6 +78,119 @@ class Profile
   /** @type {string} Table name for career/work history in IndexedDB ('career') */
   static job_table_name = "career";
 
+  /**
+   * Selects the first profile record from the 'profiles' table.
+   * @param {Context} ctx - Application context containing db.
+   * @returns {Promise<UserProfile|null>} The first user profile or null if none exists.
+   */
+  static async Select_First(ctx)
+  {
+    let profile = null;
+    const profiles = await ctx.db.Select(Profile.table_name);
+    if (profiles && profiles.length > 0)
+    {
+      profile = profiles.find(p => p.active) || profiles[0];
+    }
+    return profile;
+  }
+
+  /**
+   * Selects the first non-empty profile record from the 'profiles' table.
+   * @param {Context} ctx - Application context containing db and Utils.
+   * @returns {Promise<UserProfile|null>} The user profile object or null.
+   */
+  static async Select(ctx)
+  {
+    let profile = null;
+    const profiles = await ctx.db.Select(Profile.table_name);
+    if (profiles)
+    {
+      profile = profiles.find(p => p.active) || (!ctx.Utils.Is_Empty(profiles) ? profiles[0] : null);
+    }
+    return profile;
+  }
+
+  static Select_Active(ctx)
+  {
+    return ctx.db.Select_First(Profile.table_name, p => p.active === true);
+  }
+
+  static async Select_All(ctx)
+  {
+    return ctx.db.Select(Profile.table_name);
+  }
+
+  /**
+   * Selects a profile record by its ID from the 'profiles' table.
+   * @param {Context} ctx - Application context containing db.
+   * @param {number|string} id - Profile record ID.
+   * @returns {Promise<UserProfile|null>} The profile record or null.
+   */
+  static Select_By_Id(ctx, id)
+  {
+    return ctx.db.Select_By_Id(Profile.table_name, id);
+  }
+
+  /**
+   * Generates HTML option elements for profile selection.
+   * @param {Context} ctx - Application context.
+   * @returns {Promise<string|null>} HTML string of <option> tags.
+   */
+  static async Get_Options(ctx)
+  {
+    let html = null;
+    const objs = await Profile.Select(ctx);
+    if (objs)
+    {
+      html =
+        "<option>None</option>" +
+        "<option value='new'>New thing</option>";
+      for (const obj of objs)
+      {
+        html += "<option value='" + obj.id + "'>" + obj.name + "</option>";
+      }
+    }
+
+    return html;
+  }
+
+  static async Is_Blank_Install(ctx)
+  {
+    const profile_count = await  ctx.db.Count(Profile.table_name);
+    return profile_count < 1;
+  }
+
+  static To_Profile(form_data)
+  {
+    const profile =
+    {
+      id: form_data.id,
+      title: form_data.title?.trim() || null,
+      active: form_data.active === true,
+      name: form_data.name?.trim() || null,
+      address: form_data.address?.trim() || null,
+      seek_url: form_data.seek_url?.trim() || null,
+      linkedin_url: form_data.linkedin_url?.trim() || null,
+      residency_status: form_data.residency_status?.trim() || null,
+      personal_summary: 
+        typeof form_data.personal_summary === "string" ? 
+        (form_data.personal_summary.trim() || null) : 
+        (form_data.personal_summary || null),
+      skills: 
+        typeof form_data.skills === "string" ? 
+        (form_data.skills.trim() || null) : 
+        (form_data.skills || null),
+      interests: 
+        typeof form_data.interests === "string" ? 
+        (form_data.interests.trim() || null) : 
+        (form_data.interests || null),
+      email: form_data.email?.trim() || null,
+      phone: form_data.phone?.trim() || null,
+      url: form_data.url?.trim() || null,
+    };
+    return profile;
+  }
+
   //Insert
   //Update
 
@@ -89,42 +202,114 @@ class Profile
    */
   static async Save(ctx, form_data)
   {
-    if (form_data.active)
+    const profile = Profile.To_Profile(form_data);
+    const active_id = await ctx.db.Save(Profile.table_name, profile);
+    await Profile.Set_Active_Status(ctx, profile.active, active_id);
+
+    return active_id;
+  }
+
+  static async Set_Active_Status(ctx, active, active_id)
+  {
+    if (active === true) // set all other profiles to inactive
     {
-      const profiles = await ctx.db.Select(Profile.table_name);
-      if (profiles)
+      const where = p => p.id != active_id;
+      const other_profiles = await ctx.db.Select(Profile.table_name, where);
+      if (other_profiles)
       {
-        for (const p of profiles)
+        for (const profile of other_profiles)
         {
-          if (p.id !== form_data.id && p.active)
-          {
-            p.active = false;
-            await ctx.db.Save(Profile.table_name, p);
-          }
+          profile.active = false;
+          await ctx.db.Save(Profile.table_name, profile);
         }
       }
     }
-
-    return ctx.db.Save(Profile.table_name, form_data);
+    else // ensure at least one profile is active
+    {
+      const active_profile = await Profile.Select_Active(ctx);
+      if (!active_profile)
+      {
+        const profile = await ctx.db.Select_First(Profile.table_name, null, null, 1);
+        profile.active = true;
+        await ctx.db.Save(Profile.table_name, profile);
+      }
+    }
   }
 
   /**
-   * Saves or updates an education/certificate record in the 'education' table.
+   * Deletes a profile record by ID from the 'profiles' table.
    * @param {Context} ctx - Application context containing db.
-   * @param {EducationRecord|Object} form_data - Education form data.
-   * @returns {Promise<boolean|number|string>} Result of the database save operation.
+   * @param {number|string} id - The ID of the profile record to delete.
+   * @returns {Promise<boolean>} Whether the record was deleted.
    */
-  static Edu_Save(ctx, form_data)
+  static Delete(ctx, id)
   {
-    const obj =
-    {
-      id: form_data.id,
-      title: form_data.title?.trim() || null,
-      institution: form_data.institution?.trim() || null,
-      year: form_data.year || null,
-    };
+    return ctx.db.Delete(Profile.table_name, [id]);
+  }
 
-    return ctx.db.Save(Profile.edu_table_name, obj);
+  // jobs =====================================================================
+
+  /**
+   * Selects legacy career roles older than a set of excluded jobs up to 20 years ago.
+   * @param {Context} ctx - Application context containing Utils and db.
+   * @param {Array<number|string>} exclude_ids - IDs of current/featured jobs to exclude.
+   * @returns {Promise<CareerJobRecord[]>} Array of legacy career records.
+   */
+  static async Job_Select_Legacy(ctx, exclude_ids)
+  {
+    const exclude_jobs = 
+      await Profile.Job_Select(ctx, j => exclude_ids.includes(j.id));
+    const last_job = exclude_jobs[exclude_jobs.length - 1];
+    const older_jobs =
+      await Profile.Job_Select(ctx, j => j.start_date < last_job.start_date);
+
+    const now = Date.now();
+    const twenty_yrs_ago = now - (ctx.Utils.MILLIS_YEAR * 20);
+    const legacy_jobs = older_jobs.filter(j => j.start_date >= twenty_yrs_ago);
+
+    return legacy_jobs;
+  }
+
+  /**
+   * Selects career job records matching an optional filter, sorted descending by start_date.
+   * @param {Context} ctx - Application context containing db.
+   * @param {((job: CareerJobRecord) => boolean)} [where_fn] - Optional filter predicate function.
+   * @returns {Promise<CareerJobRecord[]|null>} Array of career jobs sorted by start_date descending.
+   */
+  static async Job_Select(ctx, where_fn)
+  {
+    const jobs = await ctx.db.Select(Profile.job_table_name, where_fn);
+    if (jobs)
+    {
+      jobs.sort((a, b) => -(a.start_date - b.start_date));
+    }
+    return jobs;
+  }
+
+  /**
+   * Selects recent career job records from the past 20 years.
+   * @param {Context} ctx - Application context containing Utils and db.
+   * @returns {Promise<CareerJobRecord[]>} Array of recent career job records.
+   */
+  static async Job_Select_Recent(ctx)
+  {
+    const jobs = await Profile.Job_Select(ctx);
+    const now = Date.now();
+    const twenty_yrs_ago = now - (ctx.Utils.MILLIS_YEAR * 20);
+    const recent_jobs = jobs.filter(j => j.start_date >= twenty_yrs_ago);
+
+    return recent_jobs;
+  }
+
+  /**
+   * Selects a career job record by ID from the 'career' table.
+   * @param {Context} ctx - Application context containing db.
+   * @param {number|string} id - Career job ID.
+   * @returns {Promise<CareerJobRecord|null>} The career record or null.
+   */
+  static Job_Select_By_Id(ctx, id)
+  {
+    return ctx.db.Select_By_Id(Profile.job_table_name, id);
   }
 
   /**
@@ -155,28 +340,6 @@ class Profile
   }
 
   /**
-   * Deletes a profile record by ID from the 'profiles' table.
-   * @param {Context} ctx - Application context containing db.
-   * @param {number|string} id - The ID of the profile record to delete.
-   * @returns {Promise<boolean>} Whether the record was deleted.
-   */
-  static Delete(ctx, id)
-  {
-    return ctx.db.Delete(Profile.table_name, [id]);
-  }
-
-  /**
-   * Deletes an education record by ID from the 'education' table.
-   * @param {Context} ctx - Application context containing db.
-   * @param {number|string} id - The ID of the education record to delete.
-   * @returns {Promise<boolean>} Whether the record was deleted.
-   */
-  static Edu_Delete(ctx, id)
-  {
-    return ctx.db.Delete(Profile.edu_table_name, [id]);
-  }
-
-  /**
    * Deletes a career job record by ID from the 'career' table.
    * @param {Context} ctx - Application context containing db.
    * @param {number|string} id - The ID of the career record to delete.
@@ -187,26 +350,7 @@ class Profile
     return ctx.db.Delete(Profile.job_table_name, [id]);
   }
 
-  /**
-   * Selects the first profile record from the 'profiles' table.
-   * @param {Context} ctx - Application context containing db.
-   * @returns {Promise<UserProfile|null>} The first user profile or null if none exists.
-   */
-  static async Select_First(ctx)
-  {
-    let profile = null;
-    const profiles = await ctx.db.Select(Profile.table_name);
-    if (profiles && profiles.length > 0)
-    {
-      profile = profiles.find(p => p.active) || profiles[0];
-    }
-    return profile;
-  }
-
-  static Select_By_Id(ctx, id)
-  {
-    return ctx.db.Select_By_Id(Profile.table_name, id);
-  }
+  // education ================================================================
 
   /**
    * Selects all education records from the 'education' table, sorted by year ascending.
@@ -223,88 +367,14 @@ class Profile
     return certificates;
   }
 
-  /**
-   * Selects the first non-empty profile record from the 'profiles' table.
-   * @param {Context} ctx - Application context containing db and Utils.
-   * @returns {Promise<UserProfile|null>} The user profile object or null.
-   */
-  static async Select(ctx)
+  static async Edu_Select_Active(ctx)
   {
-    let profile = null;
-    const profiles = await ctx.db.Select(Profile.table_name);
-    if (profiles)
-    {
-      profile = profiles.find(p => p.active) || (!ctx.Utils.Is_Empty(profiles) ? profiles[0] : null);
-    }
-    return profile;
-  }
+    const active_profile = await Profile.Select_Active(ctx);
+    const where = c => c.profile_id == active_profile.id;
+    const order_by = (a, b) => (Number(a.year) || 0) - (Number(b.year) || 0);
+    const certificates = ctx.db.Select(Profile.edu_table_name, where, order_by);
 
-  static async Select_All(ctx)
-  {
-    return ctx.db.Select(Profile.table_name);
-  }
-
-  /**
-   * Selects career job records matching an optional filter, sorted descending by start_date.
-   * @param {Context} ctx - Application context containing db.
-   * @param {((job: CareerJobRecord) => boolean)} [where_fn] - Optional filter predicate function.
-   * @returns {Promise<CareerJobRecord[]|null>} Array of career jobs sorted by start_date descending.
-   */
-  static async Job_Select(ctx, where_fn)
-  {
-    const jobs = await ctx.db.Select(Profile.job_table_name, where_fn);
-    if (jobs)
-    {
-      jobs.sort((a, b) => -(a.start_date - b.start_date));
-    }
-    return jobs;
-  }
-
-  /**
-   * Selects legacy career roles older than a set of excluded jobs up to 20 years ago.
-   * @param {Context} ctx - Application context containing Utils and db.
-   * @param {Array<number|string>} exclude_ids - IDs of current/featured jobs to exclude.
-   * @returns {Promise<CareerJobRecord[]>} Array of legacy career records.
-   */
-  static async Job_Select_Legacy(ctx, exclude_ids)
-  {
-    const exclude_jobs = 
-      await Profile.Job_Select(ctx, j => exclude_ids.includes(j.id));
-    const last_job = exclude_jobs[exclude_jobs.length - 1];
-    const older_jobs =
-      await Profile.Job_Select(ctx, j => j.start_date < last_job.start_date);
-
-    const now = Date.now();
-    const twenty_yrs_ago = now - (ctx.Utils.MILLIS_YEAR * 20);
-    const legacy_jobs = older_jobs.filter(j => j.start_date >= twenty_yrs_ago);
-
-    return legacy_jobs;
-  }
-
-  /**
-   * Selects recent career job records from the past 20 years.
-   * @param {Context} ctx - Application context containing Utils and db.
-   * @returns {Promise<CareerJobRecord[]>} Array of recent career job records.
-   */
-  static async Job_Select_Recent(ctx)
-  {
-    const jobs = await Profile.Job_Select(ctx);
-    const now = Date.now();
-    const twenty_yrs_ago = now - (ctx.Utils.MILLIS_YEAR * 20);
-    const recent_jobs = jobs.filter(j => j.start_date >= twenty_yrs_ago);
-
-    return recent_jobs;
-  }
-
-  /**
-   * Selects a profile record by its ID from the 'profiles' table.
-   * @param {Context} ctx - Application context containing db.
-   * @param {number|string} id - Profile record ID.
-   * @returns {Promise<UserProfile|null>} The profile record or null.
-   */
-  static Select_By_Id(ctx, id)
-  {
-    return ctx.db.Select_By_Id(Profile.table_name, id);
+    return certificates;
   }
 
   /**
@@ -319,43 +389,33 @@ class Profile
   }
 
   /**
-   * Selects a career job record by ID from the 'career' table.
+   * Saves or updates an education/certificate record in the 'education' table.
    * @param {Context} ctx - Application context containing db.
-   * @param {number|string} id - Career job ID.
-   * @returns {Promise<CareerJobRecord|null>} The career record or null.
+   * @param {EducationRecord|Object} form_data - Education form data.
+   * @returns {Promise<boolean|number|string>} Result of the database save operation.
    */
-  static Job_Select_By_Id(ctx, id)
+  static Edu_Save(ctx, form_data)
   {
-    return ctx.db.Select_By_Id(Profile.job_table_name, id);
+    const obj =
+    {
+      id: form_data.id,
+      title: form_data.title?.trim() || null,
+      institution: form_data.institution?.trim() || null,
+      year: form_data.year || null,
+    };
+
+    return ctx.db.Save(Profile.edu_table_name, obj);
   }
 
   /**
-   * Generates HTML option elements for profile selection.
-   * @param {Context} ctx - Application context.
-   * @returns {Promise<string|null>} HTML string of <option> tags.
+   * Deletes an education record by ID from the 'education' table.
+   * @param {Context} ctx - Application context containing db.
+   * @param {number|string} id - The ID of the education record to delete.
+   * @returns {Promise<boolean>} Whether the record was deleted.
    */
-  static async Get_Options(ctx)
+  static Edu_Delete(ctx, id)
   {
-    let html = null;
-    const objs = await Profile.Select(ctx);
-    if (objs)
-    {
-      html =
-        "<option>None</option>" +
-        "<option value='new'>New thing</option>";
-      for (const obj of objs)
-      {
-        html += "<option value='" + obj.id + "'>" + obj.name + "</option>";
-      }
-    }
-
-    return html;
-  }
-
-  static async Is_Blank_Install(ctx)
-  {
-    const profile_count = await  ctx.db.Count(Profile.table_name);
-    return profile_count < 1;
+    return ctx.db.Delete(Profile.edu_table_name, [id]);
   }
 }
 

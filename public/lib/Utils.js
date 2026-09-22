@@ -320,6 +320,10 @@ class Utils
           obj[field_name] = input_elem.value;
         }
       }
+      else if (input_type == "checkbox")
+      {
+        obj[field_name] = input_elem.checked;
+      }
       else if (!Utils.isEmpty(input_elem.value))
       {
         if (input_type == "number")
@@ -374,6 +378,10 @@ class Utils
         const date_str = 
           Utils.Millis_To_ISO_String(field_val).substring(0, 16);
         input_elem.value = date_str;
+      }
+      else if (input_type == "checkbox")
+      {
+        input_elem.checked = field_val === true;
       }
       else
       {

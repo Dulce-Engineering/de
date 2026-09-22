@@ -66,6 +66,19 @@ class Db
     return Db.Save_To_IndexedDB(this.db, db_data, schema);
   }
 
+  async Select_First(table_name, where_fn, order_by_fn, limit, pre_fn)
+  {
+    let res = null;
+
+    const items = await Db.Select(this.db, table_name, where_fn, order_by_fn, limit, pre_fn);
+    if (items?.length > 0)
+    {
+      res = items[0];
+    }
+
+    return res;
+  }
+
   Select(table_name, where_fn, order_by_fn, limit, pre_fn)
   {
     return Db.Select(this.db, table_name, where_fn, order_by_fn, limit, pre_fn);

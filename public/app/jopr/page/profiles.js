@@ -30,14 +30,8 @@ async function Main()
   import_btn.addEventListener("click", () => On_Click_Import_Btn(ctx));
   export_btn.onclick = () => On_Click_Export_Btn(ctx);
 
-  profile_menu.addEventListener("add", () => On_Click_Edit_Profile(ctx, null));
-  profile_menu.addEventListener("ai", () => On_Click_AI_Add_Profile(ctx));
-  profile_menu.addEventListener("download", () => On_Click_Download_Profile(ctx));
-  profile_list.addEventListener("render", (e) => Render_Profile_Item(e, ctx));
   await Render_Profile(ctx);
 
-  edu_list_menu.addEventListener("add", (e) => On_Click_Update_Edu(e, null, ctx));
-  edu_list.addEventListener("render", (e) => Render_Edu_Item(e, ctx));
   await Render_Education(ctx);
 
   career_list_menu.addEventListener("add", (e) => On_Click_Career_Edit(ctx, null));
@@ -87,8 +81,8 @@ async function On_Click_Import_Btn(ctx)
 
     await ctx.db.Clear();
     await ctx.db.Save_To_IndexedDB(db_data, DB_SCHEMA);
-    await Render_Profile(ctx);
-    await Render_Education(ctx);
+    await Update_Profile(ctx);
+    await Update_Education(ctx);
     await Render_Career(ctx);
     const projects = await ctx.Project.Select(ctx);
     project_list.value = projects;
@@ -127,202 +121,6 @@ async function On_Click_Export_Btn(ctx)
 }
 
 // career & profile ===============================================================
-
-async function Render_Profile(ctx)
-{
-  const profiles = await ctx.Profile.Select_All(ctx);
-  profile_list.value = profiles;
-}
-
-function Render_Profile_Item(event, ctx)
-{
-  const item_elem = event.detail.item_elem;
-  const profile = item_elem.item_obj;
-  const profile_id = profile.id;
-
-  item_elem.profile_title_elem.textContent = profile.title || profile.name || "Untitled Profile";
-  item_elem.profile_name_elem.textContent = profile.name ? `(${profile.name})` : "";
-  
-  if (profile.active)
-  {
-    item_elem.status_elem.textContent = "Active";
-    item_elem.status_elem.style.display = null;
-    item_elem.open = true;
-  }
-  else
-  {
-    item_elem.status_elem.textContent = "";
-    item_elem.status_elem.style.display = "none";
-  }
-
-  item_elem.profile_name_det.textContent = profile.name || "N/A";
-  item_elem.profile_email_elem.textContent = profile.email || "N/A";
-  item_elem.profile_phone_elem.textContent = profile.phone || "N/A";
-  item_elem.profile_address_elem.textContent = profile.address || "N/A";
-  item_elem.profile_url_elem.textContent = profile.url || "N/A";
-  item_elem.profile_seek_url_elem.textContent = profile.seek_url || "N/A";
-  item_elem.profile_linkedin_url_elem.textContent = profile.linkedin_url || "N/A";
-  item_elem.profile_residency_status_elem.textContent = profile.residency_status || "N/A";
-  item_elem.profile_personal_summary_elem.innerHTML = Str_To_HTML(profile.personal_summary || "N/A");
-  item_elem.profile_skills_elem.textContent = Array.isArray(profile.skills) ? profile.skills.join(", ") : (profile.skills || "N/A");
-  item_elem.profile_interests_elem.innerHTML = Str_To_HTML(Array.isArray(profile.interests) ? profile.interests.join(", ") : (profile.interests || "N/A"));
-
-  item_elem.profile_item_menu.addEventListener("edit", () => On_Click_Edit_Profile(ctx, profile_id));
-  item_elem.profile_item_menu.addEventListener("delete", () => On_Click_Delete_Profile(ctx, profile_id));
-  item_elem.profile_item_menu.addEventListener("download", () => On_Click_Download_Profile(ctx, profile_id));
-}
-
-async function On_Click_Delete_Profile(ctx, id)
-{
-  const confirmed = await warning_dlg.Confirm("Are you sure you want to delete this profile?");
-  if (confirmed)
-  {
-    const is_deleted = await ctx.Profile.Delete(ctx, id);
-    if (is_deleted)
-    {
-      await Render_Profile(ctx);
-      Alert("Profile deleted successfully.");
-    }
-    else
-    {
-      Alert("Failed to delete profile.");
-    }
-  }
-}
-
-async function On_Click_Edit_Profile(ctx, id)
-{
-  const profile = id ? await ctx.Profile.Select_By_Id(ctx, id) : (id === null ? null : await ctx.Profile.Select_First(ctx));
-  const form_data = await profile_form.Show_Async(profile);
-  if (form_data)
-  {
-    form_data.id = id || (id === null ? undefined : profile?.id);
-    form_data.active = form_data.active === true;
-    const is_saved = await ctx.Profile.Save(ctx, form_data);
-    if (is_saved)
-    {
-      await Render_Profile(ctx);
-      Alert("Profile saved successfully.");
-    }
-    else
-    {
-      Alert("Failed to save profile.");
-    }
-  }
-}
-
-async function On_Click_Download_Profile(ctx, id)
-{
-  const employee_profile = id ? await ctx.Profile.Select_By_Id(ctx, id) : await ctx.Profile.Select_First(ctx);
-  const education = await ctx.Profile.Edu_Select(ctx);
-  const career = await ctx.Profile.Job_Select(ctx);
-  for (const job of career)
-  {
-    job.start_date = job.start_date ? new Date(job.start_date).toISOString().split('T')[0] : null;
-    job.end_date = job.end_date ? new Date(job.end_date).toISOString().split('T')[0] : null;
-  }
-  const employee =
-  {
-    employee_profile,
-    education,
-    job_history: career
-  };
-
-  const filename = `jopr-profile-${employee_profile?.title || employee_profile?.name || 'profile'}-${new Date().toISOString().split('T')[0]}.json`;
-  const json_string = JSON.stringify(employee, null, 2);
-  const blob = new Blob([json_string], { type: 'application/json' });
-  ctx.Utils.Download_File(blob, filename);
-
-  Alert("Data exported successfully!");
-}
-
-async function On_Click_AI_Add_Profile(ctx)
-{
-  const files = await ctx.Utils.Select_Files();
-  if (files && files.length > 0) 
-  {
-    info_elem.Info("Reading CV...");
-    const cv_blob = files[0];
-    const cv_data = await ctx.ai.Extract_CV(cv_blob, info_elem.Info);
-
-    info_elem.Info("Saving CV data...");
-    if (cv_data.profile)
-    {
-      cv_data.profile.active = true;
-      cv_data.profile.title = cv_data.profile.title || cv_data.profile.name || "Main Profile";
-      await ctx.db.Clear_Table(ctx.Profile.table_name);
-      await ctx.Profile.Save(ctx, cv_data.profile);
-    }
-    await ctx.db.Clear_Table(ctx.Profile.edu_table_name);
-    await ctx.db.Insert_Items(ctx.Profile.edu_table_name, cv_data.educations);
-    await ctx.db.Clear_Table(ctx.Profile.job_table_name);
-    await ctx.db.Insert_Items(ctx.Profile.job_table_name, cv_data.career);
-
-    info_elem.Info();
-    Alert("CV extracted successfully!");
-    await Render_Profile(ctx);
-    await Render_Education(ctx);
-    await Render_Career(ctx);
-  }
-}
-
-async function Render_Education(ctx)
-{
-  const certificates = await ctx.Profile.Edu_Select(ctx);
-  edu_list.value = certificates;
-}
-
-function Render_Edu_Item(event, ctx)
-{
-  const item_elem = event.detail.item_elem;
-  const edu = item_elem.item_obj;
-  const edu_id = edu.id;
-
-  const details = ctx.Utils.Append_Str(edu.institution, edu.year, " - ");
-  item_elem.edu_title_elem.textContent = edu.title || "Unnamed Education";
-  item_elem.edu_det_elem.textContent = details;
-
-  item_elem.edu_item_menu.addEventListener("edit", (e) => On_Click_Update_Edu(e, edu_id, ctx));
-  item_elem.edu_item_menu.addEventListener("delete", (e) => On_Click_Delete_Edu(e, edu_id, ctx));
-}
-
-async function On_Click_Update_Edu(e, id, ctx)
-{
-  const curr_edu = await ctx.Profile.Edu_Select_By_Id(ctx, id);
-  const form_data = await edu_dialog.Show_Async(curr_edu);
-  if (form_data)
-  {
-    form_data.id = id;
-    const is_saved = await ctx.Profile.Edu_Save(ctx, form_data);
-    if (is_saved)
-    {
-      await Render_Education(ctx);
-      Alert("Education saved successfully.");
-    }
-    else
-    {
-      Alert("Failed to save education.");
-    }
-  }
-}
-
-async function On_Click_Delete_Edu(e, id, ctx)
-{
-  const confirmed = await warning_dlg.Confirm("Are you sure you want to delete this certificate?");
-  if (confirmed)
-  {
-    const is_deleted = await ctx.Profile.Edu_Delete(ctx, id);
-    if (is_deleted)
-    {
-      await Render_Education(ctx);
-      Alert("Certificate deleted successfully.");
-    }
-    else
-    {
-      Alert("Failed to delete certificate.");
-    }
-  }
-}
 
 async function Render_Career(ctx)
 {
@@ -524,6 +322,223 @@ function Alert(msg)
     else if (on_complete_fn)
     {
       on_complete_fn();
+    }
+  }
+}
+
+// profile ========================================================================
+
+async function Render_Profile(ctx)
+{
+  profile_menu.addEventListener("add", () => On_Click_Edit_Profile(ctx, null));
+  profile_menu.addEventListener("ai", () => On_Click_AI_Add_Profile(ctx));
+  profile_menu.addEventListener("download", () => On_Click_Download_Profile(ctx));
+  profile_list.addEventListener("render", (e) => Render_Profile_Item(e, ctx));
+  await Update_Profile(ctx);
+}
+
+async function Update_Profile(ctx)
+{
+  const profiles = await ctx.Profile.Select_All(ctx);
+  profile_list.value = profiles;
+}
+
+function Render_Profile_Item(event, ctx)
+{
+  const item_elem = event.detail.item_elem;
+  const profile = item_elem.item_obj;
+  const profile_id = profile.id;
+
+  item_elem.profile_title_elem.textContent = profile.title || profile.name || "Untitled Profile";
+  item_elem.profile_name_elem.textContent = profile.name ? `(${profile.name})` : "";
+  
+  if (profile.active)
+  {
+    item_elem.status_elem.textContent = "Active";
+    item_elem.status_elem.style.display = null;
+    item_elem.open = true;
+  }
+  else
+  {
+    item_elem.status_elem.textContent = "";
+    item_elem.status_elem.style.display = "none";
+  }
+
+  item_elem.profile_name_det.textContent = profile.name || "N/A";
+  item_elem.profile_email_elem.textContent = profile.email || "N/A";
+  item_elem.profile_phone_elem.textContent = profile.phone || "N/A";
+  item_elem.profile_address_elem.textContent = profile.address || "N/A";
+  item_elem.profile_url_elem.textContent = profile.url || "N/A";
+  item_elem.profile_seek_url_elem.textContent = profile.seek_url || "N/A";
+  item_elem.profile_linkedin_url_elem.textContent = profile.linkedin_url || "N/A";
+  item_elem.profile_residency_status_elem.textContent = profile.residency_status || "N/A";
+  item_elem.profile_personal_summary_elem.innerHTML = Str_To_HTML(profile.personal_summary || "N/A");
+  item_elem.profile_skills_elem.textContent = Array.isArray(profile.skills) ? profile.skills.join(", ") : (profile.skills || "N/A");
+  item_elem.profile_interests_elem.innerHTML = Str_To_HTML(Array.isArray(profile.interests) ? profile.interests.join(", ") : (profile.interests || "N/A"));
+
+  item_elem.profile_item_menu.addEventListener("edit", () => On_Click_Edit_Profile(ctx, profile_id));
+  item_elem.profile_item_menu.addEventListener("delete", () => On_Click_Delete_Profile(ctx, profile_id));
+  item_elem.profile_item_menu.addEventListener("download", () => On_Click_Download_Profile(ctx, profile_id));
+}
+
+async function On_Click_Edit_Profile(ctx, id)
+{
+  const profile = id ? await ctx.Profile.Select_By_Id(ctx, id) : (id === null ? null : await ctx.Profile.Select_First(ctx));
+  const form_data = await profile_form.Show_Async(profile);
+  if (form_data)
+  {
+    form_data.id = id || (id === null ? undefined : profile?.id);
+    const is_saved = await ctx.Profile.Save(ctx, form_data);
+    if (is_saved)
+    {
+      await Update_Profile(ctx);
+      await Update_Education(ctx);
+      Alert("Profile saved successfully.");
+    }
+    else
+    {
+      Alert("Failed to save profile.");
+    }
+  }
+}
+
+async function On_Click_AI_Add_Profile(ctx)
+{
+  const files = await ctx.Utils.Select_Files();
+  if (files && files.length > 0) 
+  {
+    info_elem.Info("Reading CV...");
+    const cv_blob = files[0];
+    const cv_data = await ctx.ai.Extract_CV(cv_blob, info_elem.Info);
+
+    info_elem.Info("Saving CV data...");
+    if (cv_data.profile)
+    {
+      cv_data.profile.active = true;
+      cv_data.profile.title = cv_data.profile.title || cv_data.profile.name || "Main Profile";
+      await ctx.db.Clear_Table(ctx.Profile.table_name);
+      await ctx.Profile.Save(ctx, cv_data.profile);
+    }
+    await ctx.db.Clear_Table(ctx.Profile.edu_table_name);
+    await ctx.db.Insert_Items(ctx.Profile.edu_table_name, cv_data.educations);
+    await ctx.db.Clear_Table(ctx.Profile.job_table_name);
+    await ctx.db.Insert_Items(ctx.Profile.job_table_name, cv_data.career);
+
+    info_elem.Info();
+    Alert("CV extracted successfully!");
+    await Update_Profile(ctx);
+    await Update_Education(ctx);
+    await Render_Career(ctx);
+  }
+}
+
+async function On_Click_Download_Profile(ctx, id)
+{
+  const employee_profile = id ? await ctx.Profile.Select_By_Id(ctx, id) : await ctx.Profile.Select_First(ctx);
+  const education = await ctx.Profile.Edu_Select(ctx);
+  const career = await ctx.Profile.Job_Select(ctx);
+  for (const job of career)
+  {
+    job.start_date = job.start_date ? new Date(job.start_date).toISOString().split('T')[0] : null;
+    job.end_date = job.end_date ? new Date(job.end_date).toISOString().split('T')[0] : null;
+  }
+  const employee =
+  {
+    employee_profile,
+    education,
+    job_history: career
+  };
+
+  const filename = `jopr-profile-${employee_profile?.title || employee_profile?.name || 'profile'}-${new Date().toISOString().split('T')[0]}.json`;
+  const json_string = JSON.stringify(employee, null, 2);
+  const blob = new Blob([json_string], { type: 'application/json' });
+  ctx.Utils.Download_File(blob, filename);
+
+  Alert("Data exported successfully!");
+}
+
+async function On_Click_Delete_Profile(ctx, id)
+{
+  const confirmed = await warning_dlg.Confirm("Are you sure you want to delete this profile?");
+  if (confirmed)
+  {
+    const is_deleted = await ctx.Profile.Delete(ctx, id);
+    if (is_deleted)
+    {
+      await Update_Profile(ctx);
+      await Update_Education(ctx);
+      Alert("Profile deleted successfully.");
+    }
+    else
+    {
+      Alert("Failed to delete profile.");
+    }
+  }
+}
+
+// education ======================================================================
+
+async function Render_Education(ctx)
+{
+  edu_list_menu.addEventListener("add", (e) => On_Click_Update_Edu(e, null, ctx));
+  edu_list.addEventListener("render", (e) => Render_Edu_Item(e, ctx));
+  await Update_Education(ctx);
+}
+
+async function Update_Education(ctx)
+{
+  const certificates = await ctx.Profile.Edu_Select_Active(ctx);
+  edu_list.value = certificates;
+}
+
+function Render_Edu_Item(event, ctx)
+{
+  const item_elem = event.detail.item_elem;
+  const edu = item_elem.item_obj;
+  const edu_id = edu.id;
+
+  const details = ctx.Utils.Append_Str(edu.institution, edu.year, " - ");
+  item_elem.edu_title_elem.textContent = edu.title || "Unnamed Education";
+  item_elem.edu_det_elem.textContent = details;
+
+  item_elem.edu_item_menu.addEventListener("edit", (e) => On_Click_Update_Edu(e, edu_id, ctx));
+  item_elem.edu_item_menu.addEventListener("delete", (e) => On_Click_Delete_Edu(e, edu_id, ctx));
+}
+
+async function On_Click_Update_Edu(e, id, ctx)
+{
+  const curr_edu = await ctx.Profile.Edu_Select_By_Id(ctx, id);
+  const form_data = await edu_dialog.Show_Async(curr_edu);
+  if (form_data)
+  {
+    form_data.id = id;
+    const is_saved = await ctx.Profile.Edu_Save(ctx, form_data);
+    if (is_saved)
+    {
+      await Update_Education(ctx);
+      Alert("Education saved successfully.");
+    }
+    else
+    {
+      Alert("Failed to save education.");
+    }
+  }
+}
+
+async function On_Click_Delete_Edu(e, id, ctx)
+{
+  const confirmed = await warning_dlg.Confirm("Are you sure you want to delete this certificate?");
+  if (confirmed)
+  {
+    const is_deleted = await ctx.Profile.Edu_Delete(ctx, id);
+    if (is_deleted)
+    {
+      await Update_Education(ctx);
+      Alert("Certificate deleted successfully.");
+    }
+    else
+    {
+      Alert("Failed to delete certificate.");
     }
   }
 }
