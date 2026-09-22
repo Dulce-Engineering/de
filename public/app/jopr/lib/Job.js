@@ -1,7 +1,6 @@
 /**
  * @typedef {Object} Job
  * @property {number|string} id Unique identifier for the job[cite: 2].
- * @property {number|string|null} [profile_id] ID of the associated profile.
  * @property {string|null} role_title The title of the job role[cite: 2].
  * @property {string|null} [company] Name of the hiring company[cite: 2].
  * @property {string|null} [link] URL link to the job posting[cite: 2].

@@ -164,6 +164,9 @@ class Db
 
       case 6:
         Db.Set_Default_Profile_Id(db, tx);
+
+      case 7:
+        Db.Remove_Job_Profile_Id(db, tx);
         break;
     }
   }
@@ -180,7 +183,7 @@ class Db
       if (profiles && profiles.length > 0)
       {
         const first_profile_id = profiles[0].id;
-        const tables = ["career", "education", "jobs"];
+        const tables = ["career", "education"];
         for (const table_name of tables)
         {
           if (db.objectStoreNames.contains(table_name))
@@ -200,6 +203,26 @@ class Db
               }
             };
           }
+        }
+      }
+    };
+  }
+
+  static Remove_Job_Profile_Id(db, tx)
+  {
+    if (!db.objectStoreNames.contains("jobs")) return;
+
+    const store = tx.objectStore("jobs");
+    const get_req = store.getAll();
+    get_req.onsuccess = () =>
+    {
+      const items = get_req.result || [];
+      for (const item of items)
+      {
+        if (item && "profile_id" in item)
+        {
+          delete item.profile_id;
+          store.put(item);
         }
       }
     };

@@ -31,7 +31,6 @@ interface AgencyDetails {
 }
 
 interface JobDetails {
-  profile_id?: number | string;
   company?: string;
   duration?: string;
   location?: string;
