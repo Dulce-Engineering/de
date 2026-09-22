@@ -114,7 +114,9 @@
       </header>
 
       <div id="profile_details" class="details fancy-border">
-        <h2 id="profile_name"></h2>
+        <h2 id="profile_title"></h2>
+        <p>Name: <span id="profile_name"></span></p>
+        <p>Active: <span id="profile_active"></span></p>
         <p>Address: <span id="profile_address"></span></p>
         <p>Seek URL: <span id="profile_seek_url"></span></p>
         <p>LinkedIn URL: <span id="profile_linkedin_url"></span></p>
@@ -179,6 +181,10 @@
   </footer>
 
   <de-dialog-form id="profile_form" hide-clr>
+    <label slot="fields">Title</label>
+    <input slot="fields" name="title" type="text" placeholder="Profile Title">
+    <label slot="fields">Active</label>
+    <input slot="fields" name="active" type="checkbox">
     <label slot="fields">Name</label>
     <input slot="fields" name="name" type="text" placeholder="Full name">
     <label slot="fields">Phone</label>

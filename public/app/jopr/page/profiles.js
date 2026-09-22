@@ -133,7 +133,9 @@ async function Render_Profile(ctx)
   const profile = await ctx.Profile.Select_First(ctx);
   if (profile)
   {
+    profile_title.textContent = profile.title || profile.name || "Untitled Profile";
     profile_name.textContent = profile.name || "N/A";
+    profile_active.textContent = profile.active ? "Yes" : "No";
     profile_address.textContent = profile.address || "N/A";
     profile_seek_url.textContent = profile.seek_url || "N/A";
     profile_linkedin_url.textContent = profile.linkedin_url || "N/A";
@@ -159,6 +161,7 @@ async function On_Click_Edit_Profile(ctx, id)
   if (form_data)
   {
     form_data.id = id || (id === null ? undefined : profile?.id);
+    form_data.active = form_data.active === true;
     const is_saved = await ctx.Profile.Save(ctx, form_data);
     if (is_saved)
     {
@@ -209,6 +212,8 @@ async function On_Click_AI_Add_Profile(ctx)
     info_elem.Info("Saving CV data...");
     if (cv_data.profile)
     {
+      cv_data.profile.active = true;
+      cv_data.profile.title = cv_data.profile.title || cv_data.profile.name || "Main Profile";
       await ctx.db.Clear_Table(ctx.Profile.table_name);
       await ctx.Profile.Save(ctx, cv_data.profile);
     }

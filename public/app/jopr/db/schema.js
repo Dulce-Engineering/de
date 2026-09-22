@@ -97,6 +97,8 @@ const DB_SCHEMA =
       fields:
       {
         id: "int",
+        title: "string",
+        active: "bool",
         name: "string",
         address: "string",
         seek_url: "string",

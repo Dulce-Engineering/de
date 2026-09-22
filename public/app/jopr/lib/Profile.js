@@ -2,6 +2,8 @@
  * Profile entity stored in the 'profiles' IndexedDB table.
  * @typedef {Object} UserProfile
  * @property {number|string} [id] Unique identifier for the profile.
+ * @property {string|null} [title] Profile title / identifier name.
+ * @property {boolean} [active] Whether this profile is active.
  * @property {string|null} [name] Full name of the user.
  * @property {string|null} [email] Contact email address.
  * @property {string|null} [phone] Contact phone number.
@@ -85,14 +87,23 @@ class Profile
    * @param {UserProfile|Object} form_data - Profile form data to save.
    * @returns {Promise<boolean|number|string>} Result of the database save operation.
    */
-  static Save(ctx, form_data)
+  static async Save(ctx, form_data)
   {
-    /*const obj =
+    if (form_data.active)
     {
-      id: form_data.id,
-      name: form_data.name?.trim() || null,
-      url: form_data.url?.trim() || null,
-    };*/
+      const profiles = await ctx.db.Select(Profile.table_name);
+      if (profiles)
+      {
+        for (const p of profiles)
+        {
+          if (p.id !== form_data.id && p.active)
+          {
+            p.active = false;
+            await ctx.db.Save(Profile.table_name, p);
+          }
+        }
+      }
+    }
 
     return ctx.db.Save(Profile.table_name, form_data);
   }
@@ -185,9 +196,9 @@ class Profile
   {
     let profile = null;
     const profiles = await ctx.db.Select(Profile.table_name);
-    if (profiles)
+    if (profiles && profiles.length > 0)
     {
-      profile = profiles[0];
+      profile = profiles.find(p => p.active) || profiles[0];
     }
     return profile;
   }

@@ -332,6 +332,12 @@ class AI
       type: "object",
       properties:
       {
+        title:
+        {
+          type: "string",
+          nullable: true,
+          description: "A short, descriptive headline or role title for this profile (e.g., 'Senior Frontend Engineer')."
+        },
         name:
         {
           type: "string",
