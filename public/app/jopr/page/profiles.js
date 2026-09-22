@@ -31,9 +31,9 @@ async function Main()
   export_btn.onclick = () => On_Click_Export_Btn(ctx);
 
   profile_menu.addEventListener("add", () => On_Click_Edit_Profile(ctx, null));
-  profile_menu.addEventListener("edit", () => On_Click_Edit_Profile(ctx));
   profile_menu.addEventListener("ai", () => On_Click_AI_Add_Profile(ctx));
   profile_menu.addEventListener("download", () => On_Click_Download_Profile(ctx));
+  profile_list.addEventListener("render", (e) => Render_Profile_Item(e, ctx));
   await Render_Profile(ctx);
 
   edu_list_menu.addEventListener("add", (e) => On_Click_Update_Edu(e, null, ctx));
@@ -130,27 +130,63 @@ async function On_Click_Export_Btn(ctx)
 
 async function Render_Profile(ctx)
 {
-  const profile = await ctx.Profile.Select_First(ctx);
-  if (profile)
-  {
-    profile_title.textContent = profile.title || profile.name || "Untitled Profile";
-    profile_name.textContent = profile.name || "N/A";
-    profile_active.textContent = profile.active ? "Yes" : "No";
-    profile_address.textContent = profile.address || "N/A";
-    profile_seek_url.textContent = profile.seek_url || "N/A";
-    profile_linkedin_url.textContent = profile.linkedin_url || "N/A";
-    profile_residency_status.textContent = profile.residency_status || "N/A";
-    profile_personal_summary.innerHTML = Str_To_HTML(profile.personal_summary || "N/A");
-    profile_skills.textContent = profile.skills || "N/A";
-    profile_interests.innerHTML = Str_To_HTML(profile.interests || "N/A");
+  const profiles = await ctx.Profile.Select_All(ctx);
+  profile_list.value = profiles;
+}
 
-    profile_details.style.display = null;
-    no_profile_details.style.display = "none";
+function Render_Profile_Item(event, ctx)
+{
+  const item_elem = event.detail.item_elem;
+  const profile = item_elem.item_obj;
+  const profile_id = profile.id;
+
+  item_elem.profile_title_elem.textContent = profile.title || profile.name || "Untitled Profile";
+  item_elem.profile_name_elem.textContent = profile.name ? `(${profile.name})` : "";
+  
+  if (profile.active)
+  {
+    item_elem.status_elem.textContent = "Active";
+    item_elem.status_elem.style.display = null;
+    item_elem.open = true;
   }
   else
   {
-    profile_details.style.display = "none";
-    no_profile_details.style.display = null;
+    item_elem.status_elem.textContent = "";
+    item_elem.status_elem.style.display = "none";
+  }
+
+  item_elem.profile_name_det.textContent = profile.name || "N/A";
+  item_elem.profile_email_elem.textContent = profile.email || "N/A";
+  item_elem.profile_phone_elem.textContent = profile.phone || "N/A";
+  item_elem.profile_address_elem.textContent = profile.address || "N/A";
+  item_elem.profile_url_elem.textContent = profile.url || "N/A";
+  item_elem.profile_seek_url_elem.textContent = profile.seek_url || "N/A";
+  item_elem.profile_linkedin_url_elem.textContent = profile.linkedin_url || "N/A";
+  item_elem.profile_residency_status_elem.textContent = profile.residency_status || "N/A";
+  item_elem.profile_personal_summary_elem.innerHTML = Str_To_HTML(profile.personal_summary || "N/A");
+  item_elem.profile_skills_elem.textContent = Array.isArray(profile.skills) ? profile.skills.join(", ") : (profile.skills || "N/A");
+  item_elem.profile_interests_elem.innerHTML = Str_To_HTML(Array.isArray(profile.interests) ? profile.interests.join(", ") : (profile.interests || "N/A"));
+
+  item_elem.profile_item_menu.addEventListener("edit", () => On_Click_Edit_Profile(ctx, profile_id));
+  item_elem.profile_item_menu.addEventListener("delete", () => On_Click_Delete_Profile(ctx, profile_id));
+  item_elem.profile_item_menu.addEventListener("download", () => On_Click_Download_Profile(ctx, profile_id));
+}
+
+async function On_Click_Delete_Profile(ctx, id)
+{
+  const confirmed = await warning_dlg.Confirm("Are you sure you want to delete this profile?");
+  if (confirmed)
+  {
+    const is_deleted = await ctx.Profile.Delete(ctx, id);
+    if (is_deleted)
+    {
+      await Render_Profile(ctx);
+      Alert("Profile deleted successfully.");
+    }
+    else
+    {
+      Alert("Failed to delete profile.");
+    }
   }
 }
 
@@ -175,9 +211,9 @@ async function On_Click_Edit_Profile(ctx, id)
   }
 }
 
-async function On_Click_Download_Profile(ctx)
+async function On_Click_Download_Profile(ctx, id)
 {
-  const employee_profile = await ctx.Profile.Select_First(ctx);
+  const employee_profile = id ? await ctx.Profile.Select_By_Id(ctx, id) : await ctx.Profile.Select_First(ctx);
   const education = await ctx.Profile.Edu_Select(ctx);
   const career = await ctx.Profile.Job_Select(ctx);
   for (const job of career)
@@ -192,7 +228,7 @@ async function On_Click_Download_Profile(ctx)
     job_history: career
   };
 
-  const filename = `jopr-profile-${new Date().toISOString().split('T')[0]}.json`;
+  const filename = `jopr-profile-${employee_profile?.title || employee_profile?.name || 'profile'}-${new Date().toISOString().split('T')[0]}.json`;
   const json_string = JSON.stringify(employee, null, 2);
   const blob = new Blob([json_string], { type: 'application/json' });
   ctx.Utils.Download_File(blob, filename);

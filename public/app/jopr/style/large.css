@@ -267,7 +267,7 @@
   }
 
   /* de-input-list*/ 
-  #jobs_list, #edu_list, #career_list, #project_list [cid=project_list], #profile_elem
+  #jobs_list, #edu_list, #career_list, #project_list [cid=project_list], #profile_elem, #profile_list
   {
     display: flex;
     flex-direction: column;

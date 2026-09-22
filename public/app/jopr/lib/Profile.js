@@ -234,9 +234,14 @@ class Profile
     const profiles = await ctx.db.Select(Profile.table_name);
     if (profiles)
     {
-      profile = !ctx.Utils.Is_Empty(profiles) ? profiles[0] : null;
+      profile = profiles.find(p => p.active) || (!ctx.Utils.Is_Empty(profiles) ? profiles[0] : null);
     }
     return profile;
+  }
+
+  static async Select_All(ctx)
+  {
+    return ctx.db.Select(Profile.table_name);
   }
 
   /**
