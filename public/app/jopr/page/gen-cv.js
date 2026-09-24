@@ -56,6 +56,15 @@ function On_Change_Job_Summary(event)
   ctx.Job.Save(ctx, edit_value.target_job);
 }
 
+function On_Change_Job_Tech(event)
+{
+  const edit_value = event.currentTarget.value;
+  edit_value.cv_job.tech = edit_value.text;
+
+  const ctx = edit_value.ctx;
+  ctx.Job.Save(ctx, edit_value.target_job);
+}
+
 function On_Change_Personal_Summary(event)
 {
   const edit_value = event.currentTarget.value;
@@ -218,7 +227,15 @@ async function Render_Job_Item(event, target_job, ctx)
       item_elem.job_points.style.display = "none";
 
     item_elem.job_company.innerText = cv_job.company_name;
-    item_elem.job_tech.innerText = cv_job.tech;
+
+    value =
+    {
+      ctx, target_job, cv_job,
+      text: cv_job.tech,
+      original_text: job.tech
+    };
+    item_elem.job_tech.value = value;
+    item_elem.job_tech.addEventListener("change", On_Change_Job_Tech);
 
     item_elem.legacy_job.hidden = true;
   }

@@ -17,6 +17,11 @@
 
 <!-- Multi-line textarea input -->
 <de-edit-text id="summary" input-type="textarea"></de-edit-text>
+
+<!-- With static prefix label slot -->
+<de-edit-text id="job_tech" input-type="textarea" class="separate">
+  <span slot="prefix">Tech: </span>
+</de-edit-text>
 ```
 
 ### JavaScript
@@ -43,7 +48,9 @@ titleElem.addEventListener("change", (event) => {
 
 ## Slots
 
-This component does not use slots.
+| Slot | Description |
+|---|---|
+| `prefix` | Optional static prefix content rendered immediately before the editable text element (e.g. `<span slot="prefix">Tech: </span>`). |
 
 ---
 

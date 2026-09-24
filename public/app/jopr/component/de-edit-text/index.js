@@ -15,6 +15,8 @@ import Utils from "../../../../lib/Utils.js";
  *
  * @customElement de-edit-text
  * 
+ * @slot [prefix] - Optional prefix content rendered immediately before the editable text span.
+ * 
  * @attribute {'text'|'textarea'} [input-type="text"] - Specifies the input control type inside the dialog ('text' or 'textarea').
  * 
  * @property {HTMLSpanElement} text_elem - The DOM element displaying the current text.
@@ -121,6 +123,7 @@ class DeEditText extends HTMLElement
 
     const dlg_id = "de_edit_text_dlg_" + crypto.randomUUID();
     const html = `
+      <slot name="prefix"></slot>
       <span cid="text_elem"></span>
       <button cid="edit_btn" type="button" popovertarget="${dlg_id}" class="img-btn">
         <img src="/app/jopr/image/black/edit.svg">
@@ -138,8 +141,10 @@ class DeEditText extends HTMLElement
           <button cid="cancel_btn" popovertarget="${dlg_id}" popovertargetaction="hide">Cancel</button>
         </footer>
       </dialog>
-    `;
-    this.innerHTML = html;
+    `;    
+    const html_elements = Utils.To_Document(html, this);
+    this.replaceChildren(html_elements);
+
     Utils.Set_Id_Shortcuts(this, this, "cid");
 
     this.edit_btn.addEventListener("click", this.On_Click_Edit_Btn);

@@ -435,6 +435,11 @@
         {
           display: block;
         }
+
+        [cid="job_tech"]
+        {
+          display: inline-flex;
+        }
       }
     }
     #projects_article
@@ -531,7 +536,9 @@
           <de-edit-text cid="job_title" class="h3"></de-edit-text>
           <de-edit-text cid="job_description" input-type="textarea"></de-edit-text>
           <div class="separate" cid="job_points"></div>
-          <div class="separate">Tech: <span cid="job_tech"></span></div>
+          <de-edit-text cid="job_tech" input-type="textarea" class="separate">
+            <span slot="prefix">Tech: </span>
+          </de-edit-text>
         </div>
         <div cid="legacy_job">
           <span class="subheading" cid="legacy_job_title"></span> |
