@@ -1,4 +1,5 @@
 import Utils from "../../../lib/Utils.js?v=2";
+import AI from "../lib/AI.js?v=2";
 import New_Ctx from "../lib/ctx.js?v=2";
 
 Main2();
@@ -15,7 +16,8 @@ async function Main2()
 
   if (gen || !job.cv)
   {
-    job.cv = await Generate_CV(ctx, job);
+    const profile = await ctx.Profile.Select_Active(ctx);
+    job.cv = await ctx.ai.Generate_CV(ctx, job, profile, info_elem.Info);
     await ctx.Job.Save(ctx, job);
   }
 
@@ -87,7 +89,7 @@ function CV_Job_Is_Visible(cv_job)
  * @param {Context} ctx
  * @param {object} prospective_job
  */
-async function Generate_CV(ctx, prospective_job)
+/*async function Generate_CV(ctx, prospective_job)
 {
   let cv = {};
 
@@ -139,9 +141,9 @@ async function Generate_CV(ctx, prospective_job)
   }
 
   return cv;
-}
+}*/
 
-function Get_Next_Job(job, all_jobs)
+/*function Get_Next_Job(job, all_jobs)
 {
   let res = null;
 
@@ -163,7 +165,7 @@ function Get_Next_Job(job, all_jobs)
   }
 
   return res;
-}
+}*/
 
 // render lists ===================================================================
 
@@ -177,7 +179,7 @@ async function Render_Job_Item(event, target_job, ctx)
   let job = item_elem.item_obj;
 
   Render_Vis_Buttons(ctx, item_elem, target_job);
-  Render_Date_Strs(job, all_jobs);
+  AI.Render_Date_Strs(job, all_jobs);
 
   const best_job_index = best_jobs.findIndex(j => j.id == job.id);
   if (best_job_index > -1)
@@ -347,7 +349,7 @@ async function Render_CV(job, ctx)
   education_list.value = cv.edu_items;
 }
 
-function Render_Date_Strs(job, all_jobs)
+/*function Render_Date_Strs(job, all_jobs)
 {
   if (job.date_info === null || job.date_info === undefined)
   {
@@ -360,9 +362,9 @@ function Render_Date_Strs(job, all_jobs)
     const range_str = start_date_str + " - " + end_date_str;
     job.date_info = { start_date_str, end_date_str, duration_str, range_str };
   }
-}
+}*/
 
-function Render_Date(date_ms)
+/*function Render_Date(date_ms)
 {
   let res = "";
 
@@ -375,9 +377,9 @@ function Render_Date(date_ms)
   }
 
   return res;
-}
+}*/
 
-function Duration_Str(start_time, end_time)
+/*function Duration_Str(start_time, end_time)
 {
   let res = "";
 
@@ -395,7 +397,7 @@ function Duration_Str(start_time, end_time)
   }
 
   return res;
-}
+}*/
 
 function Render_List(items)
 {

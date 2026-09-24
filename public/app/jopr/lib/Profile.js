@@ -301,11 +301,11 @@ class Profile
    * @param {Context} ctx - Application context containing Utils and db.
    * @returns {Promise<CareerJobRecord[]>} Array of recent career job records.
    */
-  static async Job_Select_Recent(ctx)
+  static async Job_Select_Recent(ctx, where_fn)
   {
-    const jobs = await Profile.Job_Select(ctx);
+    const jobs = await Profile.Job_Select(ctx, where_fn);
     const now = Date.now();
-    const twenty_yrs_ago = now - (ctx.Utils.MILLIS_YEAR * 20);
+    const twenty_yrs_ago = now - (ctx.Utils.MILLIS_YEAR * 25);
     const recent_jobs = jobs.filter(j => j.start_date >= twenty_yrs_ago);
 
     return recent_jobs;
@@ -382,9 +382,9 @@ class Profile
    * @param {Context} ctx - Application context containing db.
    * @returns {Promise<EducationRecord[]|null>} Sorted array of education records.
    */
-  static async Edu_Select(ctx)
+  static async Edu_Select(ctx, where_fn)
   {
-    const certificates = await ctx.db.Select(Profile.edu_table_name);
+    const certificates = await ctx.db.Select(Profile.edu_table_name, where_fn);
     if (certificates)
     {
       certificates.sort((a, b) => (Number(a.year) || 0) - (Number(b.year) || 0));

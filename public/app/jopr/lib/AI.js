@@ -577,6 +577,66 @@ class AI
   }
 
   /**
+   * @param {Context} ctx
+   * @param {object} prospective_job
+   */
+  async Generate_CV(ctx, prospective_job, profile, notify_fn = console.info)
+  {
+    let cv = {};
+
+    if (profile)
+    {
+      cv.profile = profile;
+
+      notify_fn("Generating CV...");
+      await Utils.sleep(1500);
+
+      notify_fn("Generating profile...");
+      cv.summ_text = await this.Generate_Summary(prospective_job, cv.profile);
+
+      notify_fn("Generating skills list...");
+      const where = i => i.profile_id == cv.profile.id;
+      cv.career_jobs = await ctx.Profile.Job_Select(ctx, where);
+      cv.skills = await this.Generate_Skills(prospective_job, cv.career_jobs, cv.profile);
+
+      notify_fn("Selecting jobs...");
+      const best_job_ids = await this.Select_Best_Jobs(cv.career_jobs, prospective_job);
+      if (best_job_ids)
+      {
+        cv.best_jobs = cv.career_jobs.filter(j => best_job_ids.includes(j.id));
+        for (const job of cv.best_jobs)
+        {
+          notify_fn("Generating " + job.company_name + " job title...");
+          job.role_title = await this.Generate_Job_Title(job, prospective_job);
+
+          notify_fn("Generating " + job.company_name + " job description...");
+          job.tailored_job = await this.Generate_Job_Description(job, prospective_job);
+        }
+      }
+
+      notify_fn("Adding other jobs...");
+      cv.legacy_jobs = await ctx.Profile.Job_Select_Recent(ctx, where);
+      if (cv.legacy_jobs)
+      {
+        for (const cv_job of cv.legacy_jobs)
+        {
+          AI.Render_Date_Strs(cv_job, cv.legacy_jobs);
+        }
+      }
+
+      notify_fn("Adding education...");
+      cv.edu_items = await ctx.Profile.Edu_Select(ctx, where);
+
+      notify_fn("Adding projects...");
+      cv.projects = await ctx.Project.Select(ctx);
+
+      notify_fn();
+    }
+
+    return cv;
+  }
+
+  /**
    * Generates a tailored cover letter using the applicant's profile and target job details.
    * @param {FullProfile} profile - The applicant's profile and work history.
    * @param {import("./Job.js").default} job - The target job description.
@@ -1015,6 +1075,80 @@ class AI
         }
       }
     }
+  }
+
+  static Render_Date_Strs(job, all_jobs)
+  {
+    if (job.date_info === null || job.date_info === undefined)
+    {
+      const start_date = job.start_date;
+      const next_job = AI.Get_Next_Job(job, all_jobs);
+      const end_date = next_job ? next_job.start_date : job.end_date;
+      const duration_str = AI.Duration_Str(start_date, end_date);
+      const start_date_str = AI.Render_Date(start_date);
+      const end_date_str = AI.Render_Date(end_date);
+      const range_str = start_date_str + " - " + end_date_str;
+      job.date_info = { start_date_str, end_date_str, duration_str, range_str };
+    }
+  }
+
+  static Get_Next_Job(job, all_jobs)
+  {
+    let res = null;
+
+    const jobs_after = all_jobs.filter(j => j.start_date > job.start_date);
+    if (!Utils.Is_Empty(jobs_after))
+    {
+      let min_job = jobs_after[0];
+      let min_dt = min_job.start_date - job.start_date;
+      for (const job_after of jobs_after)
+      {
+        const dt = job_after.start_date - job.start_date;
+        if (dt < min_dt)
+        {
+          min_dt = dt;
+          min_job = job_after;
+        }
+      }
+      res = min_job;
+    }
+
+    return res;
+  }
+
+  static Duration_Str(start_time, end_time)
+  {
+    let res = "";
+
+    if (start_time && end_time)
+    {
+      const diff_ms = end_time - start_time;
+      const diff_years = diff_ms / (1000 * 60 * 60 * 24 * 365);
+      //res = diff_years.toFixed(1) + " years";
+
+      res = diff_years.toLocaleString('en-US',
+        {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 1
+        }) + " years";
+    }
+
+    return res;
+  }
+
+  static Render_Date(date_ms)
+  {
+    let res = "";
+
+    if (date_ms)
+    {
+      const date = new Date(date_ms);
+      const month_name = date.toLocaleString('default', { month: 'long' });
+      const year = date.getFullYear();
+      res = month_name + " " + year;
+    }
+
+    return res;
   }
 }
 

@@ -79,9 +79,9 @@
       const job_id = Utils.Is_Empty(job_id_str) ? null : parseInt(job_id_str);
       const job = await ctx.Job.Select_By_Id(ctx, job_id);
   
-      const profile = await ctx.Profile.Select(ctx);
-      profile.work_history = await ctx.Profile.Job_Select(ctx);
-      profile.education = await ctx.Profile.Edu_Select(ctx);
+      const profile = await ctx.Profile.Select_Active(ctx);
+      profile.work_history = await ctx.Profile.Job_Select_Active(ctx);
+      profile.education = await ctx.Profile.Edu_Select_Active(ctx);
 
       if (gen || !job.cl)
       {
