@@ -251,7 +251,26 @@ function On_Click_Save()
 
 function On_Click_Add()
 {
+  timer_edit_dlg.timer = null;
   timer_form.reset();
+  const header_elem = timer_edit_dlg.querySelector("header");
+  if (header_elem) header_elem.innerText = "Create Timer";
+  timer_edit_dlg.showModal();
+}
+
+function On_Click_Edit_Btn(e)
+{
+  const btn_elem = e.currentTarget || e.target.closest("button");
+  const timer = btn_elem.timer;
+
+  timer_form.reset();
+  timer_edit_dlg.timer = timer;
+
+  const header_elem = timer_edit_dlg.querySelector("header");
+  if (header_elem) header_elem.innerText = "Edit Timer";
+
+  Dlg_Set_Value(timer);
+
   timer_edit_dlg.showModal();
 }
 
@@ -326,7 +345,19 @@ function On_Click_View_Btn(e)
 function On_Click_Ok()
 {
   const timer = Dlg_Get_Value();
-  timer.id = crypto.randomUUID();
+  if (timer_edit_dlg.timer)
+  {
+    timer.id = timer_edit_dlg.timer.id;
+    if (timer.time > Date.now())
+    {
+      timer.triggered = false;
+      Alarm_Stop(timer.id);
+    }
+  }
+  else
+  {
+    timer.id = crypto.randomUUID();
+  }
 
   Save_Timer(timer);
 
@@ -482,6 +513,7 @@ function Render_Timer(timer)
   const timer_elem_id = "timer_" + timer.id;
   const del_btn_id = "del_btn_" + timer.id;
   const view_btn_id = "view_btn_" + timer.id;
+  const edit_btn_id = "edit_btn_" + timer.id;
   const stop_btn_id = "stop_btn_" + timer.id;
   const quiet_btn_id = "quiet_btn_" + timer.id;
   const panel_id = "panel_" + timer.id;
@@ -497,6 +529,9 @@ function Render_Timer(timer)
         <button id="${quiet_btn_id}" hidden>Silence!</button>
         <button id="${view_btn_id}" class="view-btn img">
           <img src="./image/zoom.svg" alt="View">
+        </button>
+        <button id="${edit_btn_id}" class="edit-btn img">
+          <img src="./image/edit.svg" alt="Edit">
         </button>
         <button id="${stop_btn_id}" class="stop-btn img">
           <img src="/images/pause.svg" alt="Pause">
@@ -541,6 +576,10 @@ function Render_Timer(timer)
   const view_btn_elem = document.getElementById(view_btn_id);
   view_btn_elem.timer = timer;
   view_btn_elem.addEventListener("click", On_Click_View_Btn);
+
+  const edit_btn_elem = document.getElementById(edit_btn_id);
+  edit_btn_elem.timer = timer;
+  edit_btn_elem.addEventListener("click", On_Click_Edit_Btn);
 
   Set_Animations(panel_elem);
 }
@@ -905,6 +944,39 @@ function To_Elements(html_str)
   }
 
   return elements;
+}
+
+function Dlg_Set_Value(timer)
+{
+  if (timer)
+  {
+    timer_title.value = timer.title || "";
+    timer_description.value = timer.description || "";
+
+    if (timer.time)
+    {
+      const d = new Date(timer.time);
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      timer_date.value = `${year}-${month}-${day}`;
+
+      const hours = String(d.getHours()).padStart(2, "0");
+      const mins = String(d.getMinutes()).padStart(2, "0");
+      timer_time.value = `${hours}:${mins}`;
+
+      timer_repeat.date = timer.time;
+    }
+
+    if (timer.recurrence)
+    {
+      timer_repeat.repeat_every.value = timer.recurrence.rate || 0;
+      if (timer.recurrence.scale)
+      {
+        timer_repeat.repeat_scale.value = timer.recurrence.scale;
+      }
+    }
+  }
 }
 
 function Dlg_Get_Value()
