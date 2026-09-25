@@ -50,7 +50,7 @@
           radial-gradient(circle farthest-corner at 50% 10%, var(--green) 10%, rgb(from var(--green) calc(r / 2) calc( g / 2) calc(b / 2))) no-repeat;
           /* rgb(from var(--green) calc(r / 2) calc( g / 2) calc(b / 2)); */
       }
-      html, body, input, button, select
+      html, body, input, button, select, textarea
       {
         font-family: "Roboto Slab", serif;
         font-optical-sizing: auto;
@@ -294,7 +294,7 @@
         height: 24px;
         pointer-events: none;
       }
-      input, select
+      input, select, textarea
       {
         border: none;
         border-bottom: 1px solid var(--red);
@@ -304,7 +304,12 @@
         margin: 8px 0 0 0;
         font-size: 1.3rem;
       }
-      input:focus-visible
+      textarea
+      {
+        min-height: 80px;
+        resize: vertical;
+      }
+      input:focus-visible, textarea:focus-visible
       {
         border-bottom: 1px solid var(--white);
         outline: none;
@@ -1000,6 +1005,15 @@
               Title
             </label>
             <input id="timer_title" type="text">
+          </div>
+          <!-- description -->
+          <div class="field">
+            <label>
+              <button class="info" popovertarget="desc_info" type="button">i</button>
+              <div popover id="desc_info">Descriptions are optional.</div>
+              Description
+            </label>
+            <textarea id="timer_description"></textarea>
           </div>
           <!-- date -->
           <div class="field">

@@ -919,6 +919,7 @@ function Dlg_Get_Value()
   const res =
   {
     title: timer_title.value,
+    description: timer_description.value || null,
     time,
     recurrence: timer_repeat.value
   };
