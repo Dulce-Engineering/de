@@ -258,22 +258,6 @@ function On_Click_Add()
   timer_edit_dlg.showModal();
 }
 
-function On_Click_Edit_Btn(e)
-{
-  const btn_elem = e.currentTarget || e.target.closest("button");
-  const timer = btn_elem.timer;
-
-  timer_form.reset();
-  timer_edit_dlg.timer = timer;
-
-  const header_elem = timer_edit_dlg.querySelector("header");
-  if (header_elem) header_elem.innerText = "Edit Timer";
-
-  Dlg_Set_Value(timer);
-
-  timer_edit_dlg.showModal();
-}
-
 function On_Click_Del_All()
 {
   confirm_msg.innerText = " you want to delete all timers";
@@ -285,20 +269,6 @@ function On_Click_Sound()
 {
   sound_btn.innerText = "Sound On";
   sound_btn.classList.add("on");
-}
-
-function On_Click_Delete(e)
-{
-  const del_btn = e.target;
-
-  confirm_msg.innerText = 
-    del_btn.timer.title ? 
-      " you want to delete the \"" + del_btn.timer.title + "\" timer" :
-      " you want to delete this timer";
-
-  confirm_ok_btn.onclick = On_Click_Delete_Ok;
-  confirm_ok_btn.timer = del_btn.timer;
-  confirm_dlg.showModal();
 }
 
 function On_Click_Delete_Ok(e)
@@ -317,29 +287,6 @@ function On_Click_Delete_Ok(e)
   Update_Nav();
 
   Delete_Timer(timer_id);
-}
-
-function On_Click_View_Btn(e)
-{
-  const btn_elem = e.target;
-  const timer = btn_elem.timer;
-
-  const date_options = 
-  {
-    weekday: "long",
-    year: "numeric", month: "long", day: "numeric",
-    hour: "numeric", minute: "2-digit", second: "2-digit",
-    hour12: true
-  };
-  const view_timer = 
-  {
-    ...timer,
-    time:
-      timer.time ? new Date(timer.time).toLocaleString(undefined, date_options) : null,
-    recurrence: Format_Recurrence(timer.recurrence),
-  }
-
-  timer_view_dlg.Show_Modal(view_timer);
 }
 
 function On_Click_Ok()
@@ -366,25 +313,6 @@ function On_Click_Ok()
   Update_Nav();
 }
 
-function On_Timer_Completed(e)
-{
-  const timer_elem = e.target;
-  const timer = timer_elem.timer;
-  if (!timer.recurrence || !timer.recurrence.rate || timer.recurrence.rate <= 0)
-  {
-    timer.triggered = true;
-    Save_Timer(timer);
-  }
-
-  Alarm_On(timer);
-}
-
-function On_Click_Quiet(e) 
-{
-  const timer = e.target.timer;
-  Alarm_Off(timer);
-}
-
 // Function referenced by the confirm delete all dialog
 function On_Click_Del_All_Ok()
 {
@@ -399,22 +327,6 @@ function On_Click_Del_All_Ok()
   Update_Nav();
 
   Delete_Timers();
-}
-
-function On_Click_Stop(e)
-{
-  const stop_btn_elem = e.target;
-  const timer_elem = document.getElementById("timer_" + stop_btn_elem.timer.id);
-
-  timer_elem.toggle();
-}
-
-function On_Timer_Click(e)
-{
-  const timer_elem = e.currentTarget;
-  const elems = e.composedPath();
-  const counter_elem = elems.find(elem => elem.classList.contains("counter"));
-  timer_elem.On_Dial_Completed(counter_elem);
 }
 
 function On_Date_Change(e)
@@ -463,10 +375,10 @@ function Render_Timers(timers)
         timer.id = id;
       }
 
-      const panel_elem = document.createElement("div");
-      panel_elem.id = "panel_" + timer.id;
-      panel_elem.classList.add("timer-panel");
-      timers_elem.append(panel_elem);
+      const event_elem = document.createElement("de-event");
+      event_elem.id = "panel_" + timer.id;
+      event_elem.classList.add("timer-panel");
+      timers_elem.append(event_elem);
       Render_Timer(timer);
     }
   }
@@ -506,82 +418,6 @@ function Render_Timer_Title(panel_elem, timer)
   {
     panel_elem.title_elem.style.display = null;
   }
-}
-
-function Render_Timer(timer)
-{
-  const timer_elem_id = "timer_" + timer.id;
-  const del_btn_id = "del_btn_" + timer.id;
-  const view_btn_id = "view_btn_" + timer.id;
-  const edit_btn_id = "edit_btn_" + timer.id;
-  const stop_btn_id = "stop_btn_" + timer.id;
-  const quiet_btn_id = "quiet_btn_" + timer.id;
-  const panel_id = "panel_" + timer.id;
-
-  const html = `
-    <header class="timer">
-      <label cid="title_elem" style="display:none;">
-        <span cid="time_elem" class="time"></span>
-        <span cid="overdue_elem" class="time overdue" style="display:none;">(overdue)</span>
-        <div cid="title_text_elem"></div>
-      </label>
-      <div class="btns">
-        <button id="${quiet_btn_id}" hidden>Silence!</button>
-        <button id="${view_btn_id}" class="view-btn img">
-          <img src="./image/zoom.svg" alt="View">
-        </button>
-        <button id="${edit_btn_id}" class="edit-btn img">
-          <img src="./image/edit.svg" alt="Edit">
-        </button>
-        <button id="${stop_btn_id}" class="stop-btn img">
-          <img src="/images/pause.svg" alt="Pause">
-        </button>
-        <button id="${del_btn_id}" class="del-btn img">
-          <img src="/images/bin.svg" alt="Delete">
-        </button>
-      </div>
-    </header>
-    <de-timer id="${timer_elem_id}" show-labels></de-timer>
-  `;
-  const panel_elem = document.getElementById(panel_id);
-  panel_elem.innerHTML = html;
-  Utils.Set_Id_Shortcuts(panel_elem, panel_elem, "cid");
-  Render_Timer_Title(panel_elem, timer);
-
-  const timer_elem = document.getElementById(timer_elem_id);
-  timer_elem.timer = timer;
-  timer_elem.time = timer.time;
-  if (Timer_Is_Overdue(timer)) timer_elem.classList.add("overdue");
-  timer_elem.start();
-  timer_elem.addEventListener("completed", On_Timer_Completed);
-  timer_elem.addEventListener("click", On_Timer_Click);
-
-  const quiet_btn_elem = document.getElementById(quiet_btn_id);
-  quiet_btn_elem.timer = timer;
-  quiet_btn_elem.addEventListener("click", On_Click_Quiet);
-  if (active_alarms.has(timer.id))
-  {
-    quiet_btn_elem.hidden = false;
-    panel_elem.classList.add("alarm");
-  }
-
-  const stop_btn_elem = document.getElementById(stop_btn_id);
-  stop_btn_elem.timer = timer;
-  stop_btn_elem.addEventListener("click", On_Click_Stop);
-
-  const del_btn_elem = document.getElementById(del_btn_id);
-  del_btn_elem.timer = timer;
-  del_btn_elem.addEventListener("click", On_Click_Delete);
-
-  const view_btn_elem = document.getElementById(view_btn_id);
-  view_btn_elem.timer = timer;
-  view_btn_elem.addEventListener("click", On_Click_View_Btn);
-
-  const edit_btn_elem = document.getElementById(edit_btn_id);
-  edit_btn_elem.timer = timer;
-  edit_btn_elem.addEventListener("click", On_Click_Edit_Btn);
-
-  Set_Animations(panel_elem);
 }
 
 function Update_Nav()
@@ -713,67 +549,6 @@ function Alarm_Stop_All()
 }
 
 // misc =====================================================================================
-
-function Format_Recurrence(recurrence)
-{
-  if (!recurrence || !recurrence.rate || recurrence.rate <= 0)
-  {
-    return null;
-  }
-
-  const rate = recurrence.rate;
-  const scale = recurrence.scale;
-  let scaleStr = "";
-
-  switch (scale)
-  {
-    case "SCALE_DAY":
-      scaleStr = rate === 1 ? "day" : "days";
-      break;
-    case "SCALE_WEEK":
-      scaleStr = rate === 1 ? "week" : "weeks";
-      break;
-    case "SCALE_MONTH":
-      scaleStr = rate === 1 ? "month" : "months";
-      break;
-    case "SCALE_YEAR":
-      scaleStr = rate === 1 ? "year" : "years";
-      break;
-    default:
-      return null;
-  }
-
-  let text = rate === 1 ? "Every " + scaleStr : "Every " + rate + " " + scaleStr;
-
-  if (scale === "SCALE_WEEK" && recurrence.weekdays && recurrence.weekdays.length > 0)
-  {
-    const dayMap = {
-      "WEEKDAYS_MONDAY": "Monday",
-      "WEEKDAYS_TUESDAY": "Tuesday",
-      "WEEKDAYS_WEDNESDAY": "Wednesday",
-      "WEEKDAYS_THURSDAY": "Thursday",
-      "WEEKDAYS_FRIDAY": "Friday",
-      "WEEKDAYS_SATURDAY": "Saturday",
-      "WEEKDAYS_SUNDAY": "Sunday"
-    };
-    const days = recurrence.weekdays.map(d => dayMap[d] || d);
-    text += " on " + days.join(", ");
-  }
-
-  if (scale === "SCALE_MONTH" && recurrence.month)
-  {
-    if (recurrence.month === "MONTH_DAY")
-    {
-      text += " on the same day of the month";
-    }
-    else if (recurrence.month === "MONTH_WEEK")
-    {
-      text += " on the same day and week of the month";
-    }
-  }
-
-  return text;
-}
 
 function Parse_Ics(text)
 {
@@ -946,59 +721,6 @@ function To_Elements(html_str)
   return elements;
 }
 
-function Dlg_Set_Value(timer)
-{
-  if (timer)
-  {
-    timer_title.value = timer.title || "";
-    timer_description.value = timer.description || "";
-
-    if (timer.time)
-    {
-      const d = new Date(timer.time);
-      const year = d.getFullYear();
-      const month = String(d.getMonth() + 1).padStart(2, "0");
-      const day = String(d.getDate()).padStart(2, "0");
-      timer_date.value = `${year}-${month}-${day}`;
-
-      const hours = String(d.getHours()).padStart(2, "0");
-      const mins = String(d.getMinutes()).padStart(2, "0");
-      timer_time.value = `${hours}:${mins}`;
-
-      timer_repeat.date = timer.time;
-    }
-
-    if (timer.recurrence)
-    {
-      timer_repeat.repeat_every.value = timer.recurrence.rate || 0;
-      if (timer.recurrence.scale)
-      {
-        timer_repeat.repeat_scale.value = timer.recurrence.scale;
-      }
-    }
-  }
-}
-
-function Dlg_Get_Value()
-{
-  let time = DE.Utils.Time_Strs_To_Millis
-    (timer_date.value, timer_time.value, timer_millis.value);
-  if (!time)
-  {
-    time = Date.now();
-  }
-
-  const res =
-  {
-    title: timer_title.value,
-    description: timer_description.value || null,
-    time,
-    recurrence: timer_repeat.value
-  };
-
-  return res;
-}
-
 // db =======================================================================================
 
 function Sort_Timers(timers)
@@ -1141,4 +863,281 @@ function Increment_Timer(timer)
   }
 
   return res;
+}
+
+// de-event component =======================================================================
+
+function Format_Recurrence(recurrence)
+{
+  if (!recurrence || !recurrence.rate || recurrence.rate <= 0)
+  {
+    return null;
+  }
+
+  const rate = recurrence.rate;
+  const scale = recurrence.scale;
+  let scaleStr = "";
+
+  switch (scale)
+  {
+    case "SCALE_DAY":
+      scaleStr = rate === 1 ? "day" : "days";
+      break;
+    case "SCALE_WEEK":
+      scaleStr = rate === 1 ? "week" : "weeks";
+      break;
+    case "SCALE_MONTH":
+      scaleStr = rate === 1 ? "month" : "months";
+      break;
+    case "SCALE_YEAR":
+      scaleStr = rate === 1 ? "year" : "years";
+      break;
+    default:
+      return null;
+  }
+
+  let text = rate === 1 ? "Every " + scaleStr : "Every " + rate + " " + scaleStr;
+
+  if (scale === "SCALE_WEEK" && recurrence.weekdays && recurrence.weekdays.length > 0)
+  {
+    const dayMap = {
+      "WEEKDAYS_MONDAY": "Monday",
+      "WEEKDAYS_TUESDAY": "Tuesday",
+      "WEEKDAYS_WEDNESDAY": "Wednesday",
+      "WEEKDAYS_THURSDAY": "Thursday",
+      "WEEKDAYS_FRIDAY": "Friday",
+      "WEEKDAYS_SATURDAY": "Saturday",
+      "WEEKDAYS_SUNDAY": "Sunday"
+    };
+    const days = recurrence.weekdays.map(d => dayMap[d] || d);
+    text += " on " + days.join(", ");
+  }
+
+  if (scale === "SCALE_MONTH" && recurrence.month)
+  {
+    if (recurrence.month === "MONTH_DAY")
+    {
+      text += " on the same day of the month";
+    }
+    else if (recurrence.month === "MONTH_WEEK")
+    {
+      text += " on the same day and week of the month";
+    }
+  }
+
+  return text;
+}
+
+function Dlg_Set_Value(timer)
+{
+  if (timer)
+  {
+    timer_title.value = timer.title || "";
+    timer_description.value = timer.description || "";
+
+    if (timer.time)
+    {
+      const d = new Date(timer.time);
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      timer_date.value = `${year}-${month}-${day}`;
+
+      const hours = String(d.getHours()).padStart(2, "0");
+      const mins = String(d.getMinutes()).padStart(2, "0");
+      timer_time.value = `${hours}:${mins}`;
+
+      timer_repeat.date = timer.time;
+    }
+
+    if (timer.recurrence)
+    {
+      timer_repeat.repeat_every.value = timer.recurrence.rate || 0;
+      if (timer.recurrence.scale)
+      {
+        timer_repeat.repeat_scale.value = timer.recurrence.scale;
+      }
+    }
+  }
+}
+
+function Dlg_Get_Value()
+{
+  let time = DE.Utils.Time_Strs_To_Millis
+    (timer_date.value, timer_time.value, timer_millis.value);
+  if (!time)
+  {
+    time = Date.now();
+  }
+
+  const res =
+  {
+    title: timer_title.value,
+    description: timer_description.value || null,
+    time,
+    recurrence: timer_repeat.value
+  };
+
+  return res;
+}
+
+function On_Click_Edit_Btn(e)
+{
+  const btn_elem = e.currentTarget || e.target.closest("button");
+  const timer = btn_elem.timer;
+
+  timer_form.reset();
+  timer_edit_dlg.timer = timer;
+
+  const header_elem = timer_edit_dlg.querySelector("header");
+  if (header_elem) header_elem.innerText = "Edit Timer";
+
+  Dlg_Set_Value(timer);
+
+  timer_edit_dlg.showModal();
+}
+
+function On_Click_View_Btn(e)
+{
+  const btn_elem = e.target;
+  const timer = btn_elem.timer;
+
+  const date_options = 
+  {
+    weekday: "long",
+    year: "numeric", month: "long", day: "numeric",
+    hour: "numeric", minute: "2-digit", second: "2-digit",
+    hour12: true
+  };
+  const view_timer = 
+  {
+    ...timer,
+    time:
+      timer.time ? new Date(timer.time).toLocaleString(undefined, date_options) : null,
+    recurrence: Format_Recurrence(timer.recurrence),
+  }
+
+  timer_view_dlg.Show_Modal(view_timer);
+}
+
+function On_Click_Delete(e)
+{
+  const del_btn = e.target;
+
+  confirm_msg.innerText = 
+    del_btn.timer.title ? 
+      " you want to delete the \"" + del_btn.timer.title + "\" timer" :
+      " you want to delete this timer";
+
+  confirm_ok_btn.onclick = On_Click_Delete_Ok;
+  confirm_ok_btn.timer = del_btn.timer;
+  confirm_dlg.showModal();
+}
+
+function On_Click_Stop(e)
+{
+  const stop_btn_elem = e.target;
+  const timer_elem = document.getElementById("timer_" + stop_btn_elem.timer.id);
+
+  timer_elem.toggle();
+}
+
+function On_Click_Quiet(e) 
+{
+  const timer = e.target.timer;
+  Alarm_Off(timer);
+}
+
+function On_Timer_Completed(e)
+{
+  const timer_elem = e.target;
+  const timer = timer_elem.timer;
+  if (!timer.recurrence || !timer.recurrence.rate || timer.recurrence.rate <= 0)
+  {
+    timer.triggered = true;
+    Save_Timer(timer);
+  }
+
+  Alarm_On(timer);
+}
+
+function On_Timer_Click(event)
+{
+  const timer_elem = event.currentTarget;
+  const elems = event.composedPath();
+  const counter_elem = elems.find(elem => elem.classList.contains("counter"));
+  timer_elem.On_Dial_Completed(counter_elem);
+}
+
+function Render_Timer(timer)
+{
+  const timer_elem_id = "timer_" + timer.id;
+  const del_btn_id = "del_btn_" + timer.id;
+  const view_btn_id = "view_btn_" + timer.id;
+  const edit_btn_id = "edit_btn_" + timer.id;
+  const stop_btn_id = "stop_btn_" + timer.id;
+  const quiet_btn_id = "quiet_btn_" + timer.id;
+  const panel_id = "panel_" + timer.id;
+
+  const html = `
+    <header class="timer">
+      <label cid="title_elem" style="display:none;">
+        <span cid="time_elem" class="time"></span>
+        <span cid="overdue_elem" class="time overdue" style="display:none;">(overdue)</span>
+        <div cid="title_text_elem"></div>
+      </label>
+      <div class="btns">
+        <button id="${quiet_btn_id}" hidden>Silence!</button>
+        <button id="${view_btn_id}" class="view-btn img">
+          <img src="./image/zoom.svg" alt="View">
+        </button>
+        <button id="${edit_btn_id}" class="edit-btn img">
+          <img src="./image/edit.svg" alt="Edit">
+        </button>
+        <button id="${stop_btn_id}" class="stop-btn img">
+          <img src="/images/pause.svg" alt="Pause">
+        </button>
+        <button id="${del_btn_id}" class="del-btn img">
+          <img src="/images/bin.svg" alt="Delete">
+        </button>
+      </div>
+    </header>
+    <de-timer id="${timer_elem_id}" show-labels></de-timer>
+  `;
+  const panel_elem = document.getElementById(panel_id);
+  panel_elem.innerHTML = html;
+  Utils.Set_Id_Shortcuts(panel_elem, panel_elem, "cid");
+  Render_Timer_Title(panel_elem, timer);
+
+  const timer_elem = document.getElementById(timer_elem_id);
+  timer_elem.timer = timer;
+  timer_elem.time = timer.time;
+  if (Timer_Is_Overdue(timer)) timer_elem.classList.add("overdue");
+  
+  timer_elem.start();
+
+  const quiet_btn_elem = document.getElementById(quiet_btn_id);
+  quiet_btn_elem.timer = timer;
+  if (active_alarms.has(timer.id))
+  {
+    quiet_btn_elem.hidden = false;
+    panel_elem.classList.add("alarm");
+  }
+  const stop_btn_elem = document.getElementById(stop_btn_id);
+  stop_btn_elem.timer = timer;
+  const del_btn_elem = document.getElementById(del_btn_id);
+  del_btn_elem.timer = timer;
+  const view_btn_elem = document.getElementById(view_btn_id);
+  view_btn_elem.timer = timer;
+  const edit_btn_elem = document.getElementById(edit_btn_id);
+  edit_btn_elem.timer = timer;
+  Set_Animations(panel_elem);
+
+  timer_elem.addEventListener("click", On_Timer_Click);
+  timer_elem.addEventListener("completed", On_Timer_Completed);
+  quiet_btn_elem.addEventListener("click", On_Click_Quiet);
+  stop_btn_elem.addEventListener("click", On_Click_Stop);
+  del_btn_elem.addEventListener("click", On_Click_Delete);
+  view_btn_elem.addEventListener("click", On_Click_View_Btn);
+  edit_btn_elem.addEventListener("click", On_Click_Edit_Btn);
 }

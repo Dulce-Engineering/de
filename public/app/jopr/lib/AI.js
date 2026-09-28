@@ -1082,8 +1082,11 @@ class AI
     if (job.date_info === null || job.date_info === undefined)
     {
       const start_date = job.start_date;
-      const next_job = AI.Get_Next_Job(job, all_jobs);
-      const end_date = next_job ? next_job.start_date : job.end_date;
+
+      //const next_job = AI.Get_Next_Job(job, all_jobs);
+      //const end_date = next_job ? next_job.start_date : job.end_date;
+      const end_date = job.end_date;
+      
       const duration_str = AI.Duration_Str(start_date, end_date);
       const start_date_str = AI.Render_Date(start_date);
       const end_date_str = AI.Render_Date(end_date);
