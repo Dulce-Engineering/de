@@ -1,0 +1,23 @@
+<header class="timer">
+  <label cid="title_elem" style="display:none;">
+    <span cid="time_elem" class="time"></span>
+    <span cid="overdue_elem" class="time overdue" style="display:none;">(overdue)</span>
+    <div cid="title_text_elem"></div>
+  </label>
+  <div class="btns">
+    <button cid="quiet_btn" hidden>Silence!</button>
+    <button cid="view_btn" class="view-btn img">
+      <img src="/app/tempustoi/image/zoom.svg" alt="View">
+    </button>
+    <button cid="edit_btn" class="edit-btn img">
+      <img src="/app/tempustoi/image/edit.svg" alt="Edit">
+    </button>
+    <button cid="stop_btn" class="stop-btn img">
+      <img src="/images/pause.svg" alt="Pause">
+    </button>
+    <button cid="del_btn" class="del-btn img">
+      <img src="/images/bin.svg" alt="Delete">
+    </button>
+  </div>
+</header>
+<de-timer cid="timer_elem" show-labels></de-timer>

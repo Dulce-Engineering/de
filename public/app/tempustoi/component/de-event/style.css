@@ -1,0 +1,92 @@
+de-event
+{
+  display: block;
+  width: 100%;
+  max-width: 1000px;
+  overflow: hidden;
+  margin: 0 0 10px 0;
+  border-top: 1px dashed var(--orange, #E39828);
+}
+
+de-event:first-child
+{
+  border-top: none;
+}
+
+de-event header.timer
+{
+  justify-content: flex-end;
+  font-family: "Roboto Slab", serif;
+  font-size: 0;
+  margin: 0;
+  padding: 10px 0 0 0;
+  gap: 10px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  position: relative;
+  width: 100%;
+}
+
+de-event header.timer label
+{
+  margin: 0 auto 0 0;
+  color: var(--orange, #E39828);
+  font-size: 1rem;
+}
+
+de-event header.timer label .time
+{
+  font-size: 1rem;
+}
+
+de-event header.timer label .overdue
+{
+  color: var(--overdue, #BF211E);
+}
+
+de-event header.timer label [cid="title_text_elem"]
+{
+  font-size: 1.8rem;
+}
+
+de-event .btns
+{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  justify-content: flex-end;
+}
+
+de-event button
+{
+  background-color: var(--orange, #E39828);
+  color: var(--green, #23342C);
+  border: 2px solid transparent;
+  width: fit-content;
+  border-radius: 100px;
+  margin: 0;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+de-event button.img
+{
+  padding: 10px;
+  font-size: 0;
+}
+
+de-event button img
+{
+  width: 24px;
+  height: 24px;
+  pointer-events: none;
+}
+
+de-event.alarm .counter
+{
+  animation: pulsate-red 0.4s infinite alternate ease-in-out;
+  border-radius: 100%;
+}
