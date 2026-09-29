@@ -706,5 +706,11 @@
     "datetime": 1790549709810,
     "id": "448ec811-5839-491f-8fb3-6e364c50afe6",
     "query_id": "-angular"
+  },
+  {
+    "count": 379,
+    "datetime": 1790637133085,
+    "id": "f2590fd8-4c2e-465b-9296-4475d7b49e7b",
+    "query_id": "-angular"
   }
 ]
