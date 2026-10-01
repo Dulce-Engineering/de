@@ -18,11 +18,15 @@ import Utils from "/lib/Utils.js";
 
 /**
  * @typedef {object} Timer
- * @property {number} id - The unique identifier for the timer (timestamp).
+ * @property {number|string} id - The unique identifier for the timer (timestamp or uuid).
+ * @property {string} [calendar_id] - Unique calendar event UID for ICS export/import to prevent duplicate events.
+ * @property {number} [sequence] - Revision sequence number incremented on each update to ensure changes are applied when importing.
+ * @property {number} [updated_at] - Timestamp in milliseconds when the timer was last modified.
  * @property {string} title - The optional title of the timer.
  * @property {number} time - The target time in milliseconds since the epoch.
  * @property {string} [description] - The optional description of the timer.
  * @property {Repeat} recurrence - Optional recurrence rules for the timer.
+ * @property {boolean} [triggered] - Whether the timer alarm has fired.
  */
 
 const active_alarms = new Map();
@@ -48,6 +52,7 @@ async function Main()
   timer_date.addEventListener("change", On_Date_Change);
   about_btn.addEventListener("click", On_Click_About);
   save_btn.addEventListener("click", On_Click_Save);
+  download_ics_btn.addEventListener("click", On_Click_Download_Ics);
   load_btn.addEventListener("click", On_Click_Load_Btn);
   menu_close_btn.addEventListener("click", On_Click_Close_Menu);
 
@@ -120,10 +125,13 @@ async function On_Consume_Launch_Queue(launchParams)
               const timer = 
               {
                 id: crypto.randomUUID(),
+                calendar_id: ev.calendar_id || `${crypto.randomUUID()}@tempustoi`,
+                sequence: typeof ev.sequence === "number" ? ev.sequence : 0,
+                updated_at: ev.updated_at || Date.now(),
                 title: ev.title || "Imported Event",
                 time: ev.time,
                 description: ev.description || null,
-                recurrence: { rate: 0 }
+                recurrence: ev.recurrence || { rate: 0 }
               };
               Save_Timer(timer);
             }
@@ -193,10 +201,13 @@ function On_Click_Load_Btn()
         {
           const timer = {
             id: crypto.randomUUID(),
+            calendar_id: ev.calendar_id || `${crypto.randomUUID()}@tempustoi`,
+            sequence: typeof ev.sequence === "number" ? ev.sequence : 0,
+            updated_at: ev.updated_at || Date.now(),
             title: ev.title || "Imported Event",
             time: ev.time,
             description: ev.description || null,
-            recurrence: { rate: 0 }
+            recurrence: ev.recurrence || { rate: 0 }
           };
           Save_Timer(timer);
           importedCount++;
@@ -249,6 +260,29 @@ function On_Click_Save()
   }
 }
 
+function On_Click_Download_Ics()
+{
+  menu_panel.hidePopover();
+
+  const timers = Select_Timers();
+  if (!timers || timers.length === 0)
+  {
+    alert("No timer events to download.");
+    return;
+  }
+
+  const ics_str = Generate_Ics(timers);
+  const blob = new Blob([ics_str], { type: "text/calendar;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "tempustoi.ics";
+  link.click();
+
+  URL.revokeObjectURL(url);
+}
+
 function On_Click_Add()
 {
   timer_edit_dlg.timer = null;
@@ -295,6 +329,9 @@ function On_Click_Ok()
   if (timer_edit_dlg.timer)
   {
     timer.id = timer_edit_dlg.timer.id;
+    timer.calendar_id = timer_edit_dlg.timer.calendar_id || `${timer.id}@tempustoi`;
+    timer.sequence = (typeof timer_edit_dlg.timer.sequence === "number" ? timer_edit_dlg.timer.sequence : 0) + 1;
+    timer.updated_at = Date.now();
     if (timer.time > Date.now())
     {
       timer.triggered = false;
@@ -304,6 +341,9 @@ function On_Click_Ok()
   else
   {
     timer.id = crypto.randomUUID();
+    timer.calendar_id = `${timer.id}@tempustoi`;
+    timer.sequence = 0;
+    timer.updated_at = Date.now();
   }
 
   Save_Timer(timer);
@@ -573,7 +613,23 @@ function Parse_Ics(text)
       // 2. Extract Description
       const description = event.description || null;
 
-      // 3. Extract Start Time & convert to JavaScript epoch milliseconds
+      // 3. Extract UID and Sequence for change tracking
+      const calendar_id = event.uid || veventComp.getFirstPropertyValue("uid") || null;
+      const seq_prop = veventComp.getFirstPropertyValue("sequence");
+      const sequence = seq_prop !== null && seq_prop !== undefined ? parseInt(seq_prop, 10) : 0;
+
+      let updated_at = Date.now();
+      const last_mod = veventComp.getFirstPropertyValue("last-modified");
+      if (last_mod && typeof last_mod.toJSDate === "function")
+      {
+        const modDate = last_mod.toJSDate();
+        if (modDate && !isNaN(modDate.getTime()))
+        {
+          updated_at = modDate.getTime();
+        }
+      }
+
+      // 4. Extract Start Time & convert to JavaScript epoch milliseconds
       let time = null;
       if (event.startDate)
       {
@@ -587,6 +643,9 @@ function Parse_Ics(text)
       if (time)
       {
         events.push({
+          calendar_id,
+          sequence,
+          updated_at,
           title,
           time,
           description
@@ -653,6 +712,14 @@ function Parse_Ics_1(text)
           .replace(/\\[nN]/g, "\n");
         currentEvent.title = summary.trim();
       }
+      else if (key.startsWith("UID"))
+      {
+        currentEvent.calendar_id = value.trim();
+      }
+      else if (key.startsWith("SEQUENCE"))
+      {
+        currentEvent.sequence = parseInt(value.trim(), 10) || 0;
+      }
       else if (key.startsWith("DTSTART"))
       {
         currentEvent.time = Parse_Ics_Date(value.trim());
@@ -700,6 +767,128 @@ function Parse_Ics_Date(value)
   return null;
 }
 
+function Format_Ics_Date(timestamp)
+{
+  const d = new Date(timestamp);
+  const year = d.getUTCFullYear();
+  const month = String(d.getUTCMonth() + 1).padStart(2, "0");
+  const day = String(d.getUTCDate()).padStart(2, "0");
+  const hours = String(d.getUTCHours()).padStart(2, "0");
+  const minutes = String(d.getUTCMinutes()).padStart(2, "0");
+  const seconds = String(d.getUTCSeconds()).padStart(2, "0");
+  return `${year}${month}${day}T${hours}${minutes}${seconds}Z`;
+}
+
+function Escape_Ics_Text(text)
+{
+  if (!text) return "";
+  return String(text)
+    .replace(/\\/g, "\\\\")
+    .replace(/;/g, "\\;")
+    .replace(/,/g, "\\,")
+    .replace(/\r?\n/g, "\\n");
+}
+
+function Generate_Ics_Rrule(recurrence)
+{
+  if (!recurrence || !recurrence.rate || recurrence.rate <= 0) return null;
+
+  const rate = recurrence.rate;
+  let freq = "";
+  switch (recurrence.scale)
+  {
+    case "SCALE_DAY":
+      freq = "DAILY";
+      break;
+    case "SCALE_WEEK":
+      freq = "WEEKLY";
+      break;
+    case "SCALE_MONTH":
+      freq = "MONTHLY";
+      break;
+    case "SCALE_YEAR":
+      freq = "YEARLY";
+      break;
+    default:
+      return null;
+  }
+
+  let rrule = `FREQ=${freq};INTERVAL=${rate}`;
+
+  if (recurrence.scale === "SCALE_WEEK" && recurrence.weekdays && recurrence.weekdays.length > 0)
+  {
+    const dayMap = {
+      "WEEKDAYS_MONDAY": "MO",
+      "WEEKDAYS_TUESDAY": "TU",
+      "WEEKDAYS_WEDNESDAY": "WE",
+      "WEEKDAYS_THURSDAY": "TH",
+      "WEEKDAYS_FRIDAY": "FR",
+      "WEEKDAYS_SATURDAY": "SA",
+      "WEEKDAYS_SUNDAY": "SU"
+    };
+    const days = recurrence.weekdays.map(d => dayMap[d] || d).filter(Boolean);
+    if (days.length > 0)
+    {
+      rrule += `;BYDAY=${days.join(",")}`;
+    }
+  }
+
+  return rrule;
+}
+
+function Generate_Ics(timers)
+{
+  const now_str = Format_Ics_Date(Date.now());
+  const lines = [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "PRODID:-//Dulce Engineering//TempusToi//EN",
+    "CALSCALE:GREGORIAN",
+    "METHOD:PUBLISH",
+    "X-WR-CALNAME:TempusToi"
+  ];
+
+  for (const timer of timers)
+  {
+    if (!timer || !timer.time) continue;
+
+    const cal_id = timer.calendar_id || `${timer.id || crypto.randomUUID()}@tempustoi`;
+    const sequence = typeof timer.sequence === "number" ? timer.sequence : 0;
+    const updated_at_str = timer.updated_at ? Format_Ics_Date(timer.updated_at) : now_str;
+    const start_str = Format_Ics_Date(timer.time);
+    const end_str = Format_Ics_Date(timer.time + 30 * 60 * 1000);
+
+    lines.push("BEGIN:VEVENT");
+    lines.push(`UID:${cal_id}`);
+    lines.push(`SEQUENCE:${sequence}`);
+    lines.push(`DTSTAMP:${now_str}`);
+    lines.push(`LAST-MODIFIED:${updated_at_str}`);
+    lines.push(`DTSTART:${start_str}`);
+    lines.push(`DTEND:${end_str}`);
+    lines.push(`SUMMARY:${Escape_Ics_Text(timer.title || "Timer Event")}`);
+
+    if (timer.description)
+    {
+      lines.push(`DESCRIPTION:${Escape_Ics_Text(timer.description)}`);
+    }
+
+    if (timer.recurrence && timer.recurrence.rate > 0)
+    {
+      const rrule = Generate_Ics_Rrule(timer.recurrence);
+      if (rrule)
+      {
+        lines.push(`RRULE:${rrule}`);
+      }
+    }
+
+    lines.push("STATUS:CONFIRMED");
+    lines.push("END:VEVENT");
+  }
+
+  lines.push("END:VCALENDAR");
+  return lines.join("\r\n") + "\r\n";
+}
+
 function Timer_Is_Overdue(timer)
 {
   return timer.time <= Date.now();
@@ -740,7 +929,7 @@ function Sort_Timers(timers)
 
       if (t1_overdue && !t2_overdue) return -1;
       if (!t1_overdue && t2_overdue) return 1;
-      if (t1_overdue && t2_overdue) return t2.time - t1.time;
+      //if (t1_overdue && t2_overdue) return t2.time - t1.time;
       return t1.time - t2.time;
     }
   }
@@ -752,7 +941,40 @@ function Select_Timers()
   const timers_str = localStorage.getItem("tempustoi");
   if (timers_str)
   {
-    timers = JSON.parse(timers_str);
+    try
+    {
+      timers = JSON.parse(timers_str);
+      if (Array.isArray(timers))
+      {
+        let modified = false;
+        for (const timer of timers)
+        {
+          if (!timer.calendar_id)
+          {
+            timer.calendar_id = `${timer.id || crypto.randomUUID()}@tempustoi`;
+            modified = true;
+          }
+          if (typeof timer.sequence !== "number")
+          {
+            timer.sequence = 0;
+            modified = true;
+          }
+          if (!timer.updated_at)
+          {
+            timer.updated_at = timer.time || Date.now();
+            modified = true;
+          }
+        }
+        if (modified)
+        {
+          Save_Timers(timers);
+        }
+      }
+    }
+    catch (e)
+    {
+      console.error("Failed to parse timers from localStorage:", e);
+    }
   }
 
   return timers;
@@ -766,8 +988,38 @@ function Save_Timers(timers)
 function Save_Timer(timer)
 {
   let timers = Select_Timers() || [];
-  timers = timers.filter(t => t.id != timer.id);
-  timers.push(timer);
+  const existing_index = timers.findIndex(t => (timer.id && t.id == timer.id) || (timer.calendar_id && t.calendar_id == timer.calendar_id));
+  if (existing_index >= 0)
+  {
+    const existing = timers[existing_index];
+    if (!timer.id) timer.id = existing.id;
+    if (!timer.calendar_id) timer.calendar_id = existing.calendar_id || `${timer.id}@tempustoi`;
+    if (typeof timer.sequence !== "number")
+    {
+      timer.sequence = (typeof existing.sequence === "number" ? existing.sequence : 0) + 1;
+    }
+    if (!timer.updated_at)
+    {
+      timer.updated_at = Date.now();
+    }
+    timers[existing_index] = timer;
+  }
+  else
+  {
+    if (!timer.calendar_id)
+    {
+      timer.calendar_id = `${timer.id || crypto.randomUUID()}@tempustoi`;
+    }
+    if (typeof timer.sequence !== "number")
+    {
+      timer.sequence = 0;
+    }
+    if (!timer.updated_at)
+    {
+      timer.updated_at = Date.now();
+    }
+    timers.push(timer);
+  }
   Save_Timers(timers);
 }
 

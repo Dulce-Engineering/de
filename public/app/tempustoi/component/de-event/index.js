@@ -16,6 +16,9 @@ const html_url = new URL(html_local_url, import.meta.url).href;
  * Data structure representing a Timer entity.
  * @typedef {Object} Timer
  * @property {number|string} [id] - Unique identifier of the timer.
+ * @property {string} [calendar_id] - Unique calendar event UID for ICS export/import to prevent duplicate events.
+ * @property {number} [sequence] - Revision sequence number incremented on each update to ensure changes are applied when importing.
+ * @property {number} [updated_at] - Timestamp in milliseconds when the timer was last modified.
  * @property {string} [title] - Title/label of the timer event.
  * @property {string|null} [description] - Detailed description of the timer.
  * @property {number} [time] - Target completion timestamp in milliseconds.
