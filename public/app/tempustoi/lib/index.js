@@ -4,8 +4,7 @@ import "/component/DeInputPeriod/index.js?v=4";
 import "/component/DeInputRepeat/index.js?v=4";
 import "/component/DeDialogForm/index.js?v=4";
 import "/app/jopr/component/de-field/index.js?v=4";
-//import ICAL from "https://unpkg.com/ical.js/dist/ical.min.js";
-import ICAL from "./ical.min.js";
+import ICS from "./ICS.js";
 import Utils from "/lib/Utils.js";
 
 /**
@@ -114,7 +113,7 @@ async function On_Consume_Launch_Queue(launchParams)
         const text = await file.text();
         
         // Re-use your updated parsing logic
-        const events = Parse_Ics(text); 
+        const events = ICS.Parse(text); 
         
         if (events.length > 0) 
         {
@@ -187,7 +186,7 @@ function On_Click_Load_Btn()
     const text = reader_event.target.result;
     if (filename.toLowerCase().endsWith(".ics"))
     {
-      const events = Parse_Ics(text);
+      const events = ICS.Parse(text);
       if (events.length === 0)
       {
         alert("No valid events found in the selected ICS file.");
@@ -267,20 +266,11 @@ function On_Click_Download_Ics()
   const timers = Select_Timers();
   if (!timers || timers.length === 0)
   {
-    alert("No timer events to download.");
+    alert("No timer events to export.");
     return;
   }
 
-  const ics_str = Generate_Ics(timers);
-  const blob = new Blob([ics_str], { type: "text/calendar;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
-
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = "tempustoi.ics";
-  link.click();
-
-  URL.revokeObjectURL(url);
+  ICS.Download(timers, "tempustoi.ics");
 }
 
 function On_Click_Add()
@@ -589,305 +579,6 @@ function Alarm_Stop_All()
 }
 
 // misc =====================================================================================
-
-function Parse_Ics(text)
-{
-  const events = [];
-
-  try
-  {
-    // Parse raw text into an ICAL Component tree
-    const jcalData = ICAL.parse(text);
-    const comp = new ICAL.Component(jcalData);
-    
-    // Retrieve all VEVENT subcomponents
-    const vevents = comp.getAllSubcomponents("vevent");
-
-    for (const veventComp of vevents)
-    {
-      const event = new ICAL.Event(veventComp);
-
-      // 1. Extract Summary / Title
-      const title = event.summary || "Imported Event";
-
-      // 2. Extract Description
-      const description = event.description || null;
-
-      // 3. Extract UID and Sequence for change tracking
-      const calendar_id = event.uid || veventComp.getFirstPropertyValue("uid") || null;
-      const seq_prop = veventComp.getFirstPropertyValue("sequence");
-      const sequence = seq_prop !== null && seq_prop !== undefined ? parseInt(seq_prop, 10) : 0;
-
-      let updated_at = Date.now();
-      const last_mod = veventComp.getFirstPropertyValue("last-modified");
-      if (last_mod && typeof last_mod.toJSDate === "function")
-      {
-        const modDate = last_mod.toJSDate();
-        if (modDate && !isNaN(modDate.getTime()))
-        {
-          updated_at = modDate.getTime();
-        }
-      }
-
-      // 4. Extract Start Time & convert to JavaScript epoch milliseconds
-      let time = null;
-      if (event.startDate)
-      {
-        const jsDate = event.startDate.toJSDate();
-        if (jsDate && !isNaN(jsDate.getTime()))
-        {
-          time = jsDate.getTime();
-        }
-      }
-
-      if (time)
-      {
-        events.push({
-          calendar_id,
-          sequence,
-          updated_at,
-          title,
-          time,
-          description
-        });
-      }
-    }
-  }
-  catch (e)
-  {
-    console.error("Failed to parse ICS file with ICAL.js:", e);
-  }
-
-  return events;
-}
-
-function Parse_Ics_1(text)
-{
-  const rawLines = text.split(/\r?\n/);
-  const lines = [];
-  for (let i = 0; i < rawLines.length; i++)
-  {
-    let line = rawLines[i];
-    while (i + 1 < rawLines.length && (rawLines[i + 1].startsWith(" ") || rawLines[i + 1].startsWith("\t")))
-    {
-      line += rawLines[i + 1].slice(1);
-      i++;
-    }
-    lines.push(line);
-  }
-
-  const events = [];
-  let currentEvent = null;
-
-  for (const line of lines)
-  {
-    if (!line.trim()) continue;
-    
-    const colonIdx = line.indexOf(":");
-    if (colonIdx === -1) continue;
-    
-    const key = line.slice(0, colonIdx).trim().toUpperCase();
-    const value = line.slice(colonIdx + 1);
-
-    if (key === "BEGIN" && value.trim().toUpperCase() === "VEVENT")
-    {
-      currentEvent = {};
-    }
-    else if (key === "END" && value.trim().toUpperCase() === "VEVENT")
-    {
-      if (currentEvent)
-      {
-        events.push(currentEvent);
-        currentEvent = null;
-      }
-    }
-    else if (currentEvent)
-    {
-      if (key.startsWith("SUMMARY"))
-      {
-        let summary = value
-          .replace(/\\,/g, ",")
-          .replace(/\\;/g, ";")
-          .replace(/\\\\/g, "\\")
-          .replace(/\\[nN]/g, "\n");
-        currentEvent.title = summary.trim();
-      }
-      else if (key.startsWith("UID"))
-      {
-        currentEvent.calendar_id = value.trim();
-      }
-      else if (key.startsWith("SEQUENCE"))
-      {
-        currentEvent.sequence = parseInt(value.trim(), 10) || 0;
-      }
-      else if (key.startsWith("DTSTART"))
-      {
-        currentEvent.time = Parse_Ics_Date(value.trim());
-      }
-      else if (key.startsWith("DESCRIPTION"))
-      {
-        let desc = value
-          .replace(/\\,/g, ",")
-          .replace(/\\;/g, ";")
-          .replace(/\\\\/g, "\\")
-          .replace(/\\[nN]/g, "\n");
-        currentEvent.description = desc.trim();
-      }
-    }
-  }
-
-  return events;
-}
-
-function Parse_Ics_Date(value)
-{
-  const clean = value.replace(/[^0-9TZ]/g, "");
-  if (clean.length === 8)
-  {
-    const year = clean.slice(0, 4);
-    const month = clean.slice(4, 6);
-    const day = clean.slice(6, 8);
-    const timeVal = new Date(`${year}-${month}-${day}T00:00:00`).getTime();
-    return isNaN(timeVal) ? null : timeVal;
-  }
-  else if (clean.length >= 15)
-  {
-    const year = clean.slice(0, 4);
-    const month = clean.slice(4, 6);
-    const day = clean.slice(6, 8);
-    const hour = clean.slice(9, 11);
-    const min = clean.slice(11, 13);
-    const sec = clean.slice(13, 15);
-    const isUtc = clean.endsWith("Z");
-    
-    const dateStr = `${year}-${month}-${day}T${hour}:${min}:${sec}${isUtc ? "Z" : ""}`;
-    const timeVal = new Date(dateStr).getTime();
-    return isNaN(timeVal) ? null : timeVal;
-  }
-  return null;
-}
-
-function Format_Ics_Date(timestamp)
-{
-  const d = new Date(timestamp);
-  const year = d.getUTCFullYear();
-  const month = String(d.getUTCMonth() + 1).padStart(2, "0");
-  const day = String(d.getUTCDate()).padStart(2, "0");
-  const hours = String(d.getUTCHours()).padStart(2, "0");
-  const minutes = String(d.getUTCMinutes()).padStart(2, "0");
-  const seconds = String(d.getUTCSeconds()).padStart(2, "0");
-  return `${year}${month}${day}T${hours}${minutes}${seconds}Z`;
-}
-
-function Escape_Ics_Text(text)
-{
-  if (!text) return "";
-  return String(text)
-    .replace(/\\/g, "\\\\")
-    .replace(/;/g, "\\;")
-    .replace(/,/g, "\\,")
-    .replace(/\r?\n/g, "\\n");
-}
-
-function Generate_Ics_Rrule(recurrence)
-{
-  if (!recurrence || !recurrence.rate || recurrence.rate <= 0) return null;
-
-  const rate = recurrence.rate;
-  let freq = "";
-  switch (recurrence.scale)
-  {
-    case "SCALE_DAY":
-      freq = "DAILY";
-      break;
-    case "SCALE_WEEK":
-      freq = "WEEKLY";
-      break;
-    case "SCALE_MONTH":
-      freq = "MONTHLY";
-      break;
-    case "SCALE_YEAR":
-      freq = "YEARLY";
-      break;
-    default:
-      return null;
-  }
-
-  let rrule = `FREQ=${freq};INTERVAL=${rate}`;
-
-  if (recurrence.scale === "SCALE_WEEK" && recurrence.weekdays && recurrence.weekdays.length > 0)
-  {
-    const dayMap = {
-      "WEEKDAYS_MONDAY": "MO",
-      "WEEKDAYS_TUESDAY": "TU",
-      "WEEKDAYS_WEDNESDAY": "WE",
-      "WEEKDAYS_THURSDAY": "TH",
-      "WEEKDAYS_FRIDAY": "FR",
-      "WEEKDAYS_SATURDAY": "SA",
-      "WEEKDAYS_SUNDAY": "SU"
-    };
-    const days = recurrence.weekdays.map(d => dayMap[d] || d).filter(Boolean);
-    if (days.length > 0)
-    {
-      rrule += `;BYDAY=${days.join(",")}`;
-    }
-  }
-
-  return rrule;
-}
-
-function Generate_Ics(timers)
-{
-  const now_str = Format_Ics_Date(Date.now());
-  const lines = [
-    "BEGIN:VCALENDAR",
-    "VERSION:2.0",
-    "PRODID:-//Dulce Engineering//TempusToi//EN",
-    "CALSCALE:GREGORIAN",
-    "METHOD:PUBLISH",
-    "X-WR-CALNAME:TempusToi"
-  ];
-
-  for (const timer of timers)
-  {
-    if (!timer || !timer.time) continue;
-
-    const cal_id = timer.calendar_id || `${timer.id || crypto.randomUUID()}@tempustoi`;
-    const sequence = typeof timer.sequence === "number" ? timer.sequence : 0;
-    const updated_at_str = timer.updated_at ? Format_Ics_Date(timer.updated_at) : now_str;
-    const start_str = Format_Ics_Date(timer.time);
-    const end_str = Format_Ics_Date(timer.time + 30 * 60 * 1000);
-
-    lines.push("BEGIN:VEVENT");
-    lines.push(`UID:${cal_id}`);
-    lines.push(`SEQUENCE:${sequence}`);
-    lines.push(`DTSTAMP:${now_str}`);
-    lines.push(`LAST-MODIFIED:${updated_at_str}`);
-    lines.push(`DTSTART:${start_str}`);
-    lines.push(`DTEND:${end_str}`);
-    lines.push(`SUMMARY:${Escape_Ics_Text(timer.title || "Timer Event")}`);
-
-    if (timer.description)
-    {
-      lines.push(`DESCRIPTION:${Escape_Ics_Text(timer.description)}`);
-    }
-
-    if (timer.recurrence && timer.recurrence.rate > 0)
-    {
-      const rrule = Generate_Ics_Rrule(timer.recurrence);
-      if (rrule)
-      {
-        lines.push(`RRULE:${rrule}`);
-      }
-    }
-
-    lines.push("STATUS:CONFIRMED");
-    lines.push("END:VEVENT");
-  }
-
-  lines.push("END:VCALENDAR");
-  return lines.join("\r\n") + "\r\n";
-}
 
 function Timer_Is_Overdue(timer)
 {
