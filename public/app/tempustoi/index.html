@@ -323,6 +323,34 @@
         background-color: var(--orange);
         width: 50%;
         padding: 20px;
+        position: relative;
+
+        .close
+        {
+          position: absolute;
+          top: 10px;
+          right: 10px;
+          padding: 0;
+          background: transparent;
+          border: none;
+          cursor: pointer;
+          font-size: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          img
+          {
+            width: 24px;
+            height: 24px;
+            display: block;
+          }
+
+          &:hover
+          {
+            opacity: 0.75;
+          }
+        }
       }
       .alarm .counter
       {
@@ -1005,7 +1033,12 @@
           <div class="field">
             <label>
               <button class="info" popovertarget="title_info" type="button">i</button>
-              <div popover id="title_info">Titles are optional.</div>
+              <div popover id="title_info">
+                <button class="img close" popovertarget="title_info" popovertargetaction="hide" type="button">
+                  <img src="/images/close.svg" alt="Close">
+                </button>
+                Titles are optional.
+              </div>
               Title
             </label>
             <input id="timer_title" type="text">
@@ -1014,7 +1047,12 @@
           <div class="field">
             <label>
               <button class="info" popovertarget="desc_info" type="button">i</button>
-              <div popover id="desc_info">Descriptions are optional.</div>
+              <div popover id="desc_info">
+                <button class="img close" popovertarget="desc_info" popovertargetaction="hide" type="button">
+                  <img src="/images/close.svg" alt="Close">
+                </button>
+                Descriptions are optional.
+              </div>
               Description
             </label>
             <textarea id="timer_description"></textarea>
@@ -1023,7 +1061,12 @@
           <div class="field">
             <label>
               <button class="info" popovertarget="date_info" type="button">i</button>
-              <div popover id="date_info">Dates are optional. If not provided, will default to today's date.</div>
+              <div popover id="date_info">
+                <button class="img close" popovertarget="date_info" popovertargetaction="hide" type="button">
+                  <img src="/images/close.svg" alt="Close">
+                </button>
+                Dates are optional. If not provided, will default to today's date.
+              </div>
               Date
             </label>
             <input id="timer_date" type="date">
@@ -1032,7 +1075,12 @@
           <div class="field">
             <label>
               <button class="info" popovertarget="time_info" type="button">i</button>
-              <div popover id="time_info">Times are optional. If not provided, will default to the start of the day.</div>
+              <div popover id="time_info">
+                <button class="img close" popovertarget="time_info" popovertargetaction="hide" type="button">
+                  <img src="/images/close.svg" alt="Close">
+                </button>
+                Times are optional. If not provided, will default to the start of the day.
+              </div>
               Time
             </label>
             <input id="timer_time" type="time">
@@ -1042,6 +1090,9 @@
             <label>
               <button class="info" popovertarget="period_info" type="button">i</button>
               <div popover id="period_info">
+                <button class="img close" popovertarget="period_info" popovertargetaction="hide" type="button">
+                  <img src="/images/close.svg" alt="Close">
+                </button>
                 Periods are optional. If provided, they will override any date or time setting.
                 A period indicates that the timer should count down a specific amount of time, rather than TO a set date or time.
               </div>
@@ -1053,7 +1104,12 @@
           <div class="field">
             <de-input-repeat id="timer_repeat">
               <button slot="header" class="info" popovertarget="repeaat_info" type="button">i</button>
-              <div slot="header" popover id="repeaat_info">to do</div>
+              <div slot="header" popover id="repeaat_info">
+                <button class="img close" popovertarget="repeaat_info" popovertargetaction="hide" type="button">
+                  <img src="/images/close.svg" alt="Close">
+                </button>
+                to do
+              </div>
             </de-input-repeat>
           </div>
         </main>
