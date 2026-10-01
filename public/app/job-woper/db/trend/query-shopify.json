@@ -682,5 +682,11 @@
     "datetime": 1790637634223,
     "id": "284e2a96-9cd4-4e6d-815c-e105f7190193",
     "query_id": "-shopify"
+  },
+  {
+    "count": 28,
+    "datetime": 1790840225869,
+    "id": "d7882a18-b15a-40e6-8712-282f3de5ee01",
+    "query_id": "-shopify"
   }
 ]
