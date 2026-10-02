@@ -40,12 +40,16 @@ TempusToi is a simple and efficient task scheduling tool that helps you stay on 
 ## To Do
 ### Features
 - add tasks
-- edit events
 - cloud persistence
-- export events as .ics
 ### UI/UX
 - group events by day
 - render event details /n as <br>
 - when loading events, show a dialog with details before saving
 ### Bugs
 - tba
+### Done
+- export events as .ics
+- edit events
+- bug: expired events sorted incorrectly
+- close button on info popovers
+
