@@ -910,6 +910,20 @@
           padding: 8px;
         }
       }
+
+      /* SEO only: Visually hidden utility for search engine heading hierarchy */
+      .visually-hidden
+      {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
     </style>
 
     <!-- metadata -->
@@ -960,7 +974,9 @@
     </a>
 
     <header>
-      <svg viewBox="0 0 320 80" style="xborder: 1px solid #f00">
+      <!-- SEO only: Accessible semantic heading for search engine crawlers -->
+      <h1 class="visually-hidden">TempusToi — Visual Countdown Timers & Deadline Management</h1>
+      <svg viewBox="0 0 320 80" aria-hidden="true" style="xborder: 1px solid #f00">
         <path id="arcPath" d="M 0 70 A 250 100 0 0 1 320 70" fill="none" stroke="none"/>
         <text>
           <textPath href="#arcPath" startOffset="50%" text-anchor="middle" font-size="50px">
