@@ -66,6 +66,17 @@ async function Main()
   {
     Alarm_On(timer);
   }
+
+  const url_params = new URLSearchParams(window.location.search);
+  const action = url_params.get("action");
+  if (action === "add")
+  {
+    On_Click_Add();
+  }
+  else if (action === "export-ics")
+  {
+    On_Click_Download_Ics();
+  }
   
   //Ads();
 }

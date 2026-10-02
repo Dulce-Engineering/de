@@ -187,6 +187,6 @@ After a user clicks **"Export as ICS"**, provide a helpful notification dialog o
 - [ ] Add `<link rel="canonical">` and Twitter Card metadata in `index.html`.
 - [x] Add JSON-LD `WebApplication` schema block in `index.html`.
 - [x] Add visually hidden `<h1>` tag in `index.html`.
-- [ ] Add `categories` and `shortcuts` to `manifest.json`.
+- [x] Add `categories` and `shortcuts` to `manifest.json`.
 - [ ] Implement first-run sample timer seeding in `lib/index.js`.
 - [ ] Add Web Share option to `#menu_panel`.
