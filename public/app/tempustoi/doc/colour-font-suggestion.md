@@ -51,31 +51,53 @@ Steampunk typography works best when it contrasts **ornate 19th-century mechanic
 
 #### Option A: The "Instrument Dial & Chronicle" (Recommended)
 
+![Option A: The Instrument Dial & Chronicle](./images/typography-option-a.svg)
+
 * **Headings / App Title:** **`Cinzel Decorative`** or **`Playfair Display SC`**
-* *Character:* Evokes engraved brass nameplates, classical Victorian patent drawings, and pocket-watch maker emblems.
+  * *Character:* Evokes engraved brass nameplates, classical Victorian patent drawings, and pocket-watch maker emblems.
 
+  ![Cinzel Decorative Specimen](./images/font-cinzel-decorative.svg)
 
-* **Body / Events:** **`IM Fell English`** or **`EB Garamond`**
-* *Character:* Typeset like a 19th-century letterpress novel. Clear, dignified, and distinctly literary.
+  ![Playfair Display SC Specimen](./images/font-playfair-display-sc.svg)
 
+* **Body / Events:** **`EB Garamond`** or **`IM Fell English`**
+  * *Character:* Typeset like a 19th-century letterpress novel. Clear, dignified, and distinctly literary.
+
+  ![EB Garamond Specimen](./images/font-eb-garamond.svg)
+
+  ![IM Fell English Specimen](./images/font-im-fell-english.svg)
 
 * **Timers, Countdowns & Numbers:** **`Share Tech Mono`** or **`Space Mono`**
-* *Character:* Gives countdowns and digital timers the feeling of a precision mechanical counter, telegraph readout, or brass odometer rather than a standard modern sans-serif.
+  * *Character:* Gives countdowns and digital timers the feeling of a precision mechanical counter, telegraph readout, or brass odometer rather than a standard modern sans-serif.
 
+  ![Share Tech Mono Specimen](./images/font-share-tech-mono.svg)
 
+  ![Space Mono Specimen](./images/font-space-mono.svg)
+
+---
 
 #### Option B: The "Industrial Foundry & Patent" (More Utilitarian)
 
-* **Headings:** **`Besley`** or **`Alfa Slab One`** (used sparingly)
-* *Character:* Heavy Victorian Clarendon/Slab-serif aesthetic reminiscent of 1890s London newspaper broadsheets and industrial machinery plaques.
+![Option B: The Industrial Foundry & Patent](./images/typography-option-b.svg)
 
+* **Headings:** **`Besley`** or **`Alfa Slab One`** (used sparingly)
+  * *Character:* Heavy Victorian Clarendon/Slab-serif aesthetic reminiscent of 1890s London newspaper broadsheets and industrial machinery plaques.
+
+  ![Besley Specimen](./images/font-besley.svg)
+
+  ![Alfa Slab One Specimen](./images/font-alfa-slab-one.svg)
 
 * **Body / Lists:** **`Literata`** or **`Source Serif 4`**
-* *Character:* Exceptionally readable at small sizes on mobile screens while preserving historic warmth.
+  * *Character:* Exceptionally readable at small sizes on mobile screens while preserving historic warmth.
 
+  ![Literata Specimen](./images/font-literata.svg)
+
+  ![Source Serif 4 Specimen](./images/font-source-serif-4.svg)
 
 * **Numbers / Badges:** **`DM Mono`**
-* *Character:* Monospaced clarity for event dates and remaining time.
+  * *Character:* Monospaced clarity for event dates and remaining time.
+
+  ![DM Mono Specimen](./images/font-dm-mono.svg)
 
 
 

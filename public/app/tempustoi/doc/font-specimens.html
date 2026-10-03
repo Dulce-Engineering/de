@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>TempusToi — Steampunk Typography Specimen</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Besley:ital,wght@0,400..900;1,400..900&family=Cinzel+Decorative:wght@700;900&family=DM+Mono:ital,wght@0,400;0,500;1,400&family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=IM+Fell+English:ital@0;1&family=Literata:ital,opsz,wght@0,7..72,200..900;1,7..72,200..900&family=Playfair+Display+SC:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Share+Tech+Mono&family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-iron: #14110f;
+      --surface-wood: #2b2118;
+      --surface-hover: #3d2f23;
+      --accent-brass: #c59b27;
+      --accent-gaslight: #d96b27;
+      --accent-patina: #2a4436;
+      --text-parchment: #e6d5b8;
+      --text-muted: #8c7a6b;
+      --border-tarnish: #4a3b2c;
+      --border-brass: rgba(197, 155, 39, 0.4);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #0b0908;
+      color: var(--text-parchment);
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 36px;
+      font-family: 'EB Garamond', serif;
+    }
+
+    .specimen-card {
+      width: 820px;
+      background: radial-gradient(circle farthest-corner at 50% 10%, #2e2319, #1a1512);
+      border: 2px solid var(--accent-brass);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(197, 155, 39, 0.2);
+      border-radius: 6px;
+      padding: 24px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      position: relative;
+    }
+
+    .specimen-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      border-bottom: 1px solid var(--border-tarnish);
+      padding-bottom: 10px;
+    }
+
+    .specimen-name {
+      font-size: 1.4rem;
+      color: var(--accent-brass);
+      font-weight: bold;
+      letter-spacing: 0.05em;
+    }
+
+    .specimen-badge {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent-gaslight);
+      background: rgba(217, 107, 39, 0.12);
+      border: 1px solid rgba(217, 107, 39, 0.3);
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-family: 'Share Tech Mono', monospace;
+    }
+
+    .sample-title-lg {
+      font-size: 2.2rem;
+      line-height: 1.2;
+      color: var(--text-parchment);
+      letter-spacing: 0.03em;
+    }
+
+    .sample-title-md {
+      font-size: 1.7rem;
+      line-height: 1.3;
+      color: var(--text-parchment);
+    }
+
+    .sample-alphabet {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      word-break: break-all;
+    }
+
+    .sample-context-box {
+      background: rgba(20, 17, 15, 0.8);
+      border: 1px dashed var(--border-tarnish);
+      border-radius: 4px;
+      padding: 14px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .context-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      font-family: 'Share Tech Mono', monospace;
+    }
+
+    /* Option A & B Complete Showcase */
+    .pairing-card {
+      width: 820px;
+      background: #1e1712;
+      border: 3px double var(--accent-brass);
+      border-radius: 8px;
+      padding: 26px 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+    }
+
+    .pairing-header {
+      text-align: center;
+      border-bottom: 2px solid var(--border-tarnish);
+      padding-bottom: 12px;
+    }
+
+    .pairing-title {
+      font-size: 1.6rem;
+      color: var(--accent-brass);
+      margin-bottom: 4px;
+    }
+
+    .pairing-sub {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      font-style: italic;
+    }
+
+    .pairing-demo {
+      background: #14110f;
+      border: 1px solid var(--border-brass);
+      border-radius: 6px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ================= OPTION A PAIRING OVERVIEW ================= -->
+  <div id="specimen-option-a-overview" class="pairing-card">
+    <div class="pairing-header">
+      <div class="pairing-title" style="font-family: 'Cinzel Decorative', serif;">Option A: The Instrument Dial & Chronicle</div>
+      <div class="pairing-sub">Cinzel Decorative (Headings) + EB Garamond (Body) + Share Tech Mono (Timers)</div>
+    </div>
+    <div class="pairing-demo">
+      <div style="font-family: 'Cinzel Decorative', serif; font-size: 1.8rem; color: var(--accent-brass); letter-spacing: 0.08em; text-align: center;">
+        TEMPUSTOI • CHRONOMETRIC DIAL
+      </div>
+      <div style="font-family: 'EB Garamond', serif; font-size: 1.15rem; line-height: 1.6; color: var(--text-parchment); text-align: justify;">
+        "The Time Traveller smiled. 'Are you sure you understand how the mechanism operates?' he asked, adjusting the ivory and quartz dials with calibrated precision. 'Every revolution of the brass complication marks the passage of temporal intervals.'"
+      </div>
+      <div style="display: flex; justify-content: space-around; background: #201913; padding: 12px; border: 1px solid var(--border-tarnish); border-radius: 4px;">
+        <div style="text-align: center;">
+          <div style="font-family: 'Share Tech Mono', monospace; font-size: 1.6rem; color: var(--accent-gaslight); font-weight: bold;">03d : 14h : 22m : 45s</div>
+          <div style="font-family: 'Share Tech Mono', monospace; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Product Release Milestone</div>
+        </div>
+        <div style="text-align: center;">
+          <div style="font-family: 'Share Tech Mono', monospace; font-size: 1.6rem; color: var(--accent-brass); font-weight: bold;">00d : 00h : 24m : 18s</div>
+          <div style="font-family: 'Share Tech Mono', monospace; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Deep Focus Sprint</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= OPTION B PAIRING OVERVIEW ================= -->
+  <div id="specimen-option-b-overview" class="pairing-card">
+    <div class="pairing-header">
+      <div class="pairing-title" style="font-family: 'Besley', serif; font-weight: 800;">Option B: The Industrial Foundry & Patent</div>
+      <div class="pairing-sub">Besley (Headings) + Literata (Body) + DM Mono (Timers)</div>
+    </div>
+    <div class="pairing-demo">
+      <div style="font-family: 'Besley', serif; font-weight: 800; font-size: 1.8rem; color: var(--accent-brass); letter-spacing: 0.02em; text-align: center;">
+        TEMPUSTOI • LONDON FOUNDRY SPECIFICATION
+      </div>
+      <div style="font-family: 'Literata', serif; font-size: 1.1rem; line-height: 1.6; color: var(--text-parchment); text-align: justify;">
+        "Manufactured under Victorian patent registry, the clockwork regulator balances high-torque spring tension against jewelled movement escapements. Designed for heavy daily scheduling and rigorous deadline oversight."
+      </div>
+      <div style="display: flex; justify-content: space-around; background: #201913; padding: 12px; border: 1px solid var(--border-tarnish); border-radius: 4px;">
+        <div style="text-align: center;">
+          <div style="font-family: 'DM Mono', monospace; font-size: 1.55rem; color: var(--accent-gaslight); font-weight: 500;">03 : 14 : 22 : 45</div>
+          <div style="font-family: 'DM Mono', monospace; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Patent Filing Deadline</div>
+        </div>
+        <div style="text-align: center;">
+          <div style="font-family: 'DM Mono', monospace; font-size: 1.55rem; color: var(--accent-brass); font-weight: 500;">00 : 00 : 25 : 00</div>
+          <div style="font-family: 'DM Mono', monospace; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Machinery Inspection</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 1. CINZEL DECORATIVE ================= -->
+  <div id="specimen-cinzel-decorative" class="specimen-card">
+    <div class="specimen-header">
+      <div class="specimen-name">Cinzel Decorative</div>
+      <div class="specimen-badge">Headings &amp; Brass Nameplates</div>
+    </div>
+    <div class="sample-title-lg" style="font-family: 'Cinzel Decorative', serif; font-weight: 700; color: var(--accent-brass);">
+      TEMPUSTOI • CHRONOMETRIC REGULATOR
+    </div>
+    <div class="sample-alphabet" style="font-family: 'Cinzel Decorative', serif;">
+      ABCDEFGHIJKLMNOPQRSTUVWXYZ<br>
+      0123456789 • &amp; — № §
+    </div>
+    <div class="sample-context-box">
+      <div class="context-label">Contextual Usage • App Title &amp; Dialog Headers</div>
+      <div style="font-family: 'Cinzel Decorative', serif; font-size: 1.25rem; color: var(--text-parchment); letter-spacing: 0.06em;">
+        PATENT NO. 1895 • COUNTDOWN TO SOLAR NOON
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 2. PLAYFAIR DISPLAY SC ================= -->
+  <div id="specimen-playfair-display-sc" class="specimen-card">
+    <div class="specimen-header">
+      <div class="specimen-name">Playfair Display SC</div>
+      <div class="specimen-badge">Small-Caps Victorian Heading</div>
+    </div>
+    <div class="sample-title-lg" style="font-family: 'Playfair Display SC', serif; font-weight: 700; color: var(--accent-brass);">
+      PRECISION TIMEKEEPING &amp; DEADLINE OBSERVATORY
+    </div>
+    <div class="sample-alphabet" style="font-family: 'Playfair Display SC', serif;">
+      ABCDEFGHIJKLMNOPQRSTUVWXYZ<br>
+      abcdefghijklmnopqrstuvwxyz (Small Caps) • 0123456789
+    </div>
+    <div class="sample-context-box">
+      <div class="context-label">Contextual Usage • Complication Labels &amp; Modals</div>
+      <div style="font-family: 'Playfair Display SC', serif; font-size: 1.2rem; color: var(--text-parchment); letter-spacing: 0.04em;">
+        Interval Recurrence: Every Alternate Friday at 17:00
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 3. EB GARAMOND ================= -->
+  <div id="specimen-eb-garamond" class="specimen-card">
+    <div class="specimen-header">
+      <div class="specimen-name">EB Garamond</div>
+      <div class="specimen-badge">Body Text &amp; Letterpress Chronicles</div>
+    </div>
+    <div class="sample-title-md" style="font-family: 'EB Garamond', serif; color: var(--accent-brass);">
+      The Scientific Principles of Four-Dimensional Displacement
+    </div>
+    <div class="sample-alphabet" style="font-family: 'EB Garamond', serif; font-size: 1.15rem;">
+      ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz<br>
+      <em>Italic: The Time Machine moved smoothly into the future at twenty-four hours per revolution.</em><br>
+      0123456789 • “Parchment &amp; Ink Letterpress Aesthetics”
+    </div>
+    <div class="sample-context-box">
+      <div class="context-label">Contextual Usage • Event Descriptions &amp; About Panel</div>
+      <div style="font-family: 'EB Garamond', serif; font-size: 1.1rem; line-height: 1.5; color: var(--text-parchment);">
+        TempusToi is a local-first instrument for measuring passing hours and deadlines. All notes and schedule entries are etched directly into local browser storage with zero external transmission.
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 4. IM FELL ENGLISH ================= -->
+  <div id="specimen-im-fell-english" class="specimen-card">
+    <div class="specimen-header">
+      <div class="specimen-name">IM Fell English</div>
+      <div class="specimen-badge">Historical 17th/19th Century Typeset</div>
+    </div>
+    <div class="sample-title-md" style="font-family: 'IM Fell English', serif; color: var(--accent-brass);">
+      An Authentic Antique Letterpress Imprint
+    </div>
+    <div class="sample-alphabet" style="font-family: 'IM Fell English', serif; font-size: 1.15rem;">
+      ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz<br>
+      <em>Italic: Registered at Stationers’ Hall, London, anno Domini 1895.</em><br>
+      0123456789 • § ¶ &amp; [Ex Libris Chronos]
+    </div>
+    <div class="sample-context-box">
+      <div class="context-label">Contextual Usage • Narrative Notes &amp; Historical Themes</div>
+      <div style="font-family: 'IM Fell English', serif; font-size: 1.1rem; line-height: 1.55; color: var(--text-parchment);">
+        "There is no difference between Time and any of the three dimensions of Space except that our consciousness moves along it."
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 5. SHARE TECH MONO ================= -->
+  <div id="specimen-share-tech-mono" class="specimen-card">
+    <div class="specimen-header">
+      <div class="specimen-name">Share Tech Mono</div>
+      <div class="specimen-badge">Mechanical Readouts &amp; Timers</div>
+    </div>
+    <div class="sample-title-lg" style="font-family: 'Share Tech Mono', monospace; color: var(--accent-gaslight);">
+      03d : 18h : 42m : 19s [ACTIVE]
+    </div>
+    <div class="sample-alphabet" style="font-family: 'Share Tech Mono', monospace; font-size: 1.1rem;">
+      0 1 2 3 4 5 6 7 8 9 + - : . / % $ # @<br>
+      ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz
+    </div>
+    <div class="sample-context-box">
+      <div class="context-label">Contextual Usage • Digital Complications &amp; ICS Exporter</div>
+      <div style="font-family: 'Share Tech Mono', monospace; font-size: 1.05rem; color: var(--text-parchment);">
+        DTSTART: 20261003T083000Z | RRULE: FREQ=WEEKLY;BYDAY=MO,WE,FR
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 6. SPACE MONO ================= -->
+  <div id="specimen-space-mono" class="specimen-card">
+    <div class="specimen-header">
+      <div class="specimen-name">Space Mono</div>
+      <div class="specimen-badge">Telegraphic &amp; Gauge Monospace</div>
+    </div>
+    <div class="sample-title-lg" style="font-family: 'Space Mono', monospace; color: var(--accent-gaslight);">
+      00:45:00.000 — SPRINT
+    </div>
+    <div class="sample-alphabet" style="font-family: 'Space Mono', monospace; font-size: 1.05rem;">
+      0123456789 ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz<br>
+      <em>Italic: 120 RPM ESCAPEMENT SPEED</em>
+    </div>
+    <div class="sample-context-box">
+      <div class="context-label">Contextual Usage • Countdown Readouts &amp; Timestamp Badges</div>
+      <div style="font-family: 'Space Mono', monospace; font-size: 1rem; color: var(--text-parchment);">
+        STATUS: RUNNING | OVERDUE_OFFSET: +00:00:00 | ALARM: ARMED
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 7. BESLEY ================= -->
+  <div id="specimen-besley" class="specimen-card">
+    <div class="specimen-header">
+      <div class="specimen-name">Besley (Clarendon Style)</div>
+      <div class="specimen-badge">Heavy Victorian Slab-Serif</div>
+    </div>
+    <div class="sample-title-lg" style="font-family: 'Besley', serif; font-weight: 800; color: var(--accent-brass);">
+      THE LONDON CHRONICLE &amp; GAZETTE
+    </div>
+    <div class="sample-alphabet" style="font-family: 'Besley', serif; font-size: 1.1rem;">
+      ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz<br>
+      0123456789 • Heavy Broadsheet &amp; Industrial Plaques
+    </div>
+    <div class="sample-context-box">
+      <div class="context-label">Contextual Usage • High-Impact Title Headers</div>
+      <div style="font-family: 'Besley', serif; font-weight: 700; font-size: 1.15rem; color: var(--text-parchment);">
+        ROYAL PATENTS OF HER MAJESTY’S EMPIRE — 1895 SPECIFICATION
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 8. ALFA SLAB ONE ================= -->
+  <div id="specimen-alfa-slab-one" class="specimen-card">
+    <div class="specimen-header">
+      <div class="specimen-name">Alfa Slab One</div>
+      <div class="specimen-badge">Industrial Foundry Plaque</div>
+    </div>
+    <div class="sample-title-lg" style="font-family: 'Alfa Slab One', serif; color: var(--accent-brass); letter-spacing: 0.04em;">
+      STEAM &amp; BRASS MACHINERY
+    </div>
+    <div class="sample-alphabet" style="font-family: 'Alfa Slab One', serif; font-size: 1.05rem;">
+      ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz 0123456789
+    </div>
+    <div class="sample-context-box">
+      <div class="context-label">Contextual Usage • Heavy Brass Emblems &amp; Buttons</div>
+      <div style="font-family: 'Alfa Slab One', serif; font-size: 1.1rem; color: var(--text-parchment);">
+        START CHRONOMETER • 1895
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 9. LITERATA ================= -->
+  <div id="specimen-literata" class="specimen-card">
+    <div class="specimen-header">
+      <div class="specimen-name">Literata</div>
+      <div class="specimen-badge">High-Legibility Modern Book Serif</div>
+    </div>
+    <div class="sample-title-md" style="font-family: 'Literata', serif; font-weight: 600; color: var(--accent-brass);">
+      Modern Literary Clarity with Historic Warmth
+    </div>
+    <div class="sample-alphabet" style="font-family: 'Literata', serif; font-size: 1.1rem;">
+      ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz<br>
+      <em>Italic: Exceptional readability on mobile displays and high-density screens.</em><br>
+      0123456789 • Balanced x-height and warm proportions.
+    </div>
+    <div class="sample-context-box">
+      <div class="context-label">Contextual Usage • Mobile Schedule Lists &amp; Notes</div>
+      <div style="font-family: 'Literata', serif; font-size: 1.05rem; line-height: 1.5; color: var(--text-parchment);">
+        Engineered for effortless extended reading in dense timeline lists and description fields.
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 10. SOURCE SERIF 4 ================= -->
+  <div id="specimen-source-serif-4" class="specimen-card">
+    <div class="specimen-header">
+      <div class="specimen-name">Source Serif 4</div>
+      <div class="specimen-badge">Clean Editorial Serif</div>
+    </div>
+    <div class="sample-title-md" style="font-family: 'Source Serif 4', serif; font-weight: 600; color: var(--accent-brass);">
+      Classic Editorial Precision &amp; Rhythm
+    </div>
+    <div class="sample-alphabet" style="font-family: 'Source Serif 4', serif; font-size: 1.1rem;">
+      ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz<br>
+      <em>Italic: Crafted for clear hierarchy across all device form factors.</em><br>
+      0123456789 • (1895) [№ 42]
+    </div>
+    <div class="sample-context-box">
+      <div class="context-label">Contextual Usage • Event Lists &amp; Modal Forms</div>
+      <div style="font-family: 'Source Serif 4', serif; font-size: 1.05rem; line-height: 1.5; color: var(--text-parchment);">
+        Combines traditional French and British typography with robust digital rendering.
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 11. DM MONO ================= -->
+  <div id="specimen-dm-mono" class="specimen-card">
+    <div class="specimen-header">
+      <div class="specimen-name">DM Mono</div>
+      <div class="specimen-badge">Clean Monospaced Counter</div>
+    </div>
+    <div class="sample-title-lg" style="font-family: 'DM Mono', monospace; font-weight: 500; color: var(--accent-gaslight);">
+      04 : 12 : 30 : 59 [RECURRING]
+    </div>
+    <div class="sample-alphabet" style="font-family: 'DM Mono', monospace; font-size: 1.1rem;">
+      0123456789 ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz<br>
+      <em>Italic: ISO 8601 UTC / RFC 5545 TIMESTAMP</em>
+    </div>
+    <div class="sample-context-box">
+      <div class="context-label">Contextual Usage • Compact Timestamps &amp; Badges</div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 1rem; color: var(--text-parchment);">
+        NEXT OCCURRENCE: 2026-10-09 17:00 | INTERVAL: 7 DAYS
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

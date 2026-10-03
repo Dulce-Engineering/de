@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 320" width="100%" height="100%">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,400;0,500;1,400&amp;family=Share+Tech+Mono&amp;display=swap');
+      
+      .bg { fill: #1a1512; }
+      .card-border { fill: none; stroke: #c59b27; stroke-width: 2; rx: 8; }
+      .divider { stroke: #4a3b2c; stroke-width: 1; }
+      .title-label { font-family: 'DM Mono', monospace; font-size: 22px; font-weight: 500; fill: #c59b27; }
+      .badge-bg { fill: rgba(217, 107, 39, 0.15); stroke: rgba(217, 107, 39, 0.4); stroke-width: 1; rx: 4; }
+      .badge-text { font-family: 'Share Tech Mono', monospace; font-size: 11px; fill: #d96b27; letter-spacing: 1px; }
+      .sample-title { font-family: 'DM Mono', monospace; font-weight: 500; font-size: 25px; fill: #d96b27; }
+      .sample-alphabet { font-family: 'DM Mono', monospace; font-size: 14px; fill: #8c7a6b; }
+      .context-box { fill: #14110f; stroke: #4a3b2c; stroke-width: 1; stroke-dasharray: 4 2; rx: 4; }
+      .context-label { font-family: 'Share Tech Mono', monospace; font-size: 10px; fill: #8c7a6b; letter-spacing: 1px; }
+      .context-text { font-family: 'DM Mono', monospace; font-size: 14px; fill: #e6d5b8; }
+    </style>
+  </defs>
+
+  <rect x="2" y="2" width="796" height="316" rx="8" class="bg"/>
+  <rect x="2" y="2" width="796" height="316" rx="8" class="card-border"/>
+
+  <text x="28" y="42" class="title-label">DM Mono</text>
+  <rect x="520" y="24" width="250" height="24" class="badge-bg"/>
+  <text x="645" y="40" text-anchor="middle" class="badge-text">PRECISION NUMBERS &amp; BADGES</text>
+  
+  <line x1="28" y1="58" x2="772" y2="58" class="divider"/>
+
+  <text x="28" y="98" class="sample-title">04 : 12 : 30 : 59 [RECURRING]</text>
+
+  <text x="28" y="132" class="sample-alphabet">0123456789 ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz</text>
+  <text x="28" y="154" class="sample-alphabet" font-style="italic">Italic: ISO 8601 UTC / RFC 5545 TIMESTAMP • SEQUENCE 03</text>
+
+  <rect x="28" y="176" width="744" height="114" class="context-box"/>
+  <text x="44" y="202" class="context-label">CONTEXTUAL USAGE • COMPACT TIMESTAMPS &amp; CALENDAR INTERVALS</text>
+  <text x="44" y="234" class="context-text">NEXT OCCURRENCE: 2026-10-09 17:00 | INTERVAL: 7 DAYS</text>
+  <text x="44" y="264" class="context-text" fill="#c59b27">CALENDAR UID: #74f8-992a@tempustoi | REVISION: 01</text>
+</svg>
