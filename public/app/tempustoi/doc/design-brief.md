@@ -48,7 +48,7 @@ The application should feel less like software and more like a physical, handcra
 
 ---
 
-## 3. Core UI Components & Design Deliverables
+## 3. Core UI Components
 
 ### 3.1 Mechanical Complication Dials (`<de-timer>`)
 The visual centerpiece of each timer card is a 4-meter segmented rotary dial cluster (**Days**, **Hours**, **Minutes**, **Seconds**).
