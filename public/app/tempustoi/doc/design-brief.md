@@ -133,3 +133,35 @@ The designer must respect the repository’s pure web-standards architecture:
    - Mobile: `320px – 767px` (single-column dials, touch-friendly tap targets $\ge 48\text{px}$).
    - Tablet/Desktop: `768px – 1440px+` (multi-column dashboard, fixed navigation instruments).
 4. **Dark Mode First:** The entire interface is built upon the dark Victorian palette (`#0B3F30`, `#14110F`) with no harsh `#FFFFFF` surfaces.
+
+---
+
+## 7. Visual Reference & Current Screenshots
+
+### 7.1 Current Production Application (As-Built Screens)
+
+#### Desktop Widescreen Layout & Dials
+![Desktop Workspace Overview](../screenshot-2.png)  
+*Figure 1: Full desktop layout showing top header, navigation controls, and multiple active countdown cards with mechanical rotary dials.*
+
+#### Mobile Portrait Views
+| Mobile Instrument Dashboard | Mobile Event Stream & Footer |
+| :---: | :---: |
+| ![Mobile Instrument Dashboard](../screenshot-6.png) | ![Mobile Event Stream](../screenshot-3.png) |
+| *Figure 2: Mobile portrait layout with live `<de-clock>`, diurnal `<de-sun-moon>`, and active timer cards.* | *Figure 3: Mobile portrait view showing 3 active events and legal footer.* |
+
+#### Interactive Dialogs & Popovers
+| Create / Edit Timer Modal | Navigation Menu Popover |
+| :---: | :---: |
+| ![Create Timer Modal](../screenshot-4.png) | ![Menu Popover](../screenshot-5.png) |
+| *Figure 4: Modal form dialog for event creation with Title, Date, Time, Duration Period, and Recurrence.* | *Figure 5: Menu popover showing About, Load, Save, Add Timer, Add Event, and Delete All options.* |
+
+---
+
+### 7.2 Conceptual Steampunk Explorations (Mood Board)
+
+| British Racing Green & Brass Enamel Concept | Dark Walnut & Clockwork Gear Concept |
+| :---: | :---: |
+| ![British Racing Green Steampunk Concept](../image/ai-mockup-2.jpg) | ![Walnut Woodgrain Steampunk Concept](../image/ai-mockup-1.jpg) |
+| *Figure 6: Concept exploration using the deep green palette (`#0B3F30`), engraved corner filigree, and brass bezel meters.* | *Figure 7: Concept exploration showcasing rich woodgrain textures, clockwork cogs, and amber gauge backlights.* |
+
