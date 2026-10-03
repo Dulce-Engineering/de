@@ -55,6 +55,12 @@ async function Main()
   load_btn.addEventListener("click", On_Click_Load_Btn);
   menu_close_btn.addEventListener("click", On_Click_Close_Menu);
 
+  const landing_add_btn = document.getElementById("landing_add_btn");
+  if (landing_add_btn)
+  {
+    landing_add_btn.addEventListener("click", On_Click_Add);
+  }
+
   const alarmed_timers = Check_Startup_Alarms();
   const timers = Select_Timers();
   Render_Timers(timers);
@@ -466,20 +472,17 @@ function Update_Nav()
   const timer_elems = document.querySelectorAll("de-timer");
   const has_timers = timer_elems.length > 0;
 
-  if (!has_timers)
+  const landing_elem = document.getElementById("landing_elem");
+  if (landing_elem)
   {
-    about_panel.removeAttribute("popover");
-    bk.hidden = false;
-  }
-  else
-  {
-    about_panel.setAttribute("popover", "auto");
-    bk.hidden = true;
+    landing_elem.hidden = has_timers;
   }
 
+  bk.hidden = has_timers;
   about_btn.hidden = !has_timers;
   del_all_btn.hidden = !has_timers;
   save_btn.hidden = !has_timers;
+  download_ics_btn.hidden = !has_timers;
 
   if (window.matchMedia("(display-mode: standalone)").matches)
   {

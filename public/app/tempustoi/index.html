@@ -909,6 +909,28 @@
         {
           padding: 8px;
         }
+
+        .landing-title
+        {
+          font-size: 1.4rem;
+        }
+        .landing-section-title
+        {
+          font-size: 1.25rem;
+        }
+        .landing-tagline
+        {
+          font-size: 1rem;
+        }
+        .landing-card
+        {
+          padding: 14px 16px;
+        }
+        .landing-btn-cta
+        {
+          font-size: 1rem;
+          padding: 10px 20px;
+        }
       }
 
       /* SEO only: Visually hidden utility for search engine heading hierarchy */
@@ -923,6 +945,192 @@
         clip: rect(0, 0, 0, 0);
         white-space: nowrap;
         border: 0;
+      }
+
+      /* SEO Landing Page (Displayed when no timer events exist) */
+      .landing-page
+      {
+        width: 100%;
+        max-width: 960px;
+        margin: 0 auto 30px auto;
+        display: flex;
+        flex-direction: column;
+        gap: 28px;
+        box-sizing: border-box;
+      }
+      .landing-page[hidden]
+      {
+        display: none !important;
+      }
+      .landing-hero
+      {
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 0 20px 0;
+        border-bottom: 2px dashed var(--orange);
+      }
+      .landing-title
+      {
+        font-family: "Rye", serif;
+        font-size: 1.8rem;
+        color: var(--red);
+        margin: 0;
+        line-height: 1.3;
+        text-align: center;
+      }
+      .landing-tagline
+      {
+        font-family: "Libre Baskerville", serif;
+        font-size: 1.15rem;
+        color: var(--white);
+        line-height: 1.6;
+        max-width: 760px;
+        margin: 0 auto;
+        text-align: center;
+      }
+      .landing-cta-wrap
+      {
+        margin-top: 10px;
+      }
+      .landing-btn-cta
+      {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        background-color: var(--orange);
+        color: var(--green);
+        border: 2px solid var(--white);
+        font-size: 1.15rem;
+        font-weight: 700;
+        padding: 12px 28px;
+        border-radius: 30px;
+        cursor: pointer;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+        transition: transform 0.2s, background-color 0.2s, color 0.2s;
+      }
+      .landing-btn-cta:hover
+      {
+        background-color: var(--red);
+        color: var(--white);
+        transform: translateY(-2px);
+      }
+      .landing-btn-cta img
+      {
+        width: 22px;
+        height: 22px;
+        filter: brightness(0);
+      }
+      .landing-btn-cta:hover img
+      {
+        filter: brightness(0) invert(1);
+      }
+      .landing-section-title
+      {
+        font-family: "Rye", serif;
+        font-size: 1.5rem;
+        color: var(--orange);
+        text-align: center;
+        margin: 10px 0 20px 0;
+      }
+      .landing-grid
+      {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+        width: 100%;
+        box-sizing: border-box;
+      }
+      .landing-card
+      {
+        background: rgba(11, 63, 48, 0.75);
+        border: 2px solid var(--orange);
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        box-sizing: border-box;
+      }
+      .landing-card-icon
+      {
+        font-size: 1.8rem;
+        line-height: 1;
+      }
+      .landing-card h3
+      {
+        font-family: "Roboto Slab", serif;
+        font-size: 1.25rem;
+        color: var(--orange);
+        margin: 0;
+      }
+      .landing-card p
+      {
+        color: var(--white);
+        font-size: 0.95rem;
+        line-height: 1.55;
+        margin: 0;
+      }
+      .landing-card strong
+      {
+        color: var(--pink);
+      }
+      .landing-highlights-grid
+      {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+        width: 100%;
+        box-sizing: border-box;
+      }
+      .landing-highlight-item
+      {
+        background: rgba(235, 213, 184, 0.08);
+        border: 1px dashed var(--orange);
+        border-radius: 6px;
+        padding: 14px 16px;
+        box-sizing: border-box;
+      }
+      .landing-highlight-item h4
+      {
+        font-family: "Roboto Slab", serif;
+        font-size: 1.05rem;
+        color: var(--pink);
+        margin: 0 0 6px 0;
+      }
+      .landing-highlight-item p
+      {
+        color: var(--white);
+        font-size: 0.9rem;
+        line-height: 1.45;
+        margin: 0;
+      }
+      .landing-pill-list
+      {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+        margin: 10px 0 20px 0;
+      }
+      .landing-pill
+      {
+        background: rgba(11, 63, 48, 0.85);
+        border: 1px solid var(--orange);
+        color: var(--white);
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        transition: background-color 0.2s, color 0.2s;
+      }
+      .landing-pill:hover
+      {
+        background-color: var(--orange);
+        color: var(--green);
       }
     </style>
 
@@ -984,7 +1192,6 @@
           </textPath>
         </text>
       </svg>
-
     </header>
 
     <nav>
@@ -1068,6 +1275,118 @@
       </p>
     </div>
 
+    <section id="landing_elem" class="landing-page">
+      <header class="landing-hero">
+        <h2 class="landing-title">Visual Countdown Timers &amp; Precision Task Scheduler</h2>
+        <p class="landing-tagline">
+          Master deadlines with vintage mechanical rotary complication dials. 
+          100% private, local-first, and offline-ready with zero accounts or subscriptions.
+        </p>
+        <div class="landing-cta-wrap">
+          <button id="landing_add_btn" class="landing-btn-cta" type="button">
+            <img src="/images/plus.svg" alt="" aria-hidden="true">
+            <span>Create Your First Timer</span>
+          </button>
+        </div>
+      </header>
+
+      <section class="landing-features">
+        <h2 class="landing-section-title">Core Capabilities &amp; Features</h2>
+        <div class="landing-grid">
+          
+          <article class="landing-card">
+            <div class="landing-card-icon">⏱️</div>
+            <h3>Mechanical Complication Dials</h3>
+            <p>
+              Live animated countdown meters for <strong>Days</strong>, <strong>Hours</strong>, <strong>Minutes</strong>, and <strong>Seconds</strong>. 
+              Interactive rotating complication faces deliver deadline awareness at a single glance.
+            </p>
+          </article>
+
+          <article class="landing-card">
+            <div class="landing-card-icon">🎯</div>
+            <h3>Dual Timing Precision Modes</h3>
+            <p>
+              Set countdowns to an <strong>exact calendar date &amp; time</strong> for launches and milestones, 
+              or run <strong>relative period countdowns</strong> (e.g., 25-minute focus sprints, 90-minute tasks).
+            </p>
+          </article>
+
+          <article class="landing-card">
+            <div class="landing-card-icon">🔄</div>
+            <h3>Advanced Recurrence Engine</h3>
+            <p>
+              Schedule repeating tasks across <strong>Daily</strong>, <strong>Weekly</strong> (specific weekdays), 
+              <strong>Monthly</strong> (exact day or week-and-day), and <strong>Yearly</strong> cycles with automatic rollover.
+            </p>
+          </article>
+
+          <article class="landing-card">
+            <div class="landing-card-icon">📅</div>
+            <h3>RFC 5545 Calendar Portability</h3>
+            <p>
+              Export all timers into standard <strong>.ics bundles</strong> for Google Calendar, Apple Calendar, and Outlook. 
+              Intelligent UID and revision tracking updates existing events without duplicate clutter.
+            </p>
+          </article>
+
+          <article class="landing-card">
+            <div class="landing-card-icon">🔔</div>
+            <h3>Acoustic &amp; Visual Alarms</h3>
+            <p>
+              Audio chimes paired with high-visibility pulsating animations. 
+              Includes startup sweep to catch deadlines reached while offline, plus instant silence controls.
+            </p>
+          </article>
+
+          <article class="landing-card">
+            <div class="landing-card-icon">🔒</div>
+            <h3>100% Local-First &amp; Private</h3>
+            <p>
+              No account creation, passwords, or cloud telemetry. 
+              Your data stays entirely in your device's local storage with full offline PWA execution.
+            </p>
+          </article>
+
+        </div>
+      </section>
+
+      <section class="landing-highlights">
+        <h2 class="landing-section-title">Why Choose TempusToi?</h2>
+        <div class="landing-highlights-grid">
+          <div class="landing-highlight-item">
+            <h4>🚀 Zero Friction</h4>
+            <p>No registration, email, or login required. Start organizing your deadlines instantly.</p>
+          </div>
+          <div class="landing-highlight-item">
+            <h4>⚡ Ultra-Fast Web Standards</h4>
+            <p>Crafted with native Web Components and Vanilla JS for instant page loads and zero bloat.</p>
+          </div>
+          <div class="landing-highlight-item">
+            <h4>📱 Installable PWA</h4>
+            <p>Install natively on desktop (Windows, macOS, Linux) and mobile (iOS Safari, Android Chrome).</p>
+          </div>
+          <div class="landing-highlight-item">
+            <h4>🗂️ Universal File Handling</h4>
+            <p>Drag and drop or double-click .ics calendar and .tt backup files for instant import.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="landing-use-cases">
+        <h2 class="landing-section-title">Designed For Every Workflow</h2>
+        <div class="landing-pill-list">
+          <span class="landing-pill">🎯 Focus Sprints &amp; Pomodoro</span>
+          <span class="landing-pill">🚀 Product Launches &amp; Milestones</span>
+          <span class="landing-pill">🎓 Exam Dates &amp; Academic Deadlines</span>
+          <span class="landing-pill">🎂 Birthdays &amp; Anniversaries</span>
+          <span class="landing-pill">✈️ Vacation Countdowns</span>
+          <span class="landing-pill">🔁 Recurring Daily &amp; Weekly Habits</span>
+          <span class="landing-pill">🎮 Gaming Server Resets &amp; Cooldowns</span>
+        </div>
+      </section>
+    </section>
+
     <main id="timers_elem"></main>
 
     <dialog id="timer_edit_dlg">
@@ -1097,9 +1416,9 @@
                 <button class="img close" popovertarget="desc_info" popovertargetaction="hide" type="button">
                   <img src="/images/close.svg" alt="Close">
                 </button>
-                Descriptions are optional.
+                Notes are optional.
               </div>
-              Description
+              Notes
             </label>
             <textarea id="timer_description"></textarea>
           </div>
