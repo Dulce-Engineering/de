@@ -61,6 +61,12 @@ async function Main()
     landing_add_btn.addEventListener("click", On_Click_Add);
   }
 
+  const landing_demo_btn = document.getElementById("landing_demo_btn");
+  if (landing_demo_btn)
+  {
+    landing_demo_btn.addEventListener("click", On_Click_Demo);
+  }
+
   const alarmed_timers = Check_Startup_Alarms();
   const timers = Select_Timers();
   Render_Timers(timers);
@@ -261,7 +267,7 @@ function On_Click_Load_Btn()
 
 function On_Click_Save()
 {
-  const json_str = localStorage.getItem("tempustoi");
+  const json_str = Load_Timers();
   if (json_str)
   {
     const blob = new Blob([json_str], { type: "application/json" });
@@ -297,6 +303,51 @@ function On_Click_Add()
   const header_elem = timer_edit_dlg.querySelector("header");
   if (header_elem) header_elem.innerText = "Create Timer";
   timer_edit_dlg.showModal();
+}
+
+function On_Click_Demo()
+{
+  const sample_timers = Generate_Sample_Timers();
+  Save_Timers(sample_timers);
+  Render_Timers(sample_timers);
+  Update_Nav();
+}
+
+function Generate_Sample_Timers()
+{
+  const now = Date.now();
+  return [
+    {
+      id: crypto.randomUUID(),
+      calendar_id: `${crypto.randomUUID()}@tempustoi`,
+      sequence: 0,
+      updated_at: now,
+      title: "Focus Sprint",
+      time: now + 25 * 60 * 1000,
+      description: "25-minute Pomodoro deep work sprint.",
+      recurrence: { rate: 0 }
+    },
+    {
+      id: crypto.randomUUID(),
+      calendar_id: `${crypto.randomUUID()}@tempustoi`,
+      sequence: 0,
+      updated_at: now,
+      title: "Product Release Milestone",
+      time: now + (3 * 24 + 4) * 3600 * 1000,
+      description: "Finalize deployment and marketing release notes.",
+      recurrence: { rate: 0 }
+    },
+    {
+      id: crypto.randomUUID(),
+      calendar_id: `${crypto.randomUUID()}@tempustoi`,
+      sequence: 0,
+      updated_at: now,
+      title: "Weekly Planning & Review",
+      time: now + (2 * 24 + 1) * 3600 * 1000,
+      description: "Review sprint goals and upcoming deadlines.",
+      recurrence: { rate: 1, scale: "SCALE_WEEK", weekdays: "WEEKDAYS_MONDAY,WEEKDAYS_FRIDAY" }
+    }
+  ];
 }
 
 function On_Click_Del_All()
@@ -617,6 +668,16 @@ function To_Elements(html_str)
 
 // db =======================================================================================
 
+function Load_Timers()
+{
+  return localStorage.getItem("tempustoi");
+}
+
+function Save_Timers(timers)
+{
+  localStorage.setItem("tempustoi", JSON.stringify(timers));
+}
+
 function Sort_Timers(timers)
 {
   if (timers)
@@ -643,7 +704,7 @@ function Sort_Timers(timers)
 function Select_Timers()
 {
   let timers = null;
-  const timers_str = localStorage.getItem("tempustoi");
+  const timers_str = Load_Timers();
   if (timers_str)
   {
     try
@@ -683,11 +744,6 @@ function Select_Timers()
   }
 
   return timers;
-}
-
-function Save_Timers(timers)
-{
-  localStorage.setItem("tempustoi", JSON.stringify(timers));
 }
 
 function Save_Timer(timer)

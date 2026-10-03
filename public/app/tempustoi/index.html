@@ -926,7 +926,8 @@
         {
           padding: 14px 16px;
         }
-        .landing-btn-cta
+        .landing-btn-cta,
+        .landing-btn-secondary
         {
           font-size: 1rem;
           padding: 10px 20px;
@@ -993,6 +994,10 @@
       }
       .landing-cta-wrap
       {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 14px;
         margin-top: 10px;
       }
       .landing-btn-cta
@@ -1027,6 +1032,39 @@
       .landing-btn-cta:hover img
       {
         filter: brightness(0) invert(1);
+      }
+      .landing-btn-secondary
+      {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        background-color: rgba(11, 63, 48, 0.85);
+        color: var(--white);
+        border: 2px solid var(--orange);
+        font-size: 1.15rem;
+        font-weight: 700;
+        padding: 12px 24px;
+        border-radius: 30px;
+        cursor: pointer;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        transition: transform 0.2s, background-color 0.2s, color 0.2s, border-color 0.2s;
+      }
+      .landing-btn-secondary:hover
+      {
+        background-color: var(--orange);
+        color: var(--green);
+        transform: translateY(-2px);
+      }
+      .landing-btn-secondary img
+      {
+        width: 22px;
+        height: 22px;
+        filter: brightness(0) invert(1);
+      }
+      .landing-btn-secondary:hover img
+      {
+        filter: brightness(0);
       }
       .landing-section-title
       {
@@ -1286,6 +1324,10 @@
           <button id="landing_add_btn" class="landing-btn-cta" type="button">
             <img src="/images/plus.svg" alt="" aria-hidden="true">
             <span>Create Your First Timer</span>
+          </button>
+          <button id="landing_demo_btn" class="landing-btn-secondary" type="button">
+            <img src="/images/timer.svg" alt="" aria-hidden="true">
+            <span>View Live Demo</span>
           </button>
         </div>
       </header>
