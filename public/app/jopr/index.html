@@ -317,8 +317,6 @@
 
   <de-contact-form id="contact_dialog"></de-contact-form>
   
-
-
   <de-dialog-form id="job_dialog">
     <h2 slot="header">Add Job</h2>
     <label slot="fields">Role Title</label>
@@ -372,8 +370,6 @@
     <input slot="fields" type="email" name="email">
   </de-dialog-form>
 
-
-
   <de-dialog-form id="email_dialog">
     <h2 slot="header">Extract Job from Text</h2>
     <textarea slot="fields" name="email_text" rows="10"></textarea>
@@ -382,7 +378,18 @@
       agency details from the given text.</p>
   </de-dialog-form>
 
+  <de-dialog-form id="gencv_dialog">
+    <h2 slot="header">Generate CV</h2>
 
+    <label slot="fields">Profile</label>
+    <select slot="fields" cid="profiles_select" name="profile_id"></select>
+
+    <label slot="fields">Adjust role titles</label>
+    <input slot="fields" name="do_titles" type="checkbox">
+
+    <label slot="fields">Force regenerate</label>
+    <input slot="fields" name="do_regen" type="checkbox">
+  </de-dialog-form>
 
   <de-dialog-alert id="job_det_dialog">
     <h2 cid="role_elem" slot="header">Job Details</h2>

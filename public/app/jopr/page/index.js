@@ -217,8 +217,6 @@ async function On_Click_Export_Btn(ctx)
   Alert("Data exported successfully!");
 }
 
-
-
 // rendering ======================================================================
 
 async function Update_Chart(ctx)
@@ -369,9 +367,12 @@ function Set_Options(select_elem, options, value_fn, text_fn)
     {
       for (const option of options)
       {
+        const value = value_fn(option);
+        const text = text_fn(option);
+
         const option_elem = document.createElement("option");
-        option_elem.value = value_fn(option);
-        option_elem.textContent = text_fn(option);
+        option_elem.value = value;
+        option_elem.textContent = text;
         select_elem.appendChild(option_elem);
       }
     }
@@ -735,9 +736,21 @@ async function On_Click_Delete_Job(event, job_id, ctx)
   }
 }
 
-function On_Click_Generate_CV(e, job_id, ctx)
+async function On_Click_Generate_CV(e, job_id, ctx)
 {
-  window.open(ctx.routes["gen-cv-2"](job_id), "_blank");
+  const profiles = await ctx.Profile.Select_All(ctx);
+  const select_elem = gencv_dialog.profiles_select;
+  Set_Options(select_elem, profiles, p => p.id, p => p.title);
+  const profile = await ctx.Profile.Select_Active(ctx);
+
+  const form_data = await gencv_dialog.Show_Async({profile_id: profile?.id});
+  if (form_data)
+  {
+    // to do: do_titles
+    const gen_cv_url = 
+      ctx.routes["gen-cv-2"](job_id, form_data.profile_id, form_data.do_regen);
+    window.open(gen_cv_url, "_blank");
+  }
 }
 
 function On_Click_Generate_Cover_Letter(e, job_id, ctx)

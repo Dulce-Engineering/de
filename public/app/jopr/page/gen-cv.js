@@ -8,15 +8,20 @@ async function Main2()
   const ctx = await New_Ctx();
 
   const url_params = new URLSearchParams(window.location.search);
-  const gen = url_params.has("gen", true);
+  const gen = url_params.get("gen") == "true";
 
   const job_id_str = url_params.get("job_id");
   const job_id = Utils.Is_Empty(job_id_str) ? null : parseInt(job_id_str);
   const job = await ctx.Job.Select_By_Id(ctx, job_id);
 
+  const profile_id_str = url_params.get("profile_id");
+  const profile_id = Utils.Is_Empty(profile_id_str) ? null : parseInt(profile_id_str);
+  let profile = await ctx.Profile.Select_By_Id(ctx, profile_id);
+  if (!profile)
+    profile = await ctx.Profile.Select_Active(ctx);
+
   if (gen || !job.cv)
   {
-    const profile = await ctx.Profile.Select_Active(ctx);
     job.cv = await ctx.ai.Generate_CV(ctx, job, profile, info_elem.Info);
     await ctx.Job.Save(ctx, job);
   }
