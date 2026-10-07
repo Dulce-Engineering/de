@@ -7,45 +7,42 @@
 class DeTaskList extends HTMLElement
 {
   static tname = "de-task-list";
-
-  /** @type {Array<object>} */
-  _items = [];
-
-  get items()
-  {
-    return this._items;
-  }
+  _items = null;
 
   set items(value)
   {
-    this._items = Array.isArray(value) ? value : [];
+    this._items = Array.isArray(value) ? value : null;
     this.Render(value);
   }
 
   connectedCallback()
   {
-    //this.Render();
+    this.Render();
   }
 
-  Render(items)
+  Render(items = this._items)
   {
-    if (!items || items.length === 0) {
-      return null;
+    if (!items || items.length === 0)
+    {
+      this.innerHTML = "";
     }
 
-    return `
-      <ul id="task_list_elem">` +
-        items..
-        `<li>
-          <div>${item.description}</div>
-          <footer>
-            <span>${item.key}</span>
-            <span>${item.priority}</span>
-          </footer>
-        </li>` +
-      `</ul>`;
+    const html = `
+      <ul>
+        ${items.map((item) => `
+          <li>
+            <div>${item.description}</div>
+            <footer>
+              <span>${item.key}</span>
+              <span>${item.priority}</span>
+            </footer>
+          </li>
+        `).join("")}
+      </ul>`;
+
+    this.innerHTML = html;
   }
 }
 
 customElements.define(DeTaskList.tname, DeTaskList);
-export default DeTaskList;
+//export default DeTaskList;
