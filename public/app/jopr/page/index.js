@@ -746,9 +746,8 @@ async function On_Click_Generate_CV(e, job_id, ctx)
   const form_data = await gencv_dialog.Show_Async({profile_id: profile?.id});
   if (form_data)
   {
-    // to do: do_titles
     const gen_cv_url = 
-      ctx.routes["gen-cv-2"](job_id, form_data.profile_id, form_data.do_regen);
+      ctx.routes["gen-cv-2"](job_id, form_data.profile_id, form_data.do_regen, form_data.ignore_titles);
     window.open(gen_cv_url, "_blank");
   }
 }

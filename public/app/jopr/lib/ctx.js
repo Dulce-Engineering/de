@@ -25,8 +25,8 @@ async function New_Ctx()
     routes:
     {
       "gen-cv-2": 
-        (job_id, profile_id, gen) => 
-          Add_Params("page/gen-cv-2.html", {job_id, profile_id, gen, db_id}),
+        (job_id, profile_id, gen, ignore_titles) => 
+          Add_Params("page/gen-cv-2.html", {job_id, profile_id, gen, ignore_titles, db_id}),
       "gen-cl": job_id => Add_Params("page/gen-cl.html", {job_id, db_id}),
       "profiles": () => Add_Params("page/profiles.html", {db_id}),
       "index": () => Add_Params("index.html", {db_id}),

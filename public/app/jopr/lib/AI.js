@@ -579,8 +579,11 @@ class AI
   /**
    * @param {Context} ctx
    * @param {object} prospective_job
+   * @param {object} profile
+   * @param {function} [notify_fn]
+   * @param {object} [options]
    */
-  async Generate_CV(ctx, prospective_job, profile, notify_fn = console.info)
+  async Generate_CV(ctx, prospective_job, profile, notify_fn = console.info, options = {})
   {
     let cv = {};
 
@@ -608,8 +611,15 @@ class AI
         cv.best_jobs = cv.career_jobs.filter(j => best_job_ids.includes(j.id));
         for (const job of cv.best_jobs)
         {
-          notify_fn("Generating " + job.company_name + " job title...");
-          job.role_title = await this.Generate_Job_Title(job, prospective_job);
+          if (!options?.ignore_titles)
+          {
+            notify_fn("Generating " + job.company_name + " job title...");
+            job.role_title = await this.Generate_Job_Title(job, prospective_job);
+          }
+          else
+          {
+            job.role_title = { suggested_title: job.role_titles, reasoning: "" };
+          }
 
           notify_fn("Generating " + job.company_name + " job description...");
           job.tailored_job = await this.Generate_Job_Description(job, prospective_job);

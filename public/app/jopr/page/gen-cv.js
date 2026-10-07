@@ -9,6 +9,7 @@ async function Main2()
 
   const url_params = new URLSearchParams(window.location.search);
   const gen = url_params.get("gen") == "true";
+  const ignore_titles = url_params.get("ignore_titles") == "true";
 
   const job_id_str = url_params.get("job_id");
   const job_id = Utils.Is_Empty(job_id_str) ? null : parseInt(job_id_str);
@@ -22,7 +23,7 @@ async function Main2()
 
   if (gen || !job.cv)
   {
-    job.cv = await ctx.ai.Generate_CV(ctx, job, profile, info_elem.Info);
+    job.cv = await ctx.ai.Generate_CV(ctx, job, profile, info_elem.Info, { ignore_titles });
     await ctx.Job.Save(ctx, job);
   }
 
