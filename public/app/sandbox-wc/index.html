@@ -9,12 +9,12 @@
 
     <script type="module">
       import "./de-task-list.js";
-      import * as tl from "./task-list-data.min.js";
+      import { getTaskList } from "./task-list-data.min.js";
 
       Main();
       async function Main()
       {
-        const items = await tl.getTaskList();
+        const items = await getTaskList();
         if (items)
         {
           items.sort((a, b) => a.priority - b.priority);
