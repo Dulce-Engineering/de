@@ -596,6 +596,7 @@ class AI
 
       notify_fn("Generating skills list...");
       const where = i => i.profile_id == cv.profile.id;
+      // career_jobs represents the applicants full work history at the time of cv gen
       cv.career_jobs = await ctx.Profile.Job_Select(ctx, where);
       cv.skills = await this.Generate_Skills(prospective_job, cv.career_jobs, cv.profile);
 
@@ -603,6 +604,7 @@ class AI
       const best_job_ids = await this.Select_Best_Jobs(cv.career_jobs, prospective_job);
       if (best_job_ids)
       {
+        // best_jobs are previous jobs tailored to the target job
         cv.best_jobs = cv.career_jobs.filter(j => best_job_ids.includes(j.id));
         for (const job of cv.best_jobs)
         {
@@ -637,26 +639,85 @@ class AI
   }
 
   /**
+   * Extracts formatted work history records from the job's generated CV or profile.
+   * @param {import("./Job.js").default} job - The target job record containing any generated CV.
+   * @returns {Array<Object>} Array of formatted work history objects.
+   */
+  Get_Work_History(job)
+  {
+    let work_history = null;
+
+    if (job?.cv?.best_jobs)
+    {
+      work_history = job.cv.best_jobs
+        .filter(j => j.is_visible !== false)
+        .map(j => ({
+          role_title: j.role_title?.suggested_title || j.role_title || j.role_titles,
+          company_name: j.company_name,
+          dates: j.tailored_date_str || j.date_info?.range_str || undefined,
+          summary: j.tailored_job?.summary || j.summary || j.responsibilities,
+          accomplishments: j.tailored_job?.bullet_points || j.projects,
+          tech: j.tech
+        }));
+    }
+    else if (job?.cv?.career_jobs)
+    {
+      work_history = job.cv.career_jobs.map(j => ({
+        role_title: j.role_titles,
+        company_name: j.company_name,
+        dates: j.date_info?.range_str || undefined,
+        summary: j.responsibilities || j.summary,
+        accomplishments: j.projects,
+        tech: j.tech
+      }));
+    }
+
+    return work_history;
+  }
+
+  /**
    * Generates a tailored cover letter using the applicant's profile and target job details.
-   * @param {FullProfile} profile - The applicant's profile and work history.
-   * @param {import("./Job.js").default} job - The target job description.
+   * @param {FullProfile} profile - The applicant's profile.
+   * @param {import("./Job.js").default} job - The target job description (including generated CV if present).
+   * @param {Array<Object>} [work_history] - Precalculated work history.
    * @returns {Promise<string | null>} The tailored cover letter text.
    */
-  async Generate_Cover_Letter(profile, job)
+  async Generate_Cover_Letter(profile, job, work_history)
   {
     let res = null;
 
-    if (this.ai && job && profile)
+    if (this.ai && job && profile && work_history)
     {
+      const applicant_profile = 
+      {
+        name: profile.name,
+        email: profile.email,
+        phone: profile.phone,
+        address: profile.address,
+        residency_status: profile.residency_status,
+        personal_summary: job.cv?.summ_text || profile.personal_summary,
+        skills: job.cv?.skills || profile.skills,
+        interests: profile.interests,
+        education: profile.education
+      };
+
       const prompt = `
         Please generate a tailored cover letter using the following datasets.
         
-        ### APPLICANT PROFILE & WORK HISTORY (JSON Data):
+        ### APPLICANT PROFILE (JSON Data):
         \`\`\`json
-        ${JSON.stringify(profile, null, 2)}
+        ${JSON.stringify(applicant_profile, null, 2)}
+        \`\`\`
+
+        ### WORK HISTORY FROM GENERATED CV (JSON Data):
+        \`\`\`json
+        ${JSON.stringify(work_history, null, 2)}
         \`\`\`
         
-        ### TARGET JOB DESCRIPTION (Pasted Text):
+        ### TARGET JOB DESCRIPTION:
+        - Role Title: ${job.role_title || ""}
+        - Company: ${job.company || ""}
+        - Description Text:
         \`\`\`text
         ${job.description}
         \`\`\`
@@ -665,13 +726,13 @@ class AI
       `;
       const sys_instruction = `
         You are an expert career coach and professional copywriter. 
-        Your task is to write a compelling, tailored cover letter based on a user's JSON resume and the target JSON job details.
+        Your task is to write a compelling, tailored cover letter based on the applicant's profile, their tailored CV work history, and the target job details.
         
         Guidelines:
-        1. Highlight specific matches between the applicant's experience and the job's core requirements.
+        1. Highlight specific matches between the applicant's experience and the job's core requirements, specifically aligning with the roles, job titles, and accomplishments in the provided CV work history.
         2. Maintain a professional, confident, yet authentic tone. Avoid buzzwords like "synergy" or "rockstar".
         3. Only generate the cover letter's main body text. Do not include a header with the applicant's details or company details.
-        4. Only use facts present in the provided JSON resume. Do not invent metrics or roles.
+        4. Only use facts and roles present in the provided CV work history and applicant profile. Do not invent metrics or roles.
       `;
       res = await this.Prompt(prompt, null, null, sys_instruction);
     }

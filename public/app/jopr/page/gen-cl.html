@@ -80,7 +80,6 @@
       const job = await ctx.Job.Select_By_Id(ctx, job_id);
   
       const profile = await ctx.Profile.Select_Active(ctx);
-      profile.work_history = await ctx.Profile.Job_Select_Active(ctx);
       profile.education = await ctx.Profile.Edu_Select_Active(ctx);
 
       if (gen || !job.cl)
@@ -88,7 +87,8 @@
         info_elem.Info("Generating Cover Letter...");
         await Utils.sleep(1500);
 
-        job.cl = await ctx.ai.Generate_Cover_Letter(profile, job);
+        const work_history = ctx.ai.Get_Work_History(job);
+        job.cl = await ctx.ai.Generate_Cover_Letter(profile, job, work_history);
         await ctx.Job.Save(ctx, job);
         info_elem.Info();
       }
