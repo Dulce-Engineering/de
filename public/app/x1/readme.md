@@ -1,3 +1,5 @@
+Sample app demonstrating navigation of large dataset
+
 Several high-volume, production-grade APIs provide free access to millions of records without requiring a backend proxy or complex authentication.
 
 ### 1. OpenAlex API (Scholarly Works)

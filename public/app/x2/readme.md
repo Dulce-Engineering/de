@@ -1,3 +1,6 @@
+App to update files in firebase hosting directly.
+To be used to inject data into pages for speedy rendering on first load.
+
 Yes. The **Firebase Hosting REST API** gives you precisely this capability: your CMS can trigger a pure, static HTML replacement **at publish time** so the end user's browser fetches a pre-rendered, static HTML file with **zero client-side JavaScript overhead or extra runtime HTTP requests**.
 
 Firebase Hosting uses a **content-addressed store (SHA-256 hashing)**. When your CMS updates a single HTML file, you do **not** need to upload the whole website again. Firebase compares the file hashes of the new deployment against the previous release, uploads **only the modified HTML file**, and reuses the existing byte blobs for all unchanged assets.
