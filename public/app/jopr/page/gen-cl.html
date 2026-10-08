@@ -104,9 +104,25 @@
       link_elem.innerText = job.link;
 
       document.title = "CL-" + await ctx.Job.Get_Org_Name(ctx, job);
-      cover_letter.innerText = job.cl;
+      cover_letter.addEventListener("change", On_Change_Cover_Letter);
+      const cl_data = 
+      { 
+        ctx,
+        target_job: job,
+        text: job.cl
+      };
+      cover_letter.value = cl_data;
 
       signature_elem.innerText = profile.name;
+    }
+
+    function On_Change_Cover_Letter(event)
+    {
+      const edit_value = event.currentTarget.value;
+      edit_value.target_job.cl = edit_value.text;
+
+      const ctx = edit_value.ctx;
+      ctx.Job.Save(ctx, edit_value.target_job);
     }
   </script>
 
@@ -338,7 +354,7 @@
     </div>
 
     <h2>Dear Hiring Manager,</h2>
-    <div id="cover_letter"></div>
+    <de-edit-text id="cover_letter" input-type="textarea"></de-edit-text>
     <h2>Sincerely,</h2>
     <span id="signature_elem"></span>
   </article>

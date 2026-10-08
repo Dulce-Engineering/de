@@ -62,7 +62,9 @@ class DeEditText extends HTMLElement
   {
     this.original_value = data;
 
-    this.text_elem.textContent = data?.text;
+    const div = document.createElement("div");
+    div.textContent = data?.text || "";
+    this.text_elem.innerHTML = div.innerHTML.replace(/\n/g, "<br>");
 
     if (Utils.Is_Empty(data?.original_text))
     {
@@ -92,7 +94,7 @@ class DeEditText extends HTMLElement
    */
   On_Click_Edit_Btn()
   {
-    this.input_elem.value = this.text_elem.textContent;
+    this.input_elem.value = this.original_value?.text ?? this.text_elem.innerText;
   }
 
   /**
@@ -101,7 +103,9 @@ class DeEditText extends HTMLElement
    */
   On_Click_Ok_Btn()
   {
-    this.text_elem.textContent = this.input_elem.value;
+    const div = document.createElement("div");
+    div.textContent = this.input_elem.value || "";
+    this.text_elem.innerHTML = div.innerHTML.replace(/\n/g, "<br>");
     this.dispatchEvent(new Event("change"));
   }
 
