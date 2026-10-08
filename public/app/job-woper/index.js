@@ -53,16 +53,27 @@ async function Query_Get_Trend_Count2(query, page)
   {
     await page.goto(url); 
 
-    const count_elem = await Find_Job_Count_Elem(page);
-    if (count_elem) 
-    {
-      const count_str = await count_elem.textContent();
-      count = Utils.To_Int(count_str);
-    } 
-    else 
+    const detected_counts = await Find_Job_Counts(page);
+
+    if (detected_counts.length === 0)
     {
       console.log('element not found.');
+      return 0;
     }
+
+    const first_count = detected_counts[0].count;
+    const is_consistent = detected_counts.every(item => item.count === first_count);
+
+    if (!is_consistent)
+    {
+      console.error(
+        `Inconsistent job count values found for query: ${query.title || query.terms}`,
+        detected_counts
+      );
+      return 0;
+    }
+
+    count = first_count;
   } 
   catch (error) 
   {
@@ -72,17 +83,56 @@ async function Query_Get_Trend_Count2(query, page)
   return count;
 }
 
-async function Find_Job_Count_Elem(page)
+async function Find_Job_Counts(page)
 {
-  let count_elem = page.locator('[data-automation="totalJobsCount"]');
-  if (await count_elem.count() == 0) 
-    count_elem = page.locator("[data-automation='totalJobsCountBcues']");
-  if (await count_elem.count() == 0) 
-    count_elem = page.locator("[data-automation='totalJobsMessage']:first-child");
-  if (await count_elem.count() == 0) 
-    count_elem = null;
-  
-  return count_elem;
+  const detected = [];
+  const selectors = [
+    '[data-automation="totalJobsCount"]',
+    '[data-automation="totalJobsCountBcues"]',
+    '[data-automation="jobCounter"]',
+    '[data-automation="totalJobsMessage"]',
+    '[data-automation="totalJobsMessage"]:first-child',
+    '#searchResultSummary[data-sol-meta]',
+    '[data-automation="searchResultSummary"][data-sol-meta]'
+  ];
+
+  for (const selector of selectors)
+  {
+    const locator = page.locator(selector);
+    const elem_count = await locator.count();
+    if (elem_count > 0)
+    {
+      const elem = locator.first();
+      let val = 0;
+
+      const sol_meta = await elem.getAttribute("data-sol-meta");
+      if (sol_meta)
+      {
+        try
+        {
+          const meta = JSON.parse(sol_meta);
+          if (typeof meta.totalJobCount === "number")
+          {
+            val = meta.totalJobCount;
+          }
+        }
+        catch (e) {}
+      }
+
+      if (!val)
+      {
+        const text = await elem.textContent();
+        val = Utils.To_Int(text);
+      }
+
+      if (val > 0)
+      {
+        detected.push({ selector, count: val });
+      }
+    }
+  }
+
+  return detected;
 }
 
 function Wait(milliseconds) 
