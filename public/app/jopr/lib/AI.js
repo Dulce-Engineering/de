@@ -732,7 +732,7 @@ class AI
         ${job.description}
         \`\`\`
         
-        Output only the completed text of the cover letter.
+        Output only the completed body paragraphs of the cover letter. Do not include any salutations (e.g. 'Dear Hiring Manager') or sign-offs.
       `;
       const sys_instruction = `
         You are an expert career coach and professional copywriter. 
@@ -741,10 +741,16 @@ class AI
         Guidelines:
         1. Highlight specific matches between the applicant's experience and the job's core requirements, specifically aligning with the roles, job titles, and accomplishments in the provided CV work history.
         2. Maintain a professional, confident, yet authentic tone. Avoid buzzwords like "synergy" or "rockstar".
-        3. Only generate the cover letter's main body text. Do not include a header with the applicant's details or company details.
-        4. Only use facts and roles present in the provided CV work history and applicant profile. Do not invent metrics or roles.
+        3. Only generate the cover letter's main body paragraphs. Do not include a header, company details, or applicant contact details.
+        4. Do not include any opening salutation or greeting (e.g., "Dear Hiring Manager,", "Dear Manager,", "Dear [Name],") and do not include closing sign-offs (e.g., "Sincerely,", signature), as these are added by the page template layout.
+        5. Only use facts and roles present in the provided CV work history and applicant profile. Do not invent metrics or roles.
       `;
       res = await this.Prompt(prompt, null, null, sys_instruction);
+      if (res)
+      {
+        // Strip any leading salutation/greeting if generated
+        res = res.replace(/^(?:Dear\s+[^\n,]+|To\s+whom\s+it\s+may\s+concern|Greetings)[,:]?\s*\n*/i, "").trim();
+      }
     }
 
     return res;
