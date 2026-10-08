@@ -700,5 +700,11 @@
     "datetime": 1791201944150,
     "id": "3b6a5bef-73f7-497c-936d-e37c8c248358",
     "query_id": "-magento"
+  },
+  {
+    "count": 7,
+    "datetime": 1791417726489,
+    "id": "8c52a45e-fc77-4f23-992e-75a9e61c237e",
+    "query_id": "-magento"
   }
 ]
