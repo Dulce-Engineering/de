@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <base href="../">
+  <script async src="/lib/ga.js"></script>
+  <link rel="manifest" href="/app/jopr/manifest.json">
+  <title>JOPR: Template</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="robots" content="index, follow">
+  <link rel="shortcut icon" href="./image/favicon.ico">
+  
+  <meta name="description" content="Free local-first job tracker & AI CV builder. Track applications, customize resumes, and manage contacts securely from your browser with no signups required.">
+  <meta name="keywords" content="job tracker, job application tracker, AI resume builder, AI CV generator, local-first app, private job tracker, custom CV, tailored cover letters, resume editor, career manager, retro terminal, no signup job tracker, client-side resume builder, PWA job tracker">
+  <meta name="author" content="Dulce Engineering Pty. Ltd.">
+
+  <meta property="og:title" content="JOPR">
+  <meta property="og:description" content="Free local-first job tracker & AI CV builder. Track applications, customize resumes, and manage contacts securely from your browser with no signups required.">
+  <meta property="og:image" content="https://dulceeng.com.au/app/jopr/image/screenshot-landscape.png">
+  <meta property="og:url" content="https://dulceeng.com.au/app/jopr">
+  <meta property="og:type" content="website">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Website",
+    "name": "JOPR",
+    "url": "https://dulceeng.com.au/app/jopr",
+    "description": "Free local-first job tracker & AI CV builder. Track applications, customize resumes, and manage contacts securely from your browser with no signups required.",
+    "image": "https://dulceeng.com.au/app/jopr/image/screenshot-landscape.png"
+  }
+  </script>
+
+  <!-- Core App & Component Stylesheets -->
+  <link rel="stylesheet" href="./style/index.css?v=2">
+  <link rel="stylesheet" href="./component/de-info/style.css?v=2">
+  <link rel="stylesheet" href="./component/de-clock-2/style.css?v=2">
+  <link rel="stylesheet" href="./component/jopr-chart/style.css?v=2">
+  <!-- Feature-specific stylesheets can be added here -->
+  
+  <script type="importmap">
+  {
+    "imports": 
+    {
+      "firebase/app":       "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js",
+      "firebase/functions": "https://www.gstatic.com/firebasejs/12.12.1/firebase-functions.js",
+      "firebase/firestore": "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js",
+      "firebase/auth":      "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js",
+      "firebase-analytics": "https://www.gstatic.com/firebasejs/12.12.1/firebase-analytics.js",
+      "firebase/ai":        "https://www.gstatic.com/firebasejs/12.12.1/firebase-ai.js"
+    }
+  }
+  </script>
+
+  <!-- Common & Shared Web Components -->
+  <script src="../../dedial/dedial.js?v=2" type="module"></script>
+  <script src="../../component/DeInputList/index3.js?v=2" type="module"></script>
+  <script src="../../component/DeForm/index.js?v=2" type="module"></script>
+  <script src="../../component/DeDialogForm/index.js?v=2" type="module"></script>
+  <script src="../../component/DeDialogAlert/index.js?v=2" type="module"></script>
+  <script src="../../component/DeDialogConfirm/index.js?v=2" type="module"></script>
+  <script src="../../component/DeLineChart/index.js?v=2" type="module"></script>
+  <script src="./component/de-toolbar-menu/index.js?v=2" type="module"></script>
+  <script src="./component/de-info/index.js?v=2" type="module"></script>
+  <script src="./component/de-clock-2/index.js?v=2" type="module"></script>
+  <script src="./component/de-field/index.js?v=2" type="module"></script>
+
+  <!-- Feature-specific scripts can be added here -->
+  <!-- <script src="./page/template.js?v=2" type="module"></script> -->
+</head>
+
+<body>
+
+  <header id="hdr_elem" class="">
+    <div class="chart">
+      <de-line-chart id="chart_elem" hide-labels chart-type="smooth">
+      </de-line-chart>
+      <div class="b1"></div>
+      <div class="b2"></div>
+    </div>
+    <h1 class="title">JOPR&nbsp;&nbsp;&nbsp;</h1>
+    <de-clock-2 id="clock_elem"></de-clock-2>
+    <nav id="nav_elem">
+      <button id="import_btn" class="img" title="Upload">
+        <img src="image/upload.svg" alt="Upload">
+      </button>
+      <button id="export_btn" class="img" title="Download">
+        <img src="image/download.svg" alt="Download">
+      </button>
+      <a id="jobs_btn" class="btn img" href="index.html" title="Jobs">
+        <img src="image/work.svg" alt="Jobs">
+      </a>
+      <a id="profile_btn" class="btn img" href="./page/profiles.html" title="Profile">
+        <img src="image/person.svg" alt="Profile">
+      </a>
+      <button id="companies_btn" class="img hidden" title="Companies">
+        <img src="image/factory.svg" alt="Companies">
+      </button>
+      <button id="contacts_btn" class="img hidden" title="Contacts">
+        <img src="image/contacts.svg" alt="Contacts">
+      </button>
+      <a id="analysis_btn" class="btn img" href="../job-woper" title="Market Analysis">
+        <img src="image/chart-4.svg" alt="Market Analysis">
+      </a>
+    </nav>
+    <output id="alert_elem" role="status"></output>
+  </header>
+
+  <main id="app_body">
+    <!-- Feature content goes here -->
+  </main>
+
+  <footer>
+    © Copyright Dulce Engineering 2025. All rights reserved. v1
+  </footer>
+
+  <!-- Feature dialog forms can be defined here -->
+  <!--
+  <de-dialog-form id="feature_dialog">
+    <h2 slot="header">Dialog Title</h2>
+    <label slot="fields">Field Name</label>
+    <input slot="fields" type="text" name="field_name">
+  </de-dialog-form>
+  -->
+
+  <de-info id="info_elem"></de-info>
+
+  <de-dialog-confirm id="warning_dlg">
+    <img src="image/red/warning.svg" slot="header" alt="Warning">
+  </de-dialog-confirm>
+
+</body>
+
+</html>
