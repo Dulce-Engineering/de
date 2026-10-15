@@ -1,0 +1,16 @@
+jopr-header
+{
+  display: block;
+  width: 100%;
+}
+
+jopr-header .hidden
+{
+  display: none !important;
+}
+
+jopr-header nav button.active,
+jopr-header nav a.active
+{
+  filter: brightness(1.2);
+}
