@@ -19,5 +19,15 @@
   },
   "[css]": {
     "editor.defaultFormatter": "vscode.css-language-features"
+  },
+  "editor.scrollbar.vertical": "visible",
+  "editor.scrollbar.horizontal": "visible",
+  "editor.scrollbar.verticalScrollbarSize": 20,
+  "editor.scrollbar.horizontalScrollbarSize": 16,
+  "workbench.colorCustomizations": {
+    "scrollbarSlider.background": "#ffffffbb",
+    "scrollbarSlider.hoverBackground": "#ffffffff",
+    "scrollbarSlider.activeBackground": "#ffffffff",
+    "scrollbar.shadow": "#000000bb"
   }
 }
