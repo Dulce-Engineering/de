@@ -1,4 +1,5 @@
 import Utils from "../../../../lib/Utils.js";
+import * as StatsDefault from "../../../job-woper/lib/index.js?v=2";
 
 /**
  * DeJoprHeader is a light DOM custom web component encapsulating the header
@@ -31,7 +32,7 @@ import Utils from "../../../../lib/Utils.js";
  * @property {HTMLAnchorElement} analysis_btn - The market analysis link.
  * @property {HTMLOutputElement} alert_elem - The terminal <output id="alert_elem">.
  */
-class DeJoprHeader extends HTMLElement
+class JoprHeader extends HTMLElement
 {
   static tname = "jopr-header";
 
@@ -51,6 +52,12 @@ class DeJoprHeader extends HTMLElement
 
   /** @type {number|null} */
   alert_timer_id = null;
+
+  /** @type {Object|null} */
+  ctx = null;
+
+  /** @type {Object|null} */
+  stats = null;
 
   constructor()
   {
@@ -92,7 +99,16 @@ class DeJoprHeader extends HTMLElement
       case "hide-chart":
         if (this.chart_container)
         {
-          this.chart_container.classList.toggle("hidden", new_value !== null);
+          const hide = new_value !== null;
+          this.chart_container.classList.toggle("hidden", hide);
+          if (hide)
+          {
+            this.Stop_Chart_Timer();
+          }
+          else
+          {
+            this.Start_Chart_Timer();
+          }
         }
         break;
       case "hide-clock":
@@ -294,14 +310,16 @@ class DeJoprHeader extends HTMLElement
 
   /**
    * Updates trend line chart by querying Stats dataset if available.
-   * @param {Object} ctx - Application context object.
+   * @param {Object} [ctx] - Application context object.
    * @param {Object} [stats] - Optional Stats module (e.g., job-woper Stats).
    * @returns {Promise<void>}
    */
   async Update_Chart(ctx, stats)
   {
-    const Stats = stats || window.Stats;
-    if (!Stats?.Query?.Select_All || !Stats?.Trend?.Select_By_Query_Id || !ctx?.Utils)
+    const Stats = stats || this.stats || window.Stats || StatsDefault;
+    const effective_utils = ctx?.Utils || this.ctx?.Utils || window.ctx?.Utils || Utils;
+
+    if (!Stats?.Query?.Select_All || !Stats?.Trend?.Select_By_Query_Id)
     {
       return;
     }
@@ -315,7 +333,8 @@ class DeJoprHeader extends HTMLElement
       const random_index = Math.floor(Math.random() * seek_queries.length);
       const query = seek_queries[random_index];
       const query_id = query.id;
-      const one_week_ago = Date.now() - (ctx.Utils.MILLIS_WEEK * 4);
+      const millis_week = effective_utils?.MILLIS_WEEK || Utils.MILLIS_WEEK || (7 * 24 * 60 * 60 * 1000);
+      const one_week_ago = Date.now() - (millis_week * 4);
       const data = await Stats.Trend.Select_By_Query_Id(query_id);
       const recent_data = data ? data.filter(d => d.datetime >= one_week_ago) : [];
 
@@ -346,16 +365,18 @@ class DeJoprHeader extends HTMLElement
   }
 
   /**
-   * Starts recurring chart update timer.
-   * @param {Object} ctx - Application context object.
+   * Starts recurring chart update timer and renders initial chart.
+   * @param {Object} [ctx] - Application context object.
    * @param {Object} [stats] - Optional Stats module.
    * @param {number} [interval_millis=60000] - Timer interval in milliseconds.
    */
   Start_Chart_Timer(ctx, stats, interval_millis = 60000)
   {
+    if (ctx) this.ctx = ctx;
+    if (stats) this.stats = stats;
     this.Stop_Chart_Timer();
-    this.Update_Chart(ctx, stats);
-    this.chart_interval_id = setInterval(() => this.Update_Chart(ctx, stats), interval_millis);
+    this.Update_Chart(this.ctx, this.stats);
+    this.chart_interval_id = setInterval(() => this.Update_Chart(this.ctx, this.stats), interval_millis);
   }
 
   /**
@@ -517,8 +538,13 @@ class DeJoprHeader extends HTMLElement
       this.title_elem.addEventListener("click", this.On_Click_Title);
     }
     this.Bind_Nav_Events();
+
+    if (!hide_chart)
+    {
+      this.Start_Chart_Timer();
+    }
   }
 }
 
-Utils.Register_Element(DeJoprHeader);
-export default DeJoprHeader;
+Utils.Register_Element(JoprHeader);
+export default JoprHeader;

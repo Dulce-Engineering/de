@@ -21,7 +21,7 @@
 
 ### JavaScript
 ```javascript
-import DeJoprHeader from "./component/jopr-header/index.js";
+import JoprHeader from "./component/jopr-header/index.js";
 
 const header = document.querySelector("jopr-header");
 
@@ -40,7 +40,8 @@ header.Show_Nav();
 header.Show_Companies(true);
 header.Show_Contacts(true);
 
-// Update chart with trend analysis
+// Chart timer & rendering starts automatically upon render.
+// You can optionally override ctx or stats manually:
 await header.Update_Chart(ctx);
 header.Start_Chart_Timer(ctx);
 ```

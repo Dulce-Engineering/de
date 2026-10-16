@@ -37,6 +37,7 @@
   <link rel="stylesheet" href="./component/de-info/style.css?v=2">
   <link rel="stylesheet" href="./component/de-clock-2/style.css?v=2">
   <link rel="stylesheet" href="./component/jopr-chart/style.css?v=2">
+  <link rel="stylesheet" href="./component/jopr-header/style.css?v=2">
   <!-- Feature-specific stylesheets can be added here -->
   
   <script type="importmap">
@@ -65,6 +66,7 @@
   <script src="./component/de-info/index.js?v=2" type="module"></script>
   <script src="./component/de-clock-2/index.js?v=2" type="module"></script>
   <script src="./component/de-field/index.js?v=2" type="module"></script>
+  <script src="./component/jopr-header/index.js?v=2" type="module"></script>
 
   <!-- Feature-specific scripts can be added here -->
   <!-- <script src="./page/template.js?v=2" type="module"></script> -->
@@ -72,40 +74,7 @@
 
 <body>
 
-  <header id="hdr_elem" class="">
-    <div class="chart">
-      <de-line-chart id="chart_elem" hide-labels chart-type="smooth">
-      </de-line-chart>
-      <div class="b1"></div>
-      <div class="b2"></div>
-    </div>
-    <h1 class="title">JOPR&nbsp;&nbsp;&nbsp;</h1>
-    <de-clock-2 id="clock_elem"></de-clock-2>
-    <nav id="nav_elem">
-      <button id="import_btn" class="img" title="Upload">
-        <img src="image/upload.svg" alt="Upload">
-      </button>
-      <button id="export_btn" class="img" title="Download">
-        <img src="image/download.svg" alt="Download">
-      </button>
-      <a id="jobs_btn" class="btn img" href="index.html" title="Jobs">
-        <img src="image/work.svg" alt="Jobs">
-      </a>
-      <a id="profile_btn" class="btn img" href="./page/profiles.html" title="Profile">
-        <img src="image/person.svg" alt="Profile">
-      </a>
-      <button id="companies_btn" class="img hidden" title="Companies">
-        <img src="image/factory.svg" alt="Companies">
-      </button>
-      <button id="contacts_btn" class="img hidden" title="Contacts">
-        <img src="image/contacts.svg" alt="Contacts">
-      </button>
-      <a id="analysis_btn" class="btn img" href="../job-woper" title="Market Analysis">
-        <img src="image/chart-4.svg" alt="Market Analysis">
-      </a>
-    </nav>
-    <output id="alert_elem" role="status"></output>
-  </header>
+  <jopr-header id="header" active-page="custom" title-text="JOPR"></jopr-header>
 
   <main id="app_body">
     <!-- Feature content goes here -->
