@@ -47,15 +47,17 @@ The war against recruitment agencies and HR departments is merciless. Don't beco
 - view, add, edit, delete job details like company, title, work type, location, start time, end time, tech used, responsibilities, projects
 
 ### Job Statistics
+- to do
 
 ## Links
 - https://dulceengineering.com.au/app/jopr
+- [PWA Architecture & Design Guide](doc/architecture.md)
 
-## WarGames
+## UI Inspiration
+### WarGames
 https://www.youtube.com/watch?v=s93KC4AGKnY
 https://www.youtube.com/watch?v=NHWjlCaIrQo
-
-## Planet America
+### Planet America
 https://www.youtube.com/watch?v=oVy-KKWsdNg&list=PLDTPrMoGHssBulfAaczSuk0f8luCiKYi3
 
 ## Bugs
