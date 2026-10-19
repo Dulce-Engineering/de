@@ -918,15 +918,15 @@ class AI
             summary: Schema.string(
               {
                 description:
-                  "A 2-3 sentence high-level overview of the role, framed to match " +
-                  "the prospective job's tone and focus."
+                  "A 2-3 sentence high-level overview of the work and responsibilities, framed to match " +
+                  "the prospective job's tone and focus. Do NOT include, state, or mention the role/job title."
               }),
             bullet_points: Schema.array(
               {
                 items: Schema.string(),
                 description:
                   "3 to 5 high-impact, results-oriented bullet points tracking real " +
-                  "accomplishments, starting with strong action verbs."
+                  "accomplishments, starting with strong action verbs. Do NOT include the role/job title."
               })
           },
           required: ["summary", "bullet_points"]
@@ -945,6 +945,10 @@ class AI
               frame relevant past optimization work using those exact structural themes).
             3. BULLET ARCHITECTURE: Each bullet point should ideally tie an action to a technical context 
               and a professional outcome.
+            4. EXCLUDE ROLE TITLE: Do NOT include, mention, or reference the role title or job title anywhere 
+              in the summary or bullet points (e.g., do not write 'As a [Title]...', 'In this role...', or state 
+              the title). The role title is displayed in a separate dedicated field and may be edited independently 
+              by the user, so the job description must describe the scope, domain, and achievements without stating the title.
             
             Do not output conversational text or markdown code blocks outside the schema boundaries.
           `;
@@ -965,8 +969,10 @@ class AI
             \`\`\`
 
             OUTPUT REQUIREMENT:
-            Return a structured JSON object adhering perfectly to the schema containing the rewritten summary 
-            and bullet points.
+            - Return a structured JSON object adhering perfectly to the schema containing the rewritten summary 
+              and bullet points.
+            - STRICT RULE: Do NOT include, mention, or reference the role title anywhere in the summary 
+              or bullet points.
           `;
       res = await this.Prompt(prompt, schema, null, sys_instruction);
     }

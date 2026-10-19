@@ -39,6 +39,12 @@
   <link rel="stylesheet" href="./component/jopr-chart/style.css?v=2">
   <link rel="stylesheet" href="./component/jopr-header/style.css?v=2">
   <!-- Feature-specific stylesheets can be added here -->
+   <style>
+    :root 
+    {
+      --main: #fff;
+    }
+   </style>
   
   <script type="importmap">
   {
@@ -79,6 +85,12 @@
   <main id="app_body">
     <ul>
       <li>
+        <h1>Software Engineering</h1>
+        <ul>
+          <li>SOLID</li>
+        </ul>
+      </li>
+      <li>
         <h1><a herf="#ds">Design Systems</a></h1>
         <ul>
           <li>Chat</li>
@@ -87,7 +99,72 @@
         </ul>
       </li>
       <li>React</li>
-      <li>C#</li>
+      <li>
+        <h1>C#</h1>
+        <ul id="csharp">
+          <li>
+            Types &amp; Language Fundamentals
+            <ul>
+              <li>Value types &amp; Ref types</li>
+              <li>Var, Dynamic, &amp; Object</li>
+              <li>Nullable types</li>
+              <li>Const, readonly, &amp; static</li>
+              <li>Ref and Out params</li>
+              <li>Tuples vs anon. types</li>
+              <li>Record vs classes</li>
+            </ul>
+          </li>
+          <li>
+            OOP &amp; Language Features
+            <ul>
+              <li>Access modifiers</li>
+              <li>Interface vs abstract class</li>
+              <li>== vs .Equals()</li>
+              <li>Shallow vs Deep Copy</li>
+              <li>Extension methods</li>
+              <li>Delegates &amp; Events</li>
+              <li>Reflection</li>
+            </ul>
+          </li>
+          <li>
+            Collections, LINQ &amp; Concurrency
+            <ul>
+              <li>IEnumerable, ICollection, &amp; IList</li>
+              <li>Lambda &amp; LINQ</li>
+              <li>Task &amp; Thread</li>
+              <li>Async/Await</li>
+              <li>Lock, Monitor, &amp; Mutex</li>
+              <li>HTTP Fetch</li>
+              <li>EF Code/DB First</li>
+            </ul>
+          </li>
+          <li>
+            Runtime, Memory &amp; Architecture
+            <ul>
+              <li>What is .NET?</li>
+              <li>.NET, Core, &amp; 5/6/7</li>
+              <li>Cross-platform</li>
+              <li>Garbage collection</li>
+              <li>Memory &amp; generations in GC</li>
+              <li>DI &amp; .NET Core</li>
+              <li>Dependency Injection</li>
+            </ul>
+          </li>
+          <li>
+            Frameworks, APIs &amp; Scenarios
+            <ul>
+              <li>Middleware</li>
+              <li>Minimal APIs</li>
+              <li>ASP.NET Core Web API (Controller-Based)</li>
+              <li>ASP.NET Core MVC (Model-View-Controller)</li>
+              <li>Blazor</li>
+              <li>WCF Protocols</li>
+              <li>WPF, Win Forms, UWP</li>
+              <li>Scenario-Based &amp; Coding Questions</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
       <li>AWS</li>
     </ul>
 
@@ -221,6 +298,854 @@
             <li><strong>Address the Celebrity Trade-off:</strong> Mention the hybrid fan-out model before they even ask. This shows you already know where the template meets its physical limits.</li>
           </ol>
         </section>
+      </div>
+      <footer></footer>
+    </article>
+
+    <article id="csharp" parent-id="main">
+      <header>C#</header>
+      <div class="article-body"></div>
+      <footer></footer>
+    </article>
+
+    <article id="types_and_language_fundamentals" parent-id="csharp">
+      <header>Types &amp; Language Fundamentals</header>
+      <div class="article-body"></div>
+      <footer></footer>
+    </article>
+
+    <article id="value_types_ref_types" parent-id="types_and_language_fundamentals">
+      <header>
+        <h2>Value types &amp; Ref types</h2>
+      </header>
+      <div class="article-body">
+        <section>
+          <h3>Value Types</h3>
+          <ul>
+            <li><strong>Storage:</strong> Stored on the stack.</li>
+            <li><strong>Assignment:</strong> Copies data when assigned.</li>
+            <li><strong>Examples:</strong> <code>int</code>, <code>double</code>, <code>char</code>, <code>bool</code>, <code>struct</code>, <code>enum</code>.</li>
+          </ul>
+        </section>
+        <section>
+          <h3>Reference Types</h3>
+          <ul>
+            <li><strong>Storage:</strong> Stored on the heap.</li>
+            <li><strong>Assignment:</strong> Stores a reference (address) to data instead of copying it.</li>
+            <li><strong>Examples:</strong> <code>class</code>, <code>string</code>, <code>interface</code>, <code>array</code>, <code>delegate</code>.</li>
+          </ul>
+        </section>
+      </div>
+      <footer></footer>
+    </article>
+
+    <article id="var_dynamic_object" parent-id="types_and_language_fundamentals">
+      <header>
+        <h2>Var, Dynamic, &amp; Object</h2>
+      </header>
+      <div class="article-body">
+        <table>
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>When Used</th>
+              <th>Compile-time Check</th>
+              <th>Runtime Behavior</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong><code>var</code></strong></td>
+              <td>When type is obvious</td>
+              <td><strong>Yes</strong> (Strongly typed)</td>
+              <td>Fixed type after assignment</td>
+            </tr>
+            <tr>
+              <td><strong><code>dynamic</code></strong></td>
+              <td>When type is unknown until runtime</td>
+              <td><strong>No</strong></td>
+              <td>Type checked at runtime</td>
+            </tr>
+            <tr>
+              <td><strong><code>object</code></strong></td>
+              <td>When working with any data type</td>
+              <td><strong>Yes</strong> (Boxing/unboxing needed)</td>
+              <td>Can be cast to specific types</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <footer></footer>
+    </article>
+
+    <article id="nullable_types" parent-id="types_and_language_fundamentals">
+      <header>
+        <h2>Nullable types</h2>
+      </header>
+      <div class="article-body">
+        <p>Nullable types (<code>?</code>) allow value types to hold <code>null</code>.</p>
+      </div>
+      <footer></footer>
+    </article>
+
+    <article id="const_readonly_static" parent-id="types_and_language_fundamentals">
+      <header>
+        <h2>Const, readonly, &amp; static</h2>
+      </header>
+      <div class="article-body">
+        <table>
+          <thead>
+            <tr>
+              <th>Keyword</th>
+              <th>Behavior</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong><code>const</code></strong></td>
+              <td>Must be assigned <strong>at compile-time</strong>, cannot change.</td>
+            </tr>
+            <tr>
+              <td><strong><code>readonly</code></strong></td>
+              <td>Assigned <strong>at runtime</strong> (in constructor), cannot change later.</td>
+            </tr>
+            <tr>
+              <td><strong><code>static</code></strong></td>
+              <td>Belongs to the <strong>class, not instance</strong> (shared across all objects).</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <footer></footer>
+    </article>
+
+    <article id="ref_and_out_params" parent-id="types_and_language_fundamentals">
+      <header>
+        <h2>Ref and Out params</h2>
+      </header>
+      <div class="article-body">
+        <table>
+          <thead>
+            <tr>
+              <th>Feature</th>
+              <th><code>ref</code></th>
+              <th><code>out</code></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Initialization required?</strong></td>
+              <td>✅ Yes</td>
+              <td>❌ No</td>
+            </tr>
+            <tr>
+              <td><strong>Value can be read before assignment?</strong></td>
+              <td>✅ Yes</td>
+              <td>❌ No</td>
+            </tr>
+            <tr>
+              <td><strong>Used for</strong></td>
+              <td>Modifying an existing value</td>
+              <td>Returning multiple values</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <footer></footer>
+    </article>
+
+    <article id="tuples_vs_anon_types" parent-id="types_and_language_fundamentals">
+      <header>
+        <h2>Tuples vs anon. types</h2>
+      </header>
+      <div class="article-body">
+        <section>
+          <h3>Tuples</h3>
+          <p>A Tuple is a data structure that holds multiple values, often of different types. It’s immutable and can be used for returning multiple values from a method.</p>
+        </section>
+        <section>
+          <h3>Anonymous Types</h3>
+          <p>Similar to Tuples but typically used to hold data in a lightweight, read-only manner, and they are implicitly typed. Anonymous types cannot be returned as methods.</p>
+        </section>
+        <section>
+          <h3>Differences</h3>
+          <ul>
+            <li><strong>Named fields:</strong> Tuples can have named fields, but anonymous types have properties with implicit names.</li>
+            <li><strong>Immutability:</strong> Both are immutable, but anonymous types are more often used for single-purpose scenarios (e.g., LINQ queries).</li>
+          </ul>
+        </section>
+      </div>
+      <footer></footer>
+    </article>
+
+    <article id="record_vs_classes" parent-id="types_and_language_fundamentals">
+      <header>
+        <h2>Record vs classes</h2>
+      </header>
+      <div class="article-body">
+        <p>Record Types are a new reference type introduced in C# 9. They are immutable by default and provide a concise way to define data structures.</p>
+        <section>
+          <h3>Differences from Classes</h3>
+          <ul>
+            <li><strong>Immutability:</strong> Record types are immutable by default. You can create a new instance with modified properties using the <code>with</code> keyword.</li>
+            <li><strong>Value-based equality:</strong> Record types compare their values rather than references, while classes use reference equality.</li>
+            <li><strong>Syntax:</strong> Compact syntax for property initialization.</li>
+          </ul>
+        </section>
+      </div>
+      <footer></footer>
+    </article>
+
+    <article id="oop_and_language_features" parent-id="csharp">
+      <header>OOP &amp; Language Features</header>
+      <div class="article-body"></div>
+      <footer></footer>
+    </article>
+
+    <article id="access_modifiers" parent-id="oop_and_language_features">
+      <header>
+        <h2>Access modifiers</h2>
+      </header>
+      <div class="article-body">
+        <table>
+          <thead>
+            <tr>
+              <th>Modifier</th>
+              <th>Scope</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong><code>public</code></strong></td>
+              <td>Accessible <strong>anywhere</strong></td>
+            </tr>
+            <tr>
+              <td><strong><code>private</code></strong></td>
+              <td>Accessible <strong>only within the same class</strong></td>
+            </tr>
+            <tr>
+              <td><strong><code>protected</code></strong></td>
+              <td>Accessible in <strong>derived (child) classes</strong></td>
+            </tr>
+            <tr>
+              <td><strong><code>internal</code></strong></td>
+              <td>Accessible within the <strong>same assembly</strong></td>
+            </tr>
+            <tr>
+              <td><strong><code>protected internal</code></strong></td>
+              <td>Accessible in <strong>same assembly &amp; derived classes</strong></td>
+            </tr>
+            <tr>
+              <td><strong><code>private protected</code></strong></td>
+              <td>Accessible in <strong>same class &amp; derived classes within same assembly</strong></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <footer></footer>
+    </article>
+
+    <article id="interface_vs_abstract_class" parent-id="oop_and_language_features">
+      <header>
+        <h2>Interface vs abstract class</h2>
+      </header>
+      <div class="article-body">
+        <table>
+          <thead>
+            <tr>
+              <th>Feature</th>
+              <th>Interface</th>
+              <th>Abstract Class</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Method Implementation</strong></td>
+              <td>No method implementation (C# 7 and below)</td>
+              <td>Can have both abstract &amp; concrete methods</td>
+            </tr>
+            <tr>
+              <td><strong>Multiple Inheritance</strong></td>
+              <td>Supports multiple interfaces</td>
+              <td>Only single inheritance</td>
+            </tr>
+            <tr>
+              <td><strong>Access Modifiers</strong></td>
+              <td>Only <strong>public</strong> members</td>
+              <td>Can have <strong>private, protected, public</strong> members</td>
+            </tr>
+            <tr>
+              <td><strong>Constructors</strong></td>
+              <td>No constructors</td>
+              <td>Can have constructors</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <footer></footer>
+    </article>
+
+    <article id="equality_vs_equals" parent-id="oop_and_language_features">
+      <header>
+        <h2>== vs .Equals()</h2>
+      </header>
+      <div class="article-body">
+        <ul>
+          <li><strong><code>==</code> (Equality Operator):</strong> Compares memory location for reference types, compares values for primitives.</li>
+          <li><strong><code>.Equals()</code>:</strong> Compares actual object values.</li>
+        </ul>
+      </div>
+      <footer></footer>
+    </article>
+
+    <article id="shallow_vs_deep_copy" parent-id="oop_and_language_features">
+      <header>
+        <h2>Shallow vs Deep Copy</h2>
+      </header>
+      <div class="article-body">
+        <section>
+          <h3>Shallow Copy</h3>
+          <p>Copies the reference of objects within a collection, meaning both the original and the copy refer to the same objects.</p>
+        </section>
+        <section>
+          <h3>Deep Copy</h3>
+          <p>Creates a new instance of the original object and also recursively copies the objects inside it.</p>
+          <ul>
+            <li><strong>Manual Copy:</strong> You create a new instance and copy properties.</li>
+            <li><strong>Serialization-based:</strong> You can serialize the object and then deserialize it to create a deep copy (works well with complex objects).</li>
+          </ul>
+        </section>
+      </div>
+      <footer></footer>
+    </article>
+
+    <article id="extension_methods" parent-id="oop_and_language_features">
+      <header>
+        <h2>Extension methods</h2>
+      </header>
+      <div class="article-body">
+        <p>Extension methods allow you to add new methods to existing classes without modifying their source code.</p>
+        <p>Defined as static methods inside a static class.</p>
+      </div>
+      <footer></footer>
+    </article>
+
+    <article id="delegates_and_events" parent-id="oop_and_language_features">
+      <header>
+        <h2>Delegates &amp; Events</h2>
+      </header>
+      <div class="article-body">
+        <ul>
+          <li><strong>Delegate:</strong> A pointer to a method.</li>
+          <li><strong>Event:</strong> A specialized delegate used for notifications.</li>
+        </ul>
+      </div>
+      <footer></footer>
+    </article>
+
+    <article id="reflection" parent-id="oop_and_language_features">
+      <header>
+        <h2>Reflection</h2>
+      </header>
+      <div class="article-body">
+        <p>Reflection is the ability of a program to examine and modify its own structure and behavior at runtime.</p>
+        <section>
+          <h3>Common Uses of Reflection</h3>
+          <ul>
+            <li>Inspecting types and members (properties, methods, etc.).</li>
+            <li>Creating instances of types dynamically.</li>
+            <li>Invoking methods and accessing fields/properties dynamically.</li>
+          </ul>
+        </section>
+      </div>
+      <footer></footer>
+    </article>
+
+    <article id="collections_linq_concurrency" parent-id="csharp">
+      <header>Collections, LINQ &amp; Concurrency</header>
+      <div class="article-body"></div>
+      <footer></footer>
+    </article>
+
+    <article id="ienumerable_icollection_ilist" parent-id="collections_linq_concurrency">
+      <header>
+        <h2>IEnumerable, ICollection, &amp; IList</h2>
+      </header>
+      <div class="article-body">
+        <table>
+          <thead>
+            <tr>
+              <th>Feature</th>
+              <th><code>IEnumerable</code></th>
+              <th><code>ICollection</code></th>
+              <th><code>IList</code></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Definition</strong></td>
+              <td>Iterates over a collection</td>
+              <td>Supports count &amp; add/remove</td>
+              <td>Supports indexing</td>
+            </tr>
+            <tr>
+              <td><strong>Can modify?</strong></td>
+              <td>❌ No</td>
+              <td>✅ Yes</td>
+              <td>✅ Yes</td>
+            </tr>
+            <tr>
+              <td><strong>Supports Indexing?</strong></td>
+              <td>❌ No</td>
+              <td>❌ No</td>
+              <td>✅ Yes</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <footer></footer>
+    </article>
+
+    <article id="lambda_and_linq" parent-id="collections_linq_concurrency">
+      <header>
+        <h2>Lambda &amp; LINQ</h2>
+      </header>
+      <div class="article-body">
+        <section>
+          <h3>Lambda Expressions</h3>
+          <p>Lambda Expressions are concise ways to write anonymous functions, using the lambda operator <code>=&gt;</code>.</p>
+        </section>
+        <section>
+          <h3>Language Integrated Query (LINQ)</h3>
+          <p>LINQ provides a uniform declarative query syntax to filter, project, and sort data across multiple data sources including collections, databases, and XML.</p>
+        </section>
+      </div>
+      <footer></footer>
+    </article>
+
+    <article id="task_and_thread" parent-id="collections_linq_concurrency">
+      <header>
+        <h2>Task &amp; Thread</h2>
+      </header>
+      <div class="article-body">
+        <table>
+          <thead>
+            <tr>
+              <th>Feature</th>
+              <th><code>Task</code></th>
+              <th><code>Thread</code></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Definition</strong></td>
+              <td>Represents an <strong>asynchronous operation</strong></td>
+              <td>Represents a <strong>low-level OS thread</strong></td>
+            </tr>
+            <tr>
+              <td><strong>Creation</strong></td>
+              <td>Uses <code>Task.Run()</code></td>
+              <td>Uses <code>new Thread()</code></td>
+            </tr>
+            <tr>
+              <td><strong>Managed by</strong></td>
+              <td>.NET Task Scheduler</td>
+              <td>OS Thread Scheduler</td>
+            </tr>
+            <tr>
+              <td><strong>Resource Usage</strong></td>
+              <td>More efficient (uses ThreadPool)</td>
+              <td>Expensive (direct OS thread)</td>
+            </tr>
+            <tr>
+              <td><strong>Best for</strong></td>
+              <td><strong>Async operations</strong> (e.g., web requests, DB calls)</td>
+              <td><strong>Parallel operations</strong> (e.g., CPU-intensive tasks)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <footer></footer>
+    </article>
+
+    <article id="async_await" parent-id="collections_linq_concurrency">
+      <header>
+        <h2>Async/Await</h2>
+      </header>
+      <div class="article-body">
+        <p><code>async/await</code> enables asynchronous programming in C#, improving performance by freeing up threads instead of blocking execution.</p>
+        <section>
+          <h3>Key Benefits</h3>
+          <ul>
+            <li><strong>Non-blocking UI:</strong> Keeps user interfaces responsive during I/O operations.</li>
+            <li><strong>High Scalability:</strong> Frees thread-pool threads while awaiting external operations in web services.</li>
+          </ul>
+        </section>
+      </div>
+      <footer></footer>
+    </article>
+
+    <article id="lock_monitor_mutex" parent-id="collections_linq_concurrency">
+      <header>
+        <h2>Lock, Monitor, &amp; Mutex</h2>
+      </header>
+      <div class="article-body">
+        <ul>
+          <li><strong><code>lock</code>:</strong> A shorthand for <code>Monitor.Enter</code> and <code>Monitor.Exit</code>. It provides mutual exclusion and is used for protecting critical sections from concurrent access.</li>
+          <li><strong><code>Monitor</code>:</strong> A low-level synchronization primitive for locking and unlocking code. You can also use <code>Monitor.TryEnter</code> to avoid blocking indefinitely.</li>
+          <li><strong><code>Mutex</code>:</strong> A synchronization primitive that can be used across processes, making it suitable for thread synchronization in multi-process environments.</li>
+        </ul>
+      </div>
+      <footer></footer>
+    </article>
+
+    <article id="http_fetch" parent-id="collections_linq_concurrency">
+      <header>
+        <h2>HTTP Fetch</h2>
+      </header>
+      <div class="article-body">
+        <p>Use the <code>HttpClient</code> class with <code>GetAsync</code>, <code>PostAsync</code>, etc., methods for each HTTP method. Pass <code>StringContent</code> objects for payload data and configure header properties directly on the <code>HttpClient</code> instance.</p>
+      </div>
+      <footer></footer>
+    </article>
+
+    <article id="ef_code_db_first" parent-id="collections_linq_concurrency">
+      <header>
+        <h2>EF Code/DB First</h2>
+      </header>
+      <div class="article-body">
+        <p>Entity Framework (EF) is an ORM that maps C# objects to a database.</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Approach</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Code First</strong></td>
+              <td>Write C# classes first, then generate the database schema using Migrations</td>
+            </tr>
+            <tr>
+              <td><strong>Database First</strong></td>
+              <td>Start with an existing database, then reverse engineer / scaffold models</td>
+            </tr>
+          </tbody>
+        </table>
+        <section>
+          <h3>Key EF Core Conventions</h3>
+          <ul>
+            <li><strong>Primary Key:</strong> Property named <code>Id</code> or <code>&lt;EntityName&gt;Id</code> inferred as auto-incrementing identity key.</li>
+            <li><strong>Foreign Key:</strong> Properties matching <code>&lt;NavigationProperty&gt;Id</code> automatically inferred as foreign keys.</li>
+            <li><strong>Change Tracker:</strong> Compares loaded entity snapshots during <code>SaveChangesAsync()</code> to generate targeted SQL updates.</li>
+          </ul>
+        </section>
+      </div>
+      <footer></footer>
+    </article>
+
+    <article id="runtime_memory_architecture" parent-id="csharp">
+      <header>Runtime, Memory &amp; Architecture</header>
+      <div class="article-body"></div>
+      <footer></footer>
+    </article>
+
+    <article id="what_is_dotnet" parent-id="runtime_memory_architecture">
+      <header>
+        <h2>What is .NET?</h2>
+      </header>
+      <div class="article-body">
+        <p>.NET is a framework and runtime developed by Microsoft for building applications. It provides:</p>
+        <ul>
+          <li>A Common Language Runtime (CLR) for executing code.</li>
+          <li>A Base Class Library (BCL) for common functionality.</li>
+          <li>Support for multiple languages (C#, VB.NET, F#, etc.).</li>
+          <li>A unified platform to build web, desktop, cloud, mobile, and IoT applications.</li>
+        </ul>
+      </div>
+      <footer></footer>
+    </article>
+
+    <article id="dotnet_core_versions" parent-id="runtime_memory_architecture">
+      <header>
+        <h2>.NET, Core, &amp; 5/6/7</h2>
+      </header>
+      <div class="article-body">
+        <table>
+          <thead>
+            <tr>
+              <th>Feature</th>
+              <th>.NET Framework</th>
+              <th>.NET Core</th>
+              <th>.NET 5/6/7 (Latest)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Platform</strong></td>
+              <td>Windows-only</td>
+              <td>Cross-platform (Windows, Linux, macOS)</td>
+              <td>Cross-platform</td>
+            </tr>
+            <tr>
+              <td><strong>Performance</strong></td>
+              <td>Slower</td>
+              <td>Faster</td>
+              <td>Even more optimized</td>
+            </tr>
+            <tr>
+              <td><strong>Deployment</strong></td>
+              <td>Installed on Windows</td>
+              <td>Self-contained</td>
+              <td>Self-contained</td>
+            </tr>
+            <tr>
+              <td><strong>Support</strong></td>
+              <td>Legacy</td>
+              <td>Modern</td>
+              <td>Latest .NET version</td>
+            </tr>
+            <tr>
+              <td><strong>Latest Version</strong></td>
+              <td>4.8 (No updates)</td>
+              <td>3.1 (End of life)</td>
+              <td>.NET 7+ (Active)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <footer></footer>
+    </article>
+
+    <article id="cross_platform" parent-id="runtime_memory_architecture">
+      <header>
+        <h2>Cross-platform</h2>
+      </header>
+      <div class="article-body">
+        <p>.NET Core is cross-platform, supporting Windows, Linux, and macOS. It achieves this through:</p>
+        <ul>
+          <li><strong>.NET Runtime (CoreCLR):</strong> A platform-agnostic runtime for executing .NET applications.</li>
+          <li><strong>CoreFX Libraries:</strong> A set of APIs common across platforms.</li>
+          <li><strong>Portable Libraries:</strong> Code libraries that work across different operating systems.</li>
+        </ul>
+        <p>.NET Core uses platform-specific implementations for OS-specific concerns (e.g. file paths), abstracting these details via .NET Standard.</p>
+      </div>
+      <footer></footer>
+    </article>
+
+    <article id="garbage_collection" parent-id="runtime_memory_architecture">
+      <header>
+        <h2>Garbage collection</h2>
+      </header>
+      <div class="article-body">
+        <p>Garbage Collection (GC) automatically frees memory by removing unused objects from the heap.</p>
+        <section>
+          <h3>GC Process</h3>
+          <ol>
+            <li><strong>Mark:</strong> Identifies objects that are no longer reachable or in use.</li>
+            <li><strong>Sweep:</strong> Removes unused objects and reclaims memory.</li>
+            <li><strong>Compact:</strong> Reorganizes memory to reduce fragmentation.</li>
+          </ol>
+        </section>
+        <section>
+          <h3>Generations in GC</h3>
+          <ul>
+            <li><strong>Gen 0:</strong> Newly allocated objects (frequent collection).</li>
+            <li><strong>Gen 1:</strong> Short-lived objects that survived Gen 0.</li>
+            <li><strong>Gen 2:</strong> Long-lived objects (e.g., static variables, global instances).</li>
+          </ul>
+          <p><em>Forcing GC (not recommended):</em> <code>GC.Collect()</code></p>
+        </section>
+      </div>
+      <footer></footer>
+    </article>
+
+    <article id="memory_and_generations_in_gc" parent-id="runtime_memory_architecture">
+      <header>
+        <h2>Memory &amp; generations in GC</h2>
+      </header>
+      <div class="article-body">
+        <p><strong>Memory Management:</strong> .NET uses a Garbage Collector (GC) to handle memory allocation and deallocation automatically, tracking objects on the managed heap.</p>
+        <section>
+          <h3>Generations</h3>
+          <ul>
+            <li><strong>Gen 0:</strong> Short-lived objects (frequently collected).</li>
+            <li><strong>Gen 1:</strong> Objects that survived Gen 0 collection.</li>
+            <li><strong>Gen 2:</strong> Long-lived objects (e.g., static variables).</li>
+            <li><strong>LOH (Large Object Heap):</strong> Stores large objects (&gt; 85KB), which are collected less frequently to minimize performance overhead.</li>
+          </ul>
+        </section>
+      </div>
+      <footer></footer>
+    </article>
+
+    <article id="di_and_dotnet_core" parent-id="runtime_memory_architecture">
+      <header>
+        <h2>DI &amp; .NET Core</h2>
+      </header>
+      <div class="article-body">
+        <p>Dependency Injection (DI) is a design pattern that helps achieve loose coupling by injecting dependencies instead of hardcoding them.</p>
+        <section>
+          <h3>Types of DI</h3>
+          <ul>
+            <li><strong>Constructor Injection:</strong> Most common, dependencies passed into the constructor.</li>
+            <li><strong>Method Injection:</strong> Dependencies injected directly into specific methods.</li>
+            <li><strong>Property Injection:</strong> Dependencies set via public properties.</li>
+          </ul>
+          <p>Improves testability, maintainability, and follows SOLID principles.</p>
+        </section>
+      </div>
+      <footer></footer>
+    </article>
+
+    <article id="dependency_injection" parent-id="runtime_memory_architecture">
+      <header>
+        <h2>Dependency Injection</h2>
+      </header>
+      <div class="article-body">
+        <section>
+          <h3>Built-in DI Container</h3>
+          <p>.NET Core provides a built-in dependency injection container handling object creation and lifetime management.</p>
+        </section>
+        <section>
+          <h3>Service Lifetimes</h3>
+          <ul>
+            <li><strong>Transient:</strong> Created every time they are requested (lightweight, stateless services).</li>
+            <li><strong>Scoped:</strong> Created once per client request (e.g., Entity Framework <code>DbContext</code>).</li>
+            <li><strong>Singleton:</strong> Created once on first request and shared across the entire application lifetime.</li>
+          </ul>
+        </section>
+      </div>
+      <footer></footer>
+    </article>
+
+    <article id="frameworks_apis_scenarios" parent-id="csharp">
+      <header>Frameworks, APIs &amp; Scenarios</header>
+      <div class="article-body"></div>
+      <footer></footer>
+    </article>
+
+    <article id="middleware" parent-id="frameworks_apis_scenarios">
+      <header>
+        <h2>Middleware</h2>
+      </header>
+      <div class="article-body">
+        <p>Middleware is software that sits in the HTTP request pipeline, handling requests and responses before or after they are processed by the application.</p>
+        <section>
+          <h3>Request Pipeline</h3>
+          <p>The request pipeline is a sequence of middleware components. Each middleware can either perform logic, pass the request to the next middleware via <code>next()</code>, or short-circuit and terminate the pipeline.</p>
+        </section>
+      </div>
+      <footer></footer>
+    </article>
+
+    <article id="minimal_apis" parent-id="frameworks_apis_scenarios">
+      <header>
+        <h2>Minimal APIs</h2>
+      </header>
+      <div class="article-body">
+        <p>Minimal APIs are architected to create HTTP APIs with minimal dependencies and boilerplate in ASP.NET Core.</p>
+        <ul>
+          <li>Introduced in .NET 6 as a lightweight alternative to controller-based APIs.</li>
+          <li>Endpoints defined directly via lambda expressions (e.g., <code>app.MapGet("/", () =&gt; "Hello World")</code>).</li>
+          <li>Optimized for microservices and cloud-native applications with faster startup times.</li>
+        </ul>
+      </div>
+      <footer></footer>
+    </article>
+
+    <article id="aspnet_core_web_api" parent-id="frameworks_apis_scenarios">
+      <header>
+        <h2>ASP.NET Core Web API (Controller-Based)</h2>
+      </header>
+      <div class="article-body">
+        <p>Controller-based APIs organize HTTP endpoints into controller classes deriving from <code>ControllerBase</code>.</p>
+        <ul>
+          <li>Annotated with <code>[ApiController]</code> and route attributes (e.g., <code>[Route("api/[controller]")]</code>).</li>
+          <li>Provides structured separation of concerns, action filters, automatic model validation, and content negotiation.</li>
+        </ul>
+      </div>
+      <footer></footer>
+    </article>
+
+    <article id="aspnet_core_mvc" parent-id="frameworks_apis_scenarios">
+      <header>
+        <h2>ASP.NET Core MVC (Model-View-Controller)</h2>
+      </header>
+      <div class="article-body">
+        <p>An architectural pattern separating applications into three primary components:</p>
+        <ul>
+          <li><strong>Model:</strong> Represents application state, data rules, and business logic.</li>
+          <li><strong>View:</strong> Renders UI and presentation using Razor syntax (<code>.cshtml</code>).</li>
+          <li><strong>Controller:</strong> Handles incoming user requests, manipulates the model, and selects views to render.</li>
+        </ul>
+      </div>
+      <footer></footer>
+    </article>
+
+    <article id="blazor" parent-id="frameworks_apis_scenarios">
+      <header>
+        <h2>Blazor</h2>
+      </header>
+      <div class="article-body">
+        <p>Blazor is a modern web framework for building interactive client-side web UI using C# instead of JavaScript.</p>
+        <section>
+          <h3>Hosting Models</h3>
+          <ul>
+            <li><strong>Blazor Server:</strong> Component UI runs on the server; UI updates, events, and JavaScript interop are transmitted over real-time SignalR connections.</li>
+            <li><strong>Blazor WebAssembly:</strong> Runs directly inside the browser client on top of a WebAssembly-based .NET runtime, providing client-side offline execution.</li>
+          </ul>
+        </section>
+      </div>
+      <footer></footer>
+    </article>
+
+    <article id="wcf_protocols" parent-id="frameworks_apis_scenarios">
+      <header>
+        <h2>WCF Protocols</h2>
+      </header>
+      <div class="article-body">
+        <ul>
+          <li><strong>HTTP/HTTPS:</strong> <code>BasicHttpBinding</code>, <code>WSHttpBinding</code>, <code>WebHttpBinding</code> (Web services, REST, SOAP).</li>
+          <li><strong>TCP:</strong> <code>NetTcpBinding</code> (Fast, secure, Windows-only communication).</li>
+          <li><strong>Named Pipes:</strong> <code>NetNamedPipeBinding</code> (Same-machine high-performance communication).</li>
+          <li><strong>MSMQ:</strong> <code>NetMsmqBinding</code> (Reliable messaging, offline apps).</li>
+          <li><strong>UDP:</strong> Custom binding (Lightweight, real-time broadcast updates).</li>
+          <li><strong>WebSockets:</strong> <code>NetHttpBinding</code> (Full-duplex, real-time apps).</li>
+        </ul>
+      </div>
+      <footer></footer>
+    </article>
+
+    <article id="wpf_winforms_uwp" parent-id="frameworks_apis_scenarios">
+      <header>
+        <h2>WPF, Win Forms, UWP</h2>
+      </header>
+      <div class="article-body">
+        <ul>
+          <li><strong>WPF (Windows Presentation Foundation):</strong> Framework for building rich desktop applications with advanced UI features (2D/3D graphics, hardware acceleration, animations, and data binding with XAML).</li>
+          <li><strong>Windows Forms:</strong> Lightweight UI framework for building simple Windows desktop applications. Older than WPF, rapid drag-and-drop design.</li>
+          <li><strong>UWP (Universal Windows Platform):</strong> Framework for creating cross-platform apps running across Windows 10/11 devices (PC, tablet, Xbox, HoloLens).</li>
+        </ul>
+      </div>
+      <footer></footer>
+    </article>
+
+    <article id="scenario_based_coding_questions" parent-id="frameworks_apis_scenarios">
+      <header>
+        <h2>Scenario-Based &amp; Coding Questions</h2>
+      </header>
+      <div class="article-body">
+        <ol>
+          <li>How would you handle exceptions in a large .NET application?</li>
+          <li>How would you implement caching in .NET Core?</li>
+          <li>How would you implement a thread-safe Singleton pattern in C#?</li>
+          <li>How would you optimize the performance of a .NET Core web API?</li>
+          <li>Explain how JWT authentication works in .NET Core.</li>
+          <li>How would you implement a generic repository pattern in Entity Framework?</li>
+          <li>Describe a scenario where you would use the Factory design pattern in C#.</li>
+        </ol>
       </div>
       <footer></footer>
     </article>
