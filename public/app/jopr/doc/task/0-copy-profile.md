@@ -27,5 +27,8 @@ Allow users to create copies of profiles so they dont have to manually re-enter 
 - changes should be applied to class public\app\jopr\lib\Profile.js
 - copy data in tables profiles, career, and education
 
+## Unit Tests
+- create unit tests for Profile app logic in file test\jopr\logic\Profile.js
+
 ## Created
 21/10/2026

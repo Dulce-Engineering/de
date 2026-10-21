@@ -64,6 +64,23 @@ This repository is built around high-performance, frameworkless web applications
 - Use Playwright with clear semantic assertions (`expect(locator).toBeVisible()`).
 - Always clean up or isolate storage state (`localStorage`, `IndexedDB`) before each test to prevent cross-test contamination.
 - Run tests via `npm test` or `npx playwright test` inside the `test/` directory.
+- Create a single test file per component, page, or class. Each test file will then contain all tests for every function within that component, page, or class.
+- Create a single test function for each function being tested. Each test function will contain all scenarios required to be tested. 
+- Ensure test functions and the test caller are listed separately as indicated in the sample code below.
+  ```
+  test('DeProjectList.constructor()', Test_Constructor);
+
+  function Test_Constructor()
+  {
+    const element = new DeProjectList();
+    assert.strictEqual(element.view_type, 'list');
+    assert.strictEqual(element.save_fn, null);
+    assert.strictEqual(element.delete_fn, null);
+  }
+  ```
+- In the test title, include the page, component, or class along with the name of the function being tested.
+- The test function should have the same name as the function being tested but prepended with "Test_".
+- Avoid the use of large inline embedded arrow functions creating deep nesting. Instead, create them as a separate function and pass relevant data via parameters.
 
 ---
 

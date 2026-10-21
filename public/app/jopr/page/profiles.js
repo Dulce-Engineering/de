@@ -300,6 +300,7 @@ function Render_Profile_Item(event, ctx)
   item_elem.profile_interests_elem.innerHTML = Str_To_HTML(Array.isArray(profile.interests) ? profile.interests.join(", ") : (profile.interests || "N/A"));
 
   item_elem.profile_item_menu.addEventListener("edit", () => On_Click_Edit_Profile(ctx, profile_id));
+  item_elem.profile_item_menu.addEventListener("copy", () => On_Click_Copy_Profile(ctx, profile_id));
   item_elem.profile_item_menu.addEventListener("delete", () => On_Click_Delete_Profile(ctx, profile_id));
   item_elem.profile_item_menu.addEventListener("download", () => On_Click_Download_Profile(ctx, profile_id));
 }
@@ -398,6 +399,20 @@ async function On_Click_Delete_Profile(ctx, id)
     {
       Alert("Failed to delete profile.");
     }
+  }
+}
+
+async function On_Click_Copy_Profile(ctx, id)
+{
+  const new_profile_id = await ctx.Profile.Copy(ctx, id);
+  if (new_profile_id)
+  {
+    await Update_Profile(ctx);
+    Alert("Profile copied successfully.");
+  }
+  else
+  {
+    Alert("Failed to copy profile.");
   }
 }
 

@@ -247,6 +247,70 @@ class Profile
     return ctx.db.Delete(Profile.table_name, [id]);
   }
 
+  /**
+   * Creates a duplicate of an existing profile along with its career and education records.
+   * @param {Context} ctx - Application context containing db.
+   * @param {number|string} profile_id - ID of the profile to copy.
+   * @returns {Promise<number|string|null>} ID of the newly created profile, or null.
+   */
+  static async Copy(ctx, profile_id)
+  {
+    let new_profile_id = null;
+
+    const orig_profile = await Profile.Select_By_Id(ctx, profile_id);
+    if (orig_profile)
+    {
+      const copy_profile = { ...orig_profile };
+      delete copy_profile.id;
+      copy_profile.title = "Copy of " + (orig_profile.title || orig_profile.name || "Untitled Profile");
+      copy_profile.active = false;
+
+      if (Array.isArray(orig_profile.personal_summary))
+      {
+        copy_profile.personal_summary = [...orig_profile.personal_summary];
+      }
+      if (Array.isArray(orig_profile.skills))
+      {
+        copy_profile.skills = [...orig_profile.skills];
+      }
+      if (Array.isArray(orig_profile.interests))
+      {
+        copy_profile.interests = [...orig_profile.interests];
+      }
+
+      new_profile_id = await Profile.Save(ctx, copy_profile);
+
+      if (new_profile_id)
+      {
+        const jobs = await Profile.Job_Select(ctx, j => j.profile_id == profile_id);
+        if (jobs && jobs.length > 0)
+        {
+          for (const job of jobs)
+          {
+            const copy_job = { ...job };
+            delete copy_job.id;
+            copy_job.profile_id = new_profile_id;
+            await Profile.Job_Save(ctx, copy_job);
+          }
+        }
+
+        const edus = await Profile.Edu_Select(ctx, e => e.profile_id == profile_id);
+        if (edus && edus.length > 0)
+        {
+          for (const edu of edus)
+          {
+            const copy_edu = { ...edu };
+            delete copy_edu.id;
+            copy_edu.profile_id = new_profile_id;
+            await Profile.Edu_Save(ctx, copy_edu);
+          }
+        }
+      }
+    }
+
+    return new_profile_id;
+  }
+
   // jobs =====================================================================
 
   /**

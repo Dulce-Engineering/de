@@ -63,14 +63,15 @@ class DeToolbarMenu extends HTMLElement
     const show = this.hasAttribute("show-" + id);
     if (show)
     {
+      const label = this.getAttribute("label-" + id) || "";
       const title = 
         this.hasAttribute("label-" + id) ? 
-        `title="${this.getAttribute("label-" + id)}"` : "";
+        `title="${label}"` : "";
 
       const html = `
         <button cid="${id}_btn" class="img" type="button" ${title}>
           <img src="${img_src}">
-          <span class="label">${this.getAttribute("label-" + id)}</span>
+          <span class="label">${label}</span>
         </button>
       `;
       const btn_elem = Utils.To_Element(html);
@@ -119,6 +120,7 @@ class DeToolbarMenu extends HTMLElement
     this.Render_Btn("sort", "./image/sort.svg", dst_elem);
     this.Render_Btn("view", "./image/zoom.svg", dst_elem);
     this.Render_Btn("edit", "./image/edit.svg", dst_elem);
+    this.Render_Btn("copy", "./image/copy.svg", dst_elem);
     this.Render_Btn("add", "./image/add.svg", dst_elem);
     this.Render_Btn("delete", "./image/delete.svg", dst_elem);
     Utils.Set_Id_Shortcuts(this, this, "cid");
