@@ -451,6 +451,69 @@
     "src": "seek"
   },
   {
+    "id": "-langgraph",
+    "parent_id": "-gen-ai",
+    "terms": "langgraph",
+    "title": "LangGraph",
+    "src": "seek"
+  },
+  {
+    "id": "-langchain",
+    "parent_id": "-gen-ai",
+    "terms": "langchain",
+    "title": "LangChain",
+    "src": "seek"
+  },
+  {
+    "id": "-google-adk",
+    "parent_id": "-gen-ai",
+    "terms": "google adk",
+    "title": "Google ADK",
+    "src": "seek"
+  },
+  {
+    "id": "-mcp",
+    "parent_id": "-gen-ai",
+    "terms": "mcp",
+    "title": "Model Context Protocol (MCP)",
+    "src": "seek"
+  },
+  {
+    "id": "-rag",
+    "parent_id": "-gen-ai",
+    "terms": "rag",
+    "title": "Retrieval-Augmented Generation (RAG)",
+    "src": "seek"
+  },
+  {
+    "id": "-llm",
+    "parent_id": "-gen-ai",
+    "terms": "llm",
+    "title": "Large Language Model (LLM)",
+    "src": "seek"
+  },
+  {
+    "id": "-gemini",
+    "parent_id": "-gen-ai",
+    "terms": "gemini",
+    "title": "Gemini",
+    "src": "seek"
+  },
+  {
+    "id": "-openai",
+    "parent_id": "-gen-ai",
+    "terms": "openai",
+    "title": "OpenAI",
+    "src": "seek"
+  },
+  {
+    "id": "-anthropic",
+    "parent_id": "-gen-ai",
+    "terms": "anthropic",
+    "title": "Anthropic",
+    "src": "seek"
+  },
+  {
     "id": "-nextjs",
     "parent_id": "-LwWfF7mtKhMWsxlyxZt",
     "terms": "next.js or nextjs",
