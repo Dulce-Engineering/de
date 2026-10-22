@@ -706,5 +706,11 @@
     "datetime": 1792381833132,
     "id": "e3c0b672-5d3a-4e82-9758-96166b09ad12",
     "query_id": "-mongodb"
+  },
+  {
+    "count": 59,
+    "datetime": 1792650147055,
+    "id": "69e8b1ca-f616-46e2-977e-1298ba6da12d",
+    "query_id": "-mongodb"
   }
 ]

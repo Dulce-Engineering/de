@@ -724,5 +724,11 @@
     "datetime": 1792381745857,
     "id": "d2b0d334-dc14-4d36-a007-0c0ae99ee145",
     "query_id": "-javascript"
+  },
+  {
+    "count": 398,
+    "datetime": 1792650042298,
+    "id": "5d5aa2fd-d096-418e-8010-abae0a752a25",
+    "query_id": "-javascript"
   }
 ]
