@@ -7,7 +7,7 @@
 Feature
 
 ## Status
-To Do
+Ignore
 
 ## Description
 Add several AI related search terms to the scraping terms database.
