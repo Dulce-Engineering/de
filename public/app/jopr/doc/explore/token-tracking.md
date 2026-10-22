@@ -37,10 +37,7 @@ Gemini bills input and output tokens at different rates. To set a simple interna
 * Input: $\$0.30$ / 1,000,000 tokens ($\$0.0000003$ per token)
 * Output: $\$2.50$ / 1,000,000 tokens ($\$0.0000025$ per token)
 
-
-
 **Formula for exact execution cost:**
-
 
 $$\text{Cost} = (\text{Input Tokens} \times 0.0000003) + (\text{Output Tokens} \times 0.0000025)$$
 
@@ -67,8 +64,6 @@ If you want a unified "Credits" or "Token Unit" for your UI, scale the cost so u
 * Check user authentication status.
 * Check remaining monthly balance or credit quota.
 * Reject execution with a `402 Payment Required` or `429 Too Many Requests` status code if exhausted.
-
-
 
 ---
 
