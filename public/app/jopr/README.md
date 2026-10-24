@@ -82,6 +82,7 @@ https://www.youtube.com/watch?v=oVy-KKWsdNg&list=PLDTPrMoGHssBulfAaczSuk0f8luCiK
 - add error reporting
 - move ai to backend
 - restrict and meter ai access
+- bring your own storage
 ### Features
 - gen interview intro
 - gen interview study questions
@@ -114,11 +115,6 @@ https://www.youtube.com/watch?v=oVy-KKWsdNg&list=PLDTPrMoGHssBulfAaczSuk0f8luCiK
 - https://enhancv.com
 
 ### Notes
-given the attached curriculum vitae and job description, what are some technical questions i should study in preparation for a technical interview? please include the answers.
-
-those are good tips. what parts of my experience, as listed in the curriculum vitae, could i mention at the interview that would be relevant? 
-
-based on the curriculum vitae and job description, what can i say when asked to introduce myself at the technical interview?
 
 ### Work History
 
