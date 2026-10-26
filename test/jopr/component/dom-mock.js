@@ -124,6 +124,42 @@ class MockElement {
           };
 
           this._cachedChildren = [sel_btn, summ, dialog];
+        } else if (tname === 'de-search-select') {
+          const input_elem = new MockElement('input');
+          input_elem.setAttribute('cid', 'input_elem');
+          input_elem.value = '';
+
+          const add_btn = new MockElement('button');
+          add_btn.setAttribute('cid', 'add_btn');
+
+          const items_list = new MockElement('ul');
+          items_list.setAttribute('cid', 'items_list');
+          items_list.popover_open = false;
+          items_list.showPopover = () => { items_list.popover_open = true; };
+          items_list.hidePopover = () => { items_list.popover_open = false; };
+          items_list.rendered_options = [];
+          items_list.insertAdjacentHTML = (pos, html) => {
+            const match = html.match(/item-value="([^"]*)"[^>]*>([^<]+)/);
+            if (match) {
+              const opt = new MockElement('li');
+              opt.classList.add('option');
+              opt.setAttribute('item-value', match[1]);
+              opt.textContent = match[2].trim();
+              opt.closest = (sel) => sel === '.option' ? opt : null;
+              opt.remove = () => {
+                const idx = items_list.rendered_options.indexOf(opt);
+                if (idx !== -1) items_list.rendered_options.splice(idx, 1);
+              };
+              items_list.children.push(opt);
+              items_list.rendered_options.push(opt);
+            }
+          };
+          items_list.querySelectorAll = (sel) => {
+            if (sel === '.option') return [...items_list.rendered_options];
+            return [];
+          };
+
+          this._cachedChildren = [input_elem, add_btn, items_list];
         } else {
           const list = new MockElement('de-input-list');
           list.setAttribute('cid', 'project_list');

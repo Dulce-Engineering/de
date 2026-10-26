@@ -2,12 +2,14 @@
 
 ## Application
 list name of application and folder location
+JOPR: public\app\jopr
 
 ## Task Type
 can be "Feature" or "Bug"
 
 ## Status
 can be "Ignore", "To Do", "In Progress", "Completed"
+To Do
 
 ## Description
 high level short description of intention
