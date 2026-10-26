@@ -66,33 +66,34 @@ https://www.youtube.com/watch?v=oVy-KKWsdNg&list=PLDTPrMoGHssBulfAaczSuk0f8luCiK
 - on jobs when job created show on list at corect position
 
 ## To Do
-### Frontend
+### Onboarding
 - complete ai cv import progress indication
+- store ui filters and sorting
+- display ai usage
+- move ai to backend or ai flows
+- restrict and meter ai access
+- pay for ai
+- add error reporting
+### Frontend
 - sort jobs by application time, interview time, create time
-- on jobs show new jobs label
+- on jobs show "new" jobs label
 - filter jobs by agency
 - add job and gen cv/cl in one go
 - show job logs
-- display ai usage
-- show all contacts in jobs list
-- store ui filters and sorting
 ### Backend
 - standardise db references (db vs db2)
 - link to job woper
-- add error reporting
-- move ai to backend
-- restrict and meter ai access
 - bring your own storage
 ### Features
 - gen interview intro
 - gen interview study questions
 - gen interview talking points
 - edit cl recipient name and content
-- pay for ai
 ### Marketing
 - add marketing material
 
 ## Done
+- show all contacts in jobs list
 - generate cover letter (done)
 - refactor cv page to show saved data (done)
 - add usage reporting (done)
