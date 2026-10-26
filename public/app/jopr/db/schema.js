@@ -2,7 +2,7 @@
 const DB_SCHEMA = 
 {
   name: 'JobTrakDB',
-  version: 8,
+  version: 9,
   stores: 
   {
     action_logs: 
@@ -156,6 +156,18 @@ const DB_SCHEMA =
         url: "string",
         description: "string",
         tech: "string",
+      }
+    },
+    filters:
+    {
+      keyPath: 'id',
+      autoIncrement: false,
+      fields:
+      {
+        id: "int",
+        is_active: "bool",
+        match_str: "string",
+        contact_name: "string"
       }
     }
   }

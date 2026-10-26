@@ -180,6 +180,9 @@ class Db
 
       case 7:
         Db.Remove_Job_Profile_Id(db, tx);
+
+      case 8:
+        Db.Create_Table(db, schema, "filters");
         break;
     }
   }

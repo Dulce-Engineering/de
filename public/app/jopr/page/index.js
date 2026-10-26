@@ -31,7 +31,7 @@ async function Main()
   }
   else
   {
-    Render_App(ctx);
+    await Render_App(ctx);
   }
 
   import_btn.addEventListener("click", () => On_Click_Import_Btn(ctx));
@@ -76,6 +76,9 @@ async function Render_App(ctx)
   job_contacts?.addEventListener("select", e => On_Click_Select_Contact(e, ctx));
   job_contacts?.addEventListener("delete", e => On_Click_Delete_Job_Contact(e, ctx));
   job_contacts?.addEventListener("edit", e => On_Click_Edit_Job_Contact(e, ctx));
+
+  jobs_filter.db = ctx.db;
+  await jobs_filter.Load_Filters();
   Render_Job_Items(ctx);
 
   /*companies_btn.onclick = () => Show_View(companies_list);

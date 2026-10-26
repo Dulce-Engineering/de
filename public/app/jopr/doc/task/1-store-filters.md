@@ -7,7 +7,7 @@ JOPR: public\app\jopr
 Feature
 
 ## Status
-In Progress
+Done
 
 ## Description
 On the job tracker page, ensure all sorting and filter options set by the user are stored and restored whenever the user refreshes or visits the page.
@@ -35,3 +35,4 @@ On the job tracker page, ensure all sorting and filter options set by the user a
 
 ## Log
 26/10/2026: created.
+26/10/2026: completed UI persistence, schema update, de-filter updates, tests, and documentation.
