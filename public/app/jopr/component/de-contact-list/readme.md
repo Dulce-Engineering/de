@@ -1,58 +1,125 @@
-# DeDialogForm
+# de-contact-list
 
-This component will automatically assign object fields to specified input fields based on the input field "name" attribute.
+A custom Web Component that renders a list of contacts with support for multiple visual layouts. It integrates with `de-input-list`, `de-toolbar-menu`, `de-contact-details`, and `de-field` to provide full contact management, compact summaries, sublists for parent forms, and single-choice selection lists.
+
+## View Types
+
+* **`list`** *(Default)*: Full detailed list with expandable `<details>` items displaying contact name, agency, email, phone, position, LinkedIn link, item action menu (`edit`, `delete`), and a header `add` button.
+* **`select`**: Single-choice selection list rendering radio buttons with labels for picking a contact in dialogs. The `value` getter returns only the selected contact.
+* **`sublist`**: Compact editable list designed for embedding inside parent forms (e.g. job details form). Features `Select Contact` and `Add Contact` header buttons and item action menus (`edit`, `delete`).
+* **`compact`**: Read-only inline contact summary list using `de-contact-details` with `hide-header`.
 
 ## Usage
-```JavaScript
-const field_data = 
-{ 
-  name: "Roger Ramjet", 
-  birthday = new Date(1971, 10, 13), 
-  height: 180 
-};
-const result = await dlg.Show_Async(field_data);
-if (data)
-{
-  console.log(data);
-}
+
+### 1. Default Detailed List
+```html
+<de-contact-list id="contacts_list"></de-contact-list>
 ```
 
-```HTML
-<de-dialog-form id="dlg">
+### 2. Compact Form Sublist
+```html
+<de-contact-list id="job_contacts" name="contacts" view-type="sublist"></de-contact-list>
+```
 
-  <h1 slot="header">Person Details</h1>
+### 3. Selection Modal List
+```html
+<de-contact-list id="dlg_contact_list" view-type="select"></de-contact-list>
+```
 
-  <label slot="fields">
-    Fullname
-    <input name="name" type="number">
-  </label>
+### 4. Read-Only Summary
+```html
+<de-contact-list id="summary_contacts" view-type="compact"></de-contact-list>
+```
 
-  <label slot="fields">
-    Birthday
-    <input name="birthday" type="date">
-  </label>
+### JavaScript Integration
 
-  <label slot="fields">
-    Height (m)
-    <input name="height" type="number">
-  </label>
+```javascript
+const contactList = document.getElementById("contacts_list");
 
-</de-dialog-form>
+// 1. Populate contact records
+contactList.value = [
+  {
+    id: 1,
+    name: "Jonathan Rhodes",
+    email: "jonathan@example.com",
+    phone: "0412 345 678",
+    position: "Senior Recruiter",
+    linkedin: "https://linkedin.com/in/jonathan-rhodes",
+    agency: { name: "Hays Recruitment" }
+  },
+  {
+    id: 2,
+    name: "Debbie Teakle",
+    email: "debbie@example.com",
+    phone: "0423 456 789",
+    position: "Talent Acquisition Lead",
+    agency: { name: "Michael Page" }
+  }
+];
+
+// 2. Add or Remove contacts dynamically
+contactList.Add({ id: 3, name: "Jun Ling", email: "jun@example.com" });
+contactList.Remove(1);
+
+// 3. Listen for Header Actions
+contactList.addEventListener("add", () => {
+  console.log("Add contact button clicked: Open create contact dialog");
+});
+
+contactList.addEventListener("select", () => {
+  console.log("Select contact button clicked: Open contact picker modal");
+});
+
+// 4. Listen for Item Menu Actions (bubbled from de-toolbar-menu)
+contactList.addEventListener("edit", (event) => {
+  const contact = event.detail;
+  console.log("Edit requested for contact:", contact);
+});
+
+contactList.addEventListener("delete", (event) => {
+  const contact = event.detail;
+  console.log("Delete requested for contact:", contact);
+});
+
+// 5. In "select" view mode, retrieve only the checked contact(s)
+const selectList = document.getElementById("dlg_contact_list");
+selectList.value = contactList.value;
+const selectedContacts = selectList.value; // Returns array containing checked contact
 ```
 
 ## Slots
-### header
-### fields
+
+None. The internal layout is generated dynamically based on the configured `view-type`.
 
 ## Attributes
 
+* **`view-type`**: Presentation layout mode. Accepts `"list"` (default), `"select"`, `"sublist"`, or `"compact"`.
+
 ## Fields
-### value
+
+* **`value`**: *Getter / Setter*. Gets or sets the array of contact objects (`Array<Object>`). In `"select"` view mode, the getter filters the list to return only the contact matching the currently checked radio button.
+* **`view_type`**: *Getter / Setter*. Gets or sets the active view type layout attribute.
+* **`contacts_list`**: DOM reference to the internal `<de-input-list>` component (`cid="contacts_list"`).
+* **`add_contact_btn`**: DOM reference to the header add button (`cid="add_contact_btn"`), present in `"list"` and `"sublist"` view modes.
+* **`sel_contact_btn`**: DOM reference to the header select button (`cid="sel_contact_btn"`), present in `"sublist"` view mode.
 
 ## Events
-### save
+
+* **`add`**: Dispatched when the user clicks the add contact button (`add_contact_btn`).
+  * Bubbles: `true`.
+* **`select`**: Dispatched when the user clicks the select contact button (`sel_contact_btn`) in `"sublist"` mode.
+  * Bubbles: `true`.
+* **`edit`**: Bubbles up from an item's `de-toolbar-menu` when the edit action is clicked. `event.detail` contains the contact object.
+  * Bubbles: `true`.
+* **`delete`**: Bubbles up from an item's `de-toolbar-menu` when the delete action is clicked. `event.detail` contains the contact object.
+  * Bubbles: `true`.
 
 ## Methods
-### Show_Async()
-### Show_Modal()
-### Close()
+
+* **`Add(obj)`**: Appends a new contact object to the list via `contacts_list.Add(obj)`.
+* **`Remove(obj_id)`**: Removes a contact object from the list by ID via `contacts_list.Remove(obj_id)`.
+* **`On_Render_Item(event)`**: Event handler called by `de-input-list` for each item, populating titles, form fields, and toolbar menus.
+* **`Render()`**: Renders the default detailed list with expandable items and full fields.
+* **`Render_Select()`**: Renders the radio-button contact selection list.
+* **`Render_Sublist()`**: Renders the compact editable sublist with header actions.
+* **`Render_Compact()`**: Renders the read-only summary list using `de-contact-details`.

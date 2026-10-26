@@ -1,19 +1,84 @@
 import Utils from "../../../../lib/Utils.js";
 
+/**
+ * DeContactList is a custom Web Component that renders a collection of contacts.
+ * It supports four display modes via the `view-type` attribute:
+ * - `list` (default): Full list with expandable details, action menus, and an add button.
+ * - `select`: Single-choice list with radio buttons for picking a contact.
+ * - `sublist`: Compact editable list with select and add buttons in header and toolbar menus per item.
+ * - `compact`: Read-only summary list using de-contact-details.
+ *
+ * @customElement de-contact-list
+ * @tag de-contact-list
+ * @attribute {string} [view-type="list"] - Layout presentation ("list", "select", "sublist", "compact").
+ * @property {HTMLElement} contacts_list - Internal de-input-list element.
+ * @property {HTMLButtonElement} [add_contact_btn] - Button element to trigger adding a new contact.
+ * @property {HTMLButtonElement} [sel_contact_btn] - Button element to trigger selecting contacts.
+ * @property {Array<Object>} value - Array of contact objects. In "select" view, returns checked contacts.
+ * @property {string} view_type - Active view presentation mode.
+ * @fires DeContactList#add - Dispatched when the add contact button is clicked.
+ * @fires DeContactList#select - Dispatched when the select contact button is clicked.
+ */
 class DeContactList extends HTMLElement
 {
   static tname = "de-contact-list";
 
+  /**
+   * Observed attributes for automatic change handling.
+   *
+   * @returns {string[]} Array of observed attribute names.
+   */
+  static get observedAttributes()
+  {
+    return ["view-type"];
+  }
+
+  /**
+   * Initializes instance state and binds event handlers.
+   */
   constructor()
   {
     super();
     Utils.Bind(this, "On_");
-    this.view_type = "list";
+    this._view_type = "list";
   }
 
+  /**
+   * Lifecycle callback invoked when the element is inserted into the DOM.
+   */
   connectedCallback()
   {
     this.view_type = Utils.Get_Attr_Def(this, "view-type", "list");
+    this.Init_View();
+  }
+
+  /**
+   * Lifecycle callback invoked when an observed attribute changes.
+   *
+   * @param {string} name - Name of the attribute that changed.
+   * @param {string|null} old_value - Previous attribute value.
+   * @param {string|null} new_value - Updated attribute value.
+   */
+  attributeChangedCallback(name, old_value, new_value)
+  {
+    if (old_value === new_value) return;
+
+    if (name === "view-type")
+    {
+      this._view_type = new_value || "list";
+      if (this.contacts_list)
+      {
+        this.Init_View();
+      }
+    }
+  }
+
+  /**
+   * Initializes and renders the appropriate layout view based on `view_type`.
+   */
+  Init_View()
+  {
+    const current_value = this.value;
     if (this.view_type == "select")
     {
       this.Render_Select();
@@ -30,55 +95,126 @@ class DeContactList extends HTMLElement
     {
       this.Render();
     }
+
+    if (current_value && this.contacts_list)
+    {
+      this.contacts_list.value = current_value;
+    }
   }
 
   // properties ===============================================================
-  
-  set value(data)
+
+  /**
+   * Gets the active view type layout.
+   *
+   * @returns {string} View type string ("list", "select", "sublist", "compact").
+   */
+  get view_type()
   {
-    this.contacts_list.value = data;
+    return this._view_type || this.getAttribute("view-type") || "list";
   }
 
+  /**
+   * Sets the active view type layout attribute.
+   *
+   * @param {string} val - Desired view type.
+   */
+  set view_type(val)
+  {
+    this._view_type = val || "list";
+    if (val)
+    {
+      this.setAttribute("view-type", val);
+    }
+    else
+    {
+      this.removeAttribute("view-type");
+    }
+  }
+
+  /**
+   * Sets the list of contact objects.
+   *
+   * @param {Array<Object>|null} data - Array of contact objects.
+   */
+  set value(data)
+  {
+    this._saved_value = data;
+    if (this.contacts_list)
+    {
+      this.contacts_list.value = data;
+    }
+  }
+
+  /**
+   * Gets the contact objects. In "select" view, returns only the checked contacts.
+   *
+   * @returns {Array<Object>|null} Array of contact objects.
+   */
   get value()
   {
     let contacts = null;
 
-    const view_type = this.getAttribute("view-type");
+    const view_type = this.getAttribute("view-type") || this.view_type;
     if (view_type == "select")
     {
-      const selected_elements = 
-        this.contacts_list.items_elem.querySelectorAll("[name=selected_contact_id]:checked");
+      const items_elem = this.contacts_list?.items_elem || this.contacts_list;
+      const selected_elements = items_elem?.querySelectorAll
+        ? items_elem.querySelectorAll("[name=selected_contact_id]:checked")
+        : [];
       const selected_ids = Array.from(selected_elements).map(e => parseInt(e.value));
-      contacts = this.contacts_list.value.filter(c => selected_ids.includes(c.id));
+      const list_value = this.contacts_list?.value || this._saved_value || [];
+      contacts = list_value.filter(c => selected_ids.includes(c.id));
     }
     else
     {
-      contacts = this.contacts_list.value;
+      contacts = this.contacts_list ? this.contacts_list.value : (this._saved_value || null);
     }
 
     return contacts;
   }
 
-  // attributes ===============================================================
-
   // methods ==================================================================
 
+  /**
+   * Appends a new contact object to the list.
+   *
+   * @param {Object} obj - The contact object to add.
+   */
   Add(obj)
   {
-    this.contacts_list.Add(obj);
+    if (this.contacts_list?.Add)
+    {
+      this.contacts_list.Add(obj);
+    }
   }
 
+  /**
+   * Removes a contact object from the list by its ID.
+   *
+   * @param {number|string} obj_id - The ID of the contact to remove.
+   */
   Remove(obj_id)
   {
-    this.contacts_list.Remove(obj_id);
+    if (this.contacts_list?.Remove)
+    {
+      this.contacts_list.Remove(obj_id);
+    }
   }
 
   // events ===================================================================
 
+  /**
+   * Renders an individual contact item element from the de-input-list render event.
+   *
+   * @param {CustomEvent} event - Event dispatched by de-input-list containing item_elem and obj.
+   */
   On_Render_Item(event)
   {
-    const item_elem = event.detail.item_elem;
-    const contact = event.detail.obj;
+    const item_elem = event.detail?.item_elem || event.item_elem;
+    const contact = event.detail?.obj || event.obj || event.detail;
+
+    if (!item_elem || !contact) return;
 
     if (item_elem.contact_title_elem)
     {
@@ -88,9 +224,12 @@ class DeContactList extends HTMLElement
     }
     if (item_elem.sel_contact_radio)
     {
-      const radio_id = "scr_" + crypto.randomUUID();
+      const radio_id = "scr_" + (typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2));
       item_elem.sel_contact_radio.id = radio_id;
-      item_elem.contact_title_elem.htmlFor = radio_id;
+      if (item_elem.contact_title_elem)
+      {
+        item_elem.contact_title_elem.htmlFor = radio_id;
+      }
     }
     if (item_elem.contact_email_elem)
       item_elem.contact_email_elem.value = contact.email;
@@ -109,20 +248,39 @@ class DeContactList extends HTMLElement
       item_elem.sel_contact_radio.value = contact.id;
   }
 
+  /**
+   * Handles click events on the add contact button, dispatching a custom "add" event.
+   *
+   * @param {MouseEvent} event - Click event.
+   */
   On_Click_Add(event)
   {
-    event.stopPropagation();
-    this.dispatchEvent(new CustomEvent("add"));
+    if (event?.stopPropagation)
+    {
+      event.stopPropagation();
+    }
+    this.dispatchEvent(new CustomEvent("add", { bubbles: true }));
   }
 
-  On_Click_Sel()
+  /**
+   * Handles click events on the select contact button, dispatching a custom "select" event.
+   *
+   * @param {MouseEvent} [event] - Click event.
+   */
+  On_Click_Sel(event)
   {
-    this.dispatchEvent(new CustomEvent("select"));
+    if (event?.stopPropagation)
+    {
+      event.stopPropagation();
+    }
+    this.dispatchEvent(new CustomEvent("select", { bubbles: true }));
   }
 
   // rendering ================================================================
 
-  // read-only compact list
+  /**
+   * Renders the read-only compact list layout.
+   */
   Render_Compact()
   {
     const html = `
@@ -137,7 +295,9 @@ class DeContactList extends HTMLElement
     this.contacts_list.addEventListener("render", this.On_Render_Item);
   }
 
-  // simple list for selecting a contact
+  /**
+   * Renders the simple contact selection list layout with radio buttons.
+   */
   Render_Select()
   {
     const html = `
@@ -154,7 +314,9 @@ class DeContactList extends HTMLElement
     this.contacts_list.addEventListener("render", this.On_Render_Item);
   }
 
-  // compact list with editing options
+  /**
+   * Renders the compact sublist layout with header action buttons (select, add) and item toolbar menus.
+   */
   Render_Sublist()
   {
     const html = `
@@ -187,7 +349,9 @@ class DeContactList extends HTMLElement
     this.sel_contact_btn.addEventListener("click", this.On_Click_Sel);
   }
 
-  // default large list with all editing options
+  /**
+   * Renders the default detailed list layout with expandable items and full details.
+   */
   Render()
   {
     const html = `
@@ -215,8 +379,6 @@ class DeContactList extends HTMLElement
         </details>
       </de-input-list>
     `;
-    //const html_elements = Utils.To_Document(html, this);
-    //this.replaceChildren(html_elements);
     this.innerHTML = html;
     Utils.Set_Id_Shortcuts(this, this, "cid");
 
