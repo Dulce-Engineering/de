@@ -789,6 +789,8 @@ async function On_Click_Add_Note(e, job_id, ctx)
   await Render_Job_Items(ctx);
 }
 
+// job_contacts events ========================================================
+
 async function On_Click_Delete_Job_Contact(event)
 {
   const contact = event.detail;

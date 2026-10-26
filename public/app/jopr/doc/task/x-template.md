@@ -3,11 +3,11 @@ id: xxx
 title: xxx
 app: JOPR
 app_folder: public\app\jopr
-type: feature/bug
+type: feature # [feature, bug]
 status: todo # [todo, in-progress, review, done]
-priority: low/medium/high
+priority: low # [low, medium, high]
 created: 2026-10-26
-test_command: "node --test test/jopr/logic/ctx.js"
+test_command: tba
 ---
 
 ## Description
