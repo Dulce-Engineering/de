@@ -1,6 +1,8 @@
+const registeredElements = new Map();
+
 class MockElement {
   constructor(tag = "div") {
-    this.tagName = tag.toUpperCase();
+    this.tagName = (this.constructor?.tname || tag).toUpperCase();
     this.attributes = {};
     this.listeners = {};
     this.style = {};
@@ -11,8 +13,19 @@ class MockElement {
       remove: (c) => this.classList.classes.delete(c),
       contains: (c) => this.classList.classes.has(c)
     };
-    this.innerHTML = "";
+    this._innerHTML = "";
     this._cachedChildren = null;
+  }
+
+  get innerHTML() {
+    return this._innerHTML || "";
+  }
+
+  set innerHTML(val) {
+    this._innerHTML = val;
+    if (val === "") {
+      this.children = [];
+    }
   }
 
   getAttribute(name) {
@@ -45,28 +58,94 @@ class MockElement {
   }
 
   dispatchEvent(event) {
+    try {
+      Object.defineProperty(event, 'target', { value: this, configurable: true });
+    } catch {
+      event.target = this;
+    }
     const list = this.listeners[event.type];
     if (list) {
       list.forEach(cb => cb(event));
     }
+    if (event.bubbles && this.parentElement && !event._propagationStopped) {
+      this.parentElement.dispatchEvent(event);
+    }
     return true;
+  }
+
+  click() {
+    const event = new (globalThis.CustomEvent || globalThis.Event)("click", { bubbles: true });
+    this.dispatchEvent(event);
   }
 
   replaceChildren(...children) {
     this.children = children;
   }
 
+  append(...children) {
+    for (const child of children) {
+      if (child) {
+        if (typeof child === 'string') {
+          const textNode = new MockElement('#text');
+          textNode.textContent = child;
+          this.children.push(textNode);
+        } else {
+          child.parentElement = this;
+          this.children.push(child);
+          if (!child._connected && typeof child.connectedCallback === 'function') {
+            child._connected = true;
+            child.connectedCallback();
+          }
+        }
+      }
+    }
+  }
+
+  appendChild(child) {
+    this.append(child);
+    return child;
+  }
+
+  remove() {
+    if (this.parentElement) {
+      this.parentElement.children = this.parentElement.children.filter(c => c !== this);
+    }
+  }
+
+  closest(selector) {
+    if (selector.startsWith('.') && this.classList.contains(selector.slice(1))) {
+      return this;
+    }
+    if (selector.startsWith('[') && selector.endsWith(']')) {
+      const attr = selector.slice(1, -1);
+      if (this.hasAttribute(attr)) return this;
+    }
+    return this.parentElement?.closest ? this.parentElement.closest(selector) : null;
+  }
+
   querySelector(selector) {
-    if (selector.startsWith("[name=")) {
+    const s_lower = selector.toLowerCase();
+    if (s_lower.startsWith("[name=")) {
       const name = selector.slice(6, -1);
       return this.children.find(c => c.getAttribute?.("name") === name) || null;
     }
-    if (selector === "de-field") {
+    if (s_lower.startsWith("[cid=")) {
+      const cid = selector.slice(5, -1);
+      return this.children.find(c => c.getAttribute?.("cid") === cid) || null;
+    }
+    const matched = this.children.find(c => {
+      const tag = (c.tagName || "").toLowerCase();
+      const tname = (c.constructor?.tname || "").toLowerCase();
+      return tag === s_lower || tname === s_lower;
+    });
+    if (matched) return matched;
+
+    if (s_lower === "de-field") {
       const field = new MockElement("de-field");
       field.value = null;
       return field;
     }
-    if (selector === "button") {
+    if (s_lower === "button") {
       return new MockElement("button");
     }
     return null;
@@ -160,6 +239,45 @@ class MockElement {
           };
 
           this._cachedChildren = [input_elem, add_btn, items_list];
+        } else if (tname === 'de-search-multi-select') {
+          const input_elem = new MockElement('input');
+          input_elem.setAttribute('cid', 'input_elem');
+          input_elem.value = '';
+
+          const add_btn = new MockElement('button');
+          add_btn.setAttribute('cid', 'add_btn');
+
+          const items_list = new MockElement('ul');
+          items_list.setAttribute('cid', 'items_list');
+          items_list.popover_open = false;
+          items_list.showPopover = () => { items_list.popover_open = true; };
+          items_list.hidePopover = () => { items_list.popover_open = false; };
+          items_list.rendered_options = [];
+          items_list.insertAdjacentHTML = (pos, html) => {
+            const match = html.match(/item-value="([^"]*)"[^>]*>([^<]+)/);
+            if (match) {
+              const opt = new MockElement('li');
+              opt.classList.add('option');
+              opt.setAttribute('item-value', match[1]);
+              opt.textContent = match[2].trim();
+              opt.closest = (sel) => sel === '.option' ? opt : null;
+              opt.remove = () => {
+                const idx = items_list.rendered_options.indexOf(opt);
+                if (idx !== -1) items_list.rendered_options.splice(idx, 1);
+              };
+              items_list.children.push(opt);
+              items_list.rendered_options.push(opt);
+            }
+          };
+          items_list.querySelectorAll = (sel) => {
+            if (sel === '.option') return [...items_list.rendered_options];
+            return [];
+          };
+
+          const selected_items_elem = new MockElement('div');
+          selected_items_elem.setAttribute('cid', 'selected_items_elem');
+
+          this._cachedChildren = [input_elem, add_btn, items_list, selected_items_elem];
         } else {
           const list = new MockElement('de-input-list');
           list.setAttribute('cid', 'project_list');
@@ -194,8 +312,8 @@ class MockElement {
 globalThis.HTMLElement = MockElement;
 
 globalThis.customElements = {
-  get: () => undefined,
-  define: () => {}
+  get: (tag) => registeredElements.get(tag),
+  define: (tag, cls) => { registeredElements.set(tag, cls); }
 };
 
 globalThis.CustomEvent = class CustomEvent {
@@ -203,6 +321,11 @@ globalThis.CustomEvent = class CustomEvent {
     this.type = type;
     this.detail = options?.detail;
     this.bubbles = options?.bubbles || false;
+    this._propagationStopped = false;
+  }
+
+  stopPropagation() {
+    this._propagationStopped = true;
   }
 };
 
@@ -215,11 +338,30 @@ globalThis.document = {
   querySelectorAll: () => [],
   createElement: (tag) => {
     if (tag === 'template') {
-      return {
-        content: {
-          querySelectorAll: () => []
+      const tmpl = new MockElement('template');
+      let currentHtml = '';
+      Object.defineProperty(tmpl, 'innerHTML', {
+        get() { return currentHtml; },
+        set(val) {
+          currentHtml = val;
+          const matchCid = val.match(/cid="([^"]+)"/);
+          const btn = new MockElement('button');
+          if (matchCid) btn.setAttribute('cid', matchCid[1]);
+          tmpl.content = {
+            firstChild: btn,
+            querySelectorAll: () => [btn]
+          };
         }
+      });
+      tmpl.content = {
+        firstChild: new MockElement('div'),
+        querySelectorAll: () => []
       };
+      return tmpl;
+    }
+    const Cls = registeredElements.get(tag);
+    if (Cls) {
+      return new Cls();
     }
     return new MockElement(tag);
   }
