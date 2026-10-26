@@ -62,13 +62,12 @@ https://www.youtube.com/watch?v=oVy-KKWsdNg&list=PLDTPrMoGHssBulfAaczSuk0f8luCiK
 
 ## Bugs
 - set job chart to show "-joomla"
-- on job details check contact created
 - on jobs when job created show on list at corect position
 
 ## To Do
 ### Onboarding
+- on job details check contact created
 - complete ai cv import progress indication
-- store ui filters and sorting
 - display ai usage
 - move ai to backend or ai flows
 - restrict and meter ai access
@@ -93,6 +92,7 @@ https://www.youtube.com/watch?v=oVy-KKWsdNg&list=PLDTPrMoGHssBulfAaczSuk0f8luCiK
 - add marketing material
 
 ## Done
+- store ui filters and sorting
 - show all contacts in jobs list
 - generate cover letter (done)
 - refactor cv page to show saved data (done)
