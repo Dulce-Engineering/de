@@ -72,7 +72,6 @@ https://www.youtube.com/watch?v=oVy-KKWsdNg&list=PLDTPrMoGHssBulfAaczSuk0f8luCiK
 - move ai to backend or ai flows
 - restrict and meter ai access
 - pay for ai
-- add error reporting
 ### Frontend
 - sort jobs by application time, interview time, create time
 - on jobs show "new" jobs label
@@ -92,6 +91,7 @@ https://www.youtube.com/watch?v=oVy-KKWsdNg&list=PLDTPrMoGHssBulfAaczSuk0f8luCiK
 - add marketing material
 
 ## Done
+- add error reporting (done)
 - store ui filters and sorting
 - show all contacts in jobs list
 - generate cover letter (done)
