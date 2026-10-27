@@ -36,7 +36,6 @@ public/app/jopr/
 │   ├── jopr-contact-details/
 │   ├── de-contact-form/
 │   ├── de-contact-list/
-│   ├── de-contact-select/
 │   ├── de-edit-text/
 │   ├── de-field/
 │   ├── de-filter/
