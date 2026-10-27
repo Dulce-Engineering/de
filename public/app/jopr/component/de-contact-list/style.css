@@ -25,7 +25,7 @@ de-contact-list[view-type="sublist"]
       {
         gap: 0;
 
-        de-contact-details
+        jopr-contact-details
         {
           display: inline-flex !important;
           align-items: center;

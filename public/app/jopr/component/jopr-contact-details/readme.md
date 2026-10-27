@@ -1,16 +1,16 @@
-# de-contact-details
+# jopr-contact-details
 
-`de-contact-details` is a custom element that displays contact details (Name, Phone, Email, Position, Agency, and LinkedIn profile) using nested `<de-field>` components. It automatically manages its own visibility: it hides itself if all fields of the provided contact object are empty, and displays itself if any contact details are present.
+`jopr-contact-details` is a custom element that displays contact details (Name, Phone, Email, Position, Agency, and LinkedIn profile) using nested `<de-field>` components. It automatically manages its own visibility: it hides itself if all fields of the provided contact object are empty, and displays itself if any contact details are present.
 
 ## Usage
 
 Include the component in your HTML structure:
 
 ```html
-<de-contact-details cid="contact_details_elem"></de-contact-details>
+<jopr-contact-details cid="contact_details_elem"></jopr-contact-details>
 
 <script type="module">
-  const contactDetails = document.querySelector('de-contact-details');
+  const contactDetails = document.querySelector('jopr-contact-details');
   contactDetails.value = {
     name: "Jane Doe",
     phone: "+61400000000",

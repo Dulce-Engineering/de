@@ -1,13 +1,13 @@
 # de-contact-list
 
-A custom Web Component that renders a list of contacts with support for multiple visual layouts. It integrates with `de-input-list`, `de-toolbar-menu`, `de-contact-details`, and `de-field` to provide full contact management, compact summaries, sublists for parent forms, and single-choice selection lists.
+A custom Web Component that renders a list of contacts with support for multiple visual layouts. It integrates with `de-input-list`, `de-toolbar-menu`, `jopr-contact-details`, and `de-field` to provide full contact management, compact summaries, sublists for parent forms, and single-choice selection lists.
 
 ## View Types
 
 * **`list`** *(Default)*: Full detailed list with expandable `<details>` items displaying contact name, agency, email, phone, position, LinkedIn link, item action menu (`edit`, `delete`), and a header `add` button.
 * **`select`**: Single-choice selection list rendering radio buttons with labels for picking a contact in dialogs. The `value` getter returns only the selected contact.
 * **`sublist`**: Compact searchable multi-select list designed for embedding inside parent forms (e.g. job details form). Features an `<h2>Contacts</h2>` header, integrated search combobox, and item action menus (`edit`, `delete`) via `de-search-multi-select`.
-* **`compact`**: Read-only inline contact summary list using `de-contact-details` with `hide-header`.
+* **`compact`**: Read-only inline contact summary list using `jopr-contact-details` with `hide-header`.
 
 ## Usage
 
@@ -124,4 +124,4 @@ None. The internal layout is generated dynamically based on the configured `view
 * **`Render()`**: Renders the default detailed list with expandable items and full fields.
 * **`Render_Select()`**: Renders the radio-button contact selection list.
 * **`Render_Sublist()`**: Renders the compact searchable sublist with an `<h2>Contacts</h2>` heading and `de-search-multi-select`.
-* **`Render_Compact()`**: Renders the read-only summary list using `de-contact-details`.
+* **`Render_Compact()`**: Renders the read-only summary list using `jopr-contact-details`.

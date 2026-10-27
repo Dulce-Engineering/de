@@ -7,7 +7,7 @@ import DeSearchMultiSelect from "../de-search-multi-select/index.js";
  * - `list` (default): Full list with expandable details, action menus, and an add button.
  * - `select`: Single-choice list with radio buttons for picking a contact.
  * - `sublist`: Compact searchable multi-select list using de-search-multi-select.
- * - `compact`: Read-only summary list using de-contact-details.
+ * - `compact`: Read-only summary list using jopr-contact-details.
  *
  * @customElement de-contact-list
  * @tag de-contact-list
@@ -349,7 +349,7 @@ class DeContactList extends HTMLElement
       item_elem.contact_position_elem.value = contact.position;
     if (item_elem.contact_linkedin_elem)
       item_elem.contact_linkedin_elem.value = contact.linkedin;
-    if (item_elem.localName == "de-contact-details")
+    if (item_elem.localName == "jopr-contact-details")
       item_elem.value = contact;
 
     if (item_elem.contact_menu)
@@ -396,7 +396,7 @@ class DeContactList extends HTMLElement
     const html = `
       <de-input-list cid="contacts_list" hide-header>
         <h3 slot="header">Contacts</h3>
-        <de-contact-details slot="item" view-type="compact" class="contact-item"></de-contact-details>
+        <jopr-contact-details slot="item" view-type="compact" class="contact-item"></jopr-contact-details>
       </de-input-list>
     `;
     this.innerHTML = html;

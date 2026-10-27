@@ -1,10 +1,11 @@
 import Utils from "../../../../lib/Utils.js";
 
 /**
- * DeContactDetails is a custom element that displays contact details (Name, Phone, Email, Position, Agency, and LinkedIn profile).
+ * JOPRContactDetails is a custom element that displays contact details (Name, Phone, Email, Position, Agency, and LinkedIn profile).
  * It automatically updates its visibility, hiding itself if all fields of the provided contact object are empty.
  *
- * @customElement de-contact-details
+ * @customElement jopr-contact-details
+ * @tag jopr-contact-details
  * 
  * @property {HTMLElement} contact_title - The DOM element representing the contact details section header (<h3>). Created dynamically by Render.
  * @property {DeField} contact_name_elem - The field element representing the contact's name. Created dynamically by Render.
@@ -14,9 +15,9 @@ import Utils from "../../../../lib/Utils.js";
  * @property {DeField} contact_agency_elem - The field element representing the contact's agency. Created dynamically by Render.
  * @property {DeField} contact_linkedin_elem - The field element representing the contact's LinkedIn profile. Created dynamically by Render.
  */
-class DeContactDetails extends HTMLElement
+class JOPRContactDetails extends HTMLElement
 {
-  static tname = "de-contact-details";
+  static tname = "jopr-contact-details";
 
   constructor()
   {
@@ -138,5 +139,5 @@ class DeContactDetails extends HTMLElement
   }
 }
 
-Utils.Register_Element(DeContactDetails);
-export default DeContactDetails;
+Utils.Register_Element(JOPRContactDetails);
+export default JOPRContactDetails;

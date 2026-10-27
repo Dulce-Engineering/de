@@ -33,7 +33,7 @@ public/app/jopr/
 ├── types.d.ts                  # JSDoc TypeScript definitions
 ├── component/                  # Custom Web Components (de-*, jopr-*)
 │   ├── de-clock-2/
-│   ├── de-contact-details/
+│   ├── jopr-contact-details/
 │   ├── de-contact-form/
 │   ├── de-contact-list/
 │   ├── de-contact-select/
@@ -169,7 +169,7 @@ The following diagram illustrates the entity structures and relational associati
   - `de-filter`: List filtering and sorting bar.
 - **Domain Widgets:**
   - `de-job-details`: Comprehensive view and edit panel for job application records.
-  - `de-contact-form`, `de-contact-details`, `de-contact-list`, `de-contact-select`: Contact relationship management widgets.
+  - `de-contact-form`, `jopr-contact-details`, `de-contact-list`, `de-contact-select`: Contact relationship management widgets.
   - `de-project-list`: Portfolio project manager.
 - **Application Shell & Feedback:**
   - `jopr-header`: Global branding, active clock, and top-level navigation.

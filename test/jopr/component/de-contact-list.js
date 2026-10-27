@@ -345,7 +345,7 @@ function Test_Render_Compact()
   element.Render_Compact();
 
   assert.ok(element.contacts_list, 'contacts_list shortcut populated');
-  assert.ok(element.innerHTML.includes('de-contact-details'));
+  assert.ok(element.innerHTML.includes('jopr-contact-details'));
 }
 
 function Test_ConnectedCallback()
