@@ -12,6 +12,7 @@ Central dashboard and status tracker for JOPR application features, bug fixes, a
 | [1](1-store-filters.md) | Store UI filters state | Feature | Done | Medium | 2026-10-26 | `node --test test/jopr/component/de-filter.js` |
 | [2](2-log-errors.md) | Log errors to Firebase Analytics | Feature | Done | Medium | 2026-10-26 | `node --test test/jopr/logic/ctx.js` |
 | [3](3-multi-select.md) | New multi search select component | Feature | Done | Medium | 2026-10-26 | `node --test test/jopr/component/de-search-multi-select.js` |
+| [4](4-refactor-contact-list.md) | Refactor de-contact-list to use de-search-multi-select | Feature | Done | Medium | 2026-10-27 | `node --test test/jopr/component/de-contact-list.js` |
 
 ---
 
@@ -32,6 +33,7 @@ Central dashboard and status tracker for JOPR application features, bug fixes, a
 - [x] **[#1: Store UI filters state](1-store-filters.md)** (2026-10-26) — Persist and restore job tracker filters in IndexedDB via `de-filter`.
 - [x] **[#2: Log errors to Firebase Analytics](2-log-errors.md)** (2026-10-26) — Report uncaught errors and promise rejections to GA4.
 - [x] **[#3: New multi search select component](3-multi-select.md)** (2026-10-26) — Multi-select combobox with rendered items list, edit, and delete via `de-toolbar-menu`.
+- [x] **[#4: Refactor de-contact-list to use de-search-multi-select](4-refactor-contact-list.md)** (2026-10-27) — Replaced de-input-list with de-search-multi-select in sublist view, added items property, and integrated with job dialog.
 
 ---
 
@@ -39,7 +41,7 @@ Central dashboard and status tracker for JOPR application features, bug fixes, a
 
 To run tests across all completed tasks:
 ```bash
-node --test test/jopr/component/de-search-multi-select.js test/jopr/component/de-search-select.js test/jopr/component/de-filter.js test/jopr/logic/Profile.js test/jopr/logic/ctx.js
+node --test test/jopr/component/de-contact-list.js test/jopr/component/de-search-multi-select.js test/jopr/component/de-search-select.js test/jopr/component/de-filter.js test/jopr/logic/Profile.js test/jopr/logic/ctx.js
 ```
 
 ---

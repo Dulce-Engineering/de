@@ -1,23 +1,28 @@
 import Utils from "../../../../lib/Utils.js";
+import DeSearchMultiSelect from "../de-search-multi-select/index.js";
 
 /**
  * DeContactList is a custom Web Component that renders a collection of contacts.
  * It supports four display modes via the `view-type` attribute:
  * - `list` (default): Full list with expandable details, action menus, and an add button.
  * - `select`: Single-choice list with radio buttons for picking a contact.
- * - `sublist`: Compact editable list with select and add buttons in header and toolbar menus per item.
+ * - `sublist`: Compact searchable multi-select list using de-search-multi-select.
  * - `compact`: Read-only summary list using de-contact-details.
  *
  * @customElement de-contact-list
  * @tag de-contact-list
  * @attribute {string} [view-type="list"] - Layout presentation ("list", "select", "sublist", "compact").
- * @property {HTMLElement} contacts_list - Internal de-input-list element.
+ * @property {HTMLElement} [contacts_list] - Internal de-input-list element.
+ * @property {DeSearchMultiSelect} [contacts_search_select] - Internal de-search-multi-select element.
  * @property {HTMLButtonElement} [add_contact_btn] - Button element to trigger adding a new contact.
  * @property {HTMLButtonElement} [sel_contact_btn] - Button element to trigger selecting contacts.
+ * @property {Array<Object>|null} [items] - Available searchable contact option items.
  * @property {Array<Object>} value - Array of contact objects. In "select" view, returns checked contacts.
  * @property {string} view_type - Active view presentation mode.
  * @fires DeContactList#add - Dispatched when the add contact button is clicked.
  * @fires DeContactList#select - Dispatched when the select contact button is clicked.
+ * @fires DeContactList#edit - Dispatched when a contact item edit action is triggered.
+ * @fires DeContactList#delete - Dispatched when a contact item delete action is triggered.
  */
 class DeContactList extends HTMLElement
 {
@@ -41,6 +46,7 @@ class DeContactList extends HTMLElement
     super();
     Utils.Bind(this, "On_");
     this._view_type = "list";
+    this._items = null;
   }
 
   /**
@@ -66,7 +72,7 @@ class DeContactList extends HTMLElement
     if (name === "view-type")
     {
       this._view_type = new_value || "list";
-      if (this.contacts_list)
+      if (this.contacts_list || this.contacts_search_select)
       {
         this.Init_View();
       }
@@ -96,9 +102,9 @@ class DeContactList extends HTMLElement
       this.Render();
     }
 
-    if (current_value && this.contacts_list)
+    if (current_value)
     {
-      this.contacts_list.value = current_value;
+      this.value = current_value;
     }
   }
 
@@ -133,6 +139,59 @@ class DeContactList extends HTMLElement
   }
 
   /**
+   * Gets the available contact options for the searchable multi-select component.
+   *
+   * @returns {Array<Object>|null} List of selectable contact items.
+   */
+  get items()
+  {
+    return this.contacts_search_select?.items ?? this._items ?? null;
+  }
+
+  /**
+   * Sets the available contact options for the searchable multi-select component.
+   *
+   * @param {Array<Object>|null} data - List of selectable contact items.
+   */
+  set items(data)
+  {
+    this._items = data;
+    if (this.contacts_search_select)
+    {
+      this.contacts_search_select.items = data;
+    }
+  }
+
+  /**
+   * Gets the internal contacts list element or adapter.
+   *
+   * @returns {HTMLElement|Object|null} Internal list element or adapter in sublist mode.
+   */
+  get contacts_list()
+  {
+    if (this.view_type === "sublist" && this.contacts_search_select)
+    {
+      return {
+        Add: (item) => this.Add(item),
+        Remove: (item) => this.Remove(item),
+        get value() { return this.selected; },
+        set value(v) { this.selected = v; }
+      };
+    }
+    return this._contacts_list;
+  }
+
+  /**
+   * Sets the internal contacts list element reference.
+   *
+   * @param {HTMLElement|null} val - Elements container.
+   */
+  set contacts_list(val)
+  {
+    this._contacts_list = val;
+  }
+
+  /**
    * Sets the list of contact objects.
    *
    * @param {Array<Object>|null} data - Array of contact objects.
@@ -140,7 +199,20 @@ class DeContactList extends HTMLElement
   set value(data)
   {
     this._saved_value = data;
-    if (this.contacts_list)
+    if (this.view_type === "sublist" && this.contacts_search_select)
+    {
+      const items = Array.isArray(data) ? data.map(c => {
+        if (typeof c === "object" && c !== null)
+        {
+          const val = c.value != null ? c.value : c.id;
+          const title = c.title || c.name || c.email || String(val);
+          return { ...c, value: val, title };
+        }
+        return c;
+      }) : data;
+      this.contacts_search_select.selected = items;
+    }
+    else if (this.contacts_list)
     {
       this.contacts_list.value = data;
     }
@@ -156,7 +228,24 @@ class DeContactList extends HTMLElement
     let contacts = null;
 
     const view_type = this.getAttribute("view-type") || this.view_type;
-    if (view_type == "select")
+    if (view_type === "sublist")
+    {
+      if (this.contacts_search_select)
+      {
+        contacts = (this.contacts_search_select.selected || []).map(item => {
+          if (typeof item === "object" && item !== null)
+          {
+            return item.id != null ? item : { ...item, id: item.value };
+          }
+          return { id: item, value: item };
+        });
+      }
+      else
+      {
+        contacts = this._saved_value || null;
+      }
+    }
+    else if (view_type == "select")
     {
       const items_elem = this.contacts_list?.items_elem || this.contacts_list;
       const selected_elements = items_elem?.querySelectorAll
@@ -183,7 +272,23 @@ class DeContactList extends HTMLElement
    */
   Add(obj)
   {
-    if (this.contacts_list?.Add)
+    if (this.view_type === "sublist" && this.contacts_search_select)
+    {
+      const val = obj?.value ?? obj?.id ?? (obj?.email || obj?.name || Math.random());
+      const title = obj?.title || obj?.name || obj?.email || String(val);
+      const item_obj = typeof obj === "object" && obj !== null ? { ...obj, value: val, title } : { value: val, title };
+
+      if (!this.contacts_search_select.items_array)
+      {
+        this.contacts_search_select.items_array = [];
+      }
+      if (!this.contacts_search_select.Find_Item(val))
+      {
+        this.contacts_search_select.items_array.push(item_obj);
+      }
+      this.contacts_search_select.Add_Item(val);
+    }
+    else if (this.contacts_list?.Add)
     {
       this.contacts_list.Add(obj);
     }
@@ -192,11 +297,16 @@ class DeContactList extends HTMLElement
   /**
    * Removes a contact object from the list by its ID.
    *
-   * @param {number|string} obj_id - The ID of the contact to remove.
+   * @param {number|string|Object} obj_id - The ID or object of the contact to remove.
    */
   Remove(obj_id)
   {
-    if (this.contacts_list?.Remove)
+    if (this.view_type === "sublist" && this.contacts_search_select)
+    {
+      const val = typeof obj_id === "object" && obj_id !== null ? (obj_id.value ?? obj_id.id) : obj_id;
+      this.contacts_search_select.Remove_Item(val);
+    }
+    else if (this.contacts_list?.Remove)
     {
       this.contacts_list.Remove(obj_id);
     }
@@ -315,38 +425,26 @@ class DeContactList extends HTMLElement
   }
 
   /**
-   * Renders the compact sublist layout with header action buttons (select, add) and item toolbar menus.
+   * Renders the compact sublist layout with an h2 Contacts heading and de-search-multi-select component.
    */
   Render_Sublist()
   {
     const html = `
-      <de-input-list cid="contacts_list">
-        <header slot="header">
-          <h2>Contacts</h2>
-          <button cid="sel_contact_btn" class="img" type="button">
-            <img src="image/list.svg" alt="Select Contact">
-          </button>
-          <button cid="add_contact_btn" class="img" type="button">
-            <img src="image/add.svg" alt="Add Contact">
-          </button>
-        </header>
-        <div slot="item" class="contact-item">
-          <h2 cid="contact_title_elem"></h2>
-          <de-toolbar-menu 
-            cid="contact_menu" 
-            show-edit label-edit="Edit Contact"
-            show-delete label-delete="Delete Contact"
-          >
-          </de-toolbar-menu>
-        </div>
-      </de-input-list>
+      <h2>Contacts</h2>
+      <de-search-multi-select cid="contacts_search_select" placeholder="Type to search..."></de-search-multi-select>
     `;
     this.innerHTML = html;
     Utils.Set_Id_Shortcuts(this, this, "cid");
 
-    this.contacts_list.addEventListener("render", this.On_Render_Item);
-    this.add_contact_btn.addEventListener("click", this.On_Click_Add);
-    this.sel_contact_btn.addEventListener("click", this.On_Click_Sel);
+    if (this._items && this.contacts_search_select)
+    {
+      this.contacts_search_select.items = this._items;
+    }
+    if (this._saved_value && this.contacts_search_select)
+    {
+      this.value = this._saved_value;
+    }
+    this.contacts_search_select?.addEventListener("add", this.On_Click_Add);
   }
 
   /**

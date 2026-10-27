@@ -6,6 +6,8 @@ import DeContactList from '../../../public/app/jopr/component/de-contact-list/in
 test('DeContactList.constructor()', Test_Constructor);
 test('DeContactList.get value()', Test_Get_Value);
 test('DeContactList.set value()', Test_Set_Value);
+test('DeContactList.get items()', Test_Get_Items);
+test('DeContactList.set items()', Test_Set_Items);
 test('DeContactList.get view_type()', Test_Get_View_Type);
 test('DeContactList.set view_type()', Test_Set_View_Type);
 test('DeContactList.Init_View()', Test_Init_View);
@@ -68,15 +70,82 @@ function Test_Get_Value()
 
     assert.deepStrictEqual(element.value, [{ id: 20, name: 'Contact 20' }]);
   }
+
+  // Scenario 3: Sublist view returns contact objects
+  {
+    const element = Create_Test_Element('sublist');
+    const sample_contacts = [
+      { id: 101, title: 'Alice Walker', name: 'Alice Walker' },
+      { id: 102, title: 'Bob Builder', name: 'Bob Builder' }
+    ];
+    element.value = sample_contacts;
+    assert.deepStrictEqual(element.value, [
+      { id: 101, title: 'Alice Walker', name: 'Alice Walker', value: 101 },
+      { id: 102, title: 'Bob Builder', name: 'Bob Builder', value: 102 }
+    ]);
+  }
 }
 
 function Test_Set_Value()
 {
-  const element = Create_Test_Element();
-  const contacts = [{ id: 100, name: 'Alice Walker' }];
+  // Scenario 1: Default list
+  {
+    const element = Create_Test_Element();
+    const contacts = [{ id: 100, name: 'Alice Walker' }];
 
-  element.value = contacts;
-  assert.deepStrictEqual(element.contacts_list.value, contacts);
+    element.value = contacts;
+    assert.deepStrictEqual(element.contacts_list.value, contacts);
+  }
+
+  // Scenario 2: Sublist view
+  {
+    const element = Create_Test_Element('sublist');
+    const contacts = [{ id: 200, name: 'Bob Builder' }];
+    element.value = contacts;
+    assert.strictEqual(element.contacts_search_select.selected.length, 1);
+  }
+}
+
+function Test_Get_Items()
+{
+  // Scenario 1: Initial state returns null
+  const element = new DeContactList();
+  assert.strictEqual(element.items, null);
+
+  // Scenario 2: Returns items set on element
+  const sample_items = [
+    { title: 'Jonathan Rhodes @ Hays', value: 1 },
+    { title: 'Debbie Teakle @ Michael Page', value: 2 }
+  ];
+  element.items = sample_items;
+  assert.deepStrictEqual(element.items, sample_items);
+
+  // Scenario 3: In sublist view, delegates to contacts_search_select.items
+  const sublist_el = Create_Test_Element('sublist');
+  sublist_el.items = sample_items;
+  assert.deepStrictEqual(sublist_el.items, sample_items);
+  assert.deepStrictEqual(sublist_el.contacts_search_select.items, sample_items);
+}
+
+function Test_Set_Items()
+{
+  // Scenario 1: Sets items when contacts_search_select is present in sublist view
+  const element = Create_Test_Element('sublist');
+  const sample_items = [
+    { title: 'Alice Walker', value: 10 },
+    { title: 'Bob Builder', value: 20 }
+  ];
+  element.items = sample_items;
+  assert.deepStrictEqual(element.items, sample_items);
+  assert.deepStrictEqual(element.contacts_search_select.items, sample_items);
+
+  // Scenario 2: Preserves items set before sublist view is initialized
+  const pre_el = new DeContactList();
+  pre_el.items = sample_items;
+  pre_el.view_type = 'sublist';
+  pre_el.connectedCallback();
+  assert.deepStrictEqual(pre_el.items, sample_items);
+  assert.deepStrictEqual(pre_el.contacts_search_select.items, sample_items);
 }
 
 function Test_Get_View_Type()
@@ -114,25 +183,52 @@ function Test_Init_View()
 
 function Test_Add()
 {
-  const element = Create_Test_Element();
-  element.value = [{ id: 1, name: 'Initial' }];
+  // Scenario 1: Default list
+  {
+    const element = Create_Test_Element();
+    element.value = [{ id: 1, name: 'Initial' }];
 
-  element.Add({ id: 2, name: 'Added Contact' });
-  assert.strictEqual(element.contacts_list.value.length, 2);
-  assert.strictEqual(element.contacts_list.value[1].name, 'Added Contact');
+    element.Add({ id: 2, name: 'Added Contact' });
+    assert.strictEqual(element.contacts_list.value.length, 2);
+    assert.strictEqual(element.contacts_list.value[1].name, 'Added Contact');
+  }
+
+  // Scenario 2: Sublist view
+  {
+    const element = Create_Test_Element('sublist');
+    element.value = [{ id: 1, name: 'Initial' }];
+    element.Add({ id: 2, name: 'Added in Sublist' });
+    assert.strictEqual(element.contacts_search_select.selected.length, 2);
+  }
 }
 
 function Test_Remove()
 {
-  const element = Create_Test_Element();
-  element.value = [
-    { id: 10, name: 'First' },
-    { id: 20, name: 'Second' }
-  ];
+  // Scenario 1: Default list
+  {
+    const element = Create_Test_Element();
+    element.value = [
+      { id: 10, name: 'First' },
+      { id: 20, name: 'Second' }
+    ];
 
-  element.Remove(10);
-  assert.strictEqual(element.contacts_list.value.length, 1);
-  assert.strictEqual(element.contacts_list.value[0].id, 20);
+    element.Remove(10);
+    assert.strictEqual(element.contacts_list.value.length, 1);
+    assert.strictEqual(element.contacts_list.value[0].id, 20);
+  }
+
+  // Scenario 2: Sublist view
+  {
+    const element = Create_Test_Element('sublist');
+    element.value = [
+      { id: 10, name: 'First' },
+      { id: 20, name: 'Second' }
+    ];
+
+    element.Remove(10);
+    assert.strictEqual(element.contacts_search_select.selected.length, 1);
+    assert.strictEqual(element.contacts_search_select.selected[0].id, 20);
+  }
 }
 
 function Test_On_Render_Item()
@@ -232,9 +328,15 @@ function Test_Render_Sublist()
   const element = new DeContactList();
   element.Render_Sublist();
 
-  assert.ok(element.contacts_list, 'contacts_list shortcut populated');
-  assert.ok(element.add_contact_btn, 'add_contact_btn shortcut populated');
-  assert.ok(element.sel_contact_btn, 'sel_contact_btn shortcut populated');
+  // Scenario 1: Populates contacts_search_select shortcut
+  assert.ok(element.contacts_search_select, 'contacts_search_select shortcut populated');
+
+  // Scenario 2: Renders h2 Contacts heading before de-search-multi-select
+  assert.ok(element.innerHTML.includes('<h2>Contacts</h2>'), 'renders h2 Contacts heading');
+  assert.ok(element.innerHTML.includes('de-search-multi-select'), 'renders de-search-multi-select');
+  const h2_idx = element.innerHTML.indexOf('<h2>Contacts</h2>');
+  const sel_idx = element.innerHTML.indexOf('<de-search-multi-select');
+  assert.ok(h2_idx !== -1 && sel_idx !== -1 && h2_idx < sel_idx, 'h2 appears before de-search-multi-select');
 }
 
 function Test_Render_Compact()

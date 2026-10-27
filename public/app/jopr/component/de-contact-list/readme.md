@@ -6,7 +6,7 @@ A custom Web Component that renders a list of contacts with support for multiple
 
 * **`list`** *(Default)*: Full detailed list with expandable `<details>` items displaying contact name, agency, email, phone, position, LinkedIn link, item action menu (`edit`, `delete`), and a header `add` button.
 * **`select`**: Single-choice selection list rendering radio buttons with labels for picking a contact in dialogs. The `value` getter returns only the selected contact.
-* **`sublist`**: Compact editable list designed for embedding inside parent forms (e.g. job details form). Features `Select Contact` and `Add Contact` header buttons and item action menus (`edit`, `delete`).
+* **`sublist`**: Compact searchable multi-select list designed for embedding inside parent forms (e.g. job details form). Features an `<h2>Contacts</h2>` header, integrated search combobox, and item action menus (`edit`, `delete`) via `de-search-multi-select`.
 * **`compact`**: Read-only inline contact summary list using `de-contact-details` with `hide-header`.
 
 ## Usage
@@ -97,11 +97,13 @@ None. The internal layout is generated dynamically based on the configured `view
 
 ## Fields
 
-* **`value`**: *Getter / Setter*. Gets or sets the array of contact objects (`Array<Object>`). In `"select"` view mode, the getter filters the list to return only the contact matching the currently checked radio button.
+* **`value`**: *Getter / Setter*. Gets or sets the array of contact objects (`Array<Object>`). In `"select"` view mode, the getter filters the list to return only the contact matching the currently checked radio button. In `"sublist"` view mode, delegates to the `selected` property of `de-search-multi-select`.
+* **`items`**: *Getter / Setter*. Gets or sets the available contact options array (`Array<Object>`) for the internal `<de-search-multi-select>` in `"sublist"` view mode.
 * **`view_type`**: *Getter / Setter*. Gets or sets the active view type layout attribute.
-* **`contacts_list`**: DOM reference to the internal `<de-input-list>` component (`cid="contacts_list"`).
-* **`add_contact_btn`**: DOM reference to the header add button (`cid="add_contact_btn"`), present in `"list"` and `"sublist"` view modes.
-* **`sel_contact_btn`**: DOM reference to the header select button (`cid="sel_contact_btn"`), present in `"sublist"` view mode.
+* **`contacts_list`**: DOM reference to the internal `<de-input-list>` component (`cid="contacts_list"`), or adapter in `"sublist"` mode.
+* **`contacts_search_select`**: DOM reference to the internal `<de-search-multi-select>` component (`cid="contacts_search_select"`), present in `"sublist"` view mode.
+* **`add_contact_btn`**: DOM reference to the header add button (`cid="add_contact_btn"`), present in `"list"` view mode.
+* **`sel_contact_btn`**: DOM reference to the header select button (`cid="sel_contact_btn"`).
 
 ## Events
 
@@ -116,10 +118,10 @@ None. The internal layout is generated dynamically based on the configured `view
 
 ## Methods
 
-* **`Add(obj)`**: Appends a new contact object to the list via `contacts_list.Add(obj)`.
-* **`Remove(obj_id)`**: Removes a contact object from the list by ID via `contacts_list.Remove(obj_id)`.
+* **`Add(obj)`**: Appends a new contact object to the list (delegates to `contacts_search_select` in `"sublist"` mode or `contacts_list.Add(obj)` in other modes).
+* **`Remove(obj_id)`**: Removes a contact object from the list by ID (delegates to `contacts_search_select` in `"sublist"` mode or `contacts_list.Remove(obj_id)` in other modes).
 * **`On_Render_Item(event)`**: Event handler called by `de-input-list` for each item, populating titles, form fields, and toolbar menus.
 * **`Render()`**: Renders the default detailed list with expandable items and full fields.
 * **`Render_Select()`**: Renders the radio-button contact selection list.
-* **`Render_Sublist()`**: Renders the compact editable sublist with header actions.
+* **`Render_Sublist()`**: Renders the compact searchable sublist with an `<h2>Contacts</h2>` heading and `de-search-multi-select`.
 * **`Render_Compact()`**: Renders the read-only summary list using `de-contact-details`.

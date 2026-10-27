@@ -73,7 +73,6 @@ async function Render_App(ctx)
   jobs_list.addEventListener("render", e => Render_Job_Item(e, ctx));
   jobs_filter.addEventListener("search", () => Render_Job_Items(ctx));
   job_contacts?.addEventListener("add", On_Click_Add_Contact);
-  job_contacts?.addEventListener("select", e => On_Click_Select_Contact(e, ctx));
   job_contacts?.addEventListener("delete", e => On_Click_Delete_Job_Contact(e, ctx));
   job_contacts?.addEventListener("edit", e => On_Click_Edit_Job_Contact(e, ctx));
 
@@ -462,6 +461,10 @@ async function On_Click_Edit_Job(event, job, ctx)
 {
   job_agency_select.items = await ctx.Agency.Get_Items(ctx);
   job_agency_select.job = job;
+  if (typeof job_contacts !== "undefined" && job_contacts)
+  {
+    job_contacts.items = await ctx.Contact.Get_Items(ctx);
+  }
   const form_data = await job_dialog.Show_Async(job);
   if (form_data)
   {
@@ -794,7 +797,7 @@ async function On_Click_Add_Note(e, job_id, ctx)
 async function On_Click_Delete_Job_Contact(event)
 {
   const contact = event.detail;
-  job_contacts.contacts_list.Remove(contact);
+  job_contacts.Remove(contact);
 }
 
 async function On_Click_Add_Contact(event)
@@ -802,13 +805,17 @@ async function On_Click_Add_Contact(event)
   const contact = await contact_dialog.Show();
   if (contact)
   {
-    job_contacts.contacts_list.Add(contact);
+    job_contacts.Add(contact);
   }
 }
 
 async function On_Click_Edit_Job_Contact(event, ctx)
 {
-  const contact = event.detail;
+  let contact = event.item || event.detail;
+  if (typeof contact === "number" || typeof contact === "string")
+  {
+    contact = await ctx.db.Select_By_Id("contacts", parseInt(contact)) || { id: contact };
+  }
   contact_dialog.agency_select.innerHTML = 
     await ctx.Agency.Get_Options(ctx);
 
@@ -820,17 +827,7 @@ async function On_Click_Edit_Job_Contact(event, ctx)
       (contact, form_data, c => ctx.Contact.Save(ctx, c), msg_success, msg_fail);
   if (new_contact)
   {
-    job_contacts.contacts_list.Add(contact);
+    job_contacts.Add(new_contact);
   }
 }
 
-async function On_Click_Select_Contact(event, ctx)
-{
-  const contacts = await ctx.Contact.Select_Extended(ctx);
-  const dlg_data = await contact_list_dialog.Show_Async({contacts});
-  if (!ctx.Utils.Is_Empty(dlg_data?.contacts))
-  {
-    const contact = dlg_data.contacts[0];
-    job_contacts.contacts_list.Add(contact);
-  }
-}

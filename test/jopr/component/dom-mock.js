@@ -23,6 +23,7 @@ class MockElement {
 
   set innerHTML(val) {
     this._innerHTML = val;
+    this._cachedChildren = null;
     if (val === "") {
       this.children = [];
     }
@@ -279,34 +280,42 @@ class MockElement {
 
           this._cachedChildren = [input_elem, add_btn, items_list, selected_items_elem];
         } else if (tname === 'de-contact-list') {
-          const list = new MockElement('de-input-list');
-          list.setAttribute('cid', 'contacts_list');
-          list.value = [];
-          list.items_elem = new MockElement('div');
-          list.items_elem.checked_elements = [];
-          list.items_elem.querySelectorAll = (sel) => {
-            if (sel.includes(':checked')) {
-              return list.items_elem.checked_elements;
-            }
-            return [];
-          };
-          list.Add = (obj) => {
-            if (!list.value) list.value = [];
-            list.value.push(obj);
-          };
-          list.Remove = (id) => {
-            if (list.value) {
-              list.value = list.value.filter(item => item.id !== id);
-            }
-          };
+          if (this.view_type === 'sublist' || (this._innerHTML && this._innerHTML.includes('contacts_search_select'))) {
+            const select = document.createElement('de-search-multi-select');
+            select.setAttribute('cid', 'contacts_search_select');
+            select.parentElement = this;
+            if (select.connectedCallback) select.connectedCallback();
+            this._cachedChildren = [select];
+          } else {
+            const list = new MockElement('de-input-list');
+            list.setAttribute('cid', 'contacts_list');
+            list.value = [];
+            list.items_elem = new MockElement('div');
+            list.items_elem.checked_elements = [];
+            list.items_elem.querySelectorAll = (sel) => {
+              if (sel.includes(':checked')) {
+                return list.items_elem.checked_elements;
+              }
+              return [];
+            };
+            list.Add = (obj) => {
+              if (!list.value) list.value = [];
+              list.value.push(obj);
+            };
+            list.Remove = (id) => {
+              if (list.value) {
+                list.value = list.value.filter(item => item.id !== id);
+              }
+            };
 
-          const add_btn = new MockElement('button');
-          add_btn.setAttribute('cid', 'add_contact_btn');
+            const add_btn = new MockElement('button');
+            add_btn.setAttribute('cid', 'add_contact_btn');
 
-          const sel_btn = new MockElement('button');
-          sel_btn.setAttribute('cid', 'sel_contact_btn');
+            const sel_btn = new MockElement('button');
+            sel_btn.setAttribute('cid', 'sel_contact_btn');
 
-          this._cachedChildren = [list, add_btn, sel_btn];
+            this._cachedChildren = [list, add_btn, sel_btn];
+          }
         } else {
           const list = new MockElement('de-input-list');
           list.setAttribute('cid', 'project_list');

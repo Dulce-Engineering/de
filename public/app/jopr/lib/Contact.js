@@ -91,6 +91,23 @@ class Contact
   {
     return contact?.name || contact?.email || "Unknown Contact";
   }
+
+  static async Get_Items(ctx)
+  {
+    let items = null;
+
+    const contacts = await Contact.Select_Extended(ctx);
+    if (contacts)
+    {
+      items = contacts.map(c => {
+        const name = Contact.Get_Name(c);
+        const title = c.agency?.name ? `${name} @ ${c.agency.name}` : name;
+        return { ...c, value: c.id, title };
+      });
+    }
+
+    return items;
+  }
 }
 
 export default Contact;
