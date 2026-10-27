@@ -69,24 +69,6 @@ class Contact
     return res;
   }
 
-  static async Get_Options(ctx)
-  {
-    let html = null;
-    const contacts = await Contact.Select(ctx);
-    if (contacts)
-    {
-      html =
-        "<option>None</option>" +
-        "<option value='new'>New contact</option>";
-      for (const contact of contacts)
-      {
-        html += "<option value='" + contact.id + "'>" + Contact.Get_Name(contact) + "</option>";
-      }
-    }
-
-    return html;
-  }
-
   static Get_Name(contact)
   {
     return contact?.name || contact?.email || "Unknown Contact";
@@ -100,8 +82,7 @@ class Contact
     if (contacts)
     {
       items = contacts.map(c => {
-        const name = Contact.Get_Name(c);
-        const title = c.agency?.name ? `${name} @ ${c.agency.name}` : name;
+        const title = Contact.Get_Name(c);
         return { ...c, value: c.id, title };
       });
     }

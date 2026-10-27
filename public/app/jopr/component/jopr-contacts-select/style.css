@@ -1,0 +1,42 @@
+de-contact-list[view-type="sublist"]
+{
+  display: inline-flex;
+  gap: 10px;
+
+  h2
+  {
+    font-size: inherit;
+    margin: 8px 0 0 0;
+  }
+}
+
+@layer de-components
+{
+  de-contact-list[view-type="compact"]
+  {
+    de-input-list
+    {
+      h3
+      {
+        margin: 0;
+      }
+
+      main
+      {
+        gap: 0;
+
+        jopr-contact-details
+        {
+          display: inline-flex !important;
+          align-items: center;
+          gap: 3px;
+
+          de-field
+          {
+            display: inline-block;
+          }
+        }
+      }
+    }
+  }
+}

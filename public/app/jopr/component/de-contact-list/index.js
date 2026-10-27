@@ -151,14 +151,15 @@ class DeContactList extends HTMLElement
   /**
    * Sets the available contact options for the searchable multi-select component.
    *
-   * @param {Array<Object>|null} data - List of selectable contact items.
+   * @param {Array<Object>|null} contacts - List of selectable contact items.
    */
-  set items(data)
+  set items(contacts)
   {
-    this._items = data;
+    this._items = contacts;
     if (this.contacts_search_select)
     {
-      this.contacts_search_select.items = data;
+      DeContactList.Extend_To_Items(contacts);
+      this.contacts_search_select.items = contacts;
     }
   }
 
@@ -309,6 +310,31 @@ class DeContactList extends HTMLElement
     else if (this.contacts_list?.Remove)
     {
       this.contacts_list.Remove(obj_id);
+    }
+  }
+
+  static Get_Contact_Name(contact)
+  {
+    return contact?.name || contact?.email || "Unknown Contact";
+  }
+
+  static Extend_To_Item(contact)
+  {
+    if (contact)
+    {
+      contact.value = contact.id;
+      contact.title = DeContactList.Get_Contact_Name(contact);
+    }
+  }
+
+  static Extend_To_Items(contacts)
+  {
+    if (!Utils.Is_Empty(contacts))
+    {
+      for (const contact of contacts)
+      {
+        DeContactList.Extend_To_Item(contact);
+      }
     }
   }
 
