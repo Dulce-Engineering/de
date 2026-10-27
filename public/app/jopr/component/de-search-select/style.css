@@ -4,6 +4,7 @@ de-search-select
   display: flex;
   border: 1px solid var(--border);
   padding: 5px 5px 5px 10px;
+  justify-content: space-between;
 
   [cid="input_elem"]
   {

@@ -72,8 +72,8 @@ de-search-multi-select
 
     img
     {
-      width: 16px;
-      height: 16px;
+      width: 24px;
+      height: 24px;
     }
   }
 
@@ -124,8 +124,8 @@ de-search-multi-select
 
         img
         {
-          width: 16px;
-          height: 16px;
+          width: 24px;
+          height: 24px;
           filter: brightness(0) invert(1);
         }
 
