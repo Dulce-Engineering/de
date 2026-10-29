@@ -220,5 +220,11 @@
     "datetime": 1792975060226,
     "id": "4546ac28-476c-4636-a5f9-39e8172478c1",
     "query_id": "-rust"
+  },
+  {
+    "count": 28,
+    "datetime": 1793244775829,
+    "id": "378b7fe3-e4d7-46f1-bda4-0bfbde87a3c0",
+    "query_id": "-rust"
   }
 ]
