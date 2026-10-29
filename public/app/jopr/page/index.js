@@ -67,30 +67,19 @@ async function Render_App(ctx)
   export_btn.onclick = () => On_Click_Export_Btn(ctx);
 
   jobs_btn.onclick = () => Show_View(jobs_list);
-  job_agency_select?.addEventListener("add", On_Click_Add_Agency);
   jobs_menu?.addEventListener("add", (e) => On_Click_Edit_Job(e, null, ctx));
   jobs_menu?.addEventListener("ai", () => On_Click_AI_Add_Job(ctx));
   jobs_list.addEventListener("render", e => Render_Job_Item(e, ctx));
   jobs_filter.addEventListener("search", () => Render_Job_Items(ctx));
-  job_contacts?.addEventListener("add", On_Click_Add_Contact);
-  job_contacts?.addEventListener("delete", e => On_Click_Delete_Job_Contact(e, ctx));
-  job_contacts?.addEventListener("edit", e => On_Click_Edit_Job_Contact(e, ctx));
+  job_agency_select?.addEventListener("add", On_Click_Add_Agency);
+  //job_agency_select?.addEventListener("edit", On_Click_Edit_Agency);
+  job_contacts_select?.addEventListener("add", e => On_Click_Edit_Job_Contact(e, ctx));
+  job_contacts_select?.addEventListener("edit", e => On_Click_Edit_Job_Contact(e, ctx));
+  //job_contacts_select?.addEventListener("delete", e => On_Click_Delete_Job_Contact(e, ctx));
 
   jobs_filter.db = ctx.db;
   await jobs_filter.Load_Filters();
   Render_Job_Items(ctx);
-
-  /*companies_btn.onclick = () => Show_View(companies_list);
-  add_company_btn.onclick = (e) => On_Click_Add_Company(e, null, ctx);
-  companies_list.addEventListener("render", e => Render_Company_Item(e, ctx));
-  Render_Companies(ctx);*/
-
-  /*contacts_btn.onclick = () => Show_View(contacts_list);
-  contacts_list.addEventListener("add", e => On_Click_Edit_Contact(e, ctx));
-  contacts_list.addEventListener("edit", e => On_Click_Edit_Contact(e, ctx));
-  contacts_list.addEventListener("delete", e => On_Click_Delete_Contact(e, ctx));
-  const contacts = await ctx.Contact.Select_Extended(ctx);
-  contacts_list.value = contacts;*/
 }
 
 // events =========================================================================
@@ -288,47 +277,6 @@ function Toggle_Field(value, value_elem, label_elem)
   }
 }
 
-function Toggle_New_Agency_Fields()
-{
-  const is_new_agency = job_agency_select.value === "new";
-  if (is_new_agency == undefined)
-    is_new_agency = job_agency_select.value === "new";
-  new_agency_label.hidden = !is_new_agency;
-  new_agency_input.hidden = !is_new_agency;
-}
-
-function Toggle_New_Contact_Fields()
-{
-  const is_new_contact = job_contact_select.value === "new";
-  if (is_new_contact == undefined)
-    is_new_contact = job_contact_select.value === "new";
-  contact_name_label.hidden = !is_new_contact;
-  contact_name_input.hidden = !is_new_contact;
-  contact_phone_label.hidden = !is_new_contact;
-  contact_phone_input.hidden = !is_new_contact;
-  contact_email_label.hidden = !is_new_contact;
-  contact_email_input.hidden = !is_new_contact;
-}
-
-function Work_Type_Label(ctx, work_type)
-{
-  let res = null;
-
-  if (work_type)
-  {
-    res = ctx.Job.work_types[work_type?.toLowerCase()] || work_type["other"];
-  }
-
-  return res;
-}
-
-function Str_To_HTML(str)
-{
-  const div = document.createElement("div");
-  div.textContent = str || "";
-  return div.innerHTML.replace(/\n/g, "<br>");
-}
-
 function Show_View(view_elem)
 {
   jobs_list.classList.add("hidden");
@@ -338,26 +286,6 @@ function Show_View(view_elem)
 
   view_elem.classList.remove("hidden");
   //app_body.classList.remove("hidden");
-}
-
-function Duration_Str(start_time, end_time)
-{
-  let res = "";
-
-  if (start_time && end_time)
-  {
-    const diff_ms = end_time - start_time;
-    const diff_years = diff_ms / (1000 * 60 * 60 * 24 * 365);
-    //res = diff_years.toFixed(1) + " years";
-
-    res = diff_years.toLocaleString('en-US', 
-    {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 1
-    }) + " years";
-  }
-
-  return res;
 }
 
 function Set_Options(select_elem, options, value_fn, text_fn)
@@ -410,61 +338,16 @@ function Alert(msg)
   }
 }
 
-// companies ======================================================================
-
-async function Render_Companies(ctx)
-{
-  const companies = await ctx.Agency.Select(ctx);
-  companies_list.value = companies;
-}
-
-async function On_Click_Delete_Company(e, agency_id, ctx)
-{
-  const confirmed = await warning_dlg.Confirm("Are you sure you want to delete this company?");
-  if (confirmed)
-  {
-    const is_deleted = await ctx.Agency.Delete(ctx, agency_id);
-    if (is_deleted)
-    {
-      await Render_Companies(ctx);
-      Alert("Company deleted successfully.");
-    }
-    else
-    {
-      Alert("Failed to delete company.");
-    }
-  }
-}
-
-function Render_Company_Item(event, ctx)
-{
-  const item_elem = event.detail.item_elem;
-  const agency = item_elem.item_obj;
-  const agency_id = agency.id;
-
-  item_elem.agency_name_elem.textContent = agency.name || "Unnamed Company";
-  item_elem.agency_url_elem.textContent = agency.url || "No website";
-  item_elem.agency_url_elem.href = agency.url || "#";
-  item_elem.agency_phone_elem.textContent = agency.phone || "N/A";
-  item_elem.agency_email_elem.textContent = agency.email || "N/A";
-  item_elem.agency_address_elem.textContent = agency.address || "N/A";
-
-  Toggle_Field(agency.industry, item_elem.agency_industry_elem, item_elem.agency_industry_field);
-
-  item_elem.edit_company_btn.addEventListener("click", e => On_Click_Add_Company(e, agency_id, ctx));
-  item_elem.del_company_btn.addEventListener("click", e => On_Click_Delete_Company(e, agency_id, ctx));
-}
-
 // on click edit ==================================================================
 
 async function On_Click_Edit_Job(event, job, ctx)
 {
   job_agency_select.items = await ctx.Agency.Get_Items(ctx);
   job_agency_select.job = job;
-  if (typeof job_contacts !== "undefined" && job_contacts)
-  {
-    job_contacts.items = await ctx.Contact.Get_Items(ctx);
-  }
+
+  job_contacts_select.items = await ctx.Contact.Select_Extended(ctx);
+  job_contacts_select.job = job;
+
   const form_data = await job_dialog.Show_Async(job);
   if (form_data)
   {
@@ -484,55 +367,6 @@ async function On_Click_Edit_Job(event, job, ctx)
     {
       Alert("Failed to save job.");
     }
-  }
-}
-
-async function On_Click_Add_Company(event, id, ctx)
-{
-  const curr_agency = await ctx.Agency.Select_By_Id(ctx, id);
-  const form_data = await company_dialog.Show_Async(curr_agency);
-  if (form_data)
-  {
-    form_data.id = id;
-    const is_saved = await ctx.Agency.Save(ctx, form_data);
-    if (is_saved)
-    {
-      await Render_Companies(ctx);
-      Alert("Company saved successfully.");
-    }
-    else
-    {
-      Alert("Failed to save company.");
-    }
-  }
-}
-
-async function On_Click_Add_Agency()
-{
-  const form_data = await company_dialog.Show_Async();
-  if (form_data)
-  {
-    form_data.title = form_data.name;
-    form_data.value = "new";
-    job_agency_select.selected_item = form_data;
-  }
-}
-
-async function On_Click_Edit_Contact(event, ctx)
-{
-  const contact = event.detail;
-  contact_dialog.agency_select.innerHTML = 
-    await ctx.Agency.Get_Options(ctx);
-
-  const msg_success = "Contact saved successfully.";
-  const msg_fail = "Failed to save contact.";
-  const form_data = await contact_dialog.Show(contact);
-  const new_contact = 
-    await Save_Obj
-      (contact, form_data, c => ctx.Contact.Save(ctx, c), msg_success, msg_fail);
-  if (new_contact)
-  {
-    contacts_list.Add(new_contact);
   }
 }
 
@@ -560,25 +394,6 @@ async function Save_Obj(obj, form_data, save_fn, msg_success, msg_fail)
   }
 
   return new_obj;
-}
-
-async function On_Click_Delete_Contact(event, ctx)
-{
-  const contact_id = event.detail.id;
-  const confirmed = await warning_dlg.Confirm("Are you sure you want to delete this contact?");
-  if (confirmed)
-  {
-    const is_deleted = await ctx.Contact.Delete(ctx, contact_id);
-    if (is_deleted)
-    {
-      contacts_list.Remove(contact_id);
-      Alert("Contact deleted successfully.");
-    }
-    else
-    {
-      Alert("Failed to delete contact.");
-    }
-  }
 }
 
 // jobs ===========================================================================
@@ -792,42 +607,49 @@ async function On_Click_Add_Note(e, job_id, ctx)
   await Render_Job_Items(ctx);
 }
 
-// job_contacts events ========================================================
+// job_agency_select events ===================================================
 
-async function On_Click_Delete_Job_Contact(event)
+async function On_Click_Add_Agency()
 {
-  const contact = event.detail;
-  job_contacts.Remove(contact);
+  const form_data = await company_dialog.Show_Async();
+  if (form_data)
+  {
+    form_data.title = form_data.name;
+    form_data.value = "new";
+    job_agency_select.selected_item = form_data;
+  }
 }
 
-async function On_Click_Add_Contact(event)
+// job_contacts_select events ========================================================
+
+async function On_Click_Add_Contact(event, ctx)
 {
-  const contact = await contact_dialog.Show();
-  if (contact)
+  contact_dialog.agency_select.innerHTML = await ctx.Agency.Get_Options(ctx);
+  const form_data = await contact_dialog.Show();
+  if (form_data)
   {
-    job_contacts.Add(contact);
+    form_data.title = ctx.Contact.Get_Name(form_data);
+    job_contacts_select.Add(form_data);
   }
 }
 
 async function On_Click_Edit_Job_Contact(event, ctx)
 {
-  let contact = event.item || event.detail;
-  if (typeof contact === "number" || typeof contact === "string")
-  {
-    contact = await ctx.db.Select_By_Id("contacts", parseInt(contact)) || { id: contact };
-  }
-  contact_dialog.agency_select.innerHTML = 
-    await ctx.Agency.Get_Options(ctx);
+  let contact = event.detail;
 
-  const msg_success = "Contact saved successfully.";
-  const msg_fail = "Failed to save contact.";
+  contact_dialog.agency_select.innerHTML = await ctx.Agency.Get_Options(ctx);
   const form_data = await contact_dialog.Show(contact);
-  const new_contact = 
-    await Save_Obj
-      (contact, form_data, c => ctx.Contact.Save(ctx, c), msg_success, msg_fail);
-  if (new_contact)
+  if (form_data)
   {
-    job_contacts.Add(new_contact);
+    form_data.is_dirty = true;
+    form_data.title = ctx.Contact.Get_Name(form_data);
+    job_contacts_select.Add(form_data);
   }
+}
+
+async function On_Click_Delete_Job_Contact(event)
+{
+  const contact = event.detail;
+  job_contacts_select.Remove(contact);
 }
 

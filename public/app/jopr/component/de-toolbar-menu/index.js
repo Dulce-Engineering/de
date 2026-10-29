@@ -118,6 +118,7 @@ class DeToolbarMenu extends HTMLElement
     this.Render_Btn("genletter", "./image/mail.svg", dst_elem);
     this.Render_Btn("filter", "./image/filter-1.svg", dst_elem);
     this.Render_Btn("sort", "./image/sort.svg", dst_elem);
+    this.Render_Btn("remove", "./image/remove.svg", dst_elem);
     this.Render_Btn("view", "./image/zoom.svg", dst_elem);
     this.Render_Btn("edit", "./image/edit.svg", dst_elem);
     this.Render_Btn("copy", "./image/copy.svg", dst_elem);

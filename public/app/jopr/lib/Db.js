@@ -58,7 +58,7 @@ class Db
 
   Save(table_name, item)
   {
-    return Db.Save(this.db, table_name, item);
+    return Db.Save(this, table_name, item);
   }
 
   Save_To_IndexedDB(db_data, schema)
@@ -313,11 +313,11 @@ class Db
 
     if (item.id)
     {
-      id = Db.Update(db, table_name, item);
+      id = Db.Update(db.db, table_name, item);
     }
     else
     {
-      id = Db.Insert(db, table_name, item);
+      id = Db.Insert(db.db, table_name, item);
     }
 
     return id;
@@ -460,9 +460,9 @@ class Db
 
   // write ====================================================================
 
-  static Create_Table(db, schema, table_name)
+  static Create_Table(idxdb, schema, table_name)
   {
-    if (!db.objectStoreNames.contains(table_name))
+    if (!idxdb.objectStoreNames.contains(table_name))
     {
       const table_schema = schema.stores[table_name];
       const options = 
@@ -470,64 +470,80 @@ class Db
         keyPath: table_schema.keyPath, 
         autoIncrement: table_schema.autoIncrement 
       };
-      db.createObjectStore(table_name, options);
+      idxdb.createObjectStore(table_name, options);
     }
   }
 
-  static async Clear_Table(db, table_name)
+  static async Clear_Table(idxdb, table_name)
   {
     let res = null;
 
-    if (!db.read_only)
+    if (!idxdb.read_only)
     {
-      const table = Db.Get_Table(db, table_name, false);
+      const table = Db.Get_Table(idxdb, table_name, false);
       res = table ? Db.Get_Req_Res(table.clear()) : null;
+    }
+    else
+    {
+      console.log("Db.Clear_Table()");
     }
 
     return res;
   }
 
-  static Add(db, table, item)
+  static Add(idxdb, table, item)
   {
     let res = null;
 
-    if (!db.read_only)
+    if (!idxdb.read_only)
     {
       //const table = Db.Get_Table(db, table_name, false);
       const request = table.add(item);
       res = Db.Get_Req_Res(request);
     }
-
-    return res;
-  }
-
-  static Put(db, table_name, item)
-  {
-    let res = null;
-
-    if (!db.read_only)
+    else
     {
-      const table = Db.Get_Table(db, table_name, false);
-      const request = table.put(item);
-      res = Db.Get_Req_Res(request);
+      console.log("Db.Add(): item =", item);
     }
 
     return res;
   }
 
-  static async Delete(db, table_name, ids)
+  static Put(idxdb, table_name, item)
   {
     let res = null;
 
-    if (!db.read_only && ids?.length > 0)
+    if (!idxdb.read_only)
     {
-      const table = Db.Get_Table(db, table_name, false);
+      const table = Db.Get_Table(idxdb, table_name, false);
+      const request = table.put(item);
+      res = Db.Get_Req_Res(request);
+    }
+    else
+    {
+      console.log("Db.Put(): table_name, item =", table_name, item);
+    }
+
+    return res;
+  }
+
+  static async Delete(idxdb, table_name, ids)
+  {
+    let res = null;
+
+    if (!idxdb.read_only && ids?.length > 0)
+    {
+      const table = Db.Get_Table(idxdb, table_name, false);
       const req_res = [];
       for (const id of ids) 
       {
         req_res.push(Db.Get_Req_Res(table.delete(id)));
       }
       res = Promise.all(req_res);
+    }
+    else if (idxdb.read_only)
+    {
+      console.log("Db.Delete(): table_name, ids =", table_name, ids);
     }
 
     return res;

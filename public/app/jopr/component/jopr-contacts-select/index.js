@@ -1,5 +1,5 @@
-import Utils from "../../../../lib/Utils.js";
-import DeSearchMultiSelect from "../de-search-multi-select/index.js";
+import Utils from "../../../../lib/Utils.js?v=2";
+import DeSearchMultiSelect from "../de-search-multi-select/index.js?v=2";
 
 /**
  * JOPRContactsSelect is a custom Web Component providing a searchable multi-select contact sublist.
@@ -244,7 +244,6 @@ class JOPRContactsSelect extends HTMLElement
     {
       this.value = this._saved_value;
     }
-    this.contacts_search_select?.addEventListener("add", this.On_Click_Add);
   }
 }
 

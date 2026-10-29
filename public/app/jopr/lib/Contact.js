@@ -18,12 +18,12 @@ class Contact
       agency_id: parseInt(form_data.agency_id) || null,
     };
 
-    return ctx.db2.Save(Contact.table_name, contact);
+    return ctx.db.Save(Contact.table_name, contact);
   }
 
   static Delete(ctx, id)
   {
-    return ctx.db2.Delete(Contact.table_name, [id]);
+    return ctx.db.Delete(Contact.table_name, [id]);
   }
 
   static async Select(ctx, where_fn)
@@ -38,7 +38,7 @@ class Contact
 
   static Select_By_Id(ctx, id)
   {
-    return ctx.db2.Select_By_Id(Contact.table_name, id);
+    return ctx.db.Select_By_Id(Contact.table_name, id);
   }
 
   static async Select_Extended(ctx, where_fn)
@@ -49,6 +49,7 @@ class Contact
       for (const contact of contacts)
       {
         contact.agency = await ctx.db.Select_By_Id("agencies", contact.agency_id);
+        contact.title = Contact.Get_Name(contact);
       }
     }
 
@@ -62,7 +63,7 @@ class Contact
     if (contact && contact.email)
     {
       contact.agency_id = agency_id;
-      res = await ctx.db2.Insert_If_New
+      res = await ctx.db.Insert_If_New
         ("contacts", contact, c => c.email === contact.email);
     }
 
@@ -82,8 +83,8 @@ class Contact
     if (contacts)
     {
       items = contacts.map(c => {
-        const title = Contact.Get_Name(c);
-        return { ...c, value: c.id, title };
+        const name = Contact.Get_Name(c);
+        return { ...c, value: c.id, title: name };
       });
     }
 

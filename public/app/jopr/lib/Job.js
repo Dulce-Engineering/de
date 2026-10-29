@@ -364,7 +364,7 @@ class Job
         const contact_ids = [];
         for (const contact of form_data.contacts)
         {
-          if (contact.id)
+          if (contact.id && !contact.is_dirty)
           {
             contact_ids.push(contact.id);
           }
@@ -410,7 +410,7 @@ class Job
         job.contact_id = contact_id;
         job.status = job.status || "bookmarked";
         job.last_update = Date.now();
-        res = await ctx.db2.Insert_If_New(Job.table_name, job, Fail_If);
+        res = await ctx.db.Insert_If_New(Job.table_name, job, Fail_If);
         function Fail_If(j)
         {
           return (agency_id &&

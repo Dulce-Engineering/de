@@ -342,9 +342,13 @@
     <input slot="fields" type="text" name="location">
     <label cid="description_label" slot="fields">Description</label>
     <textarea slot="fields" name="description" rows="4"></textarea>
-    <de-contact-list id="job_contacts" slot="fields" name="contacts" view-type="sublist"></de-contact-list>
-    <label cid="agency_id_label" slot="fields">Agency</label>
+
+    <label slot="fields">Contacts</label>
+    <de-search-multi-select slot="fields" id="job_contacts_select" name="contacts"></de-search-multi-select>
+
+    <label slot="fields">Agency</label>
     <de-search-select slot="fields" id="job_agency_select" name="agency_id"></de-search-select>
+  
   </de-dialog-form>
 
   <de-dialog-form id="note_dialog">

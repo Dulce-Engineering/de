@@ -1,5 +1,5 @@
-import Utils from "../../../../lib/Utils.js";
-import DeSearchMultiSelect from "../de-search-multi-select/index.js";
+import Utils from "../../../../lib/Utils.js?v=2";
+import DeSearchMultiSelect from "../de-search-multi-select/index.js?v=2";
 
 /**
  * DeContactList is a custom Web Component that renders a collection of contacts.
