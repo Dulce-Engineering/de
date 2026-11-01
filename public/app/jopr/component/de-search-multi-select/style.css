@@ -16,7 +16,7 @@ de-search-multi-select
 
   [cid="input_elem"]
   {
-    anchor-name: --input-elem;
+    anchor-name: --de-sms-input-elem;
     border: none;
     background: transparent;
     color: var(--input-text, #fff);
@@ -26,13 +26,14 @@ de-search-multi-select
     outline: none;
   }
 
-  [cid="items_list"]
+  [cid="options_list"]
   {
-    position-anchor: --input-elem;
+    position-anchor: --de-sms-input-elem;
     top: anchor(bottom);
     left: anchor(left);
+    max-height: 140px;
+
     margin: 0;
-    max-height: 300px;
     background-color: #000;
     color: var(--input-text, #fff);
     border: 1px solid var(--border);
@@ -49,12 +50,6 @@ de-search-multi-select
       {
         background-color: #222;
         color: #00ff41;
-      }
-
-      &.none
-      {
-        font-style: italic;
-        color: #888;
       }
     }
   }
@@ -77,12 +72,16 @@ de-search-multi-select
     }
   }
 
-  [cid="selected_items_elem"]
+  [cid="selected_list"]
   {
     display: flex;
     flex-direction: column;
-    margin-top: 4px;
+    margin: 4px 0 0 0;
     gap: 2px;
+
+    list-style-type: none;
+    xmargin: 0;
+    padding: 0;
   }
 
   .selected-item

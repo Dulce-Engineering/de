@@ -146,7 +146,7 @@ class DeSearchMultiSelect extends HTMLElement
     const item_elem = document.createElement("li");
     item_elem.setAttribute("role", "option");
     item_elem.setAttribute("aria-selected", "false");
-    item_elem.className = "option none";
+    item_elem.classList.add("option");
     item_elem.item_data = item;
     item_elem.textContent = item.title;
     item_elem.addEventListener("click", () => this.On_Click_Option(item));

@@ -572,8 +572,13 @@
       color: var(--main);
       padding: 15px 20px 20px 20px;
       box-sizing: border-box;
-      xmax-height: 90vh;
-      xmax-width: 90vw;
+
+      form
+      {
+        display: flex;
+        flex-direction: column;
+        max-height: calc(100vh - 90px);
+      }
     }
     dialog::backdrop {
       background-color: var(--shade);
@@ -619,19 +624,11 @@
     {
       background: #000;
     }
-    main 
-    {
-      gap: 20px;
-      padding: 0 20px 10px 20px;
-      display: flex;
-      flex-direction: column;
-      max-height: 75vh;
-      overflow: auto;
-    }
     header
     {
       margin: 0 0 20px 0;
       display: block;
+      flex-shrink: 0;
 
       img
       {
@@ -639,10 +636,23 @@
         height: 128px;
       }
     }
+    main 
+    {
+      gap: 20px;
+      padding: 0 20px 10px 20px;
+      display: flex;
+      flex-direction: column;
+      Xmax-height: 75vh;
+
+      overflow-y: auto;
+      flex: 1 1 auto;
+      min-height: 0;
+    }
     footer 
     {
       text-align: center;
       margin: 20px 0 0 0;
+      flex-shrink: 0;
     }
     &.wait dialog
     {
@@ -654,7 +664,7 @@
     display: grid;
     align-items: center;
     grid-template-columns: auto auto auto auto;
-    max-height: 75vh;
+    Xmax-height: 75vh;
     padding: 5px 10px 5px 5px;
     gap: 10px;
 
