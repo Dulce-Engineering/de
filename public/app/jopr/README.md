@@ -152,3 +152,6 @@ https://www.youtube.com/watch?v=oVy-KKWsdNg&list=PLDTPrMoGHssBulfAaczSuk0f8luCiK
 1997-04-01 - 1998-10-01 Brilliant Digital Entertainment
 1997-04-01 - 1998-10-01 Sybiz
 1995-07-01 - 1997-03-01 Uniloc
+
+Misc Notes
+The broad category of software, for measuring CV suitability, is called an Applicant Tracking System (ATS), and the specific underlying engine that reads and evaluates the CV against the job description is a Resume Parser (or CV Parser) paired with Candidate Matching / AI Screening software.
