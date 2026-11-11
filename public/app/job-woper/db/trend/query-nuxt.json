@@ -718,5 +718,11 @@
     "datetime": 1794300544881,
     "id": "7721fff5-0a59-4f75-a56d-20a38525e594",
     "query_id": "-nuxt"
+  },
+  {
+    "count": 1,
+    "datetime": 1794396416248,
+    "id": "42f152b1-2130-4e87-b839-143ffc844c2b",
+    "query_id": "-nuxt"
   }
 ]
