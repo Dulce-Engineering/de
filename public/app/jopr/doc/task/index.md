@@ -13,6 +13,7 @@ Central dashboard and status tracker for JOPR application features, bug fixes, a
 | [2](2-log-errors.md) | Log errors to Firebase Analytics | Feature | Done | Medium | 2026-10-26 | `node --test test/jopr/logic/ctx.js` |
 | [3](3-multi-select.md) | New multi search select component | Feature | Done | Medium | 2026-10-26 | `node --test test/jopr/component/de-search-multi-select.js` |
 | [4](4-refactor-contact-list.md) | Refactor de-contact-list to use de-search-multi-select | Feature | Done | Medium | 2026-10-27 | `node --test test/jopr/component/de-contact-list.js` |
+| [5](5-edit-profile-page.md) | New page to edit a profile | Feature | Done | High | 2026-11-11 | `node --test test/jopr/logic/ctx.js` |
 
 ---
 
@@ -34,6 +35,7 @@ Central dashboard and status tracker for JOPR application features, bug fixes, a
 - [x] **[#2: Log errors to Firebase Analytics](2-log-errors.md)** (2026-10-26) — Report uncaught errors and promise rejections to GA4.
 - [x] **[#3: New multi search select component](3-multi-select.md)** (2026-10-26) — Multi-select combobox with rendered items list, edit, and delete via `de-toolbar-menu`.
 - [x] **[#4: Refactor de-contact-list to use de-search-multi-select](4-refactor-contact-list.md)** (2026-10-27) — Replaced de-input-list with de-search-multi-select in sublist view, added items property, and integrated with job dialog.
+- [x] **[#5: New page to edit a profile](5-edit-profile-page.md)** (2026-11-11) — Created standalone `profile.html` and `profile.js` page for editing a profile and its education, career, and project histories by `profile_id`, along with the `profile` route in `ctx.js`.
 
 ---
 

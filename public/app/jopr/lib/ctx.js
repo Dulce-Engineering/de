@@ -97,6 +97,7 @@ async function Init_Firebase_Analytics(app, analytics_module = fb_analytics)
  * @property {function(number|string, number|string, boolean, string[]): string} gen-cv-2 - Route to CV generator page.
  * @property {function(number|string): string} gen-cl - Route to cover letter generator page.
  * @property {function(): string} profiles - Route to profiles page.
+ * @property {function(number|string=): string} profile - Route to profile edit page.
  * @property {function(): string} index - Route to index tracker page.
  */
 
@@ -179,6 +180,7 @@ async function New_Ctx(options = {})
           Add_Params("page/gen-cv-2.html", {job_id, profile_id, gen, ignore_titles, db_id}),
       "gen-cl": job_id => Add_Params("page/gen-cl.html", {job_id, db_id}),
       "profiles": () => Add_Params("page/profiles.html", {db_id}),
+      "profile": profile_id => Add_Params("page/profile.html", {profile_id, db_id}),
       "index": () => Add_Params("index.html", {db_id}),
     },
 

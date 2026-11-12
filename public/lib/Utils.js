@@ -1,101 +1,6 @@
 class Utils
 {
-  static Abbreviate(str)
-  {
-    const MAX_LENGTH = 200;
-    let res;
-
-    if (!Utils.isEmpty(str))
-    {
-      if (str.length > MAX_LENGTH)
-      {
-        res = str.substring(0, MAX_LENGTH) + "...";
-      }
-      else
-      {
-        res = str;
-      }
-    }
-
-    return res;
-  }
-
-  static Add_Param(url, param_name, param_Value)
-  {
-    if (param_Value)
-    {
-      let sep = "&";
-
-      if (!url.includes("?"))
-      {
-        sep = "?";
-      }
-      url = Utils.appendStr(url, param_name + "=" + param_Value, sep);
-    }
-
-    return url;
-  }
-
-  static Add_Stylesheet(elem, attrib_name = "style-src")
-  {
-    if (elem.hasAttribute(attrib_name))
-    {
-      const link = document.createElement("link");
-      link.rel = "stylesheet";
-      link.href = elem.getAttribute(attrib_name);
-      elem.shadowRoot.append(link);
-    }
-  }
-
-  static appendParam(params, paramName, paramValue, defValue)
-  {
-    if (!Utils.isEmpty(paramValue))
-    {
-      params = Utils.appendStr(params, paramName + "=" + paramValue, "&");
-    }
-    else if (!Utils.isEmpty(defValue))
-    {
-      params = Utils.appendStr(params, paramName + "=" + defValue, "&");
-    }
-
-    return params;
-  }
-
-  static Append_Str(a, b, sep)
-  {
-    return Utils.appendStr(a, b, sep);
-  }
-
-  static appendStr(a, b, sep)
-  {
-    let res = null;
-    const a_has_val = !Utils.Is_Empty(a);
-    const b_has_val = !Utils.Is_Empty(b);
-
-    if (sep == null || sep == undefined)
-    {
-      sep = "";
-    }
-    if (a_has_val && b_has_val)
-    {
-      res = a + sep + b;
-    } 
-    else if (a_has_val && !b_has_val)
-    {
-      res = a;
-    } 
-    else if (!a_has_val && b_has_val)
-    {
-      res = b;
-    }
-
-    return res;
-  }
-
-  static Back_And_Refresh()
-  {
-    document.referrer ? window.location = document.referrer : history.back();
-  }
+  // #region Misc, Objects, and Arrays ==============================
 
   static Bind(obj, fn_prefix)
   {
@@ -114,245 +19,6 @@ class Utils
     }
   }
 
-  static Clone_Template(template_elem)
-  {
-    const clone = template_elem.content.cloneNode(true);
-    Utils.Set_Id_Shortcuts(clone, clone);
-    return clone;
-  }
-
-  static Connect_Store(elem, On_Store_Connected, event = "connected")
-  {
-    let store_elem = null;
-
-    const store_id = elem.getAttribute("store-id");
-    if (!Utils.isEmpty(store_id))
-    {
-      store_elem = document.getElementById(store_id);
-      if (store_elem)
-      {
-        store_elem.addEventListener(event, On_Store_Connected);
-      }
-    }
-
-    return store_elem;
-  }
-
-  static Disable(id)
-  {
-    const elem = document.getElementById(id);
-    if (elem)
-    {
-      elem.disabled = true;
-    }
-  }
-
-  static Extract_Str(src, prefix, postfix, from_index)
-  {
-    let res = null;
-
-    let start_index = src.indexOf(prefix, from_index);
-    if (start_index != -1)
-    {
-      start_index += prefix.length;
-      const end_index = src.indexOf(postfix, start_index);
-      if (end_index != -1)
-      {
-        res = src.substring(start_index, end_index);
-      }
-      else
-      {
-        res = src.substring(start_index);
-      }
-    }
-
-    return res;
-  }
-
-  static async fetch(url, method, xApiKey, body)
-  {
-    let res = null;
-    const options =
-    {
-      method,
-      headers:
-      {
-        'Content-Type': 'application/json',
-        'x-api-key': xApiKey
-      }
-    };
-
-    if (body)
-    {
-      options.body = body;
-    }
-
-    const httpRes = await fetch(url, options);
-    if (httpRes)
-    {
-      res = await httpRes.text();
-    }
-
-    return res;
-  }
-
-  static fetchGetJson(url, xApiKey)
-  {
-    return Utils.fetchJson(url, "GET", {'x-api-key':xApiKey});
-  }
-
-  static async fetchGetXml(url)
-  {
-    let res = null;
-    const options = Utils.setOptions("GET", null, 'application/soap+xml');
-
-    const httpRes = await fetch(url, options);
-    if (httpRes)
-    {
-      const textRes = await httpRes.text();
-      if (httpRes.ok)
-      {
-        res = Utils.xmlToJson(textRes);
-      }
-      else
-      {
-        console.error("Utils.fetchGetXml(): HTTP status, data -", httpRes.status, textRes);
-      }
-    }
-
-    return res;
-  }
-
-  static async fetchJson(url, method, headers, body)
-  {
-    let res = null;
-    const options =
-    {
-      method,
-      headers,
-      body
-    };
-
-    /*if (body)
-    {
-      options.body = body;
-    }*/
-
-    const httpRes = await fetch(url, options);
-    if (httpRes)
-    {
-      const textRes = await httpRes.text();
-      res = JSON.parse(textRes);
-    }
-
-    return res;
-  }
-
-  static fetchPostJson(url, xApiKey, bodyObj, auth)
-  {
-    let body;
-
-    if (bodyObj)
-    {
-      body = JSON.stringify(bodyObj);
-    }
-
-    return Utils.fetchJson(url, "POST", {'x-api-key':xApiKey,Authorization:auth}, body);
-  }
-
-  static async Fetch_Text(url, method, headers, body)
-  {
-    let res = null;
-    const options = 
-    {
-      method: method || "get",
-      headers,
-      body
-    };
-
-    const request = fetch(url, options);
-    const response = await request;
-    if (response)
-    {
-      const response_text = await response.text();
-      if (response.ok)
-      {
-        res = response_text;
-      }
-      else
-      {
-        console.error("Utils.Fetch_Text(): " + response.status + " " + response.statusText + " " + response.url);
-        console.error("Utils.Fetch_Text(): response_text =", response_text);
-      }
-    }
-
-    return res;
-  }
-
-  static Focus_Input()
-  {
-    var input = document.getElementsByTagName('INPUT');
-    for (var i = 0, n = input.length; i < n; i = i + 1)
-    {
-      if (input[i].value.length !== "")
-      {
-        input[i].focus();
-      }
-    }
-  }
-
-  static Get_Attr_Def(elem, name, def)
-  {
-    let res = def;
-    if (elem?.hasAttribute(name))
-    {
-      const attr_val = elem.getAttribute(name);
-      if (Utils.hasValue(attr_val)) res = attr_val;
-    }
-    return res;
-  }
-
-  static getFromLocalStorge(key, defaultValue)
-  {
-    return Utils.Get_From_Storage(localStorage, key, defaultValue);
-  }
-
-  static getFromLocalStorgeInt(key, defaultValue)
-  {
-    return parseInt(Utils.getFromLocalStorge(key, defaultValue));
-  }
-
-  static Get_From_Local_Storage_JSON(key, defaultValue)
-  {
-    return Utils.Get_From_Storage_JSON(localStorage, key, defaultValue);
-  }
-
-  static Get_From_Storage(storage, key, defaultValue)
-  {
-    let res = defaultValue;
-
-    const storageStr = storage.getItem(key);
-    if (!Utils.isEmpty(storageStr))
-    {
-      res = storageStr;
-    }
-
-    return res;
-  }
-
-  static Get_From_Storage_JSON(storage, key, defaultValue)
-  {
-    let res = defaultValue;
-
-    const json_str = storage.getItem(key);
-    if (!Utils.isEmpty(json_str))
-    {
-      res = JSON.parse(json_str);
-    }
-
-    return res;
-  }
-
   static getMethods(obj)
   {
     let properties = new Set();
@@ -365,76 +31,6 @@ class Utils
     return [...properties.keys()].filter(item => typeof obj[item] === 'function');
   }
 
-  static Get_Param(param_name)
-  {
-    const urlParams = new URLSearchParams(window.location.search);
-    const res = urlParams.get(param_name);
-    return res;
-  }
-
-  static async Get_Storage_Download_URL(fb_strg, id)
-  {
-    const ref = fb_strg.ref().child(id);
-    let url = null;
-
-    try
-    {
-      url = await ref.getDownloadURL();
-    }
-    catch (error)
-    {
-      console.error(error);
-    }
-
-    return url;
-  }
-
-  static Get_Store_Id(user_uid)
-  {
-    let store_id = null;
-
-    if (user_uid)
-    {
-      const key = "store_id." + user_uid;
-      store_id = localStorage.getItem(key);
-    }
-
-    return store_id;
-  }
-
-  static Get_Query_Param(param_name)
-  {
-    let param_val = null;
-
-    const params = new URL(document.location).searchParams;
-    if (params.has(param_name))
-    {
-      param_val = params.get(param_name);
-    }
-
-    return param_val;
-  }
-
-  static Set_Query_Param(param_name, param_val)
-  {
-    const params = new URL(document.location).searchParams;
-    params.set(param_name, param_val);
-    
-    return params;
-  }
-
-  static Handle_Errors(api_class)
-  {
-    if (api_class?.last_rpc?.error)
-    {
-      alert(api_class.last_rpc.error.code + ": " + api_class.last_rpc.error.message);
-    }
-    else
-    {
-      alert("There was a problem.");
-    }
-  }
-
   static hasValue(data)
   {
     let res = true;
@@ -445,51 +41,6 @@ class Utils
     }
 
     return res;
-  }
-
-  static Hide(id, parent_elem)
-  {
-    if (!parent_elem)
-    {
-      parent_elem = document;
-    }
-
-    const elem = parent_elem.querySelector("#" + id);
-    if (elem)
-    {
-      elem.style.display = "none";
-    }
-  }
-
-  static Hide_Element(elem)
-  {
-    if (elem)
-    {
-      const def_display = getComputedStyle(elem).getPropertyValue("display");
-      if (def_display && def_display != "none")
-      {
-        elem.style.setProperty("--def-display", def_display);
-      }
-      
-      elem.style.display = "none";
-    }
-  }
-
-  static async Import_API(config, on_pre_fetch_fn, on_fetch_fn, token, on_error_fn)
-  {
-    const api = await import(config.api_client_url);
-    for (const comp_class_name in api.default)
-    {
-      const comp_class = api.default[comp_class_name];
-      comp_class.server_host = config.api_server_host;
-      comp_class.On_Fetch = on_fetch_fn;
-      comp_class.On_Pre_Fetch = on_pre_fetch_fn;
-      comp_class.headers = !Utils.isEmpty(token) ? {authorization: "Firebase " + token} : null;
-      comp_class.On_Error = on_error_fn;
-      window[comp_class_name] = comp_class;
-    }
-
-    return api.default;
   }
 
   static Is_Empty(items)
@@ -569,22 +120,6 @@ class Utils
     }
 
     return res;
-  }
-
-  static Set_APIs_Auth(token, apis)
-  {
-    for (const comp_class_name in apis)
-    {
-      const comp_class = apis[comp_class_name];
-      if (token)
-      {
-        comp_class.headers = {authorization: "Firebase " + token};
-      }
-      else
-      {
-        comp_class.headers = null;
-      }
-    }
   }
 
   static Set_Filter(filters, id, value)
@@ -717,18 +252,6 @@ class Utils
     }
   }
 
-  static toJSONArray(obj)
-  {
-    let res;
-
-    if (obj)
-    {
-      res = JSON.stringify(obj);
-    }
-
-    return res;
-  }
-
   static toNull(value)
   {
     let res = value;
@@ -766,7 +289,383 @@ class Utils
     return res;
   }
 
-  // Strings ========================================================
+  // #endregion
+
+  // #region Browser & HTTP =========================================
+
+  static Add_Param(url, param_name, param_Value)
+  {
+    if (param_Value)
+    {
+      let sep = "&";
+
+      if (!url.includes("?"))
+      {
+        sep = "?";
+      }
+      url = Utils.appendStr(url, param_name + "=" + param_Value, sep);
+    }
+
+    return url;
+  }
+
+  static appendParam(params, paramName, paramValue, defValue)
+  {
+    if (!Utils.isEmpty(paramValue))
+    {
+      params = Utils.appendStr(params, paramName + "=" + paramValue, "&");
+    }
+    else if (!Utils.isEmpty(defValue))
+    {
+      params = Utils.appendStr(params, paramName + "=" + defValue, "&");
+    }
+
+    return params;
+  }
+
+  static Back_And_Refresh()
+  {
+    document.referrer ? window.location = document.referrer : history.back();
+  }
+
+  static async fetch(url, method, xApiKey, body)
+  {
+    let res = null;
+    const options =
+    {
+      method,
+      headers:
+      {
+        'Content-Type': 'application/json',
+        'x-api-key': xApiKey
+      }
+    };
+
+    if (body)
+    {
+      options.body = body;
+    }
+
+    const httpRes = await fetch(url, options);
+    if (httpRes)
+    {
+      res = await httpRes.text();
+    }
+
+    return res;
+  }
+
+  static fetchGetJson(url, xApiKey)
+  {
+    return Utils.fetchJson(url, "GET", {'x-api-key':xApiKey});
+  }
+
+  static async fetchGetXml(url)
+  {
+    let res = null;
+    const options = Utils.setOptions("GET", null, 'application/soap+xml');
+
+    const httpRes = await fetch(url, options);
+    if (httpRes)
+    {
+      const textRes = await httpRes.text();
+      if (httpRes.ok)
+      {
+        res = Utils.xmlToJson(textRes);
+      }
+      else
+      {
+        console.error("Utils.fetchGetXml(): HTTP status, data -", httpRes.status, textRes);
+      }
+    }
+
+    return res;
+  }
+
+  static async fetchJson(url, method, headers, body)
+  {
+    let res = null;
+    const options =
+    {
+      method,
+      headers,
+      body
+    };
+
+    /*if (body)
+    {
+      options.body = body;
+    }*/
+
+    const httpRes = await fetch(url, options);
+    if (httpRes)
+    {
+      const textRes = await httpRes.text();
+      res = JSON.parse(textRes);
+    }
+
+    return res;
+  }
+
+  static fetchPostJson(url, xApiKey, bodyObj, auth)
+  {
+    let body;
+
+    if (bodyObj)
+    {
+      body = JSON.stringify(bodyObj);
+    }
+
+    return Utils.fetchJson(url, "POST", {'x-api-key':xApiKey,Authorization:auth}, body);
+  }
+
+  static async Fetch_Text(url, method, headers, body)
+  {
+    let res = null;
+    const options = 
+    {
+      method: method || "get",
+      headers,
+      body
+    };
+
+    const request = fetch(url, options);
+    const response = await request;
+    if (response)
+    {
+      const response_text = await response.text();
+      if (response.ok)
+      {
+        res = response_text;
+      }
+      else
+      {
+        console.error("Utils.Fetch_Text(): " + response.status + " " + response.statusText + " " + response.url);
+        console.error("Utils.Fetch_Text(): response_text =", response_text);
+      }
+    }
+
+    return res;
+  }
+
+  static getFromLocalStorge(key, defaultValue)
+  {
+    return Utils.Get_From_Storage(localStorage, key, defaultValue);
+  }
+
+  static getFromLocalStorgeInt(key, defaultValue)
+  {
+    return parseInt(Utils.getFromLocalStorge(key, defaultValue));
+  }
+
+  static Get_From_Local_Storage_JSON(key, defaultValue)
+  {
+    return Utils.Get_From_Storage_JSON(localStorage, key, defaultValue);
+  }
+
+  static Get_From_Storage(storage, key, defaultValue)
+  {
+    let res = defaultValue;
+
+    const storageStr = storage.getItem(key);
+    if (!Utils.isEmpty(storageStr))
+    {
+      res = storageStr;
+    }
+
+    return res;
+  }
+
+  static Get_From_Storage_JSON(storage, key, defaultValue)
+  {
+    let res = defaultValue;
+
+    const json_str = storage.getItem(key);
+    if (!Utils.isEmpty(json_str))
+    {
+      res = JSON.parse(json_str);
+    }
+
+    return res;
+  }
+
+  static Get_Param(param_name)
+  {
+    const url_params = new URLSearchParams(window.location.search);
+    return url_params.get(param_name);
+  }
+
+  static Get_Param_Int(param_name, def_value = null)
+  {
+    const param_str = Utils.Get_Param(param_name);
+    return Utils.To_Int(param_str, def_value);
+  }
+
+  static async Get_Storage_Download_URL(fb_strg, id)
+  {
+    const ref = fb_strg.ref().child(id);
+    let url = null;
+
+    try
+    {
+      url = await ref.getDownloadURL();
+    }
+    catch (error)
+    {
+      console.error(error);
+    }
+
+    return url;
+  }
+
+  static Get_Store_Id(user_uid)
+  {
+    let store_id = null;
+
+    if (user_uid)
+    {
+      const key = "store_id." + user_uid;
+      store_id = localStorage.getItem(key);
+    }
+
+    return store_id;
+  }
+
+  static Handle_Errors(api_class)
+  {
+    if (api_class?.last_rpc?.error)
+    {
+      alert(api_class.last_rpc.error.code + ": " + api_class.last_rpc.error.message);
+    }
+    else
+    {
+      alert("There was a problem.");
+    }
+  }
+
+  static async Import_API(config, on_pre_fetch_fn, on_fetch_fn, token, on_error_fn)
+  {
+    const api = await import(config.api_client_url);
+    for (const comp_class_name in api.default)
+    {
+      const comp_class = api.default[comp_class_name];
+      comp_class.server_host = config.api_server_host;
+      comp_class.On_Fetch = on_fetch_fn;
+      comp_class.On_Pre_Fetch = on_pre_fetch_fn;
+      comp_class.headers = !Utils.isEmpty(token) ? {authorization: "Firebase " + token} : null;
+      comp_class.On_Error = on_error_fn;
+      window[comp_class_name] = comp_class;
+    }
+
+    return api.default;
+  }
+
+  static Set_APIs_Auth(token, apis)
+  {
+    for (const comp_class_name in apis)
+    {
+      const comp_class = apis[comp_class_name];
+      if (token)
+      {
+        comp_class.headers = {authorization: "Firebase " + token};
+      }
+      else
+      {
+        comp_class.headers = null;
+      }
+    }
+  }
+
+  static Set_Local_Storge_Json(key, value)
+  {
+    const value_str = JSON.stringify(value);
+    localStorage.setItem(key, value_str);
+  }
+
+  static Set_Query_Param(param_name, param_val)
+  {
+    const params = new URL(document.location).searchParams;
+    params.set(param_name, param_val);
+    
+    return params;
+  }
+
+  // #endregion
+
+  // #region Strings ================================================
+  
+  static Abbreviate(str)
+  {
+    const MAX_LENGTH = 200;
+    let res;
+
+    if (!Utils.isEmpty(str))
+    {
+      if (str.length > MAX_LENGTH)
+      {
+        res = str.substring(0, MAX_LENGTH) + "...";
+      }
+      else
+      {
+        res = str;
+      }
+    }
+
+    return res;
+  }
+
+  static Append_Str(a, b, sep)
+  {
+    return Utils.appendStr(a, b, sep);
+  }
+
+  static appendStr(a, b, sep)
+  {
+    let res = null;
+    const a_has_val = !Utils.Is_Empty(a);
+    const b_has_val = !Utils.Is_Empty(b);
+
+    if (sep == null || sep == undefined)
+    {
+      sep = "";
+    }
+    if (a_has_val && b_has_val)
+    {
+      res = a + sep + b;
+    } 
+    else if (a_has_val && !b_has_val)
+    {
+      res = a;
+    } 
+    else if (!a_has_val && b_has_val)
+    {
+      res = b;
+    }
+
+    return res;
+  }
+
+  static Extract_Str(src, prefix, postfix, from_index)
+  {
+    let res = null;
+
+    let start_index = src.indexOf(prefix, from_index);
+    if (start_index != -1)
+    {
+      start_index += prefix.length;
+      const end_index = src.indexOf(postfix, start_index);
+      if (end_index != -1)
+      {
+        res = src.substring(start_index, end_index);
+      }
+      else
+      {
+        res = src.substring(start_index);
+      }
+    }
+
+    return res;
+  }
 
   static to2DigitStr(number)
   {
@@ -830,6 +729,18 @@ class Utils
     return res;
   }
 
+  static toJSONArray(obj)
+  {
+    let res;
+
+    if (obj)
+    {
+      res = JSON.stringify(obj);
+    }
+
+    return res;
+  }
+
   static toJSONStr(obj)
   {
     let res;
@@ -842,7 +753,126 @@ class Utils
     return res;
   }
 
-  // HTML ===========================================================
+  // #endregion
+
+  // #region HTML ===================================================
+
+  static Add_Stylesheet(elem, attrib_name = "style-src")
+  {
+    if (elem.hasAttribute(attrib_name))
+    {
+      const link = document.createElement("link");
+      link.rel = "stylesheet";
+      link.href = elem.getAttribute(attrib_name);
+      elem.shadowRoot.append(link);
+    }
+  }
+
+  static Blob_To_Base64(blob)
+  {
+    return new Promise((resolve, reject) =>
+    {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result.split(',')[1]);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  }
+
+  static Clone_Template(template_elem)
+  {
+    const clone = template_elem.content.cloneNode(true);
+    Utils.Set_Id_Shortcuts(clone, clone);
+    return clone;
+  }
+
+  static Connect_Store(elem, On_Store_Connected, event = "connected")
+  {
+    let store_elem = null;
+
+    const store_id = elem.getAttribute("store-id");
+    if (!Utils.isEmpty(store_id))
+    {
+      store_elem = document.getElementById(store_id);
+      if (store_elem)
+      {
+        store_elem.addEventListener(event, On_Store_Connected);
+      }
+    }
+
+    return store_elem;
+  }
+
+  /**
+   * Recreates a File object from serialized JSON data
+   * @param {Object} serialized - The object containing metadata and base64 content
+   * @returns {Promise<File>}
+   */
+  static async Deserialize_File(serialized)
+  {
+    // 1. Fetch the data URL to convert it back to a Blob
+    const response = await fetch(serialized.content);
+    const blob = await response.blob();
+
+    // 2. Reconstruct the File using the stored metadata
+    return new File([blob], serialized.name, {
+      type: serialized.type,
+      lastModified: serialized.lastModified
+    });
+  }
+
+  static Disable(id)
+  {
+    const elem = document.getElementById(id);
+    if (elem)
+    {
+      elem.disabled = true;
+    }
+  }
+
+  static Download_File(blob, filename)
+  {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  static Find_Parents(element, tagName) 
+  {
+    const matchingParents = [];
+    let currentElement = element.parentNode;
+
+    tagName = tagName.toUpperCase();
+
+    while (currentElement) 
+    {
+      if (currentElement.tagName === tagName) 
+      {
+        matchingParents.push(currentElement);
+      }
+      currentElement = currentElement.parentNode;
+    }
+
+    return matchingParents.length > 0 ? matchingParents : null;
+  }
+
+  static Focus_Input()
+  {
+    var input = document.getElementsByTagName('INPUT');
+    for (var i = 0, n = input.length; i < n; i = i + 1)
+    {
+      if (input[i].value.length !== "")
+      {
+        input[i].focus();
+      }
+    }
+  }
 
   static From_Elements_To_Obj(obj, root_elem)
   {
@@ -940,6 +970,50 @@ class Utils
     }
   }
 
+  static Get_Attr_Def(elem, name, def)
+  {
+    let res = def;
+    if (elem?.hasAttribute(name))
+    {
+      const attr_val = elem.getAttribute(name);
+      if (Utils.hasValue(attr_val)) res = attr_val;
+    }
+    return res;
+  }
+
+  static Get_Slot_Content(src_elems, slot_name)
+  {
+    return src_elems.querySelector(`[slot='${slot_name}']`);
+  }
+
+  static Hide(id, parent_elem)
+  {
+    if (!parent_elem)
+    {
+      parent_elem = document;
+    }
+
+    const elem = parent_elem.querySelector("#" + id);
+    if (elem)
+    {
+      elem.style.display = "none";
+    }
+  }
+
+  static Hide_Element(elem)
+  {
+    if (elem)
+    {
+      const def_display = getComputedStyle(elem).getPropertyValue("display");
+      if (def_display && def_display != "none")
+      {
+        elem.style.setProperty("--def-display", def_display);
+      }
+      
+      elem.style.display = "none";
+    }
+  }
+
   static async Import_HTML(url)
   {
     const response = await fetch(url);
@@ -948,9 +1022,16 @@ class Utils
     return response_text;
   }
 
-  static Get_Slot_Content(src_elems, slot_name)
+  static On_Enter_Do_Click(button)
   {
-    return src_elems.querySelector(`[slot='${slot_name}']`);
+    window.addEventListener("keyup", On_Window_Keyup);
+    function On_Window_Keyup(event)
+    {
+      if (event.which == 13) 
+      {
+        button.click();
+      }
+    }
   }
 
    /**
@@ -1029,6 +1110,64 @@ class Utils
     }
   }
 
+  static Select_Files()
+  {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.multiple = true;
+    async function Files_Change(e, resolve_fn)
+    {
+      const files = Array.from(e.target.files);
+      if (files && files.length > 0)
+      {
+        resolve_fn(files);
+      }
+      else
+      {
+        resolve_fn(null);
+      }
+    }
+
+    const res = new Promise(On_Promise);
+    function On_Promise(resolve, reject)
+    {
+      input.onchange = (e) => Files_Change(e, resolve);
+      input.click();
+    }
+
+    return res;
+  }
+
+  /**
+   * Converts a File object to a JSON-serializable object including content
+   * @param {File} file 
+   * @returns {Promise<Object>}
+   */
+  static async Serialize_File(file)
+  {
+    const promise = new Promise(On_Process);
+    function On_Process(resolve, reject)
+    {
+      const reader = new FileReader();
+
+      reader.onload = () =>
+      {
+        resolve({
+          name: file.name,
+          size: file.size,
+          type: file.type,
+          lastModified: file.lastModified,
+          content: reader.result // This is the base64 string
+        });
+      };
+
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    }
+
+    return promise;
+  }
+
   /**
    * Sets up shortcuts to elements within a source element based on their attribute values.
    *
@@ -1091,12 +1230,6 @@ class Utils
     }
   }
 
-  static Set_Local_Storge_Json(key, value)
-  {
-    const value_str = JSON.stringify(value);
-    localStorage.setItem(key, value_str);
-  }
-
   static Show(id, parent_elem)
   {
     if (!parent_elem)
@@ -1124,6 +1257,14 @@ class Utils
     }
   }
 
+  static Show_File(blob, filename)
+  {
+    const url = URL.createObjectURL(blob);
+
+    window.open(url, '_blank');
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
+  }
+
   static To_Document(html, src_elems) 
   {
     return Utils.To_Template(html, src_elems).content;
@@ -1144,6 +1285,11 @@ class Utils
     return element;
   }
 
+  static toElement(html) 
+  {
+    return Utils.toDocument(html).firstChild;
+  }
+
   static To_Elements(html, attr_name) 
   {
     const elements = Utils.toElements(html);
@@ -1153,11 +1299,6 @@ class Utils
         Utils.Set_Id_Shortcuts(elem, elements, attr_name);
     }
     return elements;
-  }
-
-  static toElement(html) 
-  {
-    return Utils.toDocument(html).firstChild;
   }
 
   static toElements(html) 
@@ -1194,127 +1335,9 @@ class Utils
     return template;
   }
 
-  static On_Enter_Do_Click(button)
-  {
-    window.addEventListener("keyup", On_Window_Keyup);
-    function On_Window_Keyup(event)
-    {
-      if (event.which == 13) 
-      {
-        button.click();
-      }
-    }
-  }
+  // #endregion
 
-  static Show_File(blob, filename)
-  {
-    const url = URL.createObjectURL(blob);
-
-    window.open(url, '_blank');
-    setTimeout(() => URL.revokeObjectURL(url), 5000);
-  }
-
-  static Download_File(blob, filename)
-  {
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  }
-
-  static Select_Files()
-  {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.multiple = true;
-    async function Files_Change(e, resolve_fn)
-    {
-      const files = Array.from(e.target.files);
-      if (files && files.length > 0)
-      {
-        resolve_fn(files);
-      }
-      else
-      {
-        resolve_fn(null);
-      }
-    }
-
-    const res = new Promise(On_Promise);
-    function On_Promise(resolve, reject)
-    {
-      input.onchange = (e) => Files_Change(e, resolve);
-      input.click();
-    }
-
-    return res;
-  }
-
-  static Blob_To_Base64(blob)
-  {
-    return new Promise((resolve, reject) =>
-    {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result.split(',')[1]);
-      reader.onerror = reject;
-      reader.readAsDataURL(blob);
-    });
-  }
-
-  /**
-   * Converts a File object to a JSON-serializable object including content
-   * @param {File} file 
-   * @returns {Promise<Object>}
-   */
-  static async Serialize_File(file)
-  {
-    const promise = new Promise(On_Process);
-    function On_Process(resolve, reject)
-    {
-      const reader = new FileReader();
-
-      reader.onload = () =>
-      {
-        resolve({
-          name: file.name,
-          size: file.size,
-          type: file.type,
-          lastModified: file.lastModified,
-          content: reader.result // This is the base64 string
-        });
-      };
-
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    }
-
-    return promise;
-  }
-
-  /**
-   * Recreates a File object from serialized JSON data
-   * @param {Object} serialized - The object containing metadata and base64 content
-   * @returns {Promise<File>}
-   */
-  static async Deserialize_File(serialized)
-  {
-    // 1. Fetch the data URL to convert it back to a Blob
-    const response = await fetch(serialized.content);
-    const blob = await response.blob();
-
-    // 2. Reconstruct the File using the stored metadata
-    return new File([blob], serialized.name, {
-      type: serialized.type,
-      lastModified: serialized.lastModified
-    });
-  }
-
-  // Geometry =======================================================
+  // #region Geometry ===============================================
   
   static Calc_Arrival_Time(x1, y1, t1, x2, y2, v)
   {
@@ -1425,25 +1448,6 @@ class Utils
     return { x, y };
   }
 
-  static Find_Parents(element, tagName) 
-  {
-    const matchingParents = [];
-    let currentElement = element.parentNode;
-
-    tagName = tagName.toUpperCase();
-
-    while (currentElement) 
-    {
-      if (currentElement.tagName === tagName) 
-      {
-        matchingParents.push(currentElement);
-      }
-      currentElement = currentElement.parentNode;
-    }
-
-    return matchingParents.length > 0 ? matchingParents : null;
-  }
-
   static Is_Circle_Circle_Collision(x1, y1, r1, x2, y2, r2)
   {
     const d = Utils.Calc_Distance(x1, y1, x2, y2);
@@ -1552,7 +1556,9 @@ class Utils
     return res;
   }
 
-  // Numbers ========================================================
+  // #endregion
+
+  // #region Numbers ================================================
 
   static async Calc_Values(objs, res_field, calc_fn)
   {
@@ -1868,7 +1874,9 @@ class Utils
     return min + (index * step_size);
   }
 
-  // Date/Time ======================================================
+  // #endregion
+
+  // #region Date/Time ==============================================
 
   static MILLIS_SECOND = 1000;
   static MILLIS_MINUTE = Utils.MILLIS_SECOND * 60;
@@ -2070,6 +2078,8 @@ class Utils
 
     return time_str;
   }
+
+  // #endregion
 }
 
 export default Utils;
