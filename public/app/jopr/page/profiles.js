@@ -2,20 +2,13 @@ import New_Ctx from "../lib/ctx.js?v=2";
 import * as Stats from "../../job-woper/lib/index.js?v=2";
 import DB_SCHEMA from "../db/schema.js?v=2";
 
-const work_types =
-{
-  "full-time": "Fulltime",
-  "part-time": "Part-time",
-  "contract": "Contract",
-  "temp": "Temporary",
-  "casual": "Casual",
-  "internship": "Internship",
-  "volunteer": "Volunteer",
-  "vacation": "Vacation",
-  "other": "Other"
-};
-
 Main();
+
+/**
+ * Initializes the profiles management page.
+ *
+ * @returns {Promise<void>}
+ */
 async function Main()
 {
   const ctx = await New_Ctx();
@@ -25,30 +18,25 @@ async function Main()
     jobs_btn.href = "index.html" + window.location.search;
   }
 
-  Set_Options(career_work_type_select, Object.keys(ctx.Job.work_types), t => t, t => work_types[t]);
-
   import_btn.addEventListener("click", () => On_Click_Import_Btn(ctx));
   export_btn.onclick = () => On_Click_Export_Btn(ctx);
 
   await Render_Profile(ctx);
-  await Render_Education(ctx);
-  await Render_Career(ctx);
-
-  project_list.save_fn = project => ctx.Project.Save(ctx, project);
-  project_list.delete_fn = project_id => ctx.Project.Delete(ctx, project_id);
-  project_list.addEventListener("alert", e => Alert(e.detail));
-  const projects = await ctx.Project.Select(ctx);
-  project_list.value = projects;
 
   Update_Chart(ctx);
 
-  const url_params = new URLSearchParams(window.location.search);
-  if (url_params.get("action") === "ai")
+  if (ctx.Utils.Get_Param("action") === "ai")
   {
     On_Click_AI_Add_Profile(ctx);
   }
 }
 
+/**
+ * Handles importing a JSON database backup into IndexedDB.
+ *
+ * @param {import("../lib/ctx.js").Context} ctx - Application context.
+ * @returns {Promise<void>}
+ */
 async function On_Click_Import_Btn(ctx)
 {
   const input = document.createElement('input');
@@ -78,16 +66,18 @@ async function On_Click_Import_Btn(ctx)
     await ctx.db.Clear();
     await ctx.db.Save_To_IndexedDB(db_data, DB_SCHEMA);
     await Update_Profile(ctx);
-    await Update_Education(ctx);
-    await Update_Career(ctx);
-    const projects = await ctx.Project.Select(ctx);
-    project_list.value = projects;
     Alert("Data imported from " + file.name + " to IndexedDB instance.");
   };
 
   input.click();
 }
 
+/**
+ * Handles exporting all IndexedDB tables as a JSON file.
+ *
+ * @param {import("../lib/ctx.js").Context} ctx - Application context.
+ * @returns {Promise<void>}
+ */
 async function On_Click_Export_Btn(ctx)
 {
   const db_data = {};
@@ -118,6 +108,12 @@ async function On_Click_Export_Btn(ctx)
 
 // rendering ======================================================================
 
+/**
+ * Updates the market trend chart in the header.
+ *
+ * @param {import("../lib/ctx.js").Context} ctx - Application context.
+ * @returns {Promise<void>}
+ */
 async function Update_Chart(ctx)
 {
   const queries = await Stats.Query.Select_All();
@@ -164,18 +160,12 @@ async function Update_Chart(ctx)
   setTimeout(() => Update_Chart(ctx), 60000);
 }
 
-function Work_Type_Label(ctx, work_type)
-{
-  let res = null;
-
-  if (work_type)
-  {
-    res = ctx.Job.work_types[work_type?.toLowerCase()] || work_type["other"];
-  }
-
-  return res;
-}
-
+/**
+ * Escapes text content and converts newlines to `<br>` tags.
+ *
+ * @param {string} str - Input string.
+ * @returns {string} HTML string.
+ */
 function Str_To_HTML(str)
 {
   const div = document.createElement("div");
@@ -183,6 +173,13 @@ function Str_To_HTML(str)
   return div.innerHTML.replace(/\n/g, "<br>");
 }
 
+/**
+ * Calculates and formats a duration string in years between two dates.
+ *
+ * @param {Date|number|null} start_time - Start date/timestamp.
+ * @param {Date|number|null} end_time - End date/timestamp.
+ * @returns {string}
+ */
 function Duration_Str(start_time, end_time)
 {
   let res = "";
@@ -202,24 +199,11 @@ function Duration_Str(start_time, end_time)
   return res;
 }
 
-function Set_Options(select_elem, options, value_fn, text_fn)
-{
-  if (select_elem)
-  {
-    select_elem.innerHTML = '<option value="">None</option>';
-    if (options)
-    {
-      for (const option of options)
-      {
-        const option_elem = document.createElement("option");
-        option_elem.value = value_fn(option);
-        option_elem.textContent = text_fn(option);
-        select_elem.appendChild(option_elem);
-      }
-    }
-  }
-}
-
+/**
+ * Displays an animated status alert in `alert_elem`.
+ *
+ * @param {string} msg - Alert message text.
+ */
 function Alert(msg)
 {
   const char_millis = 35;
@@ -251,22 +235,41 @@ function Alert(msg)
 
 // profile ========================================================================
 
+/**
+ * Initializes the profile list component and toolbar listeners.
+ *
+ * @param {import("../lib/ctx.js").Context} ctx - Application context.
+ * @returns {Promise<void>}
+ */
 async function Render_Profile(ctx)
 {
-  profile_menu.addEventListener("add", () => On_Click_Edit_Profile(ctx, null));
+  profile_menu.addEventListener("add", () => On_Click_Add_Profile(ctx));
   profile_menu.addEventListener("ai", () => On_Click_AI_Add_Profile(ctx));
   profile_menu.addEventListener("download", () => On_Click_Download_Profile(ctx));
   profile_list.addEventListener("render", (e) => Render_Profile_Item(e, ctx));
   await Update_Profile(ctx);
 }
 
+/**
+ * Fetches all profiles and updates `profile_list`.
+ *
+ * @param {import("../lib/ctx.js").Context} ctx - Application context.
+ * @returns {Promise<void>}
+ */
 async function Update_Profile(ctx)
 {
   const profiles = await ctx.Profile.Select_All(ctx);
   profile_list.value = profiles;
 }
 
-function Render_Profile_Item(event, ctx)
+/**
+ * Renders a profile item along with its read-only education, career, and projects summary lists.
+ *
+ * @param {CustomEvent} event - The `de-input-list` render event.
+ * @param {import("../lib/ctx.js").Context} ctx - Application context.
+ * @returns {Promise<void>}
+ */
+async function Render_Profile_Item(event, ctx)
 {
   const item_elem = event.detail.item_elem;
   const profile = item_elem.item_obj;
@@ -303,21 +306,88 @@ function Render_Profile_Item(event, ctx)
   item_elem.profile_item_menu.addEventListener("copy", () => On_Click_Copy_Profile(ctx, profile_id));
   item_elem.profile_item_menu.addEventListener("delete", () => On_Click_Delete_Profile(ctx, profile_id));
   item_elem.profile_item_menu.addEventListener("download", () => On_Click_Download_Profile(ctx, profile_id));
+
+  item_elem.edu_list.addEventListener("render", Render_Edu_Item);
+  const certificates = await ctx.Profile.Edu_Select(ctx, c => c.profile_id == profile_id);
+  item_elem.edu_list.value = certificates;
+
+  item_elem.career_list.addEventListener("render", (e) => Render_Career_Item(ctx, e));
+  const jobs = await ctx.Profile.Job_Select(ctx, j => j.profile_id == profile_id);
+  item_elem.career_list.value = jobs;
+
+  item_elem.project_list.addEventListener("render", Render_Project_Item);
+  const projects = await ctx.Project.Select(ctx);
+  item_elem.project_list.value = projects;
 }
 
-async function On_Click_Edit_Profile(ctx, id)
+/**
+ * Renders a read-only education item inside a profile's education list.
+ *
+ * @param {CustomEvent} event - The `de-input-list` render event.
+ */
+function Render_Edu_Item(event)
 {
-  const profile = id ? await ctx.Profile.Select_By_Id(ctx, id) : (id === null ? null : await ctx.Profile.Select_First(ctx));
-  const form_data = await profile_form.Show_Async(profile);
+  const item_elem = event.detail.item_elem;
+  const edu = item_elem.item_obj;
+
+  item_elem.edu_title_elem.textContent = edu.title || "Unnamed Education";
+  item_elem.edu_institution_elem.textContent = edu.institution || "N/A";
+  item_elem.edu_year_elem.textContent = edu.year || "N/A";
+}
+
+/**
+ * Renders a read-only career item inside a profile's career list.
+ *
+ * @param {import("../lib/ctx.js").Context} ctx - Application context.
+ * @param {CustomEvent} event - The `de-input-list` render event.
+ */
+function Render_Career_Item(ctx, event)
+{
+  const item_elem = event.detail.item_elem;
+  const job = item_elem.item_obj;
+
+  const start_time = job.start_date ? new Date(job.start_date) : null;
+  const start_time_str = ctx.Utils.To_Date_Str(start_time);
+  const end_time = job.end_date ? new Date(job.end_date) : null;
+  const end_time_str = ctx.Utils.To_Date_Str(end_time);
+  const duration_str = Duration_Str(start_time, end_time);
+  let time_str = ctx.Utils.Append_Str(start_time_str, end_time_str, " - ");
+  time_str = ctx.Utils.Append_Str(time_str, duration_str ? "(" + duration_str + ")" : null, " ");
+
+  item_elem.career_company_elem.textContent = job.company_name || "N/A";
+  item_elem.career_title_elem.textContent = job.role_titles || "N/A";
+  item_elem.career_time_elem.textContent = time_str || "N/A";
+}
+
+/**
+ * Renders a read-only project item inside a profile's project list.
+ *
+ * @param {CustomEvent} event - The `de-input-list` render event.
+ */
+function Render_Project_Item(event)
+{
+  const item_elem = event.detail.item_elem;
+  const project = item_elem.item_obj;
+
+  item_elem.project_title_elem.textContent = project.title || "N/A";
+  item_elem.project_url_elem.textContent = project.url || "N/A";
+}
+
+/**
+ * Opens the dialog form to create a new profile.
+ *
+ * @param {import("../lib/ctx.js").Context} ctx - Application context.
+ * @returns {Promise<void>}
+ */
+async function On_Click_Add_Profile(ctx)
+{
+  const form_data = await profile_form.Show_Async(null);
   if (form_data)
   {
-    form_data.id = id || (id === null ? undefined : profile?.id);
     const is_saved = await ctx.Profile.Save(ctx, form_data);
     if (is_saved)
     {
       await Update_Profile(ctx);
-      await Update_Education(ctx);
-      await Update_Career(ctx);
       Alert("Profile saved successfully.");
     }
     else
@@ -327,6 +397,23 @@ async function On_Click_Edit_Profile(ctx, id)
   }
 }
 
+/**
+ * Opens the single profile edit page in a new tab for the selected profile ID.
+ *
+ * @param {import("../lib/ctx.js").Context} ctx - Application context.
+ * @param {number|string} id - Profile ID to edit.
+ */
+function On_Click_Edit_Profile(ctx, id)
+{
+  window.open(ctx.routes.profile(id), "_blank");
+}
+
+/**
+ * Extracts CV data using AI and saves the extracted profile, education, and career records.
+ *
+ * @param {import("../lib/ctx.js").Context} ctx - Application context.
+ * @returns {Promise<void>}
+ */
 async function On_Click_AI_Add_Profile(ctx)
 {
   const files = await ctx.Utils.Select_Files();
@@ -352,11 +439,16 @@ async function On_Click_AI_Add_Profile(ctx)
     info_elem.Info();
     Alert("CV extracted successfully!");
     await Update_Profile(ctx);
-    await Update_Education(ctx);
-    await Update_Career(ctx);
   }
 }
 
+/**
+ * Downloads the selected profile along with education and career history as a JSON file.
+ *
+ * @param {import("../lib/ctx.js").Context} ctx - Application context.
+ * @param {number|string} [id] - Profile ID to export.
+ * @returns {Promise<void>}
+ */
 async function On_Click_Download_Profile(ctx, id)
 {
   const employee_profile = id ? await ctx.Profile.Select_By_Id(ctx, id) : await ctx.Profile.Select_First(ctx);
@@ -382,6 +474,13 @@ async function On_Click_Download_Profile(ctx, id)
   Alert("Data exported successfully!");
 }
 
+/**
+ * Confirms and deletes a profile.
+ *
+ * @param {import("../lib/ctx.js").Context} ctx - Application context.
+ * @param {number|string} id - Profile ID to delete.
+ * @returns {Promise<void>}
+ */
 async function On_Click_Delete_Profile(ctx, id)
 {
   const confirmed = await warning_dlg.Confirm("Are you sure you want to delete this profile?");
@@ -391,8 +490,6 @@ async function On_Click_Delete_Profile(ctx, id)
     if (is_deleted)
     {
       await Update_Profile(ctx);
-      await Update_Education(ctx);
-      await Update_Career(ctx);
       Alert("Profile deleted successfully.");
     }
     else
@@ -402,6 +499,13 @@ async function On_Click_Delete_Profile(ctx, id)
   }
 }
 
+/**
+ * Duplicates an existing profile and refreshes the list.
+ *
+ * @param {import("../lib/ctx.js").Context} ctx - Application context.
+ * @param {number|string} id - Profile ID to copy.
+ * @returns {Promise<void>}
+ */
 async function On_Click_Copy_Profile(ctx, id)
 {
   const new_profile_id = await ctx.Profile.Copy(ctx, id);
@@ -416,149 +520,3 @@ async function On_Click_Copy_Profile(ctx, id)
   }
 }
 
-// education ======================================================================
-
-async function Render_Education(ctx)
-{
-  edu_list_menu.addEventListener("add", (e) => On_Click_Update_Edu(e, null, ctx));
-  edu_list.addEventListener("render", (e) => Render_Edu_Item(e, ctx));
-  await Update_Education(ctx);
-}
-
-async function Update_Education(ctx)
-{
-  const certificates = await ctx.Profile.Edu_Select_Active(ctx);
-  edu_list.value = certificates;
-}
-
-function Render_Edu_Item(event, ctx)
-{
-  const item_elem = event.detail.item_elem;
-  const edu = item_elem.item_obj;
-  const edu_id = edu.id;
-
-  const details = ctx.Utils.Append_Str(edu.institution, edu.year, " - ");
-  item_elem.edu_title_elem.textContent = edu.title || "Unnamed Education";
-  item_elem.edu_det_elem.textContent = details;
-
-  item_elem.edu_item_menu.addEventListener("edit", (e) => On_Click_Update_Edu(e, edu_id, ctx));
-  item_elem.edu_item_menu.addEventListener("delete", (e) => On_Click_Delete_Edu(e, edu_id, ctx));
-}
-
-async function On_Click_Update_Edu(e, id, ctx)
-{
-  const curr_edu = await ctx.Profile.Edu_Select_By_Id(ctx, id);
-  const form_data = await edu_dialog.Show_Async(curr_edu);
-  if (form_data)
-  {
-    form_data.id = id;
-    const is_saved = await ctx.Profile.Edu_Save(ctx, form_data);
-    if (is_saved)
-    {
-      await Update_Education(ctx);
-      Alert("Education saved successfully.");
-    }
-    else
-    {
-      Alert("Failed to save education.");
-    }
-  }
-}
-
-async function On_Click_Delete_Edu(e, id, ctx)
-{
-  const confirmed = await warning_dlg.Confirm("Are you sure you want to delete this certificate?");
-  if (confirmed)
-  {
-    const is_deleted = await ctx.Profile.Edu_Delete(ctx, id);
-    if (is_deleted)
-    {
-      await Update_Education(ctx);
-      Alert("Certificate deleted successfully.");
-    }
-    else
-    {
-      Alert("Failed to delete certificate.");
-    }
-  }
-}
-
-// career =========================================================================
-
-async function Render_Career(ctx)
-{
-  career_list_menu.addEventListener("add", (e) => On_Click_Career_Edit(ctx, null));
-  career_list.addEventListener("render", (e) => Render_Career_Item(ctx, e));
-  await Update_Career(ctx);
-}
-
-async function Update_Career(ctx)
-{
-  const jobs = await ctx.Profile.Job_Select_Active(ctx);
-  career_list.value = jobs;
-}
-
-function Render_Career_Item(ctx, event)
-{
-  const item_elem = event.detail.item_elem;
-  const job = item_elem.item_obj;
-  const job_id = job.id;
-
-  const start_time = job.start_date ? new Date(job.start_date) : null;
-  const start_time_str = ctx.Utils.To_Date_Str(start_time);
-  const end_time = job.end_date ? new Date(job.end_date) : null;
-  const end_time_str = ctx.Utils.To_Date_Str(end_time);
-  const duration_str = Duration_Str(start_time, end_time);
-  let time_str = ctx.Utils.Append_Str(start_time_str, end_time_str, " - ");
-  time_str = ctx.Utils.Append_Str(time_str, "(" + duration_str + ")", " ");
-  const role = ctx.Utils.Append_Str(job.role_titles, Work_Type_Label(ctx, job.work_type), " - ");
-  const summ = ctx.Utils.Append_Str(role, job.location, " - ");
-
-  item_elem.career_company_elem.textContent = job.company_name || "N/A";
-  item_elem.career_title_elem.textContent = summ || "N/A";
-  item_elem.career_time_elem.textContent = time_str || "N/A";
-  item_elem.career_tech_elem.textContent = job.tech || "N/A";
-  item_elem.career_resp_elem.innerHTML = Str_To_HTML(job.responsibilities || "N/A");
-  item_elem.career_proj_elem.innerHTML = Str_To_HTML(job.projects || "N/A");
-
-  item_elem.career_item_menu.addEventListener("edit", () => On_Click_Career_Edit(ctx, job_id));
-  item_elem.career_item_menu.addEventListener("delete", (e) => On_Click_Delete_Career(e, job_id, ctx));
-}
-
-async function On_Click_Career_Edit(ctx, id)
-{
-  const curr_job = await ctx.Profile.Job_Select_By_Id(ctx, id);
-  const form_data = await career_dialog.Show_Async(curr_job);
-  if (form_data)
-  {
-    form_data.id = id;
-    const is_saved = await ctx.Profile.Job_Save(ctx, form_data);
-    if (is_saved)
-    {
-      await Update_Career(ctx);
-      Alert("Job saved successfully.");
-    }
-    else
-    {
-      Alert("Failed to save job.");
-    }
-  }
-}
-
-async function On_Click_Delete_Career(e, id, ctx)
-{
-  const confirmed = await warning_dlg.Confirm("Are you sure you want to delete this job?");
-  if (confirmed)
-  {
-    const is_deleted = await ctx.Profile.Job_Delete(ctx, id);
-    if (is_deleted)
-    {
-      await Update_Career(ctx);
-      Alert("Job deleted successfully.");
-    }
-    else
-    {
-      Alert("Failed to delete job.");
-    }
-  }
-}
