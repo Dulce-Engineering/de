@@ -97,7 +97,7 @@ async function Test_New_Ctx()
     assert.ok(profiles_url.includes('page/profiles.html'));
 
     const profile_url = ctx.routes['profile'](25);
-    assert.ok(profile_url.includes('page/profile.html'));
+    assert.ok(profile_url.includes('page/profile/profile.html'));
     assert.ok(profile_url.includes('profile_id=25'));
 
     const index_url = ctx.routes['index']();
